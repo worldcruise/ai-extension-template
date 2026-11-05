@@ -1,152 +1,115 @@
 # AI Chrome Extension Template
 
-A docked Manifest V3 extension with a reusable agent shell: compact ChatGPT
-sign-in, account-provided Model and Thinking effort selectors, Previous/Next
-browser tab, editable Prompt and Input, Go/Cancel, and safely rendered Output.
-One status bar with a light and matching background sits directly beneath the
-existing Agent/Settings navigation. Copy and keyboard run are included.
+A minimal Manifest V3 extension that opens in Chrome's native side panel.
+It includes direct ChatGPT sign-in, account-provided Model and Thinking effort
+selectors, Previous/Next browser tab, editable Prompt and Input, Go/Cancel,
+safe Output with Copy, and one shared status bar beneath the navigation.
 
 ## Build and load
 
-Use Node 24. Runtime code has no third-party dependencies; Playwright is a test dependency.
-
-The extension and toolbar icons are included in `assets/` at 16, 32, 48, and
-128 px. Edit `assets/icon.svg` and regenerate them on Windows with
-`powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/build-icons.ps1`.
-Normal extension builds copy the existing icons and do not require this exporter.
+Use Node 24. There are no runtime dependencies; Playwright is for browser tests.
 
 ```powershell
 npm.cmd ci
 npm.cmd test
-npm.cmd run test:hosted
 npm.cmd run build
 ```
 
-Open `chrome://extensions`, enable Developer mode, choose **Load unpacked**, and select:
+Open `chrome://extensions`, enable **Developer mode**, select **Load unpacked**,
+and choose this repository's **`dist` folder**. In the current checkout that is:
 
 ```text
 C:\Users\Honey\Documents\dev\AI_Agent_Template\dist
 ```
 
-Click the extension's toolbar button from the browser window you want to navigate.
-It opens the agent in Chrome's native side panel, attached to that browser window.
-Chrome owns the dock and resize handle. The panel remains mounted when switching
-tabs; no separate popup window is created. Each browser window has its own panel
-view, with navigation scoped to that view's own browser window.
+Only `dist/` is needed to run the extension. Keep the source folders to customize
+and rebuild it. Reload the extension after rebuilding.
 
-Previous/Next wraps at the first/last browser tab. Both buttons are disabled for
-a single tab or an unavailable source window. A closed window is never silently
-replaced with another browser window. Navigation preserves prompt, input, model,
-effort, output, and pending inference while navigating. No page text, forms,
-titles, or URLs are captured, and no
-`tabs`, `activeTab`, scripting, or native-messaging permission is requested.
+Click its toolbar icon to open the dock in that browser window. Previous/Next
+wraps at the first/last tab, disables for one tab, and preserves the prompt,
+input, selections, output, and pending inference. Each window has its own panel;
+closing a window never redirects navigation to another one. No page content is
+captured, and no native messaging or application workflow is included.
 
-## Connect ChatGPT — reused feasibility flow
+## Sign in
 
-Reload the extension after updating, approve its updated permissions if Chrome
-asks, and choose **Sign in with ChatGPT**. Finish sign-in and plan consent in the
-authorization tab, then return to the dock. **No hosted-agent URL, server, Python
-process, or API key is required by this default adapter.** Settings only contains
-Reload models.
+Choose **Sign in with ChatGPT** and complete authorization and plan consent in
+the sign-in tab. No hosted-agent URL, backend server, API key, or Python process
+is required. Settings contains Reload models.
 
-`src/direct-oauth.mjs` reuses the browser-only authentication adapter from the
-ChatGPT feasibility check: fresh state, nonce and PKCE; the issued client ID;
-RS256 signature/JWKS/issuer/audience/expiry/account checks; and explicit
-`chatgpt.tokens.use.direct` permission. The exact loopback callback remains
-`http://127.0.0.1:1455/auth/callback`. Its temporary Chrome redirect rule applies
-only to that sign-in tab and sends the callback into packaged `auth-callback.html`.
-The rule is removed after completion, cancellation, timeout, or worker restart.
-The callback page clears its one-use code from browser history. This preserves
-the feasibility extension's callback handling; it is not a new provider endpoint.
+The direct adapter reuses the feasibility extension's state/nonce/PKCE,
+issued registration, RS256/JWKS identity verification, refresh, and revocation.
+The exact callback is `http://127.0.0.1:1455/auth/callback`; a temporary Chrome
+redirect rule, limited to the sign-in tab, sends it to packaged
+`auth-callback.html`. No local HTTP listener is needed. Rules are removed after
+completion, cancellation, timeout, and worker restart. The callback clears the
+one-use code from history.
 
-`src/direct-client.mjs` loads the signed-in account's visible catalog from the
-existing `/v1/models` endpoint and sends prompt/input to `/v1/responses` with
-`store:false` and `stream:true`. It keeps the completed-stream and refusal checks,
-including the feasibility fix that uses streamed deltas when final output is empty.
-It adds no candidate context or job-output schema to the generic template.
+Each installation stores only its non-secret host ID and issued client/verified
+subject mapping. Tokens remain in worker memory; prompts, input, output, and
+model preferences remain in page memory. Restarting the worker/browser may
+require signing in again. No credentials are copied from another app.
+Live access requires account eligibility and `chatgpt.tokens.use.direct` consent.
 
-This installation generates and retains its own non-secret host ID and issued
-client/verified-subject mapping under `chatgpt-agent.registration`. It does not
-copy another extension's credentials or the Python probe's registration. Sign
-in again in this template; the existing ChatGPT browser session may make that quick.
-Returning sign-in reuses this template's own issued registration and checks the
-selected identity before accepting credentials. Access/refresh tokens, account
-labels, prompt, input, output, and model preferences remain in worker/page memory.
-No provider credential is written to extension storage or included in diagnostics.
+The adapter fetches visible models and supported effort values from the account,
+then sends separate prompt/input to `/v1/responses` with `store:false` and
+`stream:true`. Unsupported effort is disabled and omitted. Requests are built
+after verifying identity and capabilities. Account scope uses verified stable
+identity, never a display name. Expiry clears identity, selections, output, and
+busy state; ordinary network failures/model-access 403s preserve the account.
+Cancel, editing, account/model changes, and sign-out invalidate stale work.
 
-The dock gets its own browser window ID from Chrome. Restarting the worker or
-browser may require sign-in again. Sign out attempts revocation and clears local
-credentials. Live account eligibility and plan consent are still required, but
-there is no hosted deployment prerequisite. The optional `hosted-agent/` reference
-and hosted transport remain available for future custom adapters; they are not
-used by the default extension.
+Official contracts: [sign-in](https://developers.openai.com/siwc/token-sharing-open-source/sign-in),
+[models and inference](https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference).
 
-Official references: [registration/sign-in](https://developers.openai.com/siwc/token-sharing-open-source/sign-in),
-[model discovery/inference](https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference).
+## Use for another app
 
-## Lifecycle and reuse
-
-Go and Ctrl/Cmd+Enter send prompt and input as separate fields through the adapter.
-Duplicate Go is disabled while running. Cancel stops waiting; late replies/errors
-cannot replace current state. Editing a field or changing model/effort invalidates
-old output and pending inference. Ordinary browser-tab navigation does not.
-
-401 and SESSION_EXPIRED during session checks, initial discovery, model reload,
-inference, or sign-out clear identity, models, effort, output, and busy state.
-Ordinary network failures and model-access 403s retain the verified account.
-Account switching compares stable backend account IDs, never display names.
-It discards old capabilities even when model IDs match, loads the new account's
-efforts, and requires another Go. Requests are constructed only after verification.
-Unsupported effort is disabled and omitted; values are never inferred from model names.
-
-The small extension-owned modules are:
-
-- `src/agent-shell.mjs` and CSS: reusable UI, one status surface, safe text rendering.
-- `src/controller.mjs`: session, capability, cancellation, and stale-response lifecycle.
-- `src/agent-definition.mjs`: default prompt, input/output labels, and field modes.
-- `src/extension.mjs`: composition root; replace its adapter for another AI or authenticated API.
-- `src/extension-adapter.mjs`, `direct-oauth.mjs`, `direct-client.mjs`, `response-stream.mjs`: the reused direct sign-in, account catalog, and inference transport.
-- `src/hosted-runtime.mjs`: shared account-scoped worker lifecycle, used with the direct client by default.
-- `src/browser-tabs.mjs`, `side-panel.mjs`, `service-worker.mjs`: docked launch, per-window navigation, and MV3 messages.
-
-Each prompt/input field supports `{value, label, editable, visible, required}`.
-Fixed fields use `editable:false`; hidden fields also use `visible:false`.
-They retain their values in requests. Definitions can supply `result.label`,
-`result.placeholder`, and an optional trusted `result.render(root, output)` DOM
-renderer. Provider/user content is always literal text in the default renderer.
-Use `modelSelection:false` for an authenticated API adapter with hidden model controls.
-No shell rewrite or UI framework is needed.
-
-| Adapter method | Contract |
+| Change | File |
 | --- | --- |
-| `getSession({signal?})` | `null` or `{authenticated:true,user:{id,name},expiresAt?}` from the verified backend; `id` is stable |
-| `signIn({signal})` | Complete the existing login; the controller rechecks the session |
-| `signOut({signal})` | Complete sign-out; failures preserve identity unless expired |
-| `getModels({signal,accountId})` | `[{id,label?,thinkingEfforts:[],defaultThinkingEffort?}]`; omitted for API agents |
-| `run({agentId,prompt,input,accountId,model?,thinkingEffort?,signal})` | A string, `{text}`, or `{data}` with JSON-serializable data |
+| Extension name, description, version, permissions | `manifest.json` |
+| Prompt, input, labels, output renderer | `src/agent-definition.mjs` |
+| Page title | `index.html` |
+| Initial authorization app-name hint | `src/direct-oauth.mjs` |
+| UI composition or replacement API adapter | `src/extension.mjs`, `src/extension-adapter.mjs` |
+| Worker transport | `src/direct-client.mjs`, `src/service-worker.mjs` |
+| Icon | `assets/icon.svg` and PNG exports |
 
-## Verification and explicit preview fixtures
+Keep `agent-shell.mjs`/CSS, `controller.mjs`, and `agent-runtime.mjs` as the shared
+UI/lifecycle shell. `browser-tabs.mjs` and `side-panel.mjs` own dock navigation.
+Prompt/input fields support `{value, label, editable, visible, required}`. Fixed
+fields use `editable:false`; hidden fields also use `visible:false`. Hidden
+fixed values still enter requests. Use `modelSelection:false` for an authenticated
+API agent without AI models. The default output renderer uses literal text;
+an optional trusted `result.render(root, output)` can render agent-specific DOM.
+
+Adapters implement `getSession`, `signIn`, `signOut`, `getModels` (AI only), and
+`run`. Sessions return `{authenticated:true,user:{id,name},expiresAt?}`; `id`
+must be stable and verified. Models return `{id,label?,thinkingEfforts:[],
+defaultThinkingEffort?}`. `run` receives `{agentId,prompt,input,accountId,model?,
+thinkingEffort?,signal}` and returns a string, `{text}`, or `{data}`. Preserve
+abort signals and account checks when replacing a transport. Any new network
+origin also needs explicit manifest host permissions and CSP configuration.
+
+PNG icons at 16/32/48/128 px are already included. On Windows regenerate them with:
 
 ```powershell
-npm.cmd run test:browser
-npm.cmd run build:preview
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/build-icons.ps1
 ```
 
-The browser suite loads the actual unpacked extension in isolated installed
-Chrome, with its MV3 CSP and external modules. Only provider network responses are
-mocked: the shipped sign-in tab, callback redirect rule/page, PKCE code exchange,
-RSA identity verification, direct models/Responses requests, and dock run for real
-inside the test profile. It does not use a signed-in user profile or call OpenAI.
-Results and screenshots are in ignored `artifacts/`;
-[VERIFICATION.md](VERIFICATION.md) records the checked behavior and remaining live gate.
+## Verification
 
-Native docking uses Chrome's [Side Panel API](https://developer.chrome.com/docs/extensions/reference/api/sidePanel).
-The manifest declares `sidePanel` permission and `side_panel.default_path`.
-Toolbar opening runs directly in its user gesture; no extra window is opened.
+`npm.cmd test` checks account/session lifecycle, cancellation, stale responses,
+same-name/model account switches, direct authentication/transport, navigation,
+icons, and extension builds from LF, CRLF, and mixed source files. Production
+pages use external modules under MV3 CSP; there is no standalone preview bundle.
 
-`preview.html` is an optional generated, self-contained sample fixture, using
-`examples/preview-adapter.mjs`. Its sign-in, models, and results are mock data,
-and browser-tab buttons are disabled. It makes no network requests. The Windows
-build regressions cover LF, CRLF, and mixed source files and parse the generated
-classic script. Preview code, samples, tests, and the hosted service are excluded
-from `dist/`; `index.html` always uses the real extension adapter.
+`npm.cmd run test:browser` uses isolated installed Chrome and the actual unpacked
+extension, including its native dock, real callback/PKCE/RS256 code, and CSP.
+Only provider network responses are mocked. It checks sign-in/out, model loading,
+expiry, account switching, Go/Cancel, Copy, tab navigation, one status bar, and
+320/390/800/1200 px layouts. Reports/screenshots are generated under ignored
+`artifacts/`; they are disposable. `node_modules/` can be recreated with `npm.cmd ci`.
+
+These automated checks do **not** establish live ChatGPT sign-in, entitlement,
+inference, or revocation. Sign in and run Go with your own account to verify live
+access. No hosted server configuration is required by the direct adapter.

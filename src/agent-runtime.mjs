@@ -3,7 +3,7 @@ import {ProtocolError as ContractError} from './protocol.mjs';
 
 // Worker-owned account scope; the injected transport owns credentials and only
 // verified public session/model/result data crosses the view boundary.
-export class HostedAgentRuntime {
+export class AgentRuntime {
   constructor(client, onInvalidate = () => {}) {
     this.client=client; this.onInvalidate=onInvalidate; this.session=null;
     this.catalog=[]; this.model=''; this.thinkingEffort=''; this.catalogAccountId=null;

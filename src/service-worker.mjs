@@ -1,5 +1,5 @@
 import { DirectClient } from './direct-client.mjs';
-import { HostedAgentRuntime } from './hosted-runtime.mjs';
+import { AgentRuntime } from './agent-runtime.mjs';
 import { BrowserTabs } from './browser-tabs.mjs';
 import { ProtocolError } from './protocol.mjs';
 import { installSidePanel, isAgentSender, panelWindow } from './side-panel.mjs';
@@ -7,7 +7,7 @@ import { installSidePanel, isAgentSender, panelWindow } from './side-panel.mjs';
 const pageUrl = chrome.runtime.getURL('index.html');
 const client = new DirectClient({ browser: chrome });
 const changed = () => chrome.runtime.sendMessage({ type: 'agent.changed' }).catch(() => {});
-const runtime = new HostedAgentRuntime(client, changed);
+const runtime = new AgentRuntime(client, changed);
 const contexts = () => chrome.runtime.getContexts({ contextTypes: ['TAB'], documentUrls: [pageUrl] });
 const navigation = new BrowserTabs(chrome, chrome.storage.session, async () => (await contexts()).map(context => context.tabId));
 const initialized = client.auth.ready;

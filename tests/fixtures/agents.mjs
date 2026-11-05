@@ -1,6 +1,4 @@
-import { defineAgent } from '../src/definition.mjs';
-
-export const chatgptTemplate = defineAgent({ id: 'chatgpt-template', title: 'AI agent template' });
+import { defineAgent } from '../../src/definition.mjs';
 
 export const fixedPromptAgent = defineAgent({
   id: 'fixed-prompt', title: 'Text summary',

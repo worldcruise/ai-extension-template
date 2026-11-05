@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {HostedAgentRuntime} from '../src/hosted-runtime.mjs';
-import {AgentClient} from '../src/hosted-client.mjs';
+import {AgentRuntime} from '../src/agent-runtime.mjs';
 const A={authenticated:true,user:{id:'A',name:'Same name'}},B={authenticated:true,user:{id:'B',name:'Same name'}};
 const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return {resolve,reject,promise};};
 function setup(){
@@ -10,7 +9,7 @@ function setup(){
     requests.push({path,body});if(path==='/v1/models')return hooks.models?hooks.models():{accountId:session.user.id,models:[{slug:'same-model',thinkingEfforts:session===A?['high']:['medium']}]};
     return hooks.run?hooks.run():{data:{valid:true}};
   },async disconnect(){if(hooks.disconnect)return hooks.disconnect();session=null;return {};}};
-  const runtime=new HostedAgentRuntime(client,()=>++invalidations);
+  const runtime=new AgentRuntime(client,()=>++invalidations);
   return {runtime,client,hooks,requests,setSession(value){session=value;},get invalidations(){return invalidations;}};
 }
 test('worker refuses inference when the verified account changes, including identical names/model IDs',async()=>{
@@ -52,19 +51,6 @@ test('periodic status checks coalesce with inference verification without cancel
   const f=setup();await f.runtime.models('A');const pending=deferred();f.client.status=()=>pending.promise;
   const a=f.runtime.verify(),b=f.runtime.verify();pending.resolve({signedIn:true,session:A});await Promise.all([a,b]);
   const c=f.runtime.request('/v1/run',{accountId:'A',model:'same-model'}),d=f.runtime.verify();await Promise.all([c,d]);
-});
-for(const response of [()=>new Response('not JSON',{status:401}),()=>Response.json({schemaVersion:1,report:{error:{code:'SESSION_EXPIRED'}}}),()=>Response.json({schemaVersion:1,report:{error:{code:'authentication_error'},response_diagnostics:{http_status:401}}})])test('HTTPS auth errors clear RAM even for malformed bodies or HTTP 200 envelopes',async()=>{
-  const client=new AgentClient({browser:{},baseUrl:'https://agent.test',fetchImpl:async()=>response()});client.token='a'.repeat(43);
-  await assert.rejects(client.request('/v1/models'),error=>error.status===401);assert.equal(client.token,null);
-});
-test('late HTTPS 401 from a superseded token cannot sign out B',async()=>{
-  const pending=deferred(),client=new AgentClient({browser:{},baseUrl:'https://agent.test',fetchImpl:()=>pending.promise});client.token='a'.repeat(43);
-  const old=client.request('/v1/models');client.configure('https://agent.test');client.token='b'.repeat(43);
-  pending.resolve(new Response('',{status:401}));await assert.rejects(old,{code:'cancelled'});assert.equal(client.token,'b'.repeat(43));
-});
-for(const failure of ['network','403'])test(`sign-out ${failure} preserves the current account token`,async()=>{
-  const client=new AgentClient({browser:{},baseUrl:'https://agent.test',fetchImpl:async()=>{if(failure==='network')throw new Error();return Response.json({schemaVersion:1,error:{code:'model_access_denied'}},{status:403});}});client.token='a'.repeat(43);
-  await assert.rejects(client.disconnect());assert.equal(client.token,'a'.repeat(43));
 });
 test('successful disconnect does not reuse a status check made with the old credential generation',async()=>{
   const f=setup();await f.runtime.models('A');

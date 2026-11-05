@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { AgentController } from '../src/controller.mjs';
 import { defineAgent, formatResult } from '../src/definition.mjs';
-import { apiResultAgent, fixedPromptAgent, fixedInputAgent } from '../examples/agents.mjs';
+import { apiResultAgent, fixedPromptAgent, fixedInputAgent } from './fixtures/agents.mjs';
 
 const account = { authenticated: true, user: { id: 'one', name: 'Test account' } };
 const modelList = [

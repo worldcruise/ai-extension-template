@@ -5,10 +5,8 @@
   "type": "module",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
-    "test:hosted": "node --test hosted-agent/tests/*.test.mjs",
     "test:browser": "node tests/chrome.mjs",
-    "build": "node scripts/build-extension.mjs",
-    "build:preview": "node scripts/build-preview.mjs"
+    "build": "node scripts/build-extension.mjs"
   },
   "engines": {"node": ">=24 <25"},
   "devDependencies": {"@playwright/test": "1.64.1"}

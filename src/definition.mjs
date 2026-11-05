@@ -5,7 +5,6 @@ export function defineAgent(overrides = {}) {
     title: 'AI agent template',
     provider: 'ChatGPT',
     modelSelection: true,
-    preview: false,
     ...overrides,
     prompt: {
       label: 'Prompt template',

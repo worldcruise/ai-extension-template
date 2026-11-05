@@ -2,7 +2,6 @@ node_modules/
 dist/
 artifacts/
 test-results/
-hosted-agent/data/
 .env
 .env.local
 .env.production

@@ -119,7 +119,7 @@ try {
    await authPage.getByRole('link',{name:'Approve test sign-in'}).click();await expect(authPage.locator('#callback-status')).toContainText('Connected to ChatGPT');
    assert.equal(new URL(authPage.url()).search,'');await authPage.close();
   }
-  await expect(status).toContainText('Sign in');await expect(el('connection-form')).toBeHidden();
+  await expect(status).toContainText('Sign in');await expect(page.locator('[data-el="connection-form"]')).toHaveCount(0);
   // The actual browser authorization tab, redirect rule, packaged callback, code exchange and JWT verification all run.
   const canceled=context.waitForEvent('page');await el('signin').click();const canceledPage=await canceled;await canceledPage.getByRole('link',{name:'Approve test sign-in'}).waitFor();await canceledPage.close();
   await expect(status).toContainText('canceled');await expect(el('signin')).toBeEnabled();

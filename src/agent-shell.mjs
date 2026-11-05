@@ -1,7 +1,7 @@
 import { AgentController } from './controller.mjs';
 
 let nextId = 0;
-export function mountAgent(root, { definition, adapter, navigation, connection, clipboard = globalThis.navigator?.clipboard }) {
+export function mountAgent(root, { definition, adapter, navigation, clipboard = globalThis.navigator?.clipboard }) {
   const controller = new AgentController({ definition, adapter });
   const uid = `ai-agent-${++nextId}`, doc = root.ownerDocument, events = new AbortController();
   const on = (node, event, handler) => node.addEventListener(event, handler, { signal: events.signal });
@@ -24,7 +24,7 @@ export function mountAgent(root, { definition, adapter, navigation, connection, 
       <section class="agent-panel result-panel" aria-labelledby="${uid}-result-label"><div class="result-heading"><h2 id="${uid}-result-label" data-el="result-label"></h2><button type="button" data-el="copy" disabled>Copy</button></div><p class="result-placeholder" data-el="result-empty"></p><div data-el="custom-result" hidden></div><pre data-el="result" tabindex="0" hidden></pre></section>
     </section>
     <section id="${uid}-settings" role="tabpanel" aria-labelledby="${uid}-settings-tab" data-panel="settings" class="agent-settings" hidden>
-      <h2>Settings</h2><form data-el="connection-form" novalidate><label for="${uid}-url">Hosted agent HTTPS origin</label><div class="connection-row"><input type="url" id="${uid}-url" data-el="url" placeholder="https://your-agent.example" autocomplete="off" required><button type="submit" data-el="save">Save</button></div></form>
+      <h2>Settings</h2>
       <button type="button" data-el="reload-models">Reload models</button>
     </section>`;
   const el = Object.fromEntries([...root.querySelectorAll('[data-el]')].map(node => [node.dataset.el, node]));
@@ -53,7 +53,7 @@ export function mountAgent(root, { definition, adapter, navigation, connection, 
   controller.subscribe(state => {
     const d = state.definition, account = state.session?.user, authBusy = Boolean(state.busy && state.busy !== 'running');
     el.signin.hidden = Boolean(account); el.signin.disabled = authBusy;
-    el.signin.textContent = d.preview ? 'Preview sign in' : `Sign in with ${d.provider}`;
+    el.signin.textContent = `Sign in with ${d.provider}`;
     el.account.hidden = !account; el.account.textContent = account ? `${account.name} · ${account.id.slice(-8)}` : '';
     el.signout.hidden = !account; el.signout.disabled = authBusy; el.selectors.hidden = !d.modelSelection;
     options(el.model, state.models.map(model => ({ value: model.id, label: model.label })), state.model, account ? 'No models available' : 'Sign in to select');
@@ -61,7 +61,7 @@ export function mountAgent(root, { definition, adapter, navigation, connection, 
     options(el.effort, (model?.thinkingEfforts || []).map(value => ({ value, label: value })), state.thinkingEffort, 'Not available');
     el.model.disabled = authBusy || !state.models.length; el.effort.disabled = authBusy || !model?.thinkingEfforts.length;
     el.status.dataset.tone = state.status.tone;
-    el['status-message'].textContent = `${d.preview ? 'Preview only · ' : ''}${state.status.message}${d.preview ? ' No live connection.' : ''}`;
+    el['status-message'].textContent = state.status.message;
     el.title.textContent = d.title;
     for (const field of ['prompt', 'input']) {
       el[`${field}-panel`].hidden = !d[field].visible; el[`${field}-label`].textContent = d[field].label;
@@ -75,13 +75,6 @@ export function mountAgent(root, { definition, adapter, navigation, connection, 
     el.copy.disabled = state.result === null || Boolean(state.busy); el.go.disabled = !controller.ready; el.cancel.hidden = state.busy !== 'running';
     el['reload-models'].hidden = !d.modelSelection; el['reload-models'].disabled = !account || Boolean(state.busy);
     root.querySelector('.result-panel').setAttribute('aria-busy', String(state.busy === 'running'));
-  });
-  el['connection-form'].hidden = !connection;
-  on(el['connection-form'], 'submit', async event => {
-    event.preventDefault(); if (!connection) return; el.save.disabled = true;
-    try { await connection.save(el.url.value, controller); }
-    catch (error) { controller.status('error', error?.message || 'Could not configure the hosted agent.'); }
-    finally { if (controller.alive) el.save.disabled = false; }
   });
   on(el.signin, 'click', () => controller.signIn()); on(el.signout, 'click', () => controller.signOut());
   on(el.model, 'change', () => controller.setModel(el.model.value)); on(el.effort, 'change', () => controller.setEffort(el.effort.value));
@@ -105,6 +98,6 @@ export function mountAgent(root, { definition, adapter, navigation, connection, 
     await refreshNavigation();
   });
   const ready = controller.start(); void refreshNavigation();
-  return { controller, ready, refreshNavigation, setConnectionUrl(value) { if (doc.activeElement !== el.url) el.url.value = value; },
+  return { controller, ready, refreshNavigation,
     destroy() { ++navigationEpoch; events.abort(); controller.destroy(); root.replaceChildren(); root.classList.remove('ai-agent'); } };
 }

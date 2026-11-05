@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { DirectClient } from '../src/direct-client.mjs';
-import { HostedAgentRuntime } from '../src/hosted-runtime.mjs';
+import { AgentRuntime } from '../src/agent-runtime.mjs';
 
 const credentials=(id='A')=>({clientId:'issued-'+id,subjectHash:'verified-subject-'+id,displayName:'Same name',accessToken:'PRIVATE_ACCESS_'+id,refreshToken:'PRIVATE_REFRESH_'+id,identityVerified:true,scope:'openid chatgpt.tokens.use.direct',expiresAt:Date.now()+3600000});
 function setup(){
@@ -27,7 +27,7 @@ test('direct inference reuses Responses with separate prompt/input and supported
   assert.equal(Object.hasOwn(JSON.parse(f.calls.at(-1).options.body),'reasoning'),false);
 });
 test('direct identity and efforts are scoped by verified subject/client, not display names or model IDs',async()=>{
-  const f=setup(),runtime=new HostedAgentRuntime(f.client);const a=await f.client.status();await runtime.models(a.session.user.id);
+  const f=setup(),runtime=new AgentRuntime(f.client);const a=await f.client.status();await runtime.models(a.session.user.id);
   f.auth.credentials=credentials('B');const b=await f.client.status();assert.notEqual(b.session.user.id,a.session.user.id);
   await runtime.models(b.session.user.id);assert.deepEqual(runtime.catalog[0].thinkingEfforts,['medium']);
   await assert.rejects(runtime.request('/v1/run',{accountId:a.session.user.id,model:'same',thinkingEffort:'high',prompt:'Prompt',input:'Input'}),{code:'account_changed'});

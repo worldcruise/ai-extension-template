@@ -1,4 +1,4 @@
-const CODES = new Set(['agent_connection_error','agent_authentication_required','hosted_deployment_not_configured','hosted_plan_registration_required','invalid_agent_response','request_in_progress','invalid_json','extension_connection_unavailable', 'extension_context_required', 'authorization_cancelled', 'authorization_timeout',
+const CODES = new Set(['agent_connection_error','agent_authentication_required','invalid_agent_response','request_in_progress','invalid_json','extension_connection_unavailable', 'extension_context_required', 'authorization_cancelled', 'authorization_timeout',
   'authorization_failed', 'callback_invalid', 'callback_setup_failed', 'state_mismatch', 'duplicate_callback_parameter',
   'missing_authorization_code', 'missing_issued_client_id', 'client_id_mismatch', 'invalid_client', 'unauthorized_client',
   'invalid_grant', 'invalid_scope', 'invalid_request', 'access_denied', 'chatgpt_plan_scope_not_granted',

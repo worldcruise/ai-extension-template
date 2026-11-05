@@ -1,7 +1,6 @@
 import {isSessionExpired} from './controller.mjs';
 
 const messages={
-  invalid_agent_url:'Enter an HTTPS origin without credentials, a path, query parameters, or a fragment.',
   invalid_agent_identity:'ChatGPT did not return a valid verified account identity.',
   agent_connection_error:'The ChatGPT connection could not be reached. Your account selection is retained.',
   provider_connection_error:'The provider could not be reached. Try again when the connection recovers.',
@@ -67,4 +66,3 @@ export function extensionAdapter() {
       agentId,prompt,input,model,accountId,...(thinkingEffort?{thinkingEffort}:{})},signal),
   };
 }
-export const hostedAdapter=extensionAdapter;
