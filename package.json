@@ -1,0 +1,11 @@
+{
+  "name": "application-tracker-ai-agent-template",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/controller.test.mjs",
+    "preview": "python3 -m http.server 8080 --bind 127.0.0.1",
+    "build:preview": "node scripts/build-preview.mjs"
+  }
+}

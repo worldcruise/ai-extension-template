@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI agent template · Application Tracker</title>
+  <style>
+.at-agent {
+  box-sizing: border-box;
+  color-scheme: light dark;
+  --ag-bg: light-dark(#f5f7fa, #11161e);
+  --ag-panel: light-dark(#ffffff, #191f29);
+  --ag-editor: light-dark(#fbfcfe, #141b25);
+  --ag-ink: light-dark(#1a273b, #e6ecf4);
+  --ag-muted: light-dark(#617087, #9eacc0);
+  --ag-line: light-dark(#dce3ed, #303b4c);
+  --ag-accent: light-dark(#2b60d3, #8cafff);
+  --ag-primary: light-dark(#2b60d3, #80a6ff);
+  --ag-primary-ink: light-dark(#ffffff, #0f2349);
+  --ag-focus: light-dark(#3069dc, #a6c2ff);
+  font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ag-ink);
+  background: var(--ag-bg);
+  border: 1px solid var(--ag-line);
+  border-radius: 16px;
+  overflow: clip;
+  width: 100%;
+  min-width: 0;
+  container-type: inline-size;
+}
+.at-agent *, .at-agent *::before, .at-agent *::after { box-sizing: border-box; }
+.at-agent [hidden] { display: none !important; }
+.at-agent button, .at-agent input, .at-agent select, .at-agent textarea { font: inherit; color: inherit; }
+.at-agent button { cursor: pointer; }
+.at-agent button:disabled { opacity: .5; cursor: default; }
+.at-agent :is(button, select, textarea, input, pre):focus-visible { outline: 3px solid var(--ag-focus); outline-offset: 3px; }
+.at-agent .agent-topbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px; padding: 18px 24px; background: var(--ag-panel); }
+.at-agent .agent-account { display: flex; align-items: center; gap: 10px; min-width: 0; max-width: 100%; }
+.at-agent .agent-signin { display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 9px 14px; border: 1px solid var(--ag-line); border-radius: 9px; background: var(--ag-panel); font-weight: 600; }
+.at-agent .agent-signin:hover { background: var(--ag-bg); }
+.at-agent .account-mark { width: 20px; height: 20px; border-radius: 6px; background: var(--ag-ink); color: var(--ag-panel); display: grid; place-items: center; }
+.at-agent .account-name { max-width: min(360px, 54cqw); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.at-agent .agent-text-button { background: transparent; border: 0; padding: 6px 3px; color: var(--ag-muted); font-size: 12px; white-space: nowrap; }
+.at-agent .agent-text-button:hover { color: var(--ag-accent); }
+.at-agent .agent-selectors { display: flex; gap: 12px; min-width: 0; max-width: 100%; }
+.at-agent .compact-picker { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 9px; font-size: 12px; color: var(--ag-muted); min-width: 0; }
+.at-agent .compact-picker select { width: 156px; max-width: 100%; height: 36px; border: 1px solid var(--ag-line); border-radius: 7px; background: var(--ag-panel); padding: 0 25px 0 10px; color: var(--ag-ink); font-size: 12px; text-overflow: ellipsis; }
+.at-agent .effort-picker select { width: 108px; }
+.at-agent .agent-tabs { display: flex; gap: 22px; padding: 0 24px; border-bottom: 1px solid var(--ag-line); background: var(--ag-panel); }
+.at-agent .agent-tabs button { padding: 11px 0 12px; border: 0; border-bottom: 2px solid transparent; color: var(--ag-muted); background: transparent; font-size: 13px; }
+.at-agent .agent-tabs button[aria-selected='true'] { color: var(--ag-accent); border-bottom-color: var(--ag-accent); font-weight: 600; }
+.at-agent .agent-status { --status-ink: light-dark(#53647c, #b1c1d7); --status-bg: light-dark(#eef2f7, #202b3b); display: flex; gap: 9px; align-items: center; padding: 11px 24px; min-height: 44px; background: var(--status-bg); color: var(--status-ink); font-size: 12px; overflow-wrap: anywhere; }
+.at-agent .agent-status[data-tone='success'] { --status-ink: light-dark(#19664d, #97ddbe); --status-bg: light-dark(#eaf6f0, #18352c); }
+.at-agent .agent-status[data-tone='busy'] { --status-ink: light-dark(#285ab4, #b1cdff); --status-bg: light-dark(#eaf1ff, #202f49); }
+.at-agent .agent-status[data-tone='warning'] { --status-ink: light-dark(#805312, #f5d09b); --status-bg: light-dark(#fff5e4, #3c2d18); }
+.at-agent .agent-status[data-tone='error'] { --status-ink: light-dark(#a32f3d, #ffb9c2); --status-bg: light-dark(#ffedef, #42242c); }
+.at-agent .status-light { width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 12%, transparent); }
+.at-agent .agent-status[data-tone='busy'] .status-light { animation: agent-pulse 1.3s ease-in-out infinite; }
+.at-agent .agent-workspace, .at-agent .agent-settings { padding: 25px 24px 24px; }
+.at-agent .agent-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 21px; }
+.at-agent .agent-eyebrow { color: var(--ag-muted); font-size: 10px; letter-spacing: 1.8px; font-weight: 600; margin: 0 0 5px; }
+.at-agent h1 { margin: 0; font-size: 22px; line-height: 1.3; letter-spacing: -.6px; font-weight: 600; overflow-wrap: anywhere; }
+.at-agent .agent-version { font-size: 10px; letter-spacing: 1px; color: var(--ag-muted); white-space: nowrap; padding: 5px 9px; border: 1px solid var(--ag-line); border-radius: 5px; }
+.at-agent .agent-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: stretch; }
+.at-agent .agent-inputs { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.at-agent .agent-panel { min-width: 0; border: 1px solid var(--ag-line); border-radius: 11px; overflow: clip; background: var(--ag-panel); }
+.at-agent .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; min-height: 51px; border-bottom: 1px solid var(--ag-line); }
+.at-agent .panel-heading :is(label, h2) { margin: 0; font-size: 13px; font-weight: 600; }
+.at-agent .field-mode { color: var(--ag-muted); font-size: 10px; letter-spacing: 1px; }
+.at-agent textarea { display: block; width: 100%; min-height: 168px; resize: vertical; border: 0; background: var(--ag-editor); padding: 16px; font: 12px/1.8 ui-monospace, 'Cascadia Code', Consolas, monospace; border-radius: 0 0 10px 10px; }
+.at-agent textarea:read-only { color: var(--ag-muted); }
+.at-agent .input-panel textarea { min-height: 158px; }
+.at-agent textarea::placeholder { color: var(--ag-muted); opacity: 1; }
+.at-agent .agent-runbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.at-agent .keyboard-hint { font-size: 11px; color: var(--ag-muted); }
+.at-agent .agent-runbar > div { display: flex; gap: 9px; margin-left: auto; }
+.at-agent .agent-go, .at-agent .agent-secondary { border: 1px solid transparent; border-radius: 8px; padding: 9px 16px; font-size: 13px; font-weight: 600; min-height: 39px; }
+.at-agent .agent-go { background: var(--ag-primary); color: var(--ag-primary-ink); }
+.at-agent .agent-go > span { margin-left: 18px; }
+.at-agent .agent-go:hover:not(:disabled) { filter: brightness(.94); }
+.at-agent .agent-secondary { background: var(--ag-panel); border-color: var(--ag-line); }
+.at-agent .result-panel { display: flex; flex-direction: column; min-height: 300px; }
+.at-agent .result-body { flex: 1; min-height: 0; display: flex; }
+.at-agent .result-placeholder { align-self: center; text-align: center; width: 100%; color: var(--ag-muted); padding: 40px 20px; margin: 0; font-size: 13px; }
+.at-agent .result-body pre { width: 100%; max-height: 580px; overflow: auto; padding: 19px; margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 12px/1.85 ui-monospace, 'Cascadia Code', Consolas, monospace; }
+.at-agent .settings-form { max-width: 690px; padding: 24px; }
+.at-agent .settings-form label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; }
+.at-agent .settings-form :is(input, select) { width: 100%; min-width: 0; background: var(--ag-editor); border: 1px solid var(--ag-line); border-radius: 7px; padding: 10px 12px; }
+.at-agent .settings-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 22px; }
+.at-agent .settings-help { font-size: 12px; color: var(--ag-muted); margin: 20px 0; }
+.at-agent .settings-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+@container (max-width: 740px) {
+  .at-agent .agent-grid { grid-template-columns: minmax(0, 1fr); }
+  .at-agent .agent-topbar { gap: 15px; }
+  .at-agent .agent-selectors { margin-left: auto; }
+  .at-agent .result-panel { min-height: 260px; }
+}
+@container (max-width: 500px) {
+  .at-agent .agent-topbar { padding: 16px; }
+  .at-agent .agent-selectors { width: 100%; margin-left: 0; }
+  .at-agent .compact-picker { display: flex; flex: 1; flex-direction: column; align-items: stretch; gap: 5px; }
+  .at-agent .compact-picker select { width: 100%; }
+  .at-agent .agent-tabs { padding: 0 16px; }
+  .at-agent .agent-status { padding: 11px 16px; }
+  .at-agent .agent-workspace, .at-agent .agent-settings { padding: 22px 16px 16px; }
+  .at-agent .agent-version { display: none; }
+  .at-agent .settings-columns { grid-template-columns: 1fr; gap: 18px; }
+  .at-agent .settings-form { padding: 18px; }
+}
+@media (prefers-reduced-motion: reduce) { .at-agent .status-light { animation: none !important; } }
+@keyframes agent-pulse { 50% { opacity: .35; } }
+
+</style>
+  <style>
+    :root { color-scheme: light dark; background: light-dark(#edf1f7, #0d1118); }
+    body { margin: 0; padding: 32px; }
+    main { width: min(1140px, 100%); margin: 0 auto; }
+    @media (max-width: 600px) { body { padding: 10px; } }
+  </style>
+</head>
+<body><main id="agent" aria-label="AI agent template"></main><script>
+// Every agent shares this shell; change its definition and adapter, not its UI.
+function defineAgent(overrides = {}) {
+  const agent = {
+    id: 'chatgpt-template',
+    title: 'AI agent template',
+    provider: 'ChatGPT',
+    modelSelection: true,
+    preview: false,
+    ...overrides,
+    prompt: {
+      label: 'Prompt template',
+      value: 'Use the test input to complete the requested task.\nBe clear, accurate, and concise.\nUse only the information provided.',
+      editable: true,
+      visible: true,
+      required: true,
+      ...overrides.prompt,
+    },
+    input: {
+      label: 'Test input',
+      value: '',
+      placeholder: 'Paste the information you want to test…',
+      editable: true,
+      visible: true,
+      required: true,
+      ...overrides.input,
+    },
+    result: {
+      label: 'Result',
+      placeholder: 'Your result will appear here.',
+      ...overrides.result,
+    },
+  };
+  if (!agent.id || !agent.title) throw new TypeError('An agent needs an id and title.');
+  for (const key of ['prompt', 'input']) {
+    if (typeof agent[key].value !== 'string') throw new TypeError(`${key}.value must be a string.`);
+    if (!agent[key].visible && agent[key].editable) {
+      throw new TypeError(`Hidden ${key} must be fixed (editable: false).`);
+    }
+  }
+  return agent;
+}
+
+function formatResult(result) {
+  if (typeof result === 'string') return result;
+  if (result && typeof result.text === 'string') return result.text;
+  if (result && Object.hasOwn(result, 'data')) {
+    const serialized = JSON.stringify(result.data, null, 2);
+    if (typeof serialized === 'string') return serialized;
+  }
+  throw new TypeError('The agent must return a string, { text }, or { data }.');
+}
+
+
+function verifiedSession(value, now) {
+  if (!value || value.authenticated !== true || typeof value.user?.name !== 'string' || !value.user.name.trim()) return null;
+  if (value.expiresAt != null) {
+    const expiry = typeof value.expiresAt === 'number' ? value.expiresAt : Date.parse(value.expiresAt);
+    if (!Number.isFinite(expiry) || expiry <= now) return null;
+  }
+  return value;
+}
+
+function normalizeModels(values) {
+  if (!Array.isArray(values)) throw new TypeError('Model list is unavailable.');
+  const ids = new Set();
+  return values.map(model => {
+    if (!model?.id || typeof model.id !== 'string' || ids.has(model.id)) {
+      throw new TypeError('Models must have unique string ids.');
+    }
+    ids.add(model.id);
+    const efforts = [...new Set(model.thinkingEfforts ?? [])];
+    if (efforts.some(value => typeof value !== 'string' || !value)) {
+      throw new TypeError('Thinking efforts must be nonempty strings.');
+    }
+    return { ...model, label: model.label || model.id, thinkingEfforts: efforts };
+  });
+}
+
+class AgentController {
+  constructor({ definition, adapter, now = Date.now }) {
+    for (const method of ['getSession', 'signIn', 'signOut', 'run']) {
+      if (typeof adapter?.[method] !== 'function') throw new TypeError(`Adapter needs ${method}().`);
+    }
+    this.adapter = adapter;
+    this.now = now;
+    this.listeners = new Set();
+    this.authEpoch = 0;
+    this.runEpoch = 0;
+    this.alive = true;
+    this.state = {
+      definition: defineAgent(definition),
+      session: null,
+      models: [],
+      model: '',
+      thinkingEffort: '',
+      busy: 'checking',
+      result: null,
+      status: { tone: 'busy', message: 'Checking sign-in…' },
+    };
+  }
+
+  subscribe(listener) {
+    this.listeners.add(listener);
+    listener(this.state);
+    return () => this.listeners.delete(listener);
+  }
+
+  emit() { if (this.alive) for (const listener of this.listeners) listener(this.state); }
+
+  status(tone, message) {
+    this.state.status = { tone, message };
+    this.emit();
+  }
+
+  get ready() {
+    const s = this.state;
+    return this.alive && !s.busy && Boolean(s.session) &&
+      (!s.definition.modelSelection || Boolean(s.model));
+  }
+
+  async start() { await this.authenticate(false); }
+
+  async signIn() {
+    if (this.state.busy && this.state.busy !== 'running') return;
+    await this.authenticate(true);
+  }
+
+  async authenticate(connect) {
+    const epoch = ++this.authEpoch;
+    this.invalidateRun();
+    this.authAbort?.abort();
+    const abort = this.authAbort = new AbortController();
+    this.state.busy = connect ? 'signing-in' : 'checking';
+    this.status('busy', connect ? 'Completing sign-in…' : 'Checking sign-in…');
+    try {
+      if (connect) await this.adapter.signIn({ signal: abort.signal });
+      // Opening/closing a login window is not evidence of a successful sign-in.
+      const session = verifiedSession(await this.adapter.getSession({ signal: abort.signal }), this.now());
+      if (!this.alive || epoch !== this.authEpoch) return;
+      this.state.session = session;
+      this.state.models = [];
+      this.state.model = '';
+      this.state.thinkingEffort = '';
+      if (!session) {
+        this.state.busy = null;
+        this.status(connect ? 'warning' : 'neutral', connect
+          ? 'Sign-in was not completed. Try again.'
+          : 'Sign in to test your agent.');
+        return;
+      }
+      await this.loadModels(abort.signal);
+      if (!this.alive || epoch !== this.authEpoch) return;
+      this.state.busy = null;
+      const hasModels = !this.state.definition.modelSelection || this.state.models.length > 0;
+      this.status(hasModels ? 'success' : 'warning', hasModels
+        ? `Signed in as ${session.user.name}. Ready to test.`
+        : 'Signed in, but no models are available. Use Reload models in Settings.');
+    } catch (error) {
+      if (!this.alive || epoch !== this.authEpoch) return;
+      this.state.busy = null;
+      this.status('error', error?.message || 'Sign-in could not be checked. Try again.');
+    }
+  }
+
+  async loadModels(signal) {
+    if (!this.state.definition.modelSelection) return;
+    if (typeof this.adapter.getModels !== 'function') throw new TypeError('Adapter needs getModels().');
+    const models = normalizeModels(await this.adapter.getModels({ signal }));
+    if (signal?.aborted || !this.alive) return;
+    this.state.models = models;
+    this.state.model = models.some(model => model.id === this.state.model) ? this.state.model : models[0]?.id || '';
+    this.chooseEffort();
+  }
+
+  async reloadModels() {
+    if (!this.state.session || this.state.busy) return;
+    this.state.busy = 'models';
+    this.invalidateRun();
+    this.status('busy', 'Loading available models…');
+    const epoch = this.authEpoch;
+    try {
+      await this.loadModels(this.authAbort?.signal);
+      if (!this.alive || epoch !== this.authEpoch) return;
+      this.state.busy = null;
+      this.status(this.state.models.length ? 'success' : 'warning', this.state.models.length
+        ? 'Models updated. Ready to test.' : 'No models are available for this account.');
+    } catch (error) {
+      if (!this.alive || epoch !== this.authEpoch) return;
+      this.state.busy = null;
+      this.status('error', error?.message || 'Could not load models.');
+    }
+  }
+
+  chooseEffort() {
+    const model = this.state.models.find(model => model.id === this.state.model);
+    const efforts = model?.thinkingEfforts || [];
+    this.state.thinkingEffort = efforts.includes(this.state.thinkingEffort) ? this.state.thinkingEffort
+      : efforts.includes(model?.defaultThinkingEffort) ? model.defaultThinkingEffort : efforts[0] || '';
+  }
+
+  setModel(id) {
+    if (!this.state.models.some(model => model.id === id) || this.state.model === id) return;
+    this.state.model = id;
+    this.chooseEffort();
+    this.changed('Model changed.');
+  }
+
+  setEffort(value) {
+    const model = this.state.models.find(model => model.id === this.state.model);
+    if (!model?.thinkingEfforts.includes(value) || value === this.state.thinkingEffort) return;
+    this.state.thinkingEffort = value;
+    this.changed('Thinking effort changed.');
+  }
+
+  setValue(field, value) {
+    if (!['prompt', 'input'].includes(field) || !this.state.definition[field].editable) return;
+    if (this.state.definition[field].value === value) return;
+    this.state.definition = defineAgent({ ...this.state.definition,
+      [field]: { ...this.state.definition[field], value } });
+    this.changed(`${this.state.definition[field].label} changed.`);
+  }
+
+  configure({ title, promptMode, inputMode }) {
+    if (this.state.busy && this.state.busy !== 'running') return;
+    const modes = { editable: { editable: true, visible: true },
+      fixed: { editable: false, visible: true }, hidden: { editable: false, visible: false } };
+    if (!title?.trim() || !modes[promptMode] || !modes[inputMode]) {
+      this.status('error', 'Enter a template name and choose valid field modes.');
+      return false;
+    }
+    for (const [key, mode] of [['prompt', promptMode], ['input', inputMode]]) {
+      if (mode !== 'editable' && this.state.definition[key].required && !this.state.definition[key].value.trim()) {
+        this.status('warning', `Add ${this.state.definition[key].label.toLowerCase()} before making it fixed or hidden.`);
+        return false;
+      }
+    }
+    this.state.definition = defineAgent({ ...this.state.definition, title: title.trim(),
+      prompt: { ...this.state.definition.prompt, ...modes[promptMode] },
+      input: { ...this.state.definition.input, ...modes[inputMode] } });
+    this.changed('Template updated for this session.');
+    return true;
+  }
+
+  changed(message) {
+    const stale = this.state.result !== null || this.state.busy === 'running';
+    this.invalidateRun();
+    if (stale) this.status('warning', `${message} Run again for a current result.`);
+    else if (!this.state.busy) this.status('neutral',
+      this.state.session ? message : `${message} Sign in to test.`);
+    else this.emit();
+  }
+
+  invalidateRun() {
+    ++this.runEpoch;
+    this.runAbort?.abort();
+    this.runAbort = null;
+    this.state.result = null;
+    if (this.state.busy === 'running') this.state.busy = null;
+  }
+
+  cancel() {
+    if (this.state.busy !== 'running') return;
+    this.invalidateRun();
+    this.status('warning', 'Test canceled. Ready to try again.');
+  }
+
+  async run() {
+    if (!this.ready) {
+      if (!this.state.busy) this.status('warning', this.state.session
+        ? 'Choose an available model first.' : 'Sign in before running a test.');
+      return;
+    }
+    const d = this.state.definition;
+    for (const field of ['prompt', 'input']) {
+      if (d[field].required && !d[field].value.trim()) {
+        this.status('warning', `Add ${d[field].label.toLowerCase()} before running a test.`);
+        return;
+      }
+    }
+    this.invalidateRun();
+    const epoch = this.runEpoch;
+    const abort = this.runAbort = new AbortController();
+    const request = { agentId: d.id, prompt: d.prompt.value, input: d.input.value, signal: abort.signal };
+    if (d.modelSelection) {
+      request.model = this.state.model;
+      if (this.state.thinkingEffort) request.thinkingEffort = this.state.thinkingEffort;
+    }
+    this.state.busy = 'running';
+    this.status('busy', 'Running your test…');
+    try {
+      const session = verifiedSession(await this.adapter.getSession({ signal: abort.signal }), this.now());
+      if (!this.alive || epoch !== this.runEpoch) return;
+      if (!session) {
+        this.state.session = null;
+        this.state.models = [];
+        this.state.model = '';
+        this.state.thinkingEffort = '';
+        this.state.busy = null;
+        this.status('warning', 'Your session expired. Sign in again to test.');
+        return;
+      }
+      this.state.session = session;
+      const result = await this.adapter.run(request);
+      if (!this.alive || epoch !== this.runEpoch || abort.signal.aborted) return;
+      this.state.result = formatResult(result);
+      this.state.busy = null;
+      this.status('success', 'Test complete. Your result is ready.');
+    } catch (error) {
+      if (!this.alive || epoch !== this.runEpoch) return;
+      this.state.busy = null;
+      if (error?.status === 401 || error?.code === 'SESSION_EXPIRED') {
+        this.state.session = null;
+        this.state.models = [];
+        this.state.model = '';
+        this.state.thinkingEffort = '';
+        this.status('warning', 'Your session expired. Sign in again to test.');
+      } else this.status('error', error?.message || 'The test failed. Try again.');
+    }
+  }
+
+  async signOut() {
+    if (!this.state.session || (this.state.busy && this.state.busy !== 'running')) return;
+    ++this.authEpoch;
+    this.invalidateRun();
+    this.state.busy = 'signing-out';
+    this.status('busy', 'Signing out…');
+    try {
+      await this.adapter.signOut();
+      const session = verifiedSession(await this.adapter.getSession({}), this.now());
+      if (!this.alive) return;
+      this.state.session = session;
+      this.state.busy = null;
+      if (session) this.status('error', 'Sign-out was not completed. Try again.');
+      else {
+        this.state.models = [];
+        this.state.model = '';
+        this.state.thinkingEffort = '';
+        this.status('neutral', 'Signed out. Sign in to test your agent.');
+      }
+    } catch (error) {
+      if (!this.alive) return;
+      this.state.busy = null;
+      this.status('error', error?.message || 'Could not sign out. Try again.');
+    }
+  }
+
+  destroy() {
+    this.alive = false;
+    ++this.authEpoch;
+    this.invalidateRun();
+    this.authAbort?.abort();
+    this.listeners.clear();
+  }
+}
+
+
+const mode = field => !field.visible ? 'hidden' : field.editable ? 'editable' : 'fixed';
+const friendly = text => text.charAt(0).toUpperCase() + text.slice(1);
+let nextId = 0;
+
+function mountAgent(root, { definition, adapter, clipboard = globalThis.navigator?.clipboard }) {
+  const controller = new AgentController({ definition, adapter });
+  const uid = `at-agent-${++nextId}`;
+  root.classList.add('at-agent');
+  // Only static markup is inserted as HTML. All provider and user text uses textContent/value.
+  root.innerHTML = `
+    <header class="agent-topbar">
+      <div class="agent-account">
+        <button type="button" class="agent-signin" data-el="signin"><span class="account-mark" aria-hidden="true">↗</span><span data-el="signin-label"></span></button>
+        <span class="account-name" data-el="account" hidden></span>
+        <button type="button" class="agent-text-button" data-el="signout" hidden>Sign out</button>
+      </div>
+      <div class="agent-selectors" data-el="selectors">
+        <label class="compact-picker" for="${uid}-model"><span>Model</span><select id="${uid}-model" data-el="model"></select></label>
+        <label class="compact-picker effort-picker" for="${uid}-effort"><span>Thinking effort</span><select id="${uid}-effort" data-el="effort"></select></label>
+      </div>
+    </header>
+    <nav class="agent-tabs" role="tablist" aria-label="Agent workspace">
+      <button type="button" id="${uid}-agent-tab" role="tab" aria-selected="true" aria-controls="${uid}-workspace" data-tab="workspace">Agent</button>
+      <button type="button" id="${uid}-settings-tab" role="tab" aria-selected="false" aria-controls="${uid}-settings" tabindex="-1" data-tab="settings">Settings</button>
+    </nav>
+    <div class="agent-status" data-el="status" data-tone="busy" role="status" aria-live="polite" aria-atomic="true">
+      <span class="status-light" aria-hidden="true"></span><span data-el="status-message"></span>
+    </div>
+    <section id="${uid}-workspace" class="agent-workspace" role="tabpanel" aria-labelledby="${uid}-agent-tab" data-panel="workspace">
+      <div class="agent-heading"><div><p class="agent-eyebrow">APPLICATION TRACKER</p><h1 data-el="title"></h1></div><span class="agent-version">BASE TEMPLATE</span></div>
+      <div class="agent-grid">
+        <div class="agent-inputs">
+          <section class="agent-panel prompt-panel" data-el="prompt-panel">
+            <div class="panel-heading"><label for="${uid}-prompt" data-el="prompt-label"></label><span class="field-mode" data-el="prompt-mode"></span></div>
+            <textarea id="${uid}-prompt" data-el="prompt" spellcheck="false"></textarea>
+          </section>
+          <section class="agent-panel input-panel" data-el="input-panel">
+            <div class="panel-heading"><label for="${uid}-input" data-el="input-label"></label><span class="field-mode" data-el="input-mode"></span></div>
+            <textarea id="${uid}-input" data-el="input" spellcheck="false"></textarea>
+          </section>
+          <div class="agent-runbar"><span class="keyboard-hint">Ctrl / ⌘ + Enter to run</span><div><button type="button" class="agent-secondary" data-el="cancel" hidden>Cancel</button><button type="button" class="agent-go" data-el="go">Go <span aria-hidden="true">↗</span></button></div></div>
+        </div>
+        <section class="agent-panel result-panel" aria-labelledby="${uid}-result-heading">
+          <div class="panel-heading"><h2 id="${uid}-result-heading" data-el="result-label"></h2><button type="button" class="agent-text-button" data-el="copy" disabled>Copy result</button></div>
+          <div class="result-body"><p class="result-placeholder" data-el="result-empty"></p><pre data-el="result" tabindex="0" hidden></pre></div>
+        </section>
+      </div>
+    </section>
+    <section id="${uid}-settings" class="agent-settings" role="tabpanel" aria-labelledby="${uid}-settings-tab" data-panel="settings" hidden>
+      <div class="agent-heading"><div><p class="agent-eyebrow">REUSABLE BASELINE</p><h1>Template settings</h1></div></div>
+      <form class="agent-panel settings-form" data-el="settings-form" novalidate>
+        <label for="${uid}-title">Template name</label><input id="${uid}-title" data-el="settings-title" maxlength="100" required>
+        <div class="settings-columns">
+          <div><label for="${uid}-prompt-mode">Prompt template</label><select id="${uid}-prompt-mode" data-el="settings-prompt"><option value="editable">Editable</option><option value="fixed">Fixed · read only</option><option value="hidden">Fixed · hidden</option></select></div>
+          <div><label for="${uid}-input-mode">Test input</label><select id="${uid}-input-mode" data-el="settings-input"><option value="editable">Editable</option><option value="fixed">Fixed · read only</option><option value="hidden">Fixed · hidden</option></select></div>
+        </div>
+        <p class="settings-help">Fixed fields use their current value. Changes apply to this session.</p>
+        <div class="settings-actions"><button type="submit" class="agent-go">Apply changes</button><button type="button" class="agent-secondary" data-el="reload-models">Reload models</button></div>
+      </form>
+    </section>`;
+
+  const el = Object.fromEntries([...root.querySelectorAll('[data-el]')].map(node => [node.dataset.el, node]));
+  const tabs = [...root.querySelectorAll('[data-tab]')];
+  const panels = [...root.querySelectorAll('[data-panel]')];
+  const events = new AbortController();
+  const on = (node, event, fn) => node.addEventListener(event, fn, { signal: events.signal });
+  const options = (select, values, selected, empty) => {
+    const items = values.length ? values : [{ value: '', label: empty }];
+    const signature = JSON.stringify(items);
+    if (select.dataset.options !== signature) {
+      select.replaceChildren(...items.map(item => {
+        const option = document.createElement('option');
+        option.value = item.value;
+        option.textContent = item.label;
+        return option;
+      }));
+      select.dataset.options = signature;
+    }
+    select.value = selected;
+  };
+  const syncSettings = () => {
+    const d = controller.state.definition;
+    el['settings-title'].value = d.title;
+    el['settings-prompt'].value = mode(d.prompt);
+    el['settings-input'].value = mode(d.input);
+  };
+  const selectTab = name => {
+    for (const tab of tabs) {
+      const selected = tab.dataset.tab === name;
+      tab.setAttribute('aria-selected', String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+    }
+    for (const panel of panels) panel.hidden = panel.dataset.panel !== name;
+    if (name === 'settings') syncSettings();
+  };
+  for (const tab of tabs) {
+    on(tab, 'click', () => selectTab(tab.dataset.tab));
+    on(tab, 'keydown', event => {
+      const index = tabs.indexOf(tab);
+      const target = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1
+        : event.key === 'ArrowRight' ? (index + 1) % tabs.length
+        : event.key === 'ArrowLeft' ? (index + tabs.length - 1) % tabs.length : -1;
+      if (target >= 0) {
+        event.preventDefault();
+        selectTab(tabs[target].dataset.tab);
+        tabs[target].focus();
+      }
+    });
+  }
+
+  controller.subscribe(state => {
+    const d = state.definition;
+    const account = state.session?.user.name;
+    const authBusy = Boolean(state.busy && state.busy !== 'running');
+    el.signin.hidden = Boolean(account);
+    el.signin.disabled = authBusy;
+    el['signin-label'].textContent = d.preview ? 'Preview sign in' : `Sign in with ${d.provider}`;
+    el.account.hidden = !account;
+    el.account.textContent = account || '';
+    el.signout.hidden = !account;
+    el.signout.disabled = authBusy;
+    el.selectors.hidden = !d.modelSelection;
+    options(el.model, state.models.map(model => ({ value: model.id, label: model.label })), state.model,
+      account ? 'No models available' : 'Sign in to select');
+    const model = state.models.find(model => model.id === state.model);
+    options(el.effort, (model?.thinkingEfforts || []).map(value => ({ value, label: friendly(value) })),
+      state.thinkingEffort, model ? 'Not available' : '—');
+    el.model.disabled = authBusy || state.models.length === 0;
+    el.effort.disabled = authBusy || !model?.thinkingEfforts.length;
+    el.status.dataset.tone = state.status.tone;
+    el['status-message'].textContent = `${d.preview ? 'Preview only · ' : ''}${state.status.message}${d.preview ? ' No live connection.' : ''}`;
+    el.title.textContent = d.title;
+    for (const field of ['prompt', 'input']) {
+      el[`${field}-panel`].hidden = !d[field].visible;
+      el[`${field}-label`].textContent = d[field].label;
+      el[field].readOnly = !d[field].editable;
+      el[field].placeholder = d[field].placeholder || '';
+      if (el[field].value !== d[field].value) el[field].value = d[field].value;
+      el[`${field}-mode`].textContent = d[field].editable ? '' : 'FIXED';
+    }
+    el['result-label'].textContent = d.result.label;
+    el['result-empty'].textContent = d.result.placeholder;
+    el['result-empty'].hidden = state.result !== null;
+    el.result.hidden = state.result === null;
+    el.result.textContent = state.result ?? '';
+    el.copy.disabled = state.result === null || state.busy === 'running';
+    el.go.disabled = !controller.ready;
+    el.cancel.hidden = state.busy !== 'running';
+    el['reload-models'].hidden = !d.modelSelection;
+    el['reload-models'].disabled = !account || Boolean(state.busy);
+    root.querySelector('.result-panel').setAttribute('aria-busy', String(state.busy === 'running'));
+  });
+  syncSettings();
+  on(el.signin, 'click', () => controller.signIn());
+  on(el.signout, 'click', () => controller.signOut());
+  on(el.model, 'change', () => controller.setModel(el.model.value));
+  on(el.effort, 'change', () => controller.setEffort(el.effort.value));
+  on(el.prompt, 'input', () => controller.setValue('prompt', el.prompt.value));
+  on(el.input, 'input', () => controller.setValue('input', el.input.value));
+  on(el.go, 'click', () => controller.run());
+  on(el.cancel, 'click', () => controller.cancel());
+  on(el['reload-models'], 'click', () => controller.reloadModels());
+  on(el.copy, 'click', async () => {
+    const result = controller.state.result;
+    const epoch = controller.runEpoch;
+    try {
+      if (!clipboard?.writeText) throw new Error('Copy is unavailable here. Select the result text to copy it.');
+      await clipboard.writeText(result);
+      if (controller.alive && epoch === controller.runEpoch) controller.status('success', 'Result copied.');
+    } catch (error) {
+      if (controller.alive && epoch === controller.runEpoch) controller.status('error', error?.message || 'Could not copy the result.');
+    }
+  });
+  on(el['settings-form'], 'submit', event => {
+    event.preventDefault();
+    if (controller.configure({ title: el['settings-title'].value,
+      promptMode: el['settings-prompt'].value, inputMode: el['settings-input'].value })) selectTab('workspace');
+  });
+  on(root, 'keydown', event => {
+    if (event.key === 'Enter' && (event.ctrlKey || event.metaKey) && !panels[0].hidden) {
+      event.preventDefault();
+      if (controller.ready) controller.run();
+    }
+  });
+  const ready = controller.start();
+  return { controller, ready, destroy() { events.abort(); controller.destroy(); root.replaceChildren(); root.classList.remove('at-agent'); } };
+}
+
+function delay(ms, signal) {
+  return new Promise((resolve, reject) => {
+    const abort = () => { clearTimeout(timer); reject(new DOMException('Canceled', 'AbortError')); };
+    const timer = setTimeout(() => { signal?.removeEventListener('abort', abort); resolve(); }, ms);
+    if (signal?.aborted) abort();
+    else signal?.addEventListener('abort', abort, { once: true });
+  });
+}
+
+// UI fixture only. No network calls, credentials, live models, or AI inference.
+function createPreviewAdapter({ latency = 650 } = {}) {
+  let signedIn = false;
+  return {
+    async getSession() {
+      return signedIn ? { authenticated: true, user: { id: 'preview', name: 'Preview account' } } : null;
+    },
+    async signIn({ signal } = {}) { await delay(220, signal); signedIn = true; },
+    async signOut() { signedIn = false; },
+    async getModels() {
+      return [
+        { id: 'sample-reasoning', label: 'Sample reasoning model', thinkingEfforts: ['low', 'medium', 'high'], defaultThinkingEffort: 'medium' },
+        { id: 'sample-standard', label: 'Sample standard model', thinkingEfforts: [] },
+      ];
+    },
+    async run({ prompt, input, model, thinkingEffort, signal }) {
+      await delay(latency, signal);
+      return { text: [
+        'SAMPLE RESULT · UI PREVIEW', '',
+        'This is a local sample response. No information was sent to ChatGPT or an API.', '',
+        'Prompt template:', prompt, '', 'Test input:', input,
+        ...(model ? ['', `Selected model: ${model}`, ...(thinkingEffort ? [`Thinking effort: ${thinkingEffort}`] : [])] : []),
+      ].join('\n') };
+    },
+  };
+}
+
+
+const chatgptTemplate = defineAgent({ id: 'chatgpt-template', title: 'AI agent template' });
+
+const fixedPromptAgent = defineAgent({
+  id: 'job-summary', title: 'Job summary',
+  prompt: { value: 'Summarize the supplied job description using only its stated requirements.', editable: false },
+  input: { label: 'Job description' },
+});
+
+const fixedInputAgent = defineAgent({
+  id: 'profile-review', title: 'Profile review',
+  input: { value: 'Sample profile for a UI demonstration.', editable: false, visible: false },
+});
+
+// An authenticated API may return { data } directly. No AI model selector is needed.
+const apiResultAgent = defineAgent({
+  id: 'api-result', title: 'API lookup', provider: 'your service', modelSelection: false,
+  prompt: { value: '', editable: false, visible: false, required: false },
+  input: { label: 'Lookup input', placeholder: 'Enter the value to look up…' },
+});
+
+
+mountAgent(document.querySelector('#agent'), {
+  definition: { ...chatgptTemplate, preview: true, input: { ...chatgptTemplate.input,
+    value: 'Summarize this role in three points:\nSenior engineer · remote · product development and cross-team collaboration.' } },
+  adapter: createPreviewAdapter(),
+});
+
+</script></body>
+</html>
