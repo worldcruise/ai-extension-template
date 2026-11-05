@@ -3,14 +3,14 @@ import { defineAgent } from '../src/definition.mjs';
 export const chatgptTemplate = defineAgent({ id: 'chatgpt-template', title: 'AI agent template' });
 
 export const fixedPromptAgent = defineAgent({
-  id: 'job-summary', title: 'Job summary',
-  prompt: { value: 'Summarize the supplied job description using only its stated requirements.', editable: false },
-  input: { label: 'Job description' },
+  id: 'fixed-prompt', title: 'Text summary',
+  prompt: { value: 'Summarize the supplied text using only the information it contains.', editable: false },
+  input: { label: 'Text to summarize' },
 });
 
 export const fixedInputAgent = defineAgent({
-  id: 'profile-review', title: 'Profile review',
-  input: { value: 'Sample profile for a UI demonstration.', editable: false, visible: false },
+  id: 'fixed-input', title: 'Fixed input example',
+  input: { value: 'Sample text for a UI demonstration.', editable: false, visible: false },
 });
 
 // An authenticated API may return { data } directly. No AI model selector is needed.

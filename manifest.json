@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "AI Agent Template",
+  "version": "0.2.0",
+  "description": "A docked AI agent side panel with account models, prompt, input, output, and browser-tab navigation.",
+  "minimum_chrome_version": "116",
+  "permissions": ["storage", "sidePanel", "declarativeNetRequestWithHostAccess", "alarms"],
+  "host_permissions": ["https://api.openai.com/*", "https://auth.openai.com/*", "http://127.0.0.1/*"],
+  "web_accessible_resources": [{"resources":["auth-callback.html"],"matches":["http://127.0.0.1/*","https://auth.openai.com/*"]}],
+  "icons": {"16":"assets/icon-16.png","32":"assets/icon-32.png","48":"assets/icon-48.png","128":"assets/icon-128.png"},
+  "action": {"default_title": "Open AI agent", "default_icon":{"16":"assets/icon-16.png","32":"assets/icon-32.png","48":"assets/icon-48.png","128":"assets/icon-128.png"}},
+  "side_panel": {"default_path": "index.html"},
+  "background": {"service_worker": "src/service-worker.mjs", "type": "module"},
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self' https://api.openai.com https://auth.openai.com; object-src 'none'; base-uri 'none'"
+  }
+}

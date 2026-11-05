@@ -1,30 +1,85 @@
 # Verification
 
-Verified on November 5, 2026.
+Verified November 5, 2026 with Node 24.22.0 and Chrome 156.0.8078.80.
 
 ## Passed
 
-`node --test tests/controller.test.mjs`: **20 passed, 0 failed**.
+- `npm.cmd test`: **111 passed, 0 failed**.
+- `npm.cmd run test:hosted`: **13 passed, 0 failed**.
+- `npm.cmd run build`: production MV3 extension created at `dist/`.
+- `npm.cmd run build:preview`: explicit standalone sample rebuilt successfully.
+- JavaScript syntax checks and `git diff --check`.
+- `npm.cmd run test:browser`: actual unpacked extension, external module scripts,
+  production CSP, isolated installed Chrome, and the shipped direct ChatGPT
+  authentication/inference adapter with provider network responses mocked.
 
-The tests cover verified/canceled/failed sign-in, dynamic models and effort support, separate prompt/input payloads, stale-response rejection, cancellation, session expiry, sign-out (including failure), fixed/hidden fields, validation, provider failures, structured API results, and teardown.
+The direct adapter reuses the original browser-only feasibility extension's
+registration, authorization tab, exact loopback callback, temporary redirect
+rule, PKCE, RS256/JWKS verification, refresh, revocation, models, and Responses
+contracts. The browser suite exercises these paths with generated test identities;
+it does not substitute a mock UI adapter. It also checks canceled sign-in and
+retry, callback query cleanup, registration reuse, rule cleanup, and that tokens
+never enter extension storage or page content.
 
-`node scripts/build-preview.mjs`: standalone preview generated successfully. JavaScript syntax checks and static standalone dependency checks pass.
+The browser suite checks compact sign-in/out and models, safe literal output,
+separate prompt/input, unsupported effort omission, identical-name/model account
+switches with different efforts, another Go after switching, cancellation,
+duplicate Go, edits/stale replies, copying, initial/reload/inference expiry, model
+403 retention, one status bar beneath navigation, keyboard tabs, dark appearance,
+reduced motion, and 320/390/800/1200px layouts with scrolling. It asserts no runtime
+errors or CSP violations and no persistence of drafts, results, or credentials.
 
-## Not verified
+Native docking is verified in actual Chrome: toolbar click creates a `SIDE_PANEL`
+context with no popup window. Direct CDP interaction checks the native panel's
+Go/output, navigation during inference, retained input/output, and persistent
+document across tab navigation. A second browser window opens its own panel;
+navigation remains scoped to each panel's window and single-tab controls disable.
+The full widget/lifecycle suite runs on the same packaged extension page in a
+regular tab under its real CSP, because Playwright does not expose Chrome's
+native side-panel target as a Page. The native-panel checks use that actual
+target through CDP rather than substituting a webpage for the dock.
 
-The optional Playwright browser suite could not run because this environment has no installed Chromium executable. The available remote browser could not open the local preview within its access rules. Responsive layout, visual appearance, clipboard access, and full browser interaction therefore remain unverified here. The included `tests/browser.test.mjs` checks these flows at widths from 320px to 1440px when Playwright/Chromium are available.
+Navigation uses actual Chrome tabs/windows. Tests exercise first/last wrapping,
+single-tab handling, and retained prompt, input, model, effort, output, and pending
+inference. Unit tests also cover closed-window handling without retargeting,
+serialized rapid navigation, and excluding extension tabs without browsing-history access.
 
-No live ChatGPT login, OAuth callback, model discovery, or inference was tested. The current hosted agent and extension source were not included among the attachments. The supplied preview intentionally uses sample data and performs no network requests.
+Controller/worker tests retain expiry coverage for all lifecycle phases, account
+scope, late authentication/model/inference failures after switching, cancellation
+slot release, and ordinary network/403 retention. A regression covers sign-out
+overlapping an older status check made with previous credentials, plus sign-out
+overlapping another dock observing locally cleared direct credentials. Direct
+transport tests cover refresh network/403 retention, 401 expiry and explicit
+SESSION_EXPIRED envelopes (including HTTP 200/403 and streamed errors), account scope,
+and late status/401 responses after switching or signing out. Dock regressions
+cover shared model loads and concurrent sign-in/session checks without canceling
+another panel's verified account. Hosted tests
+cover protected credentials, PKCE/identity verification, generic prompt/input
+forwarding, completed streaming, HTTP/CORS boundaries, identity binding,
+deduplication, and slow-response expiry envelopes.
 
-## Manual acceptance
+Windows preview tests build from LF, CRLF, and mixed source files, assert no
+leftover module imports/exports or external script references, and parse the
+generated classic script. Extension build tests verify that production bundles
+exclude fixtures, optional hosted code, and test-only host permissions.
 
-1. Open `preview.html` in a current Chrome/Edge browser.
-2. Confirm Sign in is at the top left, with only Model and Thinking effort on the right.
-3. Choose Preview sign in. Confirm the account name appears and the shared status row changes to success.
-4. Select a sample model and effort, edit prompt/input, and choose Go. Confirm the sample result appears.
-5. Edit an input while running; confirm the old test is canceled and its late result never appears.
-6. Select the standard sample model; confirm effort becomes unavailable.
-7. Use Settings to make populated fields fixed or hidden, then apply. Confirm these fields retain their values.
-8. Confirm status messages appear only beneath the tabs and pair readable text with a light and background color.
-9. Test a narrow window, keyboard navigation, Copy result, dark appearance, and sign-out.
-10. After integration, repeat with the actual agent's verified session, supported models, expiry, connection failures, and real result contract.
+Evidence: `artifacts/chrome-results.json`, `artifacts/extension-docked.png`,
+`artifacts/extension.png`, and `artifacts/extension-dark.png`. The report explicitly records
+`mode: mock_direct_chatgpt`, `liveAuthentication: false`, `providerInference: false`.
+The browser suite uses the production manifest and restores the production bundle
+after testing; fixture endpoints are never added to it.
+
+## Not verified live
+
+No live ChatGPT sign-in, model/effort entitlement discovery, provider inference,
+or remote revocation was attempted in this template. The original feasibility
+extension was previously reported working with the user's account; that does
+not establish live verification of this new extension installation.
+
+There is no hosted-agent configuration prerequisite in the default extension.
+Reload `dist/`, approve updated Chrome permissions if prompted, and sign in in
+this template to establish its own issued registration. Live access still
+depends on account eligibility and consent for `chatgpt.tokens.use.direct`.
+No credentials or issued registration from another installation were copied.
+The optional generic hosted adapter remains an unused reference and has not
+been deployed; its separate setup requirements do not block the default adapter.
