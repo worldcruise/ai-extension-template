@@ -1,0 +1,24 @@
+* { box-sizing: border-box; }
+body { margin: 0; padding: 40px 20px; background: #f5f6fa; color: #252338; font: 16px/1.6 system-ui, sans-serif; }
+main { max-width: 840px; margin: 0 auto; padding: 44px 52px; border: 1px solid #e4e1f1; border-radius: 22px; background: white; box-shadow: 0 16px 60px #3123570a; }
+header { display: flex; gap: 12px; align-items: center; font-weight: 700; }
+.brand-name { font-size: 32px; line-height: 1.2; }
+.version { margin-left: auto; color: #6c637b; font-size: 13px; font-weight: 400; }
+.eyebrow { margin: 40px 0 12px; color: #6452ca; font-weight: 650; }
+h1 { margin: 0 0 22px; font-size: clamp(30px, 5vw, 48px); line-height: 1.15; letter-spacing: -1.5px; }
+h1 span { color: #6554d4; }
+.intro { font-size: 19px; color: #514b62; }
+.benefit { margin: 28px 0; padding: 22px; border-radius: 12px; background: #f1efff; }
+p { margin: 10px 0; }
+.styles { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 24px 0; }
+h2 { font-size: 16px; margin: 0 0 8px; }
+.styles p { font-size: 15px; color: #514b62; }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+button { padding: 13px 20px; font: inherit; font-weight: 600; border: 1px solid #6554d4; border-radius: 8px; color: white; background: #6554d4; cursor: pointer; }
+button:hover:not(:disabled) { background: #5140be; }
+button.secondary { background: white; color: #514b62; border-color: #c8c3d4; }
+button.secondary:hover:not(:disabled) { background: #f5f6fa; }
+button:disabled { opacity: .55; cursor: default; }
+button:focus-visible { outline: 3px solid #b7aaff; outline-offset: 3px; }
+#status { min-height: 26px; margin-top: 18px; color: #514b62; }
+@media (max-width: 600px) { body { padding: 16px; } main { padding: 26px; } .styles { grid-template-columns: 1fr; gap: 16px; } }

@@ -3,5 +3,5 @@ dist/
 artifacts/
 test-results/
 .env
-.env.local
-.env.production
+.env.*
+!.env.example

@@ -1,19 +1,47 @@
-import { cp, mkdir, rm, readFile, writeFile } from 'node:fs/promises';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { cp, mkdir, mkdtemp, rename, rm } from 'node:fs/promises';
+import { resolve, join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { resumeTemplates } from '../src/resume-templates.mjs';
 
-export async function buildExtension(base = fileURLToPath(new URL('../', import.meta.url))) {
-  base = resolve(base);
-  const dist = resolve(base, 'dist');
-  if (dirname(dist) !== base) throw new Error('Invalid extension build destination.');
-  const manifest = JSON.parse(await readFile(resolve(base, 'manifest.json'), 'utf8'));
-  await readFile(resolve(base, 'index.html'));
-  await rm(dist, { recursive: true, force: true });
-  await mkdir(dist, { recursive: true });
-  for (const name of ['index.html', 'auth-callback.html', 'src', 'assets']) await cp(resolve(base, name), resolve(dist, name), { recursive: true });
-  await writeFile(resolve(dist, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
-  return dist;
+export const root = fileURLToPath(new URL('../', import.meta.url));
+export const extensionFiles = [
+  'manifest.json', 'index.html',
+  'src/sidebar.css', 'src/sidebar.mjs', 'src/sidebar-protocol.mjs',
+  'src/workspace.mjs', 'src/studio.mjs', 'src/studio-examples.mjs', 'src/icons.mjs',
+  'src/browser-tabs.mjs',
+  'src/chat-toolbar.mjs',
+  'src/company-chats.mjs',
+  'src/resume-templates.mjs',
+  'src/keyword-matcher.js', 'src/job-page-highlighter.js', 'src/page-highlights.mjs', 'src/keyword-settings.mjs',
+  'src/job-highlights.css',
+  'src/service-worker.mjs', 'src/chatgpt-frame.js',
+  'assets/icon-16.png', 'assets/icon-32.png', 'assets/icon-48.png', 'assets/icon-128.png',
+  ...resumeTemplates.map(template => template.thumbnail)
+];
+
+export async function buildExtension() {
+  const outputRoot = join(root, 'dist');
+  const output = join(outputRoot, 'extension');
+  await mkdir(outputRoot, { recursive: true });
+  const staging = await mkdtemp(join(outputRoot, '.extension-'));
+  try {
+    for (const file of extensionFiles) {
+      const target = join(staging, file);
+      await mkdir(resolve(target, '..'), { recursive: true });
+      await cp(join(root, file), target);
+    }
+    if (dirname(resolve(output)) !== resolve(outputRoot) || dirname(resolve(staging)) !== resolve(outputRoot)) {
+      throw new Error('Build paths must stay inside the project dist directory.');
+    }
+    await rm(output, { recursive: true, force: true });
+    await rename(staging, output);
+    return output;
+  } finally {
+    if (dirname(resolve(staging)) !== resolve(outputRoot)) throw new Error('Unexpected build staging path.');
+    await rm(staging, { recursive: true, force: true });
+  }
 }
-if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
-  console.log('Built extension:', await buildExtension());
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  console.log(`Extension built: ${await buildExtension()}`);
 }

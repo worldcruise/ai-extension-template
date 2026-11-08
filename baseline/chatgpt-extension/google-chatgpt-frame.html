@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT for Google</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #ffffff;
+            color: #3c4043;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            background: #f9f9f9;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #202124;
+        }
+        
+        .logo svg {
+            width: 20px;
+            height: 20px;
+            color: #10a37f;
+        }
+        
+        .stop-btn {
+            padding: 6px 14px;
+            background: #ea4335;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: none;
+        }
+        
+        .stop-btn:hover {
+            background: #d33426;
+        }
+
+        .settings-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #d2d6dc;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #5f6368;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+
+        .settings-btn:hover {
+            background: #eef2ff;
+            color: #374151;
+        }
+        
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            overflow-wrap: break-word; /* The standard property */
+        }
+        
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #5f6368;
+        }
+        
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #e0e0e0;
+            border-top-color: #10a37f;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .response {
+            display: none;
+        }
+        
+        .response.active {
+            display: block;
+        }
+        
+        .response p {
+            margin: 0 0 10px 0;
+        }
+        
+        .response ul, .response ol {
+            margin: 0 0 10px 0;
+            padding-left: 20px;
+        }
+        
+        .response li {
+            margin-bottom: 6px;
+        }
+        
+        .response code {
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+        }
+        
+        .response pre {
+            background: #f1f3f4;
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        .response pre code {
+            background: none;
+            padding: 0;
+        }
+        
+        .error {
+            padding: 14px;
+            background: transparent;
+            border: none;
+            border-radius: 14px;
+            color: #102033;
+            font-size: 13px;
+            display: none;
+            box-shadow: none;
+        }
+        
+        .error a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+        
+        .error a:hover {
+            text-decoration: underline;
+        }
+        
+        .limit-error-content {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .limit-error-content strong {
+            color: #009f75;
+            font-size: 15px;
+            font-weight: 750;
+        }
+        
+        .limit-error-content .limit-reset {
+            margin: 8px 0 12px 0;
+            font-size: 12px;
+            color: #536176;
+        }
+        
+        .limit-upgrade-btn {
+            align-self: flex-start;
+            margin-top: 8px;
+            background: #0f172a;
+            color: #ffffff;
+            border: none;
+            border-radius: 9px;
+            padding: 9px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.16);
+            transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+        }
+        
+        .limit-upgrade-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 22px rgba(15, 23, 42, 0.18);
+            filter: brightness(1.03);
+        }
+
+        .limit-upgrade-btn.secondary {
+            background: #b9dc7f;
+            color: #07111f;
+            box-shadow: 0 8px 18px rgba(126, 172, 64, 0.22);
+        }
+        
+        #stopBtn{
+            display: none !important;
+        }
+    
+        .header{background:#fff;border-bottom:1px solid #e5eee9;padding:14px 16px}
+        .content{padding:16px 18px;background:linear-gradient(#fbfffd,#fff)}
+        .response{font-size:14px;line-height:1.65;color:#26372f}
+        .response p{margin:0 0 12px}.response ul,.response ol{padding-left:22px;margin:10px 0 16px}
+        .response li{padding-left:3px;margin:6px 0}.response h2,.response h3,.response h4{color:#087b58;margin:18px 0 9px;font-size:16px;line-height:1.4}
+        .response h1{font-size:22px;line-height:1.3;margin:8px 0 14px;font-weight:700}
+        .response .sideai-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px;margin:14px 0 18px}
+        .response .sideai-facts>div{padding:10px 12px;border:1px solid #dce8e0;border-radius:9px;background:#f3f9f6}
+        .response .sideai-facts dt{font-size:12px;color:#587166;margin:0 0 4px}
+        .response .sideai-facts dd{font-size:18px;font-weight:650;line-height:1.3;margin:0;overflow-wrap:anywhere}
+        .response a{color:#067854;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+        .response img{display:block;max-width:100%;height:auto;border-radius:10px;margin:12px 0}
+        .response .sideai-image-placeholder{height:106px;margin:0 0 14px;border-radius:9px;background:#eef6f2}
+        .content{min-height:0;scrollbar-gutter:stable;overflow-anchor:none}
+        .header{flex-shrink:0}
+        .response .sideai-image-strip{display:flex;gap:8px;max-width:100%;margin:0 0 14px;padding:2px 2px 8px;overflow-x:auto;overflow-y:clip;overscroll-behavior-inline:contain;scroll-snap-type:inline proximity;scrollbar-width:thin;scrollbar-color:#9bcfbd transparent}
+        .response .sideai-image-strip::-webkit-scrollbar{height:6px}
+        .response .sideai-image-strip::-webkit-scrollbar-track{background:transparent}
+        .response .sideai-image-strip::-webkit-scrollbar-thumb{background:#9bcfbd;border-radius:999px}
+        .response .sideai-image-strip>a{display:block;flex:0 0 clamp(138px,42%,176px);min-width:0;border-radius:9px;scroll-snap-align:start;text-decoration:none}
+        .response .sideai-image-strip>a:focus-visible{outline:2px solid #00a579;outline-offset:2px}
+        .response .sideai-image-strip img{display:block;width:100%;height:96px;max-height:96px;margin:0;border:1px solid #d8e7e0;border-radius:9px;object-fit:cover;background:#eef6f2}
+        .response .sideai-image-strip br{display:none}
+        .response a.sideai-citation{display:inline-flex;align-items:center;gap:4px;max-width:180px;padding:2px 7px;margin:0 2px;border-radius:12px;background:#eaf2ee;color:#465b52;font-size:10px;line-height:16px;vertical-align:middle;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .response a.sideai-citation:hover,.response a.sideai-source-card:hover{background:#e1f1e9;color:#067854}
+        .response .sideai-sources{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+        .response a.sideai-source-card{display:grid;grid-template-columns:16px minmax(0,1fr);gap:3px 7px;padding:10px;border:1px solid #d8e7e0;border-radius:10px;color:#244a3b;text-decoration:none;font-size:12px;line-height:1.4;background:#fff}
+        .response .sideai-source-card span{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+        .response .sideai-source-card small{grid-column:2;color:#687d73;font-size:10px;overflow-wrap:anywhere}
+        .response .sideai-favicon{display:inline-block;flex:0 0 16px;width:16px;height:16px;max-height:16px;margin:0;border:0;border-radius:3px;object-fit:contain}
+        .response .sideai-citation:focus-visible,.response .sideai-source-card:focus-visible{outline:2px solid #00a579;outline-offset:2px}
+        .response td img,.response th img{width:min(120px,100%);height:auto;max-height:92px;object-fit:cover;margin:5px 0;border:1px solid #d8ebe4}
+        .response pre{background:#f1f6f3;padding:12px;border:1px solid #e0eae4;border-radius:9px;overflow-x:auto;white-space:pre}
+        .response code{font-size:12px;background:#f0f5f2;border-radius:4px;padding:2px 4px}.response pre code{padding:0;background:none}
+        .response blockquote{border-left:3px solid #0ba777;padding-left:12px;margin:12px 0;color:#5a6c62}
+        .sideai-table-scroll{max-width:100%;overflow:auto;margin:12px 0}.response table{border-collapse:collapse;width:100%;font-size:12px}
+        .response th,.response td{border:1px solid #dce8e0;padding:8px;text-align:left}.response th{background:#ecf8f1}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="48" height="48" viewBox="0 0 48 48">
+                    <image xlink:href="images/sideai-feature.png" x="0" y="0" width="48" height="48"/>
+                </svg>
+                <span>Chatgpt Search Insights</span>
+            </div>
+            <div class="header-actions">
+                <button class="settings-btn" id="settingsBtn" title="Open Disabled Sites settings" aria-label="Open Disabled Sites settings">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8.92 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.19.5.68.84 1.21 1H21a2 2 0 1 1 0 4h-.09c-.53.16-1.02.5-1.21 1z"></path>
+                    </svg>
+                </button>
+                <button class="stop-btn" id="stopBtn">Stop</button>
+            </div>
+        </div>
+        <div class="content">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <span>Thinking...</span>
+            </div>
+            <div class="response" id="response"></div>
+            <div class="error" id="error"></div>
+        </div>
+    </div>
+    
+    <script src="stream-text.js"></script>
+    <script src="vendor/marked.js"></script>
+    <script src="vendor/purify.js"></script>
+    <script src="google-chatgpt-frame.js"></script>
+</body>
+</html>

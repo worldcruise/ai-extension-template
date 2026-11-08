@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>ChatGPT API Offscreen</title>
+</head>
+<body>
+    <!-- Hidden ChatGPT iframe - extension context so session cookies work (like sidepanel) -->
+    <iframe id="chatgpt-iframe" src="about:blank" data-src="https://chatgpt.com/" 
+            style="position:absolute;width:1px;height:1px;opacity:0;left:-9999px;border:none;"
+            allow="clipboard-write; microphone"></iframe>
+    <script src="offscreen-chatgpt.js"></script>
+</body>
+</html>

@@ -1,47 +1,84 @@
-import { ProtocolError } from './protocol.mjs';
-
-// Only Chrome tab/window IDs are used. Navigating never changes agent state.
-export class BrowserTabs {
-  constructor(browser, storage, excludedTabs = async () => []) {
-    this.browser = browser; this.storage = storage; this.excludedTabs = excludedTabs;
-    this.queue = Promise.resolve();
+// URL metadata is available only for pages Chrome has granted access to.
+export function createBrowserTabs({ browser = globalThis.chrome, onChange = () => {}, onError = () => {} } = {}) {
+  let windowId;
+  let ownTabId;
+  let selectedId;
+  let tabs = [];
+  let busy = false;
+  let disposed = false;
+  let pending = Promise.resolve();
+  const subscriptions = [];
+  const enqueue = operation => {
+    const result = pending.then(operation);
+    pending = result.catch(() => {});
+    return result;
+  };
+  const publish = () => {
+    if (!disposed) onChange({ windowId, count: tabs.length, index: tabs.findIndex(tab => tab.id === selectedId) + 1,
+      tabId: selectedId ?? null, url: tabs.find(tab => tab.id === selectedId)?.url || '', busy });
+  };
+  const report = () => {
+    tabs = [];
+    selectedId = undefined;
+    publish();
+    if (!disposed) onError('Could not access this window’s tabs. Try opening the sidebar again.');
+  };
+  async function readTabs() {
+    if (disposed || !Number.isInteger(windowId)) return;
+    const queried = await browser.tabs.query({ windowId });
+    if (disposed) return;
+    const ownOrigin = browser.runtime.getURL('');
+    tabs = queried.filter(tab => Number.isInteger(tab.id) && tab.id >= 0 && tab.id !== ownTabId &&
+      !tab.url?.startsWith(ownOrigin)).sort((left, right) => left.index - right.index);
+    selectedId = tabs.find(tab => tab.active)?.id ?? tabs.find(tab => tab.id === selectedId)?.id ?? tabs[0]?.id;
+    publish();
   }
-  async bind(windowId) {
-    if (!Number.isInteger(windowId)) throw new ProtocolError('browser_window_unavailable');
-    const window = await this.browser.windows.get(windowId);
-    if (window.type !== 'normal') throw new ProtocolError('browser_window_unavailable');
-    await this.storage.set({ associatedBrowserWindow: windowId });
+  function refresh() { return enqueue(readTabs).catch(report); }
+  function listen(event, relevant) {
+    if (!event?.addListener) return;
+    const callback = (...args) => { if (relevant(...args)) void refresh(); };
+    event.addListener(callback);
+    subscriptions.push(() => event.removeListener(callback));
   }
-  async state(windowId) {
-    if (windowId === undefined) ({ associatedBrowserWindow: windowId } = await this.storage.get('associatedBrowserWindow'));
-    if (!Number.isInteger(windowId)) return { available: false, count: 0 };
+  async function initialize() {
     try {
-      const window = await this.browser.windows.get(windowId);
-      if (window.type !== 'normal') return { available: false, count: 0 };
-      const excluded = new Set(await this.excludedTabs());
-      const tabs = (await this.browser.tabs.query({ windowId }))
-        .filter(tab => Number.isInteger(tab.id) && !excluded.has(tab.id)).sort((a, b) => a.index - b.index);
-      return { available: tabs.length > 0, count: tabs.length, windowId, tabs };
-    } catch { return { available: false, count: 0 }; }
+      if (!browser?.tabs || !browser?.windows) throw new Error('Extension APIs unavailable');
+      const ownTab = await browser.tabs.getCurrent();
+      ownTabId = ownTab?.id;
+      windowId = ownTab?.windowId ?? (await browser.windows.getCurrent()).id;
+      if (!Number.isInteger(windowId) || windowId < 0) throw new Error('No associated window');
+      if (disposed) return;
+      listen(browser.tabs.onActivated, info => info.windowId === windowId);
+      listen(browser.tabs.onCreated, tab => tab.windowId === windowId);
+      listen(browser.tabs.onRemoved, (_id, info) => info.windowId === windowId);
+      listen(browser.tabs.onMoved, (_id, info) => info.windowId === windowId);
+      listen(browser.tabs.onAttached, (_id, info) => info.newWindowId === windowId);
+      listen(browser.tabs.onDetached, (_id, info) => info.oldWindowId === windowId);
+      listen(browser.tabs.onUpdated, (_id, _change, tab) => tab.windowId === windowId);
+      await refresh();
+    } catch { report(); }
   }
-  move(direction, windowId) {
-    const operation = this.queue.catch(() => {}).then(async () => {
-      if (![-1, 1].includes(direction)) throw new ProtocolError('invalid_request');
-      const state = await this.state(windowId);
-      if (!state.available) throw new ProtocolError('browser_window_unavailable');
-      if (state.count === 1) return { count: 1, message: 'Only one browser tab is open.' };
-      const index = state.tabs.findIndex(tab => tab.active);
-      // The extension itself may be the active tab in an ordinary window.
-      const nextIndex = index < 0 ? (direction === 1 ? 0 : state.count - 1)
-        : (index + direction + state.count) % state.count;
-      const tab = state.tabs[nextIndex];
-      try {
-        await this.browser.tabs.update(tab.id, { active: true });
-        await this.browser.windows.update(state.windowId, { focused: true });
-      } catch { throw new ProtocolError('browser_window_unavailable'); }
-      return { count: state.count, tabId: tab.id, message: `Browser tab ${nextIndex + 1} of ${state.count} selected.` };
-    });
-    this.queue = operation;
-    return operation;
+  const ready = initialize();
+  async function move(direction) {
+    if (busy || disposed || ![-1, 1].includes(direction)) return;
+    busy = true;
+    publish();
+    try {
+      await ready;
+      await enqueue(async () => {
+        await readTabs();
+        if (disposed || tabs.length < 2) return;
+        const index = tabs.findIndex(tab => tab.id === selectedId);
+        const target = tabs[(Math.max(0, index) + direction + tabs.length) % tabs.length];
+        await browser.tabs.update(target.id, { active: true });
+        await readTabs();
+      });
+    } catch { report(); }
+    finally { busy = false; publish(); }
   }
+  function dispose() {
+    disposed = true;
+    for (const unsubscribe of subscriptions) unsubscribe();
+  }
+  return { ready, refresh, move, dispose };
 }

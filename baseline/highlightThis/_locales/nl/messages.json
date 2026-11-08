@@ -1,0 +1,836 @@
+{
+   "action_example": {
+      "message": "Bijvoorbeeld, bij het markeren van het woord 'highlight' met de zoekopdracht 'Hi?hl*' zal resulteren in:"
+   },
+   "action_intro": {
+      "message": "Specifieer de aktie die moet uitgevoerd worden bij het klikken op een markering"
+   },
+   "action_newtab": {
+      "message": "Open in een nieuw tabblad"
+   },
+   "action_none": {
+      "message": "Geen"
+   },
+   "action_sametab": {
+      "message": "Openen in huidig tabblad"
+   },
+   "action_tip1": {
+      "message": "%t% wordt vervangen door tekst zoals gevonden op de pagina (vb Highlight)"
+   },
+   "action_tip2": {
+      "message": "%s% wordt vervangen door het zoekwoord (vb Hi?hL*)"
+   },
+   "action_tip3": {
+      "message": "%tu% of %tl%, %su% of %sl% forceert het woord in hoofd of kleine letters"
+   },
+   "action_tip4": {
+      "message": "enkele voorbeelden: https://wikipedia.com/%t% , https://google.com/search?q=%t%"
+   },
+   "added_new_word": {
+      "message": "Nieuw woord toegevoegd"
+   },
+   "added_non_term": {
+      "message": "Let op: het woord wordt mogelijk niet gemarkeerd"
+   },
+   "added_non_term_description": {
+      "message": "Je hebt tekens toegevoegd uit scripts die doorgaans niet worden gescheiden door spaties of symbolen.\n\nControleer de instellingen van de lijst om overeenkomst tussen woorden en termen op te geven"
+   },
+   "agree": {
+      "message": "Ik ga akkoord met de"
+   },
+   "already_in_wordlist": {
+      "message": "was al aan de lijst toegevoegd"
+   },
+   "application_description": {
+      "message": "Vind en markeer woorden automatisch op de web pagina, volgens jouw eigen lijsten."
+   },
+   "application_title": {
+      "message": "Highlight This: Vind en markeer woorden"
+   },
+   "assistant_step_1": {
+      "message": "Maak, of open een bestaand Google Sheets document"
+   },
+   "assistant_step_2": {
+      "message": "Maak je lijst in de eerste sheet, in eerste kolom"
+   },
+   "assistant_step_3": {
+      "message": "Deel jouw Google sheets"
+   },
+   "assistant_step_4": {
+      "message": "Deel met iedereeen die de link heeft"
+   },
+   "assistant_step_5": {
+      "message": "Seleteer de link via 'Copy Link'"
+   },
+   "assistant_step_6": {
+      "message": "Plak de link hier"
+   },
+   "autoBackup_Daily": {
+      "message": "Dagelijks"
+   },
+   "autoBackup_Monthly": {
+      "message": "Maandelijks"
+   },
+   "autoBackup_Never": {
+      "message": "Nooit"
+   },
+   "autoBackup_Weekly": {
+      "message": "Wekelijks"
+   },
+   "changelicense_ad_button": {
+      "message": "Advertenties inschakelen"
+   },
+   "changelicense_ad_description": {
+      "message": "\u003Cli>Er worden advertenties getoond in Highlight This!\u003C/li>\u003Cli>Inclusief onbeperkt woorden markeren en alle markeringsstijlen.\u003C/li>\u003Cli>Kies een betaalde licentie voor een ervaring zonder advertenties.\u003C/li>"
+   },
+   "changelicense_ad_moreinfo": {
+      "message": "Over advertenties"
+   },
+   "changelicense_ad_title": {
+      "message": "Overschakelen naar de versie met advertenties"
+   },
+   "changelicense_free_button": {
+      "message": "Activeer de gratis versie"
+   },
+   "changelicense_free_description": {
+      "message": "\u003Cli>Uw markering is beperkt tot 200 woorden. Highlight This! gebruikt alleen de eerste 200 woorden van uw lijsten\u003C/li>\u003Cli>U heeft beperkte markeringsstijlen\u003C/li>\u003Cli>U krijgt geen advertenties\u003C/li>"
+   },
+   "changelicense_free_title": {
+      "message": "Gratis beperkte markering tot 200 woorden"
+   },
+   "changelicense_paid_button": {
+      "message": "Koop een licentie"
+   },
+   "changelicense_paid_description": {
+      "message": "\u003Cli>Afhankelijk van de versie die je kiest, heb je markering in 500 of een onbeperkt aantal woorden\u003C/li>\u003Cli>Je hebt beperkte markeringsstijlen\u003C/li>"
+   },
+   "changelicense_paid_title": {
+      "message": "Koop een jaarlijkse licentie om meer woorden te markeren zonder het gebruik van advertenties"
+   },
+   "changelicense_title": {
+      "message": "Versie wijzigen"
+   },
+   "close_assistant": {
+      "message": "Sluit de assistent"
+   },
+   "confirm_email": {
+      "message": "Bevesting jouw email"
+   },
+   "create_new_list": {
+      "message": "Maak lijst"
+   },
+   "currentlicense_500_description": {
+      "message": "\u003Cli>Uw markering is beperkt tot 500 woorden. Highlight This! gebruikt alleen de eerste 500 woorden van uw lijsten\u003C/li>\u003Cli>U beschikt over alle markeringsstijlen\u003C/li>\u003Cli>U krijgt geen advertenties\u003C/li>"
+   },
+   "currentlicense_500_title": {
+      "message": "U gebruikt de betaalde versie met een limiet van 500 woorden"
+   },
+   "currentlicense_ad_description": {
+      "message": "\u003Cli>Er worden advertenties getoond in Highlight This!\u003C/li>\u003Cli>Inclusief onbeperkt woorden markeren en alle markeringsstijlen.\u003C/li>\u003Cli>Kies een betaalde licentie voor een ervaring zonder advertenties.\u003C/li>"
+   },
+   "currentlicense_ad_title": {
+      "message": "U gebruikt de versie met advertenties"
+   },
+   "currentlicense_free_description": {
+      "message": "\u003Cli>Uw markering is beperkt tot 200 woorden. Highlight This! gebruikt alleen de eerste 200 woorden van uw lijsten\u003C/li>\u003Cli>U heeft beperkte markeringsstijlen\u003C/li>\u003Cli>U krijgt geen advertenties\u003C/li>"
+   },
+   "currentlicense_free_title": {
+      "message": "U gebruikt de gratis versie"
+   },
+   "currentlicense_temp_description": {
+      "message": "\u003Cli>Je highlighting is onbeperkt\u003C/li>\u003Cli>Je hebt alle highlighting-stijlen\u003C/li>\u003Cli>U krijgt geen advertenties\u003C/li>"
+   },
+   "currentlicense_temp_title": {
+      "message": "Je gebruikt de proefversie, je hebt nog \u003Cb>{0}\u003C/b> dagen over"
+   },
+   "currentlicense_unlimited_description": {
+      "message": "\u003Cli>Je highlighting is onbeperkt\u003C/li>\u003Cli>Je hebt alle highlighting-stijlen\u003C/li>\u003Cli>U krijgt geen advertenties\u003C/li>"
+   },
+   "currentlicense_unlimited_title": {
+      "message": "U gebruikt de onbeperkte betaalde versie"
+   },
+   "deleteGroupLink": {
+      "message": "Verwijder lijst"
+   },
+   "donate1": {
+      "message": "Hallo, ik hoop dat je het leuk vindt om Highlight This! te gebruiken."
+   },
+   "donate2": {
+      "message": "Ik ontwikkel de extensie in mijn vrije tijd, steun mijn werk door 1&dollar; / 1&euro; te schenken."
+   },
+   "donate3": {
+      "message": "Highlight This! zal altijd Gratis zijn"
+   },
+   "donatebtn": {
+      "message": "Doe een gift"
+   },
+   "dontdonate": {
+      "message": "Ik wil nu niet schenken, blijf gratis gebruiken"
+   },
+   "download_backup": {
+      "message": "Klik op deze link als het bestand niet automatisch is gedownload"
+   },
+   "download_frequency": {
+      "message": "Frekwentie van download"
+   },
+   "download_frequency_1": {
+      "message": "Elke 10 minuten"
+   },
+   "download_frequency_2": {
+      "message": "Elke 30 minuten"
+   },
+   "download_frequency_3": {
+      "message": "Elk uur"
+   },
+   "download_frequency_4": {
+      "message": "Elke 4 uur"
+   },
+   "download_frequency_5": {
+      "message": "Elke 8 uur"
+   },
+   "download_frequency_6": {
+      "message": "Elke dag"
+   },
+   "duration": {
+      "message": "Licentie"
+   },
+   "email": {
+      "message": "Email"
+   },
+   "enter_license": {
+      "message": "Voeg een nieuwe licentiesleutel in"
+   },
+   "enterlicense_button": {
+      "message": "Valideren"
+   },
+   "enterlicense_description": {
+      "message": "Als u al een licentiesleutel heeft, kunt u deze hier invoeren."
+   },
+   "enterlicense_label": {
+      "message": "Licentiesleutel"
+   },
+   "enterlicense_title": {
+      "message": "Voer uw licentiesleutel in"
+   },
+   "everytime": {
+      "message": "Altijd"
+   },
+   "example": {
+      "message": "voorbeeld"
+   },
+   "example1": {
+      "message": "Dit is een"
+   },
+   "example2": {
+      "message": "van gemarkeerde tekst"
+   },
+   "field_autoBackupSettings": {
+      "message": "Automatische back-up"
+   },
+   "field_background": {
+      "message": "Achtergrond"
+   },
+   "field_boxColor": {
+      "message": "Randkleur voor invoervelden"
+   },
+   "field_caseSensitive_label": {
+      "message": "Vergelijk in hoofdlettergevoelige modus"
+   },
+   "field_clearSyncLists": {
+      "message": "Gegevens en instellingen resetten:"
+   },
+   "field_colors": {
+      "message": "Kleuren"
+   },
+   "field_colors_help": {
+      "message": "Selecteer een kleur voor de markeringen"
+   },
+   "field_containerSelector": {
+      "message": "Markeer alleen wanneer de container overeenkomt met deze queryselector"
+   },
+   "field_detection": {
+      "message": "Ontdek"
+   },
+   "field_detection_help": {
+      "message": "Ontdek enkel volledige woorden"
+   },
+   "field_dontHighlight": {
+      "message": "Markeer niet op deze sites"
+   },
+   "field_export": {
+      "message": "Export"
+   },
+   "field_exportSettings": {
+      "message": "Exporteren"
+   },
+   "field_foreground": {
+      "message": "Voorgrond"
+   },
+   "field_highlightOn": {
+      "message": "Markeer enkel op deze sites"
+   },
+   "field_import": {
+      "message": "Import"
+   },
+   "field_importSettings": {
+      "message": "Importeren"
+   },
+   "field_limitations": {
+      "message": "Limieten"
+   },
+   "field_listname": {
+      "message": "Lijst naam"
+   },
+   "field_neverHighlightOn": {
+      "message": "Markeer nooit op deze sites"
+   },
+   "field_neverHighlightOn_help": {
+      "message": "Maak een lijst van sites waarop je nooit wil markeren. \u003Cbr />Je kan * en ? gebruiken als jokertekens.\u003Cbr /> voorbeelden: *.google.com, www.google.com, www.google.com/something/page.html"
+   },
+   "field_printHighlights": {
+      "message": "Druk de markeringen af"
+   },
+   "field_sendErrors": {
+      "message": "Meld een fout aan de ontwikkelaar"
+   },
+   "field_sendErrorsDescription": {
+      "message": "Beschrijving van het probleem:"
+   },
+   "field_sendErrorsEmail": {
+      "message": "E-mailadres:"
+   },
+   "field_showFoundWords": {
+      "message": "Toon overzicht van gevonden woorden"
+   },
+   "field_sitesToHighlight": {
+      "message": "Definieer op welke sites je woorden wilt markeren"
+   },
+   "field_source": {
+      "message": "Bron"
+   },
+   "field_useRegexTokens_help": {
+      "message": "Gebruik Regex-tokens in plaats van eenvoudige * en ? jokertekens"
+   },
+   "field_words": {
+      "message": "Woorden"
+   },
+   "field_words_help": {
+      "message": "Je kan * en ? gebruiken als jokertekens. Elke nieuwe lijn wordt beschouwd als een woord."
+   },
+   "field_words_regex_help": {
+      "message": "Je kan gebruik maken van Regex tokens zoals [a-z], [1-9] of \b"
+   },
+   "filterwords": {
+      "message": "Filter"
+   },
+   "first_list": {
+      "message": "Mijn lijst"
+   },
+   "has_been_added_to": {
+      "message": "toegevoegd aan"
+   },
+   "has_been_updated": {
+      "message": "is vernieuwd"
+   },
+   "highlight_editable_fields": {
+      "message": "Markeer in editeerbare velden"
+   },
+   "importLocalRules": {
+      "message": "Zet \u003Cb>{0} niet-gesynchroniseerde lijst(en)\u003C/b> en instellingen terug"
+   },
+   "importSyncRules": {
+      "message": "Zet \u003Cb>{0} gesynchroniseerde\u003C/b> lijst(en) terug"
+   },
+   "info_autoBackupSettings": {
+      "message": "Maakt een back-up in uw map Downloads"
+   },
+   "info_clearSyncLists": {
+      "message": "Zorg ervoor dat u een back-up maakt voordat u uw gegevens en instellingen reset"
+   },
+   "jump_to_word": {
+      "message": "Spring naar het woord"
+   },
+   "label_action": {
+      "message": "Actie"
+   },
+   "label_link": {
+      "message": "Link"
+   },
+   "last_synced_on": {
+      "message": "Laatst gedownload op"
+   },
+   "launch_assistant": {
+      "message": "Lanceer de assistent"
+   },
+   "license_500": {
+      "message": "500"
+   },
+   "license_ad": {
+      "message": "Versie met advertenties"
+   },
+   "license_confirm_temp_remove": {
+      "message": "Weet u zeker dat u wilt overstappen van de proefversie? U kunt niet terugschakelen naar de proefversie."
+   },
+   "license_expired": {
+      "message": "Jouw licentie is vervallen"
+   },
+   "license_expired_message": {
+      "message": "Je bent terug op de gratis versie"
+   },
+   "license_expires": {
+      "message": "Uw licentie verloopt over {0} dag(en). \u003Ca id=\"linkSubscription\" style=\"text-decoration: underline\">Wijzig uw abonnement\u003C/a> om geen enkel hoogtepunt te missen"
+   },
+   "license_free": {
+      "message": "Gratis"
+   },
+   "license_message_temp": {
+      "message": "U heeft een proefabonnement met alle functies ingeschakeld. Uw proefperiode verloopt over \u003Cb>{0}\u003C/b> dagen. \u003Ca id=\"linkSubscription\" style=\"text-decoration: underline\">Uw abonnement wijzigen\u003C/a>"
+   },
+   "license_new": {
+      "message": "Nieuwe licentie"
+   },
+   "license_new_until": {
+      "message": "Jouw licentie is geldig tot"
+   },
+   "license_temp": {
+      "message": "proef versie"
+   },
+   "license_unlimited": {
+      "message": "Onbeperkt"
+   },
+   "license_updated": {
+      "message": "Vernieuwde licentie"
+   },
+   "list_synced": {
+      "message": "Lijst vernieuwd"
+   },
+   "localLabel": {
+      "message": "Standaard lijst"
+   },
+   "magicHighlighting": {
+      "message": "Snelheid geoptimaliseerde highlighting"
+   },
+   "maxwords_reached": {
+      "message": "Je bent aan {0} % van de woorden. \u003Ca id=\"linkSubscription\" style=\"text-decoration: underline\">Wijzig jouw abonnement\u003C/a> om geen enkele markering te missen"
+   },
+   "menu_help_label": {
+      "message": "Hulp"
+   },
+   "menu_home_label": {
+      "message": "Thuis"
+   },
+   "menu_sendErrors_label": {
+      "message": "Meld een fout"
+   },
+   "menu_settings_label": {
+      "message": "Instellingen"
+   },
+   "menu_subscription_label": {
+      "message": "Abonnement"
+   },
+   "migrate_local_button": {
+      "message": "Maak lijst lokaal"
+   },
+   "migrate_local_text": {
+      "message": "Verander deze lijst in een lokale lijst, deze zal dan alleen beschikbaar zijn in deze browser"
+   },
+   "migrate_sync_button": {
+      "message": "Lijst synchroniseren"
+   },
+   "migrate_sync_text": {
+      "message": "Wijzig deze lijst in een gesynchroniseerde lijst om deze beschikbaar te maken in al uw browsers waar u bent opgeslagen"
+   },
+   "migrate_sync_toobig_text": {
+      "message": "De lijst kan niet worden gewijzigd in een gesynchroniseerde lijst omdat deze te groot is, beperk het aantal woorden om de lijst te synchroniseren met alle browsers waarin u bent ingelogd"
+   },
+   "more": {
+      "message": "Meer"
+   },
+   "need_more_subscriptions": {
+      "message": "Heb je extra licenties nodig? Vraag ze nu aan."
+   },
+   "newGroupDetail": {
+      "message": "Met een standaard lijst beheert u de woorden rechtstreeks.\u003Cbr />Een externe lijst downloadt een lijst met woorden van een externe site (v.b. pastebin)"
+   },
+   "noReset": {
+      "message": "Annuleren"
+   },
+   "no_subscription_request": {
+      "message": "Ik heb nog geen licentie, vraag er één aan"
+   },
+   "non_unicode_chars": {
+      "message": "U heeft tekens toegevoegd uit scripts die doorgaans niet gescheiden zijn door spaties of symbolen. Deze instelling werkt het beste voor talen met door spaties gescheiden woorden. Voor scripts zoals Chinees, Koreaans of Japans, die geen spaties tussen woorden gebruiken, kan dit de detectienauwkeurigheid verminderen. Overweeg deze optie uit te schakelen voor een betere markering in deze talen."
+   },
+   "notif_allDisabled": {
+      "message": "Markeren is uitgeschakeld"
+   },
+   "notif_allEnabled": {
+      "message": "Markeren is ingeschakeld"
+   },
+   "notif_backupDone": {
+      "message": "De back-up staat klaar in uw map Downloads"
+   },
+   "notif_bugReportSent": {
+      "message": "Bugrapport ingediend"
+   },
+   "notif_licenseAd": {
+      "message": "U gebruikt nu de versie met advertenties"
+   },
+   "notif_licenseAdfree": {
+      "message": "U bevindt zich nu op de gratis versie"
+   },
+   "notif_licensePaid": {
+      "message": "U bevindt zich nu in de versie 'Highlight This! {0}'"
+   },
+   "notif_listDeleted": {
+      "message": "Lijst \"{0}\" is verwijderd"
+   },
+   "notif_listDisabled": {
+      "message": "Lijst \"{0}\" is uitgeschakeld"
+   },
+   "notif_listEnabled": {
+      "message": "Lijst \"{0}\" is ingeschakeld"
+   },
+   "notif_listSaved": {
+      "message": "Lijst \"{0}\" is opgeslagen"
+   },
+   "notif_restoreComplete": {
+      "message": "Het herstel is voltooid"
+   },
+   "notif_settingsSaved": {
+      "message": "De instellingen zijn opgeslagen"
+   },
+   "notify_when_found": {
+      "message": "Verwittig mij wanneer een woord gevonden is"
+   },
+   "nr_users": {
+      "message": "Aantal gebruikers"
+   },
+   "once_per_page": {
+      "message": "Eenmaal per pagina"
+   },
+   "perf_100": {
+      "message": "Snel - enkel voor snelle computers"
+   },
+   "perf_200": {
+      "message": "Standaard - dynamische aanpassing van snelheid bij hermarkeringen"
+   },
+   "perf_300": {
+      "message": "Traag - hermakeren gaat iets trager om de PC niet te vertragen"
+   },
+   "perf_400": {
+      "message": "Geen hermarkeringen bij pagina updates - Highlight This markeert slechts 1 maal de woorden wanneer de pagina geladen is"
+   },
+   "performance": {
+      "message": "Performantie"
+   },
+   "performanceHelp": {
+      "message": "Definieer hoeveel impact Highlight This mag hebben op de performantie van jouw PC"
+   },
+   "popup_add": {
+      "message": "Toevoegen"
+   },
+   "popup_addnewlist": {
+      "message": "Voeg een woordenlijst toe"
+   },
+   "popup_back": {
+      "message": "\u003C Terug"
+   },
+   "popup_byline": {
+      "message": "De extensie markeert alle onderstaande woorden"
+   },
+   "popup_cancel": {
+      "message": "Annuleer"
+   },
+   "popup_collapseAll": {
+      "message": "Inklappen"
+   },
+   "popup_configureWords": {
+      "message": "\u003C Configureer de woorden"
+   },
+   "popup_confirmDelete": {
+      "message": "Ben je zeker dat je deze lijst en de woorden wilt verwijderen?"
+   },
+   "popup_confirmReset": {
+      "message": "\u003Cdiv>Weet u zeker dat u al uw gegevens en instellingen wilt resetten?\u003C/div>\u003Cdiv>Zorg ervoor dat u een back-up heeft voordat u doorgaat\u003C/div>"
+   },
+   "popup_create1": {
+      "message": "Maak een woordenlijst zodat"
+   },
+   "popup_create2": {
+      "message": " deze kan vinden en markeren op de pagina's."
+   },
+   "popup_createWordList": {
+      "message": "Maak een woordenlijst"
+   },
+   "popup_disabled": {
+      "message": "non-actief"
+   },
+   "popup_dontshowwords": {
+      "message": "Toon deze informatie niet meer"
+   },
+   "popup_edit": {
+      "message": "Wijzig"
+   },
+   "popup_editWordlist": {
+      "message": "Wijzig"
+   },
+   "popup_expandAll": {
+      "message": "Uitklappen"
+   },
+   "popup_foundWords": {
+      "message": "We hebben woorden gevonden op deze pagina."
+   },
+   "popup_importFailed": {
+      "message": "Import mislukt"
+   },
+   "popup_labelListName": {
+      "message": "Lijst naam"
+   },
+   "popup_limitations": {
+      "message": "limieten"
+   },
+   "popup_next": {
+      "message": "Volgende"
+   },
+   "popup_no": {
+      "message": "Neen"
+   },
+   "popup_nowords": {
+      "message": "Er zijn nog geen woordenlijsten aangemaakt"
+   },
+   "popup_save": {
+      "message": "Bewaar"
+   },
+   "popup_settings": {
+      "message": "Instellingen"
+   },
+   "popup_showDonate": {
+      "message": "Help & Giften!"
+   },
+   "popup_tip1": {
+      "message": "Tip: Gebruik"
+   },
+   "popup_tip2": {
+      "message": "+Shift+Space"
+   },
+   "popup_tip3": {
+      "message": "om tussen de gevonden woorden te navigeren"
+   },
+   "popup_title": {
+      "message": "Highlight This!"
+   },
+   "popup_yes": {
+      "message": "Ja"
+   },
+   "premium_feature": {
+      "message": "Dit is een Premium feature"
+   },
+   "price_tier1": {
+      "message": "3 maanden (6 euro/gebruiker)"
+   },
+   "price_tier2": {
+      "message": "6 maanden (11 euro/gebruiker)"
+   },
+   "price_tier3": {
+      "message": "12 maanden (18 euro/gebruiker)"
+   },
+   "price_tier4": {
+      "message": "24 maanden (24 euro/gebruiker)"
+   },
+   "refresh_page": {
+      "message": "Herlaad de pagina om de nieuwe markeringen toe te passen."
+   },
+   "regex_invalid": {
+      "message": "De regex is ongeldig"
+   },
+   "regex_mode": {
+      "message": "Regex mode"
+   },
+   "regex_too_many_matches": {
+      "message": "De regex is te breed, waardoor pagina's niet meer zullen reageren"
+   },
+   "remoteLabel": {
+      "message": "Externe lijst (Web, Pastebin, Google Sheets)"
+   },
+   "request_extra_license": {
+      "message": "Vraag extra licentie sleutels aan"
+   },
+   "request_license": {
+      "message": "Vraag een licentie aan"
+   },
+   "request_license_form": {
+      "message": "Je kan een licentiesleutel aanvragen met dit formulier. Zodra we jouw aanvraag ontvangen bezorgen we je een tijdelijke sleuten en contacteren we jou voor de betalings- en facturatie gegevens"
+   },
+   "request_licensekey": {
+      "message": "Vraag een licentie aan"
+   },
+   "resetDataAndSettings": {
+      "message": "Gegevens en instellingen resetten"
+   },
+   "restoreWarning": {
+      "message": "Als u een back-up van gesynchroniseerde lijsten terugzet, worden alleen de gesynchroniseerde lijsten verwijderd en teruggezet. \u003Cbr /> Als u de niet-gesynchroniseerde lijsten herstelt, wordt uw configuratie teruggezet en worden alleen uw niet-gesynchroniseerde lijsten verwijderd en teruggezet."
+   },
+   "sendErrorsButton": {
+      "message": "Versturen"
+   },
+   "sendErrorsHelp": {
+      "message": "\u003Cp>Als u problemen ondervindt, stuur dan een bugrapport naar de ontwikkelaar. \u003C/p>\u003Cp>Gevangen fouten worden ook verzonden, deze informatie bevat geen persoonlijke gegevens of woorden.\u003C/p>"
+   },
+   "send_to": {
+      "message": "Stuur naar"
+   },
+   "sheets_assistant": {
+      "message": "Google Sheets assistent"
+   },
+   "sheets_id": {
+      "message": "Sheets id"
+   },
+   "shortmonth_1": {
+      "message": "JAN"
+   },
+   "shortmonth_10": {
+      "message": "OKT"
+   },
+   "shortmonth_11": {
+      "message": "NOV"
+   },
+   "shortmonth_12": {
+      "message": "DEC"
+   },
+   "shortmonth_2": {
+      "message": "FEB"
+   },
+   "shortmonth_3": {
+      "message": "MAR"
+   },
+   "shortmonth_4": {
+      "message": "APR"
+   },
+   "shortmonth_5": {
+      "message": "MEI"
+   },
+   "shortmonth_6": {
+      "message": "JUN"
+   },
+   "shortmonth_7": {
+      "message": "JUL"
+   },
+   "shortmonth_8": {
+      "message": "AUG"
+   },
+   "shortmonth_9": {
+      "message": "SEP"
+   },
+   "sites_info": {
+      "message": "Definieer op welke sites je woorden wilt markeren. Je kan een witte lijst en een zwarte lijst definiëren, de zwarte lijst is prioritair. \u003Cbr />Indien je niets defineert, wordt de markering op alle sites uitgevoerd. \u003Cbr />\u003Cbr />Je kan * en ? gebruiken als jokertekens.\u003Cbr /> voorbeelden: *.google.com, www.google.com, www.google.com/something/page.html, www.go?gle.com/*/page.html"
+   },
+   "submit_form": {
+      "message": "Verzend"
+   },
+   "subscription_enter_key": {
+      "message": "Voeg een licentiesleutel in"
+   },
+   "subscription_enter_key_help": {
+      "message": "Je kan de licentiesleutel die je via email kreeg hier plakken of intikken"
+   },
+   "subscription_valid_until": {
+      "message": "Jouw licentie is geldig tot"
+   },
+   "sync": {
+      "message": "Download"
+   },
+   "sync_list_desc": {
+      "message": "Een gesynchronizeerde lijst is beschikbaar op al jouw browsers waar je ingelogt bent. Er zijn limieten op de lengte van de lijst."
+   },
+   "sync_list_header": {
+      "message": "Wil je jouw woordenlijst synchronizeren tussen jouw browsers?"
+   },
+   "sync_list_no": {
+      "message": "Neen, synchronizeer deze lijst niet"
+   },
+   "sync_list_yes": {
+      "message": "Ja, synchronizeer deze lijst"
+   },
+   "synchronizing": {
+      "message": "Bezig met synchroniseren"
+   },
+   "tab_action": {
+      "message": "Actie"
+   },
+   "tab_advanced": {
+      "message": "Geavanceerd"
+   },
+   "tab_general": {
+      "message": "Algemeen"
+   },
+   "tab_limitations": {
+      "message": "Beperkingen"
+   },
+   "tab_settings_backup": {
+      "message": "Backup"
+   },
+   "tab_settings_general": {
+      "message": "Algemeen"
+   },
+   "tab_style": {
+      "message": "Stijl"
+   },
+   "term_conditions": {
+      "message": "Algemene voorwaarden"
+   },
+   "thanks_request": {
+      "message": "Dank je voor je aanvraag"
+   },
+   "thanks_request_info": {
+      "message": "We nemen snel met jou contact op voor de betalings- en facturatie gegevens."
+   },
+   "title_newGroupType": {
+      "message": "Welketype woordenlijst wil je aanmaken?"
+   },
+   "upgrade_feature1": {
+      "message": "Gebruik Google Sheets om woorden te beheren"
+   },
+   "upgrade_feature2": {
+      "message": "Definieer acties wanneer u op een markering klikt"
+   },
+   "upgrade_feature3": {
+      "message": "Er komt nog meer…"
+   },
+   "upgrade_price_title": {
+      "message": "Highlight This! Premium is beschikbaar voor"
+   },
+   "upgrade_tier1": {
+      "message": "3 maanden: 6 euro"
+   },
+   "upgrade_tier2": {
+      "message": "6 maanden: 11 euro"
+   },
+   "upgrade_tier3": {
+      "message": "12 maanden: 18 euro"
+   },
+   "upgrade_tier4": {
+      "message": "24 maanden: 24 euro"
+   },
+   "upgrade_to_premium": {
+      "message": "Upgrade naar Premium"
+   },
+   "upgrade_to_premium_intro": {
+      "message": "Upgrade naar Highlight This! Premium en profiteer van meer geavanceerde functies"
+   },
+   "url_invalid": {
+      "message": "De url is niet correct"
+   },
+   "word_found_on_page": {
+      "message": "Woord gevonden op de pagina"
+   },
+   "wordlist_too_long_for_sync_storage": {
+      "message": "De lijst is te lang om te worden gesynchroniseerd met andere browsers"
+   },
+   "yesReset": {
+      "message": "Reset al mijn gegevens"
+   },
+   "you_are_premium": {
+      "message": "Je bent een Premium gebruiker"
+   }
+}

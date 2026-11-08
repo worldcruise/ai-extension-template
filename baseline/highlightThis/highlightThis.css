@@ -1,0 +1,36 @@
+.highlightThisMarker{
+  width: 13px;
+  height: 2px;
+  border: 1px solid black;
+  position: absolute;
+  right: 1px;
+  z-index: 10000;
+}
+em.Highlight-dev {
+  position: relative; /* Needed to position the tooltip */
+  cursor: pointer; /* Just to show that it's hoverable */
+}
+
+em.Highlight-dev::after {
+  content: attr(data-tooltip); /* Fetches and displays the tooltip text */
+  position: absolute;
+  bottom: 100%; /* Position the tooltip above the element */
+  left: 50%; /* Start the tooltip in the center of the element */
+  transform: translateX(-50%); /* Center the tooltip */
+  white-space: nowrap; /* Keeps the tooltip text on a single line */
+  visibility: hidden; /* Hide the tooltip by default */
+  opacity: 0;
+  transition: opacity 0.2s, visibility 0.2s; /* Smooth transition for tooltip */
+  background-color: black; /* Tooltip background */
+  color: white; /* Tooltip text color */
+  text-align: center;
+  border-radius: 4px; /* Optional: adds rounded corners to the tooltip */
+  padding: 5px 10px; /* Padding inside the tooltip */
+  font-size: 0.75em; /* Smaller font size for the tooltip */
+  z-index: 1000; /* Ensure the tooltip is above other content */
+}
+
+em.Highlight-dev:hover::after {
+  visibility: visible; /* Show the tooltip on hover */
+  opacity: 1;
+}

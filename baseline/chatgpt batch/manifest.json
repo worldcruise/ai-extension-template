@@ -1,0 +1,35 @@
+{
+   "action": {
+      "default_icon": {
+         "128": "icon128.png",
+         "16": "icon16.png",
+         "48": "icon48.png"
+      },
+      "default_title": "Open ChatGPT Automation Panel"
+   },
+   "background": {
+      "service_worker": "background.js",
+      "type": "module"
+   },
+   "content_scripts": [ {
+      "js": [ "content.js" ],
+      "matches": [ "*://chatgpt.com/*", "*://*.chatgpt.com/*" ],
+      "run_at": "document_end"
+   } ],
+   "description": "Unlimited batch automation for ChatGPT. Auto-submit prompts, auto-download images and text directly in your sidebar.",
+   "host_permissions": [ "*://chatgpt.com/*", "*://*.chatgpt.com/*", "*://*.oaiusercontent.com/*" ],
+   "icons": {
+      "128": "icon128.png",
+      "16": "icon16.png",
+      "48": "icon48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAm8uSuVuZGGEEsTRwV84jolgtPT7QqYGAhxrl6If5P6ly2gaexgd6KvvmzT+HlnDfzcRL+JyR6oPGTXWYtz1ci35Eli5uRGxFdnq32yA+QEvRxIuaIXG0goSw9nN7Ksmxudtt741JTkaPESmvyAUmMEIS2tN6Rr4+L6Z0xaEx8KacAI8L6N2GUqkHIdso0Cd2QcJtzXQHP7kwmfBL/P01WXT4ziZPC/B25JKoG17tvfi5xMLl9iKtRKvzlVOrbcF0wjFi4GHvGJEhS45Cf5i21RwW9uPnim02pggUq6a1gSywIauP0UCmQCeCun9eRSSdYrBbneoOU/qodHqntH9yBQIDAQAB",
+   "manifest_version": 3,
+   "name": "ChatGPT Automation - Auto Batch",
+   "permissions": [ "sidePanel", "downloads", "contentSettings", "storage", "unlimitedStorage", "tabs", "scripting", "activeTab", "alarms" ],
+   "side_panel": {
+      "default_path": "sidepanel.html"
+   },
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "1.1.0"
+}

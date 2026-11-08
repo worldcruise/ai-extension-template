@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SideAI Microphone Permission</title>
+  <script src="permission_prompt.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #f5f5f5;
+    }
+
+    .content {
+      max-width: 400px;
+      text-align: center;
+      padding: 40px 20px;
+      margin-top: 60px;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #333;
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    p {
+      color: #666;
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .instruction {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
+    }
+
+    .instruction-text {
+      color: #333;
+      font-size: 16px;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #1a1a1a;
+      }
+
+      h1 {
+        color: #e0e0e0;
+      }
+
+      p {
+        color: #b0b0b0;
+      }
+
+      .instruction {
+        background: #2d2d2d;
+      }
+
+      .instruction-text {
+        color: #e0e0e0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <img src="images/sideai-feature.png" alt="SideAI logo" class="logo">
+    <h1>Allow microphone access</h1>
+    <p>SideAI needs microphone access to enable voice features inside the sidebar. This grants access to the extension only; ChatGPT access still uses your own ChatGPT account.</p>
+    
+    <div class="instruction">
+      <p class="instruction-text">
+        When the Chrome permission popup appears,<br>
+        please click "Allow while visiting the site" to enable voice features.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%;background:transparent;font:13px inherit}#aiext-input{width:100%;height:100%;border:none;background:transparent;color:#333;font-size:13px;outline:none;resize:none}#aiext-input::placeholder{color:#999}</style>
+</head>
+<body>
+<textarea id="aiext-input" rows="1"></textarea>
+<script>
+(function(){
+  var params=new URLSearchParams(window.location.search);
+  var ph=params.get('ph')||'Type here...';
+  var type=params.get('type')||'ask';
+  document.getElementById('aiext-input').placeholder=ph;
+  var last=0;
+  var send=function(){
+    if(Date.now()-last<250)return;
+    last=Date.now();
+    var val=document.getElementById('aiext-input').value||'';
+    try{window.parent.postMessage({type:type==='chat'?'AEXT_CHAT_SUBMIT':'AEXT_ASK_SUBMIT',value:val},"*")}catch(_){}
+  };
+  var h=function(e){
+    if((e.key==="Enter"||e.code==="Enter")&&(e.ctrlKey||e.metaKey)){
+      e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+      send();
+    }
+  };
+  var el=document.getElementById('aiext-input');
+  if(el){el.addEventListener('keydown',h);el.addEventListener('keyup',h);}
+  document.addEventListener('keydown',h,true);document.addEventListener('keyup',h,true);
+})();
+</script>
+</body>
+</html>

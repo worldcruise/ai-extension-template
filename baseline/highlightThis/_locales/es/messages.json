@@ -1,0 +1,836 @@
+{
+   "action_example": {
+      "message": "Ejemplo, un resaltado de la palabra 'resaltar' usando el token 'Hi?hL*', dará como resultado:"
+   },
+   "action_intro": {
+      "message": "Defina la acción a ejecutar al hacer clic en un resaltado"
+   },
+   "action_newtab": {
+      "message": "Abrir en una pestaña nueva"
+   },
+   "action_none": {
+      "message": "Ninguno"
+   },
+   "action_sametab": {
+      "message": "Abrir en la pestaña actual"
+   },
+   "action_tip1": {
+      "message": "%t% se reemplaza por el texto que se encuentra en la página (p. ej. Resaltar)"
+   },
+   "action_tip2": {
+      "message": "%s% se reemplaza por su palabra de búsqueda (por ejemplo, Hi?hL*)"
+   },
+   "action_tip3": {
+      "message": "%tu% o %tl%, %su% o %sl% fuerza en mayúsculas o minúsculas"
+   },
+   "action_tip4": {
+      "message": "Algunos ejemplos: https://wikipedia.com/%t% , https://google.com/search?q=%t%"
+   },
+   "added_new_word": {
+      "message": "Nueva palabra añadida"
+   },
+   "added_non_term": {
+      "message": "Atención, es posible que la palabra no se resalte."
+   },
+   "added_non_term_description": {
+      "message": "Ha agregado caracteres de secuencias de comandos que normalmente no están separados por espacios o símbolos.\n\nCompruebe la configuración de la lista para especificar la coincidencia de palabras/términos."
+   },
+   "agree": {
+      "message": "estoy de acuerdo con el"
+   },
+   "already_in_wordlist": {
+      "message": "ya estaba presente en  la lista de palabras"
+   },
+   "application_description": {
+      "message": "Busca y resalta automáticamente palabras y frases en la página web según tu lista"
+   },
+   "application_title": {
+      "message": "Highlight This: busca y marca palabras"
+   },
+   "assistant_step_1": {
+      "message": "Cree o abra un documento existente de Hojas de cálculo de Google."
+   },
+   "assistant_step_2": {
+      "message": "En la primera hoja, primera columna crea tu lista de palabras."
+   },
+   "assistant_step_3": {
+      "message": "Comparte las hojas de Google"
+   },
+   "assistant_step_4": {
+      "message": "Compártelo con cualquiera que tenga el enlace."
+   },
+   "assistant_step_5": {
+      "message": "Seleccione el enlace de 'Copiar enlace'"
+   },
+   "assistant_step_6": {
+      "message": "Pega el enlace aquí"
+   },
+   "autoBackup_Daily": {
+      "message": "A diario"
+   },
+   "autoBackup_Monthly": {
+      "message": "Mensual"
+   },
+   "autoBackup_Never": {
+      "message": "Nunca"
+   },
+   "autoBackup_Weekly": {
+      "message": "Semanalmente"
+   },
+   "changelicense_ad_button": {
+      "message": "Activar anuncios"
+   },
+   "changelicense_ad_description": {
+      "message": "\u003Cli>Se muestran anuncios en Highlight This!\u003C/li>\u003Cli>Incluye resaltado ilimitado de palabras y todos los estilos de resaltado.\u003C/li>\u003Cli>Elija una licencia de pago para una experiencia sin anuncios.\u003C/li>"
+   },
+   "changelicense_ad_moreinfo": {
+      "message": "Acerca de los anuncios"
+   },
+   "changelicense_ad_title": {
+      "message": "Cambiar a la versión con anuncios"
+   },
+   "changelicense_free_button": {
+      "message": "Activar versión gratuita"
+   },
+   "changelicense_free_description": {
+      "message": "\u003Cli>Su resaltado está limitado a 200 palabras. Highlight This! solo usará las primeras 200 palabras de sus listas\u003C/li>\u003Cli>Tiene estilos de resaltado limitados\u003C/li>\u003Cli>No se muestran anuncios\u003C/li>"
+   },
+   "changelicense_free_title": {
+      "message": "Resaltado limitado gratuito con 200 palabras"
+   },
+   "changelicense_paid_button": {
+      "message": "comprar una licencia"
+   },
+   "changelicense_paid_description": {
+      "message": "\u003Cli>Dependiendo de la versión que elija, tiene resaltado en 500 o ilimitadas palabras\u003C/li>\u003Cli>Tiene estilos de resaltado limitados\u003C/li>"
+   },
+   "changelicense_paid_title": {
+      "message": "Compre una licencia anual para permitir resaltar más palabras sin el uso de anuncios"
+   },
+   "changelicense_title": {
+      "message": "Cambiar versión"
+   },
+   "close_assistant": {
+      "message": "Cierra el asistente"
+   },
+   "confirm_email": {
+      "message": "Confirmar correo electrónico"
+   },
+   "create_new_list": {
+      "message": "Crear una nueva lista"
+   },
+   "currentlicense_500_description": {
+      "message": "\u003Cli>Su resaltado está limitado a 500 palabras. Highlight This! solo usará las primeras 500 palabras de tus listas\u003C/li>\u003Cli>Tienes todos los estilos de resaltado\u003C/li>\u003Cli>No se muestran anuncios\u003C/li>"
+   },
+   "currentlicense_500_title": {
+      "message": "Estás usando la versión paga con un límite de 500 palabras"
+   },
+   "currentlicense_ad_description": {
+      "message": "\u003Cli>Se muestran anuncios en Highlight This!\u003C/li>\u003Cli>Incluye resaltado ilimitado de palabras y todos los estilos de resaltado.\u003C/li>\u003Cli>Elija una licencia de pago para una experiencia sin anuncios.\u003C/li>"
+   },
+   "currentlicense_ad_title": {
+      "message": "Está usando la versión con anuncios"
+   },
+   "currentlicense_free_description": {
+      "message": "\u003Cli>Su resaltado está limitado a 200 palabras. Highlight This! solo usará las primeras 200 palabras de sus listas\u003C/li>\u003Cli>Tiene estilos de resaltado limitados\u003C/li>\u003Cli>No se muestran anuncios\u003C/li>"
+   },
+   "currentlicense_free_title": {
+      "message": "Estás usando la versión gratuita"
+   },
+   "currentlicense_temp_description": {
+      "message": "\u003Cli>Tu resaltado es ilimitado\u003C/li>\u003Cli>Tienes todos los estilos de resaltado\u003C/li>\u003Cli>No se muestran anuncios\u003C/li>"
+   },
+   "currentlicense_temp_title": {
+      "message": "Estás en la versión de prueba, te quedan \u003Cb>{0}\u003C/b> días"
+   },
+   "currentlicense_unlimited_description": {
+      "message": "\u003Cli>Tu resaltado es ilimitado\u003C/li>\u003Cli>Tienes todos los estilos de resaltado\u003C/li>\u003Cli>No se muestran anuncios\u003C/li>"
+   },
+   "currentlicense_unlimited_title": {
+      "message": "Estás usando la versión paga ilimitada"
+   },
+   "deleteGroupLink": {
+      "message": "Eliminar la lista"
+   },
+   "donate1": {
+      "message": "Holà, esperó que disfrutés usando Highlight This!"
+   },
+   "donate2": {
+      "message": "Desarrollo la extensión en mi tiempo libre, apoya mi trabajo donando 1&dollar; / 1&euro;."
+   },
+   "donate3": {
+      "message": "Highlight This! siempre seguirá siendo gratuito"
+   },
+   "donatebtn": {
+      "message": "Hacer una donación"
+   },
+   "dontdonate": {
+      "message": "No quiero dar ahora, continúo usando gratís"
+   },
+   "download_backup": {
+      "message": "Clic en este enlace si el archivo no se descargó automáticamente"
+   },
+   "download_frequency": {
+      "message": "Frecuencia de descarga (función Premium)"
+   },
+   "download_frequency_1": {
+      "message": "cada 10 minutos"
+   },
+   "download_frequency_2": {
+      "message": "cada 30 minutos"
+   },
+   "download_frequency_3": {
+      "message": "cada 1 hora"
+   },
+   "download_frequency_4": {
+      "message": "cada 4 horas"
+   },
+   "download_frequency_5": {
+      "message": "cada 8 horas"
+   },
+   "download_frequency_6": {
+      "message": "Cada día"
+   },
+   "duration": {
+      "message": "Duración"
+   },
+   "email": {
+      "message": "Correo electrónico"
+   },
+   "enter_license": {
+      "message": "Introduzca una nueva clave de licencia"
+   },
+   "enterlicense_button": {
+      "message": "Validar"
+   },
+   "enterlicense_description": {
+      "message": "Si ya tiene una clave de licencia, puede ingresarla aquí."
+   },
+   "enterlicense_label": {
+      "message": "Clave de licencia"
+   },
+   "enterlicense_title": {
+      "message": "Introduce tu clave de licencia"
+   },
+   "everytime": {
+      "message": "Cada vez"
+   },
+   "example": {
+      "message": "ejemplo"
+   },
+   "example1": {
+      "message": "Esto es un"
+   },
+   "example2": {
+      "message": "texto resaltado"
+   },
+   "field_autoBackupSettings": {
+      "message": "Copia de seguridad automática"
+   },
+   "field_background": {
+      "message": "Color de fondo"
+   },
+   "field_boxColor": {
+      "message": "Color de borde para campos de entrada"
+   },
+   "field_caseSensitive_label": {
+      "message": "Comparar en modo de mayúsculas y minúsculas"
+   },
+   "field_clearSyncLists": {
+      "message": "Restablecer datos y configuraciones:"
+   },
+   "field_colors": {
+      "message": "Colores"
+   },
+   "field_colors_help": {
+      "message": "Seleccionar colores resaltados"
+   },
+   "field_containerSelector": {
+      "message": "Resaltar solo cuando el contenedor coincida con este selector de consulta"
+   },
+   "field_detection": {
+      "message": "Detección"
+   },
+   "field_detection_help": {
+      "message": "Solo detectar las  palabras completas"
+   },
+   "field_dontHighlight": {
+      "message": "No destacar en estos sitios"
+   },
+   "field_export": {
+      "message": "Exportar"
+   },
+   "field_exportSettings": {
+      "message": "Crea una copia de seguridad"
+   },
+   "field_foreground": {
+      "message": "Color de primer plano"
+   },
+   "field_highlightOn": {
+      "message": "Destacar en estos sitios"
+   },
+   "field_import": {
+      "message": "Importar"
+   },
+   "field_importSettings": {
+      "message": "Restaurar una copia de seguridad"
+   },
+   "field_limitations": {
+      "message": "Límites"
+   },
+   "field_listname": {
+      "message": "nombre de la lista"
+   },
+   "field_neverHighlightOn": {
+      "message": "Nunca destacar  en estos sitios"
+   },
+   "field_neverHighlightOn_help": {
+      "message": "Enumere los sitios en los que nunca desea que aparezcan elementos destacados. \u003Cbr /> \u003Cbr /> Puede usar caracteres como * y ?. \u003Cbr /> ejemplos * .google.com, www.google.com, www.google.com/something/page.html"
+   },
+   "field_printHighlights": {
+      "message": "Imprimir los destacados"
+   },
+   "field_sendErrors": {
+      "message": "Informar de un error al desarrollador"
+   },
+   "field_sendErrorsDescription": {
+      "message": "Descripción del problema:"
+   },
+   "field_sendErrorsEmail": {
+      "message": "Dirección de correo electrónico:"
+   },
+   "field_showFoundWords": {
+      "message": "Mostrar resumen de las palabras encontradas"
+   },
+   "field_sitesToHighlight": {
+      "message": "Seleccionar los sitios para actuar"
+   },
+   "field_source": {
+      "message": "Fuente"
+   },
+   "field_useRegexTokens_help": {
+      "message": "Use tokens Regex en lugar de simples caracteres * y ? "
+   },
+   "field_words": {
+      "message": "Palabras"
+   },
+   "field_words_help": {
+      "message": "Puede usar caracteres como * y ?. Cada nueva línea se considera una palabra."
+   },
+   "field_words_regex_help": {
+      "message": "Puede usar tokens Regex como \b, [a-z], [1-9] "
+   },
+   "filterwords": {
+      "message": "Filtrar"
+   },
+   "first_list": {
+      "message": "Mi lista"
+   },
+   "has_been_added_to": {
+      "message": ""
+   },
+   "has_been_updated": {
+      "message": "ha sido actualizado"
+   },
+   "highlight_editable_fields": {
+      "message": "Destacar en campos editables"
+   },
+   "importLocalRules": {
+      "message": "Restaurar \u003Cb>{0} listas no sincronizadas\u003C/b> y configuraciones"
+   },
+   "importSyncRules": {
+      "message": "Restaurar \u003Cb>{0} sincronizado\u003C/b> lista (s)"
+   },
+   "info_autoBackupSettings": {
+      "message": "Crea una copia de seguridad en su carpeta de Descargas"
+   },
+   "info_clearSyncLists": {
+      "message": "Asegúrese de crear una copia de seguridad antes de restablecer sus datos y configuraciones"
+   },
+   "jump_to_word": {
+      "message": "Ir a la palabra"
+   },
+   "label_action": {
+      "message": "Acción"
+   },
+   "label_link": {
+      "message": "Enlace"
+   },
+   "last_synced_on": {
+      "message": "Descargado por última vez el"
+   },
+   "launch_assistant": {
+      "message": "Iniciar el asistente"
+   },
+   "license_500": {
+      "message": "500"
+   },
+   "license_ad": {
+      "message": "Versión con anuncios"
+   },
+   "license_confirm_temp_remove": {
+      "message": "¿Está seguro de que desea abandonar la versión de prueba? No puede volver a la versión de prueba."
+   },
+   "license_expired": {
+      "message": "Su licencia ha expirado"
+   },
+   "license_expired_message": {
+      "message": "Estás de vuelta en la versión gratuita."
+   },
+   "license_expires": {
+      "message": "Su licencia caduca en {0} día(s). \u003Ca id=\"linkSubscription\" style=\"text-decoration: underline\">Cambia tu suscripción\u003C/a> para no perderte ningún momento destacado"
+   },
+   "license_free": {
+      "message": "gratis"
+   },
+   "license_message_temp": {
+      "message": "Tiene una suscripción de prueba con todas las funciones habilitadas. Su prueba caduca en \u003Cb>{0}\u003C/b> días. \u003Ca id=\"linkSubscription\" style=\"text-decoration: underline\">Cambia tu suscripción\u003C/a>"
+   },
+   "license_new": {
+      "message": "Nueva licencia"
+   },
+   "license_new_until": {
+      "message": "Su nueva licencia es válida hasta"
+   },
+   "license_temp": {
+      "message": "ensayo"
+   },
+   "license_unlimited": {
+      "message": "Ilimitado"
+   },
+   "license_updated": {
+      "message": "Licencia actualizada"
+   },
+   "list_synced": {
+      "message": "Lista sincronizada"
+   },
+   "localLabel": {
+      "message": "Lista estándar"
+   },
+   "magicHighlighting": {
+      "message": "Resaltado optimizado para velocidad"
+   },
+   "maxwords_reached": {
+      "message": "Tienes {0} % de palabras. \u003Ca id=\"linkSubscription\" style=\"text-decoration: underline\">Edite su suscripción\u003C/a> para no perder ningún resaltado"
+   },
+   "menu_help_label": {
+      "message": "Ayuda"
+   },
+   "menu_home_label": {
+      "message": "Hogar"
+   },
+   "menu_sendErrors_label": {
+      "message": "Reportar un error"
+   },
+   "menu_settings_label": {
+      "message": "Ajustes"
+   },
+   "menu_subscription_label": {
+      "message": "Suscripción"
+   },
+   "migrate_local_button": {
+      "message": "Hacer lista local"
+   },
+   "migrate_local_text": {
+      "message": "Cambie esta lista a una lista local, entonces solo estará disponible en este navegador"
+   },
+   "migrate_sync_button": {
+      "message": "Sincronizar lista"
+   },
+   "migrate_sync_text": {
+      "message": "Cambie esta lista a una lista sincronizada, para que esté disponible en todos sus navegadores donde haya iniciado sesión"
+   },
+   "migrate_sync_toobig_text": {
+      "message": "La lista no se puede cambiar a una lista sincronizada porque es demasiado grande, limite el número de palabras para sincronizar la lista a todos los navegadores en los que ha iniciado sesión"
+   },
+   "more": {
+      "message": "Más"
+   },
+   "need_more_subscriptions": {
+      "message": "Si necesitas más licencias, puedes solicitarlas ahora"
+   },
+   "newGroupDetail": {
+      "message": "Una lista estándar le permite administrar palabras directamente. \u003Cbr /> Una lista externa descarga una lista de palabras de un sitio externo (por ejemplo, pastebin)"
+   },
+   "noReset": {
+      "message": "Cancelar"
+   },
+   "no_subscription_request": {
+      "message": "Si no tienes licencia, puedes solicitar una ahora"
+   },
+   "non_unicode_chars": {
+      "message": "Ha agregado caracteres de scripts que normalmente no están separados por espacios o símbolos. Esta configuración funciona mejor para idiomas con palabras delimitadas por espacios. Para escrituras como el chino, el coreano o el japonés, que no utilizan espacios entre palabras, esto puede reducir la precisión de la detección. Considere desmarcar esta opción para resaltar mejor en estos idiomas."
+   },
+   "notif_allDisabled": {
+      "message": "El resaltado está deshabilitado"
+   },
+   "notif_allEnabled": {
+      "message": "El resaltado está habilitado"
+   },
+   "notif_backupDone": {
+      "message": "La copia de seguridad está lista en su carpeta de Descargas"
+   },
+   "notif_bugReportSent": {
+      "message": "Informe de error enviado"
+   },
+   "notif_licenseAd": {
+      "message": "Ahora está usando la versión con anuncios"
+   },
+   "notif_licenseAdfree": {
+      "message": "Ahora estás en la versión gratuita"
+   },
+   "notif_licensePaid": {
+      "message": "Ahora estás en la versión \"Highlight This! {0}\""
+   },
+   "notif_listDeleted": {
+      "message": "Se elimina la lista \"{0}\""
+   },
+   "notif_listDisabled": {
+      "message": "La lista \"{0}\" está deshabilitada"
+   },
+   "notif_listEnabled": {
+      "message": "La lista \"{0}\" está habilitada"
+   },
+   "notif_listSaved": {
+      "message": "La lista \"{0}\" está guardada"
+   },
+   "notif_restoreComplete": {
+      "message": "La restauración está completa"
+   },
+   "notif_settingsSaved": {
+      "message": "Los ajustes se guardan"
+   },
+   "notify_when_found": {
+      "message": "Notificar cuando se encuentra una palabra"
+   },
+   "nr_users": {
+      "message": "# de usuarios"
+   },
+   "once_per_page": {
+      "message": "Una vez por página"
+   },
+   "perf_100": {
+      "message": "Rápido -  requiere una máquina potente"
+   },
+   "perf_200": {
+      "message": "Predeterminado -  ajusta la velocidad de resaltado según la frecuencia con la que se actualizan las páginas"
+   },
+   "perf_300": {
+      "message": "Lento -  el resaltado va un poco más lento para ahorrar recursos"
+   },
+   "perf_400": {
+      "message": "Sin resaltar en las actualizaciones de la página - Resaltar Esto solo marca palabras una vez cuando se carga la página"
+   },
+   "performance": {
+      "message": "Rendimiento"
+   },
+   "performanceHelp": {
+      "message": "Establezca el nivel de impacto Resaltar Esto está permitido tener en los recursos de su dispositivo (potencia de procesamiento)."
+   },
+   "popup_add": {
+      "message": "Añadir"
+   },
+   "popup_addnewlist": {
+      "message": "Agregar una nueva lista de palabras"
+   },
+   "popup_back": {
+      "message": "\u003CVolver"
+   },
+   "popup_byline": {
+      "message": "La extensión resalta todas las palabras a continuación."
+   },
+   "popup_cancel": {
+      "message": "Anular"
+   },
+   "popup_collapseAll": {
+      "message": "Reducir todo"
+   },
+   "popup_configureWords": {
+      "message": "\u003CConfiguración de Word"
+   },
+   "popup_confirmDelete": {
+      "message": "¿Estás seguro de que deseas eliminar la lista y sus palabras?"
+   },
+   "popup_confirmReset": {
+      "message": "\u003Cdiv>¿Está seguro de que desea restablecer todos sus datos y configuraciones?\u003C/div>\u003Cdiv>Asegúrese de tener una copia de seguridad antes de continuar\u003C/div>"
+   },
+   "popup_create1": {
+      "message": "Crear una lista con palabras que"
+   },
+   "popup_create2": {
+      "message": " detecta y resalta en páginas web mientras navega."
+   },
+   "popup_createWordList": {
+      "message": "Crea una lista de palabras"
+   },
+   "popup_disabled": {
+      "message": "desactivado"
+   },
+   "popup_dontshowwords": {
+      "message": "Deja de mostrar palabras encontradas en la página"
+   },
+   "popup_edit": {
+      "message": "Editar"
+   },
+   "popup_editWordlist": {
+      "message": "Lista de edición"
+   },
+   "popup_expandAll": {
+      "message": "Ver todo"
+   },
+   "popup_foundWords": {
+      "message": "Encontramos palabras en esta página."
+   },
+   "popup_importFailed": {
+      "message": "Importación fallida"
+   },
+   "popup_labelListName": {
+      "message": "nombre de la lista"
+   },
+   "popup_limitations": {
+      "message": "límites"
+   },
+   "popup_next": {
+      "message": "Próximo"
+   },
+   "popup_no": {
+      "message": "No"
+   },
+   "popup_nowords": {
+      "message": "No hay una lista definida"
+   },
+   "popup_save": {
+      "message": "Salvar"
+   },
+   "popup_settings": {
+      "message": "configuraciones"
+   },
+   "popup_showDonate": {
+      "message": "Ayuda y Don!"
+   },
+   "popup_tip1": {
+      "message": "Consejo: Uso"
+   },
+   "popup_tip2": {
+      "message": "+Shift+Space"
+   },
+   "popup_tip3": {
+      "message": "para navegar por  palabras de la página"
+   },
+   "popup_title": {
+      "message": "Highlight This!"
+   },
+   "popup_yes": {
+      "message": "Si"
+   },
+   "premium_feature": {
+      "message": "Esta es una característica premium"
+   },
+   "price_tier1": {
+      "message": "3 meses (6 euros/usuario)"
+   },
+   "price_tier2": {
+      "message": "6 meses (11 euros/usuario)"
+   },
+   "price_tier3": {
+      "message": "12 meses (18 euros/usuario)"
+   },
+   "price_tier4": {
+      "message": "24 meses (24 euros/usuario)"
+   },
+   "refresh_page": {
+      "message": "Recarga la página"
+   },
+   "regex_invalid": {
+      "message": "La expresión regular no es válida."
+   },
+   "regex_mode": {
+      "message": "Regex mode"
+   },
+   "regex_too_many_matches": {
+      "message": "La expresión regular es demasiado amplia, hará que las páginas no respondan"
+   },
+   "remoteLabel": {
+      "message": "Externo (Web, Pastebin, Google Sheets)"
+   },
+   "request_extra_license": {
+      "message": "Solicitar claves de licencia adicionales"
+   },
+   "request_license": {
+      "message": "Solicitar una licencia"
+   },
+   "request_license_form": {
+      "message": "Puede solicitar una clave de licencia utilizando este formulario. Una vez que recibamos su solicitud, le enviaremos una clave de licencia temporal y nos pondremos en contacto con usted para obtener información de facturación/pago."
+   },
+   "request_licensekey": {
+      "message": "Solicitar una clave de licencia"
+   },
+   "resetDataAndSettings": {
+      "message": "Restablecer datos y configuraciones"
+   },
+   "restoreWarning": {
+      "message": "Restaurar una copia de seguridad de listas sincronizadas solo eliminará y restaurará las listas sincronizadas. \u003Cbr /> Una restauración de las listas no sincronizadas restaurará su configuración, y eliminará y restaurará solo sus listas no sincronizadas."
+   },
+   "sendErrorsButton": {
+      "message": "Enviar"
+   },
+   "sendErrorsHelp": {
+      "message": "\u003Cp>Si encuentra algún problema, envíe un informe de error al desarrollador. \u003C/p>\u003Cp>También se enviarán los errores detectados, esta información no contiene datos personales ni palabras.\u003C/p>"
+   },
+   "send_to": {
+      "message": "Enviar a"
+   },
+   "sheets_assistant": {
+      "message": "Asistente de Hojas de cálculo de Google"
+   },
+   "sheets_id": {
+      "message": "Hojas de identificación"
+   },
+   "shortmonth_1": {
+      "message": "ENE"
+   },
+   "shortmonth_10": {
+      "message": "OCT"
+   },
+   "shortmonth_11": {
+      "message": "NOV"
+   },
+   "shortmonth_12": {
+      "message": "DIC"
+   },
+   "shortmonth_2": {
+      "message": "FEB"
+   },
+   "shortmonth_3": {
+      "message": "MAR"
+   },
+   "shortmonth_4": {
+      "message": "ABR"
+   },
+   "shortmonth_5": {
+      "message": "MAYO"
+   },
+   "shortmonth_6": {
+      "message": "JUN"
+   },
+   "shortmonth_7": {
+      "message": "JUL"
+   },
+   "shortmonth_8": {
+      "message": "AGO"
+   },
+   "shortmonth_9": {
+      "message": "SEP"
+   },
+   "sites_info": {
+      "message": "Enumere los sitios en los que desea resaltar las palabras. \u003Cbr /> Puede definir una lista blanca y una lista negra, la lista negra tiene prioridad. \u003Cbr /> Si no se define nada, el resaltado se realiza en todas las páginas. \u003Cbr /> \u003Cbr /> Usted puede usar comodines como * y ?. \u003Cbr /> ejemplos:  *.google.com, www.google.com, www.google.com/something/page.html, www.go?gle.com/*/page.html"
+   },
+   "submit_form": {
+      "message": "Enviar formulario"
+   },
+   "subscription_enter_key": {
+      "message": "Introduzca una clave de licencia"
+   },
+   "subscription_enter_key_help": {
+      "message": "Puede escribir o pegar su clave de licencia, que recibió por correo electrónico, aquí"
+   },
+   "subscription_valid_until": {
+      "message": "Tu suscripción es válida hasta"
+   },
+   "sync": {
+      "message": "Download"
+   },
+   "sync_list_desc": {
+      "message": "Una lista sincronizada está disponible en todos sus navegadores cuando está conectado a su navegador, pero admite menos palabras debido a las limitaciones de almacenamiento."
+   },
+   "sync_list_header": {
+      "message": "¿Desea sincronizar esta lista entre sus navegadores?"
+   },
+   "sync_list_no": {
+      "message": "No, no sincronice esta lista"
+   },
+   "sync_list_yes": {
+      "message": "Sí, sincroniza esta lista"
+   },
+   "synchronizing": {
+      "message": "Sincronizando"
+   },
+   "tab_action": {
+      "message": "Acción"
+   },
+   "tab_advanced": {
+      "message": "Avanzado"
+   },
+   "tab_general": {
+      "message": "General"
+   },
+   "tab_limitations": {
+      "message": "Limitaciones"
+   },
+   "tab_settings_backup": {
+      "message": "Apoyo"
+   },
+   "tab_settings_general": {
+      "message": "General"
+   },
+   "tab_style": {
+      "message": "Estilo"
+   },
+   "term_conditions": {
+      "message": "Términos y condiciones"
+   },
+   "thanks_request": {
+      "message": "Gracias por su solicitud"
+   },
+   "thanks_request_info": {
+      "message": "Nos pondremos en contacto con usted muy pronto para intercambiar información de facturación y pago."
+   },
+   "title_newGroupType": {
+      "message": "¿Qué tipo de lista de palabras quieres crear?"
+   },
+   "upgrade_feature1": {
+      "message": "Usa las hojas de Google para administrar las palabras"
+   },
+   "upgrade_feature2": {
+      "message": "Definir acciones al hacer clic en un resaltado"
+   },
+   "upgrade_feature3": {
+      "message": "Más por venir..."
+   },
+   "upgrade_price_title": {
+      "message": "Highlight This! La prima está disponible para"
+   },
+   "upgrade_tier1": {
+      "message": "3 meses: 6 euros"
+   },
+   "upgrade_tier2": {
+      "message": "6 meses: 11 euros"
+   },
+   "upgrade_tier3": {
+      "message": "12 meses: 18 euros"
+   },
+   "upgrade_tier4": {
+      "message": "24 meses: 24 euros"
+   },
+   "upgrade_to_premium": {
+      "message": "Mejorado a Premium"
+   },
+   "upgrade_to_premium_intro": {
+      "message": "Actualice para Highlight This! Premium y benefíciese de funciones de resaltado más avanzadas"
+   },
+   "url_invalid": {
+      "message": "La URL no es válida"
+   },
+   "word_found_on_page": {
+      "message": "Palabra encontrada en la página"
+   },
+   "wordlist_too_long_for_sync_storage": {
+      "message": "La lista es demasiado larga para sincronizarse con otros navegadores."
+   },
+   "yesReset": {
+      "message": "Restablecer todos mis datos"
+   },
+   "you_are_premium": {
+      "message": "Eres un usuario Premium"
+   }
+}

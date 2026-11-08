@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Enable Screenshots - SideAI</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f7f8fa;
+    color: #1f2328;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    max-width: 520px;
+    width: 100%;
+    padding: 28px 28px 24px;
+  }
+  h1 { font-size: 20px; margin: 0 0 8px; }
+  p { font-size: 14px; line-height: 1.5; color: #4b5563; margin: 0 0 12px; }
+  ul { font-size: 13px; color: #4b5563; padding-left: 20px; margin: 0 0 18px; }
+  .row { display: flex; gap: 10px; margin-top: 18px; }
+  button {
+    font: 600 14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    border-radius: 8px;
+    padding: 10px 16px;
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+  .primary { background: #10a37f; color: #fff; }
+  .primary:hover { background: #0e8f70; }
+  .secondary { background: #fff; color: #1f2328; border-color: #d0d7de; }
+  .secondary:hover { background: #f3f4f6; }
+  .status { font-size: 13px; margin-top: 14px; min-height: 18px; }
+  .ok { color: #10a37f; }
+  .err { color: #b91c1c; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Enable one-click screenshots</h1>
+    <p>
+      Grant SideAI access to the sites you take screenshots on. Without this,
+      Chrome blocks screenshot capture on pages outside ChatGPT.
+    </p>
+    <ul>
+      <li>Your data is never collected. Access is only used to capture the visible tab when you ask.</li>
+      <li>You can remove this permission any time from <em>chrome://extensions</em>.</li>
+    </ul>
+    <div class="row">
+      <button id="grantBtn" class="primary" type="button">Grant access</button>
+      <button id="cancelBtn" class="secondary" type="button">Not now</button>
+    </div>
+    <div id="status" class="status"></div>
+  </div>
+<script src="grant-access.js"></script>
+</body>
+</html>

@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>ChatGPT Sidebar</title>
+    <link rel="preconnect" href="https://chatgpt.com">
+    <style>
+        :root {
+            --sp-bg: #101427;
+            --sp-surface: #121a2f;
+            --sp-surface-strong: #182038;
+            --sp-surface-soft: rgba(18, 26, 47, 0.85);
+            --sp-border: rgba(148, 163, 184, 0.14);
+            --sp-text: #e2e8f0;
+            --sp-text-soft: rgba(226, 232, 240, 0.7);
+            --sp-text-muted: rgba(203, 213, 225, 0.55);
+            --sp-accent: #f9735d;
+            --sp-accent-soft: rgba(249, 115, 93, 0.14);
+            --sp-blue: #60a5fa;
+            --sp-success: #34d399;
+            --sp-error: #f87171;
+            --sp-wrapper-bg: linear-gradient(160deg, rgba(12, 16, 32, 0.98) 0%, rgba(11, 12, 24, 0.96) 65%, rgba(18, 26, 47, 0.94) 100%);
+            --sp-footer-bg: #000000;
+            --sp-overlay-bg: rgba(9, 12, 23, 0.55);
+            --sp-modal-bg: var(--sp-surface);
+            --sp-tooltip-bg: rgba(38, 44, 68, 0.96);
+            --sp-iframe-bg: #0b1021;
+            --sp-textarea-bg: var(--sp-surface-strong);
+            --footer-height: 0px;
+            font-size: 14px;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            background: var(--sp-bg);
+            color: var(--sp-text);
+            font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        body.light-mode {
+            --sp-bg: #f5f7fb;
+            --sp-surface: rgba(255, 255, 255, 0.98);
+            --sp-surface-strong: rgba(255, 255, 255, 1);
+            --sp-surface-soft: rgba(241, 244, 251, 0.92);
+            --sp-border: rgba(148, 163, 184, 0.22);
+            --sp-text: #1f2937;
+            --sp-text-soft: rgba(51, 65, 85, 0.88);
+            --sp-text-muted: rgba(100, 116, 139, 0.76);
+            --sp-accent: #ef654b;
+            --sp-accent-soft: rgba(239, 101, 75, 0.18);
+            --sp-blue: #2563eb;
+            --sp-success: #059669;
+            --sp-error: #dc2626;
+            --sp-wrapper-bg: linear-gradient(160deg, rgba(246, 247, 252, 0.98) 0%, rgba(242, 245, 252, 0.95) 64%, rgba(233, 237, 247, 0.94) 100%);
+            --sp-footer-bg: rgb(255 255 255);
+            --sp-overlay-bg: rgba(15, 23, 42, 0.18);
+            --sp-modal-bg: rgba(255, 255, 255, 0.98);
+            --sp-tooltip-bg: rgba(239, 241, 248, 0.98);
+            --sp-iframe-bg: #ffffff;
+            --sp-textarea-bg: rgba(255, 255, 255, 0.92);
+        }
+
+        #sidepanel-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            background: var(--sp-wrapper-bg);
+        }
+
+        .sideai-shortcut-hint[hidden] {
+            display: none !important;
+        }
+
+        .sideai-shortcut-hint {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 8px;
+            border: 1px solid rgba(16, 185, 129, 0.22);
+            background:
+                radial-gradient(circle at 0% 0%, rgba(185, 220, 127, 0.2), transparent 38%),
+                linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(241, 255, 248, 0.94));
+            color: #07111f;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+        }
+
+        .sideai-shortcut-icon {
+            flex: 0 0 auto;
+            display: grid;
+            place-items: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 12px;
+            background: transparent;
+            color: #253858;
+        }
+
+        .sideai-shortcut-icon svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .sideai-shortcut-copy {
+            flex: 1 1 auto;
+            min-width: 0;
+            font-size: 11px;
+            line-height: 1.25;
+            color: rgba(15, 23, 42, 0.78);
+        }
+
+        .sideai-shortcut-copy-line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 2px 4px;
+            margin-bottom: 2px;
+        }
+
+        .sideai-shortcut-copy strong {
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .sideai-shortcut-keys {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            margin: 0;
+            white-space: nowrap;
+            color: #07111f;
+            font-weight: 600;
+        }
+
+        .sideai-shortcut-key {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
+            height: 18px;
+            padding: 0 3px;
+            border-radius: 5px;
+            border: 1px solid rgba(15, 23, 42, 0.12);
+            background: #ffffff;
+            box-shadow: inset 0 -1px 0 rgba(15, 23, 42, 0.08);
+            font-size: 10px;
+            line-height: 1;
+        }
+
+        .sideai-shortcut-settings {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 0;
+            padding: 0;
+            border: none;
+            background: transparent;
+            color: #0f766e;
+            font: inherit;
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            cursor: pointer;
+            transition: color 0.18s ease;
+        }
+
+        .sideai-shortcut-settings:hover,
+        .sideai-shortcut-settings:focus-visible {
+            color: #0b5f59;
+            outline: none;
+        }
+
+        .sideai-shortcut-dismiss {
+            flex: 0 0 auto;
+            display: grid;
+            place-items: center;
+            width: 24px;
+            height: 24px;
+            border: none;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.06);
+            color: rgba(15, 23, 42, 0.58);
+            font-size: 17px;
+            line-height: 1;
+            cursor: pointer;
+            transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+        }
+
+        .sideai-shortcut-dismiss:hover,
+        .sideai-shortcut-dismiss:focus-visible {
+            background: rgba(15, 23, 42, 0.1);
+            color: #07111f;
+            transform: rotate(90deg);
+            outline: none;
+        }
+
+        .sideai-rating-prompt[hidden] {
+            display: none !important;
+        }
+
+        .sideai-rating-prompt {
+            flex: 0 0 auto;
+            padding: 9px 10px;
+            border: 1px solid rgba(16, 185, 129, 0.22);
+            background:
+                radial-gradient(circle at 0% 0%, rgba(185, 220, 127, 0.2), transparent 38%),
+                linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(241, 255, 248, 0.94));
+            color: #07111f;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+        }
+
+        .sideai-rating-prompt-inner {
+            width: min(100%, 420px);
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .sideai-rating-prompt-icon {
+            flex: 0 0 auto;
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: linear-gradient(180deg, rgba(220, 252, 231, 0.96), rgba(209, 250, 229, 0.88));
+            color: #059669;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .sideai-rating-prompt-body {
+            flex: 1 1 auto;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .sideai-rating-prompt-copy-wrap {
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+
+        .sideai-rating-prompt-title {
+            margin: 0 0 1px;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: #07111f;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sideai-rating-prompt-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .sideai-rating-prompt-copy {
+            margin: 0;
+            min-width: 0;
+            flex: 1 1 auto;
+            font-size: 12px;
+            line-height: 1.25;
+            color: rgba(15, 23, 42, 0.78);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sideai-rating-prompt-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex: 0 0 auto;
+            white-space: nowrap;
+        }
+
+        .sideai-rating-prompt-stars {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .sideai-rating-prompt-star {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            padding: 0;
+            border: none;
+            background: transparent;
+            color: rgba(148, 163, 184, 0.82);
+            cursor: pointer;
+            transition: transform 0.18s ease, color 0.18s ease;
+        }
+
+        .sideai-rating-prompt-star svg {
+            width: 16px;
+            height: 16px;
+            display: block;
+        }
+
+        .sideai-rating-prompt-star path {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.7;
+            stroke-linejoin: round;
+            transition: fill 0.18s ease, stroke 0.18s ease;
+        }
+
+        .sideai-rating-prompt-star:hover,
+        .sideai-rating-prompt-star:focus-visible,
+        .sideai-rating-prompt-star.active {
+            color: #10b981;
+            transform: translateY(-1px) scale(1.08);
+            outline: none;
+        }
+
+        .sideai-rating-prompt-star:hover path,
+        .sideai-rating-prompt-star:focus-visible path,
+        .sideai-rating-prompt-star.active path {
+            fill: currentColor;
+            stroke: currentColor;
+        }
+
+        .sideai-rating-prompt-later {
+            border: none;
+            background: transparent;
+            color: rgba(15, 23, 42, 0.68);
+            font: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0;
+            text-decoration: underline;
+        }
+
+        .sideai-rating-prompt-later:hover,
+        .sideai-rating-prompt-later:focus-visible {
+            color: #07111f;
+            outline: none;
+        }
+
+        .sideai-rating-prompt-later[hidden] {
+            display: none !important;
+        }
+
+        .sideai-rating-prompt-dismiss {
+            flex: 0 0 auto;
+            display: grid;
+            place-items: center;
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.12);
+            color: rgba(100, 116, 139, 0.86);
+            font-size: 17px;
+            line-height: 1;
+            cursor: pointer;
+            transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+        }
+
+        .sideai-rating-prompt-dismiss:hover,
+        .sideai-rating-prompt-dismiss:focus-visible {
+            background: rgba(15, 23, 42, 0.1);
+            color: #07111f;
+            transform: rotate(90deg);
+            outline: none;
+        }
+
+        @media (max-width: 360px) {
+            .sideai-rating-prompt {
+                padding: 8px 9px;
+            }
+
+            .sideai-rating-prompt-inner {
+                gap: 8px;
+            }
+
+            .sideai-rating-prompt-icon {
+                width: 34px;
+                height: 34px;
+            }
+
+            .sideai-rating-prompt-title {
+                font-size: 13px;
+            }
+
+            .sideai-rating-prompt-copy {
+                font-size: 11px;
+            }
+
+            .sideai-rating-prompt-stars {
+                gap: 2px;
+            }
+
+            .sideai-rating-prompt-star {
+                width: 16px;
+                height: 16px;
+            }
+
+            .sideai-rating-prompt-star svg {
+                width: 14px;
+                height: 14px;
+            }
+
+            .sideai-rating-prompt-dismiss {
+                width: 26px;
+                height: 26px;
+            }
+        }
+
+        #chatgpt-iframe {
+            flex: 1 1 auto;
+            min-height: 0;
+            width: 100%;
+            border: none;
+            background: var(--sp-iframe-bg);
+        }
+        #sideai-login-help-frame[hidden] { display: none !important; }
+        #sideai-login-help-frame {
+            position: absolute;
+            inset: 0;
+            z-index: 50;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background: var(--sp-iframe-bg);
+        }
+
+        .sideai-update-overlay[hidden] {
+            display: none !important;
+        }
+
+        .sideai-update-overlay {
+            position: absolute;
+            inset: 0 0 var(--footer-height) 0;
+            z-index: 120;
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            padding: 10px;
+            background: rgba(8, 13, 24, 0.34);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            overflow: hidden;
+        }
+
+        .sideai-update-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            width: min(480px, 100%);
+            height: 100%;
+            max-height: 100%;
+            min-height: 0;
+            overflow: hidden;
+            border-radius: 24px;
+            background:
+                radial-gradient(circle at 12% 0%, rgba(185, 220, 127, 0.22), transparent 35%),
+                linear-gradient(180deg, #ffffff 0%, #f8fff9 100%);
+            color: #07111f;
+            box-shadow: 0 28px 70px rgba(5, 10, 20, 0.34);
+            border: 1px solid rgba(20, 184, 129, 0.18);
+            padding: clamp(14px, 2.7vh, 22px);
+            text-align: center;
+        }
+
+        .sideai-update-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 34px;
+            height: 34px;
+            border: none;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.06);
+            color: rgba(15, 23, 42, 0.54);
+            font-size: 24px;
+            line-height: 1;
+            cursor: pointer;
+            transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+        }
+
+        .sideai-update-close:hover,
+        .sideai-update-close:focus-visible {
+            background: rgba(15, 23, 42, 0.1);
+            color: #07111f;
+            transform: rotate(90deg);
+            outline: none;
+        }
+
+        .sideai-update-logo {
+            flex: 0 0 auto;
+            width: clamp(58px, 9vh, 76px);
+            height: clamp(58px, 9vh, 76px);
+            margin: 2px auto clamp(8px, 1.5vh, 14px);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            box-shadow: 0 18px 38px rgba(16, 185, 129, 0.18);
+        }
+
+        .sideai-update-logo img {
+            width: 68%;
+            height: 68%;
+            object-fit: contain;
+        }
+
+        .sideai-update-card h2 {
+            flex: 0 0 auto;
+            margin: 0 auto clamp(6px, 1vh, 10px);
+            max-width: 360px;
+            font-size: clamp(20px, 4.2vh, 24px);
+            line-height: 1.12;
+            letter-spacing: -0.04em;
+            color: #07111f;
+        }
+
+        .sideai-update-rebrand {
+            flex: 0 0 auto;
+            margin: 0 auto clamp(8px, 1.3vh, 12px);
+            max-width: 360px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(16, 185, 129, 0.1);
+            color: #047857;
+            font-size: 12px;
+            font-weight: 750;
+            line-height: 1.35;
+        }
+
+        .sideai-update-intro {
+            flex: 0 0 auto;
+            margin: 0 auto clamp(10px, 1.8vh, 18px);
+            max-width: 360px;
+            color: #526174;
+            font-size: clamp(13px, 2.15vh, 14px);
+            line-height: 1.45;
+        }
+
+        .sideai-update-slide {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.86);
+            padding: clamp(8px, 1.6vh, 12px);
+            box-shadow: 0 16px 34px rgba(15, 23, 42, 0.09);
+        }
+
+        .sideai-update-slide img {
+            flex: 0 1 auto;
+            display: block;
+            width: 100%;
+            height: clamp(112px, 23vh, 160px);
+            min-height: 0;
+            object-fit: cover;
+            border-radius: 16px;
+            background: #eefaf2;
+        }
+
+        .sideai-update-slide h3 {
+            flex: 0 0 auto;
+            margin: clamp(9px, 1.5vh, 14px) 4px 6px;
+            font-size: clamp(17px, 2.9vh, 18px);
+            line-height: 1.18;
+            letter-spacing: -0.02em;
+            color: #07111f;
+            text-align: left;
+        }
+
+        .sideai-update-slide p {
+            flex: 0 0 auto;
+            margin: 0 4px 0;
+            color: #526174;
+            font-size: clamp(12px, 2.1vh, 13px);
+            line-height: 1.42;
+            text-align: left;
+        }
+
+        .sideai-update-dots {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin: clamp(10px, 1.6vh, 16px) 0 clamp(9px, 1.5vh, 14px);
+        }
+
+        .sideai-update-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            border: none;
+            background: rgba(15, 23, 42, 0.18);
+            padding: 0;
+            cursor: pointer;
+            transition: width 0.18s ease, background 0.18s ease;
+        }
+
+        .sideai-update-dot.active {
+            width: 22px;
+            background: #10b981;
+        }
+
+        .sideai-update-controls {
+            flex: 0 0 auto;
+            display: flex;
+            gap: 10px;
+            margin-bottom: clamp(8px, 1.4vh, 12px);
+        }
+
+        .sideai-update-btn {
+            flex: 1;
+            height: clamp(38px, 6vh, 42px);
+            border: none;
+            border-radius: 999px;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 750;
+            cursor: pointer;
+            transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+        }
+
+        .sideai-update-btn:hover,
+        .sideai-update-btn:focus-visible {
+            transform: translateY(-1px);
+            outline: none;
+        }
+
+        .sideai-update-btn.secondary {
+            background: #eef3eb;
+            color: #07111f;
+        }
+
+        .sideai-update-btn.primary {
+            background: #0f172a;
+            color: #ffffff;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
+        }
+
+        .sideai-update-actions {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sideai-update-link,
+        .sideai-update-disable {
+            border: none;
+            background: transparent;
+            color: #07875f;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 750;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .sideai-update-disable {
+            color: #738096;
+            font-weight: 650;
+        }
+
+        @media (max-width: 420px) {
+            .sideai-update-overlay {
+                padding: 8px;
+            }
+
+            .sideai-update-card {
+                border-radius: 22px;
+                padding: 14px 12px;
+            }
+
+            .sideai-update-card h2 {
+                font-size: 21px;
+            }
+
+            .sideai-update-slide img {
+                height: clamp(108px, 21vh, 132px);
+            }
+        }
+
+        @media (max-height: 720px) {
+            .sideai-update-card {
+                padding: 12px;
+                border-radius: 20px;
+            }
+
+            .sideai-update-close {
+                top: 10px;
+                right: 10px;
+                width: 30px;
+                height: 30px;
+                font-size: 22px;
+            }
+
+            .sideai-update-logo {
+                width: 54px;
+                height: 54px;
+                border-radius: 18px;
+            }
+
+            .sideai-update-card h2 {
+                max-width: 330px;
+                font-size: 20px;
+            }
+
+            .sideai-update-rebrand {
+                padding: 7px 10px;
+                font-size: 11px;
+            }
+
+            .sideai-update-intro {
+                font-size: 12px;
+            }
+
+            .sideai-update-slide {
+                border-radius: 18px;
+                padding: 8px;
+            }
+
+            .sideai-update-slide img {
+                height: clamp(88px, 20vh, 122px);
+                border-radius: 13px;
+            }
+
+            .sideai-update-slide h3 {
+                margin-top: 8px;
+                font-size: 16px;
+            }
+
+            .sideai-update-slide p {
+                font-size: 12px;
+                line-height: 1.35;
+            }
+
+            .sideai-update-dot {
+                width: 6px;
+                height: 6px;
+            }
+
+            .sideai-update-dot.active {
+                width: 19px;
+            }
+
+            .sideai-update-btn {
+                height: 36px;
+                font-size: 13px;
+            }
+        }
+
+        #sidepanel-footer {
+            flex: 0 0 auto;
+            /* height: var(--footer-height); */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: var(--sp-footer-bg);
+            color: var(--sp-text-soft);
+            font-size: 11px;
+            letter-spacing: 0;
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            z-index: 10;
+        }
+
+        #sidepanel-footer button {
+            font-family: inherit;
+        }
+
+        .footer-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: transparent;
+            border: 1px solid transparent;
+            color: inherit;
+            font-size: 11px;
+            font-weight: 500;
+            opacity: 0.8;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .footer-btn:hover,
+        .footer-btn:focus-visible {
+            opacity: 1;
+            border-color: rgba(148, 163, 184, 0.18);
+            background: rgba(148, 163, 184, 0.08);
+            outline: none;
+        }
+
+        .footer-btn .footer-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 12px;
+            height: 12px;
+        }
+
+        .footer-btn svg {
+            width: 12px;
+            height: 12px;
+            fill: currentColor;
+        }
+
+        .footer-divider {
+            width: 1px;
+            height: 14px;
+            background: rgba(148, 163, 184, 0.18);
+        }
+
+        .footer-rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            color: inherit;
+        }
+
+        .rating-label {
+            opacity: 0.75;
+            font-weight: 500;
+            font-size: 11px;
+        }
+
+        .rating-stars {
+            display: inline-flex;
+            gap: 2px;
+        }
+
+        .rating-star {
+            width: 100%;
+            max-width: 10.5px;
+            min-width: 0;
+            background: transparent;
+            border: none;
+            color: #bfbfbf;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.18s ease;
+        }
+
+        .rating-star .star-icon {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .rating-star .star-shape {
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 1.2;
+            stroke-linejoin: round;
+            transition: fill 0.18s ease, stroke 0.18s ease;
+        }
+
+        .rating-star:hover,
+        .rating-star:focus-visible,
+        .rating-star.active {
+            transform: translateY(-1px) scale(1.08);
+            outline: none;
+        }
+
+        .rating-star:hover .star-shape,
+        .rating-star:focus-visible .star-shape,
+        .rating-star.active .star-shape {
+            fill: var(--sp-accent);
+            stroke: none;
+        }
+
+        .rating-tooltip {
+            position: absolute;
+            bottom: 28px;
+            left: 50%;
+            transform: translate(-50%, 2px);
+            padding: 5px 8px;
+            border-radius: 8px;
+            background: var(--sp-tooltip-bg);
+            color: #f8fafc;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.005em;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 14px 28px rgba(5, 9, 20, 0.32);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            z-index: 40;
+        }
+
+        .rating-tooltip::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px 5px 0 5px;
+            border-style: solid;
+            border-color: var(--sp-tooltip-bg) transparent transparent transparent;
+        }
+
+        .rating-tooltip .emoji {
+            font-size: 14px;
+        }
+
+        .rating-tooltip .caption {
+            font-size: 10px;
+            font-weight: 500;
+            color: rgba(226, 232, 240, 0.75);
+        }
+
+        .rating-tooltip.visible {
+            opacity: 1;
+            transform: translate(-50%, -4px);
+        }
+
+        .footer-modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: var(--sp-overlay-bg);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            z-index: 30;
+        }
+
+        .footer-modal-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .footer-modal {
+            position: absolute;
+            left: 50%;
+            bottom: calc(var(--footer-height) + 14px);
+            transform: translate(-50%, 6px) scale(0.96);
+            width: min(280px, calc(100% - 24px));
+            padding: 18px 20px 16px;
+            border-radius: 16px;
+            background: var(--sp-modal-bg);
+            color: var(--sp-text);
+            border: 1px solid var(--sp-border);
+            box-shadow: 0 24px 48px rgba(4, 10, 25, 0.45);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            z-index: 60;
+        }
+
+        .footer-modal.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, 0) scale(1);
+        }
+
+        .footer-modal h3 {
+            margin: 0 0 4px;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.005em;
+            color: #f1f5f9;
+        }
+
+        .footer-modal p {
+            margin: 0;
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--sp-text-muted);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(148, 163, 184, 0.18);
+            color: var(--sp-text);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .modal-close:hover,
+        .modal-close:focus-visible {
+            background: rgba(148, 163, 184, 0.32);
+            transform: rotate(90deg);
+            outline: none;
+        }
+
+        .share-grid {
+            display: flex;
+            gap: 12px;
+            margin: 14px 0 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .share-option {
+            flex: 0 1 64px;
+            max-width: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            background: transparent;
+            border: none;
+            color: var(--sp-text);
+            cursor: pointer;
+            transition: transform 0.18s ease, opacity 0.18s ease;
+        }
+
+        .share-option:hover,
+        .share-option:focus-visible {
+            transform: translateY(-4px);
+            opacity: 1;
+            outline: none;
+        }
+
+        .share-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 18px;
+            box-shadow: 0 12px 22px rgba(8, 12, 24, 0.4);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .share-option:hover .share-circle,
+        .share-option:focus-visible .share-circle {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 30px rgba(8, 12, 24, 0.45);
+        }
+
+        .share-option[data-share="copy"] .share-circle {
+            background: linear-gradient(135deg, #60a5fa 0%, #22d3ee 100%);
+        }
+
+        .share-option[data-share="facebook"] .share-circle {
+            background: #1877f2;
+        }
+
+        .share-option[data-share="x"] .share-circle {
+            background: #0f172a;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+        }
+
+        .share-option[data-share="telegram"] .share-circle {
+            background: #2aa7df;
+        }
+
+        .share-option svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        .share-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--sp-text-soft);
+        }
+
+        .modal-note {
+            margin-top: 6px;
+            font-size: 11px;
+            min-height: 16px;
+            text-align: center;
+            color: var(--sp-text-muted);
+        }
+
+        .modal-note.success {
+            color: var(--sp-success);
+        }
+
+        .modal-note.error {
+            color: var(--sp-error);
+        }
+
+        .modal-note.info {
+            color: var(--sp-blue);
+        }
+
+        .feedback-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .feedback-form textarea {
+            min-height: 88px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--sp-border);
+            background: var(--sp-textarea-bg);
+            resize: vertical;
+            color: var(--sp-text);
+            font-family: inherit;
+            font-size: 12px;
+            line-height: 1.45;
+            transition: border 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .feedback-form textarea::placeholder {
+            color: rgba(203, 213, 225, 0.55);
+        }
+
+        .feedback-form textarea:focus-visible {
+            outline: none;
+            border-color: var(--sp-blue);
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.25);
+        }
+
+        .feedback-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .feedback-actions button {
+            padding: 8px 18px;
+            border-radius: 999px;
+            border: none;
+            background: var(--sp-accent);
+            color: #ffffff;
+            font-weight: 600;
+            letter-spacing: 0.005em;
+            cursor: pointer;
+            box-shadow: 0 12px 28px rgba(249, 115, 93, 0.28);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .feedback-actions button:hover,
+        .feedback-actions button:focus-visible {
+            transform: translateY(-1px);
+            box-shadow: 0 16px 38px rgba(249, 115, 93, 0.38);
+            outline: none;
+        }
+
+        .feedback-actions button:disabled {
+            background: rgba(249, 115, 93, 0.55);
+            box-shadow: none;
+            cursor: progress;
+        }
+
+        @media (max-width: 520px) {
+            #sidepanel-footer {
+                gap: 10px;
+            }
+
+            .footer-btn {
+                padding: 4px 6px;
+            }
+
+
+            .footer-modal {
+                width: calc(100% - 20px);
+            }
+
+            .share-grid {
+                gap: 10px;
+            }
+        }
+
+        body.light-mode .footer-btn:hover,
+        body.light-mode .footer-btn:focus-visible {
+            /* border-color: rgba(148, 163, 184, 0.25); */
+            background: rgb(255 255 255);
+        }
+
+        body.light-mode .rating-tooltip {
+            color: #1f2937;
+            box-shadow: 0 16px 32px rgba(15, 23, 42, 0.18);
+        }
+
+        body.light-mode .rating-tooltip .caption {
+            color: rgba(71, 85, 105, 0.7);
+        }
+
+        body.light-mode .rating-tooltip::after {
+            border-color: var(--sp-tooltip-bg) transparent transparent transparent;
+        }
+
+        body.light-mode .rating-star .star-shape {
+            stroke: #0d0d0d;
+        }
+
+        body.light-mode .rating-star:hover .star-shape,
+        body.light-mode .rating-star:focus-visible .star-shape,
+        body.light-mode .rating-star.active .star-shape {
+            stroke: none;
+        }
+
+        body.light-mode .footer-modal h3 {
+            color: #1f2937;
+        }
+
+        body.light-mode .footer-modal {
+            box-shadow: 0 24px 48px rgba(15, 23, 42, 0.18);
+        }
+
+        body.light-mode .feedback-form textarea::placeholder {
+            color: rgba(100, 116, 139, 0.6);
+        }
+
+        body.light-mode .footer-btn {
+            color: rgba(51, 65, 85, 0.85);
+        }
+
+        body.light-mode .rating-label {
+            color: rgba(51, 65, 85, 0.8);
+        }
+
+        body.light-mode .modal-close {
+            background: rgba(15, 23, 42, 0.08);
+            color: var(--sp-text);
+        }
+
+        body.light-mode .modal-close:hover,
+        body.light-mode .modal-close:focus-visible {
+            background: rgba(15, 23, 42, 0.16);
+        }
+
+        body.sideai-login-active #sideai-shortcut-hint,
+        body.sideai-login-active #sideai-rating-prompt,
+        body.sideai-login-active #sideai-update-overlay {
+            display: none !important;
+        }
+    </style>
+</head>
+<body class="sideai-login-active">
+    <div id="sidepanel-wrapper">
+        <div id="sideai-shortcut-hint" class="sideai-shortcut-hint" hidden>
+            <div class="sideai-shortcut-icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 48 48">
+                    <path fill="#ffe082" d="M26.4,9.1C20,9.8,14.8,15,14.1,21.4c-0.7,5.9,2.4,11.2,7.1,13.8V38c0,1.4,1.1,2.5,2.5,2.5h-0.3V44c0,1.4,1.1,2.5,2.5,2.5H30c1.4,0,2.5-1.1,2.5-2.5v-3.5h-0.3c1.4,0,2.5-1.1,2.5-2.5v-2.8C39,32.8,42,28.2,42,23C42,14.7,34.8,8.2,26.4,9.1z"/>
+                    <path fill="none" stroke="#18193f" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="3" d="M37.7,21.5c0.2-0.8,0.2-1.7,0.2-2.6c0-8.2-7.1-14.8-15.5-13.9c-2.4,0.3-4.7,1.2-6.6,2.5"/>
+                    <path fill="none" stroke="#18193f" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="3" d="M11.5,12.8c-0.7,1.4-1.2,3-1.4,4.6c-0.7,5.9,2.4,11.2,7.1,13.8V34c0,1.4,1.1,2.5,2.5,2.5h8.4c1.4,0,2.5-1.1,2.5-2.5v-2.8c1.8-1,3.3-2.3,4.5-3.9"/>
+                    <path fill="none" stroke="#18193f" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="3" d="M26,42.5H22c-1.4,0-2.5-1.1-2.5-2.5v-3.5h9V40C28.5,41.4,27.4,42.5,26,42.5z"/>
+                </svg>
+            </div>
+            <div class="sideai-shortcut-copy">
+                <span class="sideai-shortcut-copy-line">
+                    <strong>Open/close SideAI</strong> <span id="sideai-shortcut-keys" class="sideai-shortcut-keys"></span>
+                </span>
+                <span class="sideai-shortcut-copy-line">
+                    <strong>Hide and resume chat</strong> <span id="sideai-resume-shortcut-keys" class="sideai-shortcut-keys"></span>
+                </span>
+                <span class="sideai-shortcut-copy-line">
+                    <strong>Open last closed chat</strong> <span id="sideai-last-shortcut-keys" class="sideai-shortcut-keys"></span>
+                </span>
+                <button type="button" id="sideai-shortcut-settings" class="sideai-shortcut-settings">Change it in Settings</button>
+            </div>
+            <button type="button" id="sideai-shortcut-dismiss" class="sideai-shortcut-dismiss" aria-label="Dismiss shortcut tip">×</button>
+        </div>
+        <div id="sideai-rating-prompt" class="sideai-rating-prompt" hidden>
+            <div class="sideai-rating-prompt-inner">
+                <div class="sideai-rating-prompt-icon" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 3.75L14.547 8.913L20.246 9.741L16.123 13.76L17.097 19.437L12 16.757L6.903 19.437L7.877 13.76L3.754 9.741L9.453 8.913L12 3.75Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="sideai-rating-prompt-body">
+                    <div class="sideai-rating-prompt-copy-wrap">
+                        <p class="sideai-rating-prompt-title">If SideAI saved you time, rate us</p>
+                        <div class="sideai-rating-prompt-meta">
+                            <p class="sideai-rating-prompt-copy">Help us improve faster.</p>
+                            <div class="sideai-rating-prompt-actions">
+                                <div id="sideai-rating-prompt-stars" class="sideai-rating-prompt-stars" role="group" aria-label="Rate SideAI">
+                                    <button type="button" class="sideai-rating-prompt-star" data-value="1" aria-label="Rate 1 star">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.75L14.547 8.913L20.246 9.741L16.123 13.76L17.097 19.437L12 16.757L6.903 19.437L7.877 13.76L3.754 9.741L9.453 8.913L12 3.75Z"></path></svg>
+                                    </button>
+                                    <button type="button" class="sideai-rating-prompt-star" data-value="2" aria-label="Rate 2 stars">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.75L14.547 8.913L20.246 9.741L16.123 13.76L17.097 19.437L12 16.757L6.903 19.437L7.877 13.76L3.754 9.741L9.453 8.913L12 3.75Z"></path></svg>
+                                    </button>
+                                    <button type="button" class="sideai-rating-prompt-star" data-value="3" aria-label="Rate 3 stars">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.75L14.547 8.913L20.246 9.741L16.123 13.76L17.097 19.437L12 16.757L6.903 19.437L7.877 13.76L3.754 9.741L9.453 8.913L12 3.75Z"></path></svg>
+                                    </button>
+                                    <button type="button" class="sideai-rating-prompt-star" data-value="4" aria-label="Rate 4 stars">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.75L14.547 8.913L20.246 9.741L16.123 13.76L17.097 19.437L12 16.757L6.903 19.437L7.877 13.76L3.754 9.741L9.453 8.913L12 3.75Z"></path></svg>
+                                    </button>
+                                    <button type="button" class="sideai-rating-prompt-star" data-value="5" aria-label="Rate 5 stars">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.75L14.547 8.913L20.246 9.741L16.123 13.76L17.097 19.437L12 16.757L6.903 19.437L7.877 13.76L3.754 9.741L9.453 8.913L12 3.75Z"></path></svg>
+                                    </button>
+                                </div>
+                                <button type="button" id="sideai-rating-prompt-later" class="sideai-rating-prompt-later" hidden>Not now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" id="sideai-rating-prompt-dismiss" class="sideai-rating-prompt-dismiss" aria-label="Dismiss rating prompt">×</button>
+                </div>
+            </div>
+        </div>
+        <iframe id="chatgpt-iframe" data-src="https://chatgpt.com/" allow="clipboard-write; microphone"></iframe>
+        <iframe id="sideai-login-help-frame" title="SideAI sign in" hidden></iframe>
+
+        <div id="sideai-update-overlay" class="sideai-update-overlay" hidden>
+            <section class="sideai-update-card" role="dialog" aria-modal="true" aria-labelledby="sideai-update-title">
+                <button type="button" class="sideai-update-close" id="sideai-update-close" aria-label="Dismiss update notice">×</button>
+                <div class="sideai-update-logo" aria-hidden="true">
+                    <img src="../images/sideai-feature.png" alt="">
+                </div>
+                <h2 id="sideai-update-title">SideAI has been updated to version 6.0.1</h2>
+                <p class="sideai-update-rebrand">We rebranded from Sidebar for ChatGPT to SideAI. Same extension, cleaner name, better workflows.</p>
+                <p class="sideai-update-intro">New assistant workflows, faster actions, and better page tools are now available.</p>
+
+                <div class="sideai-update-slide">
+                    <img id="sideai-update-image" src="../images/whats-new/improved-text-menu.png" alt="">
+                    <h3 id="sideai-update-feature-title">Improved Text Menu</h3>
+                    <p id="sideai-update-feature-text">Quick actions on selected text.</p>
+                </div>
+
+                <div class="sideai-update-dots" id="sideai-update-dots" aria-label="Update feature slides"></div>
+
+                <div class="sideai-update-controls">
+                    <button type="button" class="sideai-update-btn secondary" id="sideai-update-prev">Back</button>
+                    <button type="button" class="sideai-update-btn primary" id="sideai-update-next">Next</button>
+                </div>
+
+                <div class="sideai-update-actions">
+                    <button type="button" class="sideai-update-link" id="sideai-update-details">More details on sideai.app</button>
+                    <button type="button" class="sideai-update-disable" id="sideai-update-disable">Disable update notifications</button>
+                </div>
+            </section>
+        </div>
+
+        <div id="modal-overlay" class="footer-modal-overlay"></div>
+
+        <section id="share-modal" class="footer-modal" role="dialog" aria-modal="true" aria-labelledby="share-modal-title">
+            <button type="button" class="modal-close" data-close aria-label="Close share dialog">×</button>
+            <h3 id="share-modal-title">Did this tool help you?</h3>
+            <p>Share it with friends who work with images. Who would find it useful?</p>
+            <div class="share-grid">
+                <button type="button" class="share-option" data-share="copy">
+                    <span class="share-circle" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M8.464 15.536a5 5 0 0 1 0-7.072l2-2a5 5 0 0 1 7.072 7.072l-1.086 1.086" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                            <path d="M15.536 8.464a5 5 0 0 1 0 7.072l-2 2a5 5 0 0 1-7.072-7.072l1.086-1.086" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <span class="share-label">Copy link</span>
+                </button>
+                <button type="button" class="share-option" data-share="facebook">
+                    <span class="share-circle" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M13.5 22v-8h2.5l.5-3h-3V8.5c0-.9.3-1.5 1.7-1.5H16V4.2C15.4 4.1 14.4 4 13.3 4 10.9 4 9.2 5.5 9.2 8.2V11H7v3h2.2v8h4.3Z"/>
+                        </svg>
+                    </span>
+                    <span class="share-label">Facebook</span>
+                </button>
+                <button type="button" class="share-option" data-share="x">
+                    <span class="share-circle" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M4 4h3.7l4.1 5.6L16.8 4H20l-6.6 7.6L20 20h-3.8l-4.4-6L7 20H4l6.7-7.5L4 4Z"/>
+                        </svg>
+                    </span>
+                    <span class="share-label">X</span>
+                </button>
+                <button type="button" class="share-option" data-share="telegram">
+                    <span class="share-circle" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="m9.5 16.6-.4 4.2c.6 0 .9-.2 1.2-.5l2.9-2.7 6 4.4c1.1.7 1.9.4 2.2-.9l3.9-18.3v-.1c.4-1.8-.7-2.5-1.8-2.1L1.6 9.4c-1.7.7-1.7 1.7-.3 2.1l6 1.9L20.3 5c.6-.4 1.1-.2.7.2"/>
+                        </svg>
+                    </span>
+                    <span class="share-label">Telegram</span>
+                </button>
+            </div>
+            <p class="modal-note" id="share-status"></p>
+        </section>
+
+        <section id="feedback-modal" class="footer-modal" role="dialog" aria-modal="true" aria-labelledby="feedback-modal-title">
+            <button type="button" class="modal-close" data-close aria-label="Close feedback dialog">×</button>
+            <h3 id="feedback-modal-title">Help us be better</h3>
+            <p>Your feedback matters. What can we improve?</p>
+            <form id="feedback-form" class="feedback-form" autocomplete="off">
+                <textarea id="feedback-message" name="message" placeholder="Write your feedback here" required></textarea>
+                <input type="hidden" name="rating" id="feedback-rating-input" value="">
+                <input type="hidden" name="source" value="sidepanel-footer">
+                <input type="hidden" name="timestamp" value="">
+                <div class="feedback-actions">
+                    <button type="submit" id="feedback-submit">Send</button>
+                </div>
+            </form>
+            <p class="modal-note" id="feedback-status"></p>
+        </section>
+    </div>
+    <script src="session.js"></script>
+    <script src="sidepanel.js"></script>
+</body>
+</html>

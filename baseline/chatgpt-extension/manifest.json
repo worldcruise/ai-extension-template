@@ -1,0 +1,120 @@
+{
+   "action": {
+      "default_icon": {
+         "128": "images/icon128.png",
+         "16": "images/icon16.png",
+         "48": "images/icon48.png"
+      },
+      "default_title": "ChatGPT Sidebar"
+   },
+   "background": {
+      "service_worker": "background.js"
+   },
+   "commands": {
+      "_execute_action": {
+         "description": "Open/close SideAI sidebar",
+         "suggested_key": {
+            "chromeos": "Alt+Space",
+            "default": "Ctrl+Space",
+            "mac": "Command+Shift+Space"
+         }
+      },
+      "focus-sidepanel-prompt": {
+         "description": "Focus the SideAI ChatGPT prompt",
+         "suggested_key": {
+            "default": "Alt+Shift+K",
+            "mac": "Command+Shift+K"
+         }
+      },
+      "open-last-closed-sidepanel": {
+         "description": "Open your last closed SideAI chat",
+         "suggested_key": {
+            "chromeos": "Alt+L",
+            "default": "Alt+Shift+L",
+            "mac": "Command+Shift+U"
+         }
+      },
+      "toggle-resume-sidepanel": {
+         "description": "Hide and resume chat",
+         "suggested_key": {
+            "chromeos": "Alt+Shift+Space",
+            "default": "Ctrl+Shift+Space",
+            "mac": "Command+Shift+Y"
+         }
+      }
+   },
+   "content_scripts": [ {
+      "all_frames": true,
+      "exclude_matches": [ "*://*.chatgpt.com/*", "*://*.chat.openai.com/*" ],
+      "js": [ "stream-text.js", "polar-config.js", "sideai-icons.js", "shortcut-settings.js", "content-menu.js" ],
+      "matches": [ "\u003Call_urls>" ],
+      "run_at": "document_end"
+   }, {
+      "all_frames": true,
+      "exclude_matches": [ "*://*.chatgpt.com/*", "*://*.chat.openai.com/*" ],
+      "js": [ "stream-text.js", "shortcut-settings.js", "page-context.js", "writing-assistant.js", "email-reply.js" ],
+      "matches": [ "\u003Call_urls>" ],
+      "run_at": "document_start"
+   }, {
+      "all_frames": true,
+      "js": [ "chatgpt-mic-detector.js" ],
+      "match_about_blank": true,
+      "matches": [ "https://chat.openai.com/*", "*://chatgpt.com/*" ],
+      "run_at": "document_start",
+      "world": "MAIN"
+   }, {
+      "all_frames": true,
+      "js": [ "polar-config.js", "chatgpt-api.js", "chatgpt-content.js", "sidepanel-search.js" ],
+      "match_about_blank": true,
+      "matches": [ "https://chat.openai.com/*", "*://chatgpt.com/*" ],
+      "run_at": "document_start"
+   }, {
+      "all_frames": false,
+      "exclude_matches": [ "*://*.chatgpt.com/*", "*://*.chat.openai.com/*" ],
+      "js": [ "screenshot-capture.js" ],
+      "matches": [ "\u003Call_urls>" ],
+      "run_at": "document_idle"
+   }, {
+      "js": [ "google-search-chatgpt.js" ],
+      "matches": [ "https://www.google.com/search*", "https://www.google.co.uk/search*", "https://www.google.ca/search*", "https://www.google.com.au/search*", "https://www.google.de/search*", "https://www.google.fr/search*", "https://www.google.es/search*", "https://www.google.it/search*", "https://www.google.co.jp/search*", "https://www.google.com.br/search*", "https://www.google.nl/search*", "https://www.google.co.in/search*", "https://www.google.com.mx/search*", "https://www.google.co.kr/search*", "https://www.google.co.za/search*", "https://www.google.com/search*" ],
+      "run_at": "document_end"
+   } ],
+   "declarative_net_request": {
+      "rule_resources": [ {
+         "enabled": true,
+         "id": "ruleset_1",
+         "path": "rules.json"
+      } ]
+   },
+   "default_locale": "en",
+   "description": "__MSG_appDesc__",
+   "host_permissions": [ "*://*.chat.openai.com/*", "*://*.chatgpt.com/*", "\u003Call_urls>" ],
+   "icons": {
+      "128": "images/icon128.png",
+      "16": "images/icon16.png",
+      "48": "images/icon48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApmLcPkkkLYRTgIWoB5IGLx5PbBtsk5aEg6voyZ7rF9ZcAJiwce2knxWgV2Katn0EUUXqYHtTTJds8UJdb8TL81a2KX6amdZMWG4jUWjrBX3fRS+QyVDToi07iRyDyyuAHaXsMw/u+RJlBKU6w2R4PDa+RII0yPyL4UXu9617UXHRV41ZcrnWhFFPIXj5Qu5nXm2W4intgQJrNR6cDIDzU9MDzEPJP49dZI94FzJtPrjHWO2EIqHh9ha2AhL62/YEkbIwt5ppqOPaUWkS3Fq15/AsebSZbJ2XGGce4LYijgsnXxkgs8b+o9JU4Frf5fRgigdY86dNkgWV9wXig+1yvwIDAQAB",
+   "manifest_version": 3,
+   "name": "__MSG_appName__",
+   "options_page": "options/options.html",
+   "permissions": [ "storage", "contextMenus", "declarativeNetRequest", "sidePanel", "scripting", "offscreen" ],
+   "short_name": "SideAI",
+   "side_panel": {
+      "default_path": "sidepanel/index.html"
+   },
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "7.0.13",
+   "web_accessible_resources": [ {
+      "matches": [ "\u003Call_urls>" ],
+      "resources": [ "sidepanel/index.html", "icons/*.png", "icons/*.svg", "images/icon48.png", "images/sideai-feature.png", "images/whats-new/*", "images/alarm.gif", "permission_prompt.html", "grant-access.html", "screenshot-capture.js", "google-chatgpt-frame.html", "google-chatgpt-frame.js", "ai-assistant-chatgpt-frame.html", "ai-assistant-chatgpt-frame.js", "email-reply.css", "offscreen-chatgpt.html", "offscreen-chatgpt.js", "sideai-icons.js", "chatgpt-api-inpage.js" ],
+      "use_dynamic_url": false
+   }, {
+      "matches": [ "*://chatgpt.com/*", "*://chat.openai.com/*" ],
+      "resources": [ "chatgpt-content.js" ],
+      "use_dynamic_url": false
+   }, {
+      "matches": [ "\u003Call_urls>" ],
+      "resources": [ "icons/*" ]
+   } ]
+}

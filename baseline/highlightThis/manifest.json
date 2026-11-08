@@ -1,0 +1,48 @@
+{
+   "action": {
+      "default_icon": {
+         "16": "icons/modern/toolbar-16.png",
+         "32": "icons/modern/toolbar-32.png"
+      },
+      "default_popup": "popup.html",
+      "default_title": "Click Me"
+   },
+   "background": {
+      "service_worker": "serviceWorker.js",
+      "type": "module"
+   },
+   "commands": {
+      "ScrollHighlight": {
+         "description": "ScrollHighlight",
+         "suggested_key": {
+            "default": "Ctrl+Shift+Space",
+            "mac": "Command+Shift+Space"
+         }
+      }
+   },
+   "content_scripts": [ {
+      "all_frames": true,
+      "css": [ "highlightThis.css" ],
+      "js": [ "tab/wordsManager.js", "common.js", "highlightEngine.js", "highlightFields.js", "tabWordHighlighter.js" ],
+      "match_about_blank": true,
+      "matches": [ "\u003Call_urls>" ],
+      "run_at": "document_start"
+   } ],
+   "default_locale": "en",
+   "description": "__MSG_application_description__",
+   "host_permissions": [ "https://api.highlightthis.net/*" ],
+   "icons": {
+      "128": "icons/modern/highlight-this-store-128.png",
+      "16": "icons/modern/highlight-this-16.png",
+      "32": "icons/modern/highlight-this-32.png",
+      "48": "icons/modern/highlight-this-48.png",
+      "96": "icons/modern/highlight-this-96.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4qbwro4b0R7cWD43H9p1R/1zo2bXD92jSfXUG9cK4o/bPEQMn8jd4Zv8C50vB5r0Xo/HPFnc8Kb3gPzGs0vVMwiCTAvcANkgUyppUgOCMjdHeYFdHMlVPGKM0sDM9TUuKKgT2EjjZh+utU48H7JsMALLVBuUMFo2xsXj4hGFr44nx5B5TSfBwFCP6M+xI499Owa5wU65I/qe4HeVV7urF9dy/s0ttmBJWebTLPTbsF9QnJfCP+L1ewWflfHiVZscUkzW+IxkwGRbpth1yXFuRsJ/4UZBQtL7mo18lJaoU5qLdthJcwde4MiyvgvcD5ZUeTKXl5fo+vwd3+q/hX47LQIDAQAB",
+   "manifest_version": 3,
+   "name": "__MSG_application_title__",
+   "permissions": [ "tabs", "contextMenus", "notifications", "alarms", "storage", "offscreen" ],
+   "short_name": "Highlight This",
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "6.3.15"
+}

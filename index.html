@@ -2,11 +2,111 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>AI Agent Template</title>
-  <link rel="icon" type="image/png" href="assets/icon-32.png">
-  <link rel="stylesheet" href="src/agent-shell.css">
-  <script type="module" src="src/extension.mjs"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>AI Workspace · ChatGPT + Resume Studio</title>
+  <link rel="icon" href="assets/icon-32.png">
+  <link rel="stylesheet" href="src/sidebar.css">
+  <script type="module" src="src/workspace.mjs"></script>
 </head>
-<body><main id="agent" aria-label="AI agent"></main></body>
+<body>
+  <header class="toolbar">
+    <h1 class="sr-only">AI Workspace</h1>
+    <div class="workspace-tabs" role="tablist" aria-label="Workspace view">
+      <button id="studio-tab" type="button" role="tab" aria-selected="true" aria-controls="studio-view"><i data-icon="file-pen"></i>Resume Studio</button>
+      <button id="chat-tab" type="button" role="tab" aria-selected="false" aria-controls="chat-view" tabindex="-1"><i data-icon="chat"></i>Chat</button>
+    </div>
+    <div class="account-wrap">
+      <button id="account-toggle" class="account-button" type="button" title="ChatGPT connection" aria-label="ChatGPT connection" aria-expanded="false" aria-controls="account-panel"><i data-icon="user"></i></button>
+      <section id="account-panel" class="account-panel" aria-label="ChatGPT connection" hidden><strong>ChatGPT account</strong><p>Use your ChatGPT account in the Chat view.</p><button id="account-chat" class="button" type="button"><i data-icon="chat"></i>Go to Chat</button><button id="account-settings" class="button subtle" type="button"><i data-icon="settings"></i>Settings</button><button id="account-sign-in" class="button subtle" type="button"><i data-icon="external"></i>Sign in on ChatGPT</button></section>
+    </div>
+  </header>
+  <main id="workspace-content">
+    <section id="studio-view" class="workspace-view studio-view" role="tabpanel" aria-labelledby="studio-tab">
+      <div class="studio-navigation"><div class="studio-tabs" role="tablist" aria-label="Resume workflow"><button id="job-tab" type="button" role="tab" aria-selected="false" aria-controls="job-panel" tabindex="-1">Review Job</button><button id="results-tab" type="button" role="tab" aria-selected="true" aria-controls="results-panel">Review resume<span id="review-count" class="count">3</span></button></div><span class="preview-label">UI preview</span></div>
+      <div id="studio-scroll" class="studio-scroll">
+        <section id="job-panel" role="tabpanel" aria-labelledby="job-tab" hidden>
+          <div class="section-heading"><h2>Prepare the next resume</h2><span>Job context</span></div>
+          <div class="profile-card"><span id="candidate-avatar" class="profile-avatar">MT</span><div class="profile-copy"><label class="sr-only" for="candidate">Candidate profile</label><select id="candidate"><optgroup label="Example profiles"><option value="morgan">Morgan Taylor</option><option value="jordan">Jordan Lee</option></optgroup></select><p id="profile-filename">Morgan_Profile.json · Example profile</p></div><button id="profile-details" class="button subtle" type="button"><i data-icon="user"></i>Profile</button></div>
+          <div class="toggle-row"><div><strong>Tailor to this job</strong><p id="tailor-description">Use the profile and job description.</p></div><label class="switch"><input id="tailor" type="checkbox" checked aria-label="Tailor to this job"><span></span></label></div>
+          <div id="job-context" class="job-card">
+            <div class="job-tools">
+              <nav class="tab-navigation" aria-label="Open browser tabs"><button id="previous-job" class="icon-button" type="button" aria-label="Previous tab" title="Previous tab" disabled><i data-icon="chevron-left"></i></button><span id="job-position" aria-live="polite" aria-label="Open tab position">0 / 0</span><button id="next-job" class="icon-button" type="button" aria-label="Next tab" title="Next tab" disabled><i data-icon="chevron-right"></i></button></nav>
+              <label class="keyword-page-toggle" title="Highlight keywords on the job web page"><i data-icon="highlight"></i><span class="keyword-toggle-text">Highlight</span><span class="switch"><input id="highlight-keywords" type="checkbox" aria-label="Highlight keywords on job web pages" disabled><span></span></span></label>
+              <button id="read-page" class="button" type="button" disabled title="Browser page capture is not connected yet"><i data-icon="scan"></i>Read page</button>
+            </div>
+            <div class="job-body">
+              <div class="job-identity"><label class="field" for="job-company"><span>Company</span><input id="job-company" class="input" type="text" placeholder="Company name" autocomplete="off"></label><label class="field" for="job-title"><span>Job title</span><input id="job-title" class="input" type="text" placeholder="Job title" autocomplete="off"></label><label class="field" for="job-url"><span>URL</span><input id="job-url" class="input" type="url" inputmode="url" placeholder="https://…" autocomplete="off" spellcheck="false"></label></div>
+              <label class="field job-description-field" for="job-description"><span>Job Description</span><textarea id="job-description" class="input" rows="5" aria-label="Job Description" placeholder="Paste a job description here…"></textarea></label>
+            </div>
+          </div>
+          <details class="resume-options"><summary>Resume options &amp; instructions</summary>
+            <div class="options-grid"><div class="option-selects">
+              <label class="field"><span>Resume template</span><select id="resume-template" class="input" aria-controls="template-preview"></select></label>
+              <label id="prompt-template-field" class="field"><span>Prompt template</span><select id="prompt-template" class="input"><option value="focused">Job focused</option><option value="concise">Concise</option><option value="technical">Technical</option></select></label>
+            </div><div id="template-preview" class="template-preview" aria-label="Selected template preview" aria-live="polite"><p id="template-caption" class="preview-caption">Resume template</p><img id="resume-thumbnail" class="resume-thumbnail" alt="Resume template preview" width="816" height="1056"><div id="prompt-preview" class="prompt-preview" hidden><strong id="prompt-name">Job focused</strong><p id="prompt-text"></p></div></div></div>
+          </details>
+        </section>
+        <section id="results-panel" role="tabpanel" aria-labelledby="results-tab">
+          <div class="section-heading"><h2>Sent jobs</h2><span id="queue-owner">Morgan Taylor</span></div><ol id="resume-queue" class="resume-queue" aria-label="Resume generation queue"></ol>
+          <div id="empty-queue" class="empty-state" hidden><span class="empty-icon"><i data-icon="file-pen"></i></span><h3>A fresh start for this candidate</h3><p>Prepare a job to add the first request to this example queue.</p><button id="empty-prepare" class="button" type="button">Review a job<i data-icon="arrow-right"></i></button></div>
+          <details id="resume-preview" class="document-preview" hidden><summary id="resume-preview-title">Resume preview</summary><article id="resume-paper" class="resume-paper" aria-label="Example resume preview"></article><div class="document-actions"><button id="copy-json" class="button" type="button"><i data-icon="copy"></i>Copy JSON</button><button id="export-resume" class="button" type="button"><i data-icon="download"></i>Export</button></div></details>
+        </section>
+      </div>
+        <footer class="studio-footer">
+          <div id="job-actions" class="form-actions" hidden><button id="add-request" class="button primary" type="button"><i data-icon="plus"></i>Add to queue</button><button id="view-queue" class="button" type="button">View queue</button></div>
+          <div id="results-actions" class="form-actions"><button id="review-another" class="button primary review-another" type="button"><i data-icon="plus"></i>Review another job</button></div>
+          <div class="queue-bar"><i data-icon="queue"></i><span id="queue-summary">2 ready · 1 save pending</span><button id="pause-queue" class="icon-button" type="button" aria-pressed="false" aria-label="Pause queue" title="Pause queue"><i data-icon="pause"></i></button><button id="open-queue" class="icon-button" type="button" aria-label="Open generation queue" title="Open generation queue"><i data-icon="arrow-right"></i></button></div>
+          <p id="workspace-status" class="sr-only" role="status" aria-live="polite">Select a request to review.</p>
+        </footer>
+    </section>
+    <section id="chat-view" class="workspace-view chat-view" role="tabpanel" aria-labelledby="chat-tab" hidden>
+      <div id="chat-toolbar-shell" class="chat-toolbar-shell" data-open="false">
+        <button id="chat-toolbar-reveal" class="chat-toolbar-reveal" type="button" aria-label="Show hidden Chat controls" title="Show Chat controls" aria-controls="chat-toolbar" aria-expanded="false"><span class="chat-toolbar-handle"><i data-icon="chevron-down"></i></span></button>
+        <div id="chat-toolbar" class="chat-toolbar" inert>
+          <div class="company-chat-picker">
+            <button id="company-chat-toggle" class="company-chat-toggle" type="button" aria-expanded="false" aria-controls="company-chat-menu"><i data-icon="link"></i><span id="company-chat-label">Company chats</span><i data-icon="chevron-down"></i></button>
+            <section id="company-chat-menu" class="company-chat-menu" aria-label="Saved companies’ connected chats" hidden>
+              <div class="company-chat-heading"><strong>Company chats</strong><button id="company-chat-refresh" class="icon-button" type="button" title="Refresh company chats" aria-label="Refresh company chats"><i data-icon="refresh"></i></button></div>
+              <label class="sr-only" for="company-chat-search">Search saved companies</label><input id="company-chat-search" class="company-chat-search" type="search" placeholder="Search companies…" autocomplete="off">
+              <p id="company-chat-status" class="company-chat-status" role="status" aria-live="polite"></p>
+              <ul id="company-chat-list" class="company-chat-list" aria-label="Connected company chats"></ul>
+              <p class="company-chat-note">Connected chats for this candidate’s saved companies</p>
+            </section>
+          </div>
+          <nav class="chat-tools" aria-label="Chat controls">
+        <button id="zoom-in" class="icon-button" type="button" title="Increase text size (100%)" aria-label="Increase chat text size" disabled><i data-icon="zoom-in"></i></button>
+        <button id="zoom-out" class="icon-button" type="button" title="Decrease text size (100%)" aria-label="Decrease chat text size" disabled><i data-icon="zoom-out"></i></button>
+        <output id="chat-zoom-status" class="sr-only" role="status" aria-live="polite">Chat text size 100%</output>
+        <button id="new-chat" class="icon-button" type="button" title="New chat" aria-label="New chat" disabled><i data-icon="plus"></i></button>
+        <button id="reload" class="icon-button" type="button" title="Reload ChatGPT" aria-label="Reload ChatGPT" disabled><i data-icon="refresh"></i></button>
+        <button id="open-tab" class="icon-button" type="button" title="Open ChatGPT in a tab" aria-label="Open ChatGPT in a tab"><i data-icon="external"></i></button>
+          </nav>
+        </div>
+      </div>
+      <section id="connection" class="connection" data-state="loading" aria-label="ChatGPT connection"><span class="indicator" aria-hidden="true"></span><p id="status" role="status" aria-live="polite">Opening ChatGPT…</p><div id="recovery" class="recovery" hidden><button id="sign-in" class="button" type="button">Open ChatGPT</button><button id="retry" class="button" type="button">Try again</button></div></section>
+      <iframe id="chatgpt-frame" title="ChatGPT conversation" allow="clipboard-write" referrerpolicy="no-referrer"></iframe>
+    </section>
+    <section id="settings-view" class="workspace-view settings-view" aria-labelledby="settings-title" hidden>
+      <div class="settings-heading"><button id="settings-back" class="icon-button" type="button" aria-label="Back to Resume Studio" title="Back to Resume Studio"><i data-icon="chevron-left"></i></button><h2 id="settings-title">Settings</h2></div>
+      <div class="settings-tabs" role="tablist" aria-label="Settings"><button id="keyword-settings-tab" type="button" role="tab" aria-selected="true" aria-controls="keyword-settings-panel"><i data-icon="highlight"></i>Keyword highlights</button></div>
+      <div class="settings-scroll"><section id="keyword-settings-panel" role="tabpanel" aria-labelledby="keyword-settings-tab">
+        <h3>Highlight what matters</h3><p class="settings-description">Highlight your keywords on job web pages. The dock and ChatGPT stay unchanged.</p>
+        <form id="keyword-settings-form">
+          <label class="settings-check"><input id="keyword-enabled" type="checkbox"><span>Enable keyword highlighting</span></label>
+          <label class="field" for="keyword-list"><span>Keywords and phrases</span><textarea id="keyword-list" class="input keyword-list" rows="8" maxlength="16500" placeholder="One keyword or phrase per line"></textarea></label>
+          <p class="field-hint">One per line, up to 200. For example: TypeScript, Python, or project management.</p>
+          <div class="keyword-color-row"><label for="keyword-color">Highlight color</label><input id="keyword-color" type="color" value="#fff2a8"></div>
+          <label class="settings-check"><input id="keyword-case-sensitive" type="checkbox"><span>Match letter case</span></label>
+          <label class="settings-check"><input id="keyword-whole-words" type="checkbox" checked><span>Match whole words and phrases</span></label>
+          <button id="keyword-save" class="button primary" type="submit"><i data-icon="check"></i>Save keywords</button>
+          <p id="keyword-save-status" class="settings-status" role="status" aria-live="polite">Loading keyword settings…</p>
+        </form>
+      </section></div>
+    </section>
+  </main>
+  <dialog id="profile-dialog" aria-labelledby="profile-dialog-title"><div class="dialog-heading"><div><span class="eyebrow">Example profile</span><h2 id="profile-dialog-title">Candidate profile</h2></div><button class="icon-button" type="button" data-close-dialog aria-label="Close profile"><i data-icon="close"></i></button></div><div class="dialog-content"><h3 id="profile-name"></h3><p id="profile-role" class="muted"></p><p id="profile-summary" class="profile-summary"></p><div id="profile-skills" class="skill-tags"></div><div class="integration-note"><i data-icon="file-json"></i><div><strong>Candidate JSON</strong><p>Profile import is not connected yet. These examples let you explore the workspace.</p></div></div><button class="button" type="button" disabled><i data-icon="upload"></i>Import profile JSON</button><button id="reset-examples" class="button subtle" type="button">Reset sample data</button></div></dialog>
+  <dialog id="request-dialog" aria-labelledby="request-dialog-title"><div class="dialog-heading"><div><span class="eyebrow">Example request</span><h2 id="request-dialog-title">Request details</h2></div><button class="icon-button" type="button" data-close-dialog aria-label="Close request"><i data-icon="close"></i></button></div><div class="dialog-content"><dl id="request-metadata" class="request-metadata"></dl><details class="request-section" open><summary>Prompt &amp; instructions</summary><p id="request-prompt"></p></details><details class="request-section"><summary>Job description</summary><p id="request-job"></p></details><details id="request-output-section" class="request-section"><summary>Resume JSON</summary><pre id="request-output"></pre></details><div class="integration-note"><i data-icon="link"></i><div><strong>Source conversation</strong><p id="request-source-note"></p></div></div><div class="request-source-actions"><button id="request-open-chat" class="button" type="button" disabled><i data-icon="chat"></i>Open connected chat</button><button id="request-connect-chat" class="button" type="button" disabled><i data-icon="link"></i>Connect current chat</button></div></div></dialog>
+  <dialog id="export-dialog" aria-labelledby="export-dialog-title"><div class="dialog-heading"><div><span class="eyebrow">Resume export</span><h2 id="export-dialog-title">Choose a format</h2></div><button class="icon-button" type="button" data-close-dialog aria-label="Close export"><i data-icon="close"></i></button></div><div class="dialog-content"><div class="export-formats"><button class="export-format" type="button" disabled><i data-icon="file"></i><strong>PDF</strong><span>Ready to share</span></button><button class="export-format" type="button" disabled><i data-icon="file-pen"></i><strong>Word</strong><span>Editable .docx</span></button></div><p class="muted">Document export is not connected yet. You can copy the example resume JSON from its preview.</p></div></dialog>
+</body>
 </html>

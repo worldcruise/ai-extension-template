@@ -1,0 +1,860 @@
+{
+   "action_example": {
+      "message": "Example, a highlight of the word 'highlight' by using the token 'Hi?hL*', will result in:"
+   },
+   "action_intro": {
+      "message": "Define the action to execute when clicking on a highlight"
+   },
+   "action_newtab": {
+      "message": "Open in new tab"
+   },
+   "action_none": {
+      "message": "None"
+   },
+   "action_sametab": {
+      "message": "Open in current tab"
+   },
+   "action_tip1": {
+      "message": "%t% gets replaced by the text found on the page (eg Highlight)"
+   },
+   "action_tip2": {
+      "message": "%s% gets replaced by your search word (eg Hi?hL*)"
+   },
+   "action_tip3": {
+      "message": "%tu% or %tl%, %su% or %sl% forces in uppercase or lowercase"
+   },
+   "action_tip4": {
+      "message": "Some examples: https://wikipedia.com/%t% , https://google.com/search?q=%t%"
+   },
+   "added_new_word": {
+      "message": "Added new word"
+   },
+   "added_non_term": {
+      "message": "Attention the word might not highlight"
+   },
+   "added_non_term_description": {
+      "message": "You've added characters from scripts typically not separated by spaces or symbols.\n\nCheck the settings of the list to specify word/term matching"
+   },
+   "agree": {
+      "message": "I agree with the"
+   },
+   "already_in_wordlist": {
+      "message": "was already assigned to the word list"
+   },
+   "application_description": {
+      "message": "Automatically finds and highlights words and phrases on the web page according to your list"
+   },
+   "application_title": {
+      "message": "Highlight This: finds and marks words"
+   },
+   "assistant_step_1": {
+      "message": "Make or open an existing a Google Sheets document."
+   },
+   "assistant_step_2": {
+      "message": "In the first sheet, first column create your list of words."
+   },
+   "assistant_step_3": {
+      "message": "Share your sheet"
+   },
+   "assistant_step_4": {
+      "message": "Share with Anyone having the link"
+   },
+   "assistant_step_5": {
+      "message": "Select the link from 'Copy Link' and click 'Done'"
+   },
+   "assistant_step_6": {
+      "message": "Paste the link here "
+   },
+   "autoBackup_Daily": {
+      "message": "Daily"
+   },
+   "autoBackup_Monthly": {
+      "message": "Monthly"
+   },
+   "autoBackup_Never": {
+      "message": "Never"
+   },
+   "autoBackup_Weekly": {
+      "message": "Weekly"
+   },
+   "changelicense_ad_button": {
+      "message": "Enable advertisements"
+   },
+   "changelicense_ad_description": {
+      "message": "\u003Cli>Ads are shown in Highlight This!\u003C/li>\u003Cli>Includes unlimited word highlighting and all highlighting styles.\u003C/li>\u003Cli>Choose a paid license for an ad-free experience.\u003C/li>"
+   },
+   "changelicense_ad_moreinfo": {
+      "message": "About advertisements"
+   },
+   "changelicense_ad_title": {
+      "message": "Switch to the ad-supported version"
+   },
+   "changelicense_free_button": {
+      "message": "Activate Free"
+   },
+   "changelicense_free_description": {
+      "message": "\u003Cli>Your highlighting is limited to 200 words. Highlight This! will only use the first 200 words of your lists\u003C/li>\u003Cli>You have limited highlighting styles\u003C/li>\u003Cli>You have no advertisements\u003C/li>"
+   },
+   "changelicense_free_title": {
+      "message": "Free limited highlighting with 200 words"
+   },
+   "changelicense_paid_button": {
+      "message": "Buy a license"
+   },
+   "changelicense_paid_description": {
+      "message": "\u003Cli>Depending on the version you choose you have highlighting in either 500 or unlimited words\u003C/li>\u003Cli>You have all highlighting styles\u003C/li>"
+   },
+   "changelicense_paid_title": {
+      "message": "Purchase a yearly license for ad-free highlighting"
+   },
+   "changelicense_title": {
+      "message": "Change version"
+   },
+   "close_assistant": {
+      "message": "Close the assistant"
+   },
+   "confirm_email": {
+      "message": "Confirm email"
+   },
+   "create_new_list": {
+      "message": "Create new list"
+   },
+   "currentlicense_500_description": {
+      "message": " \u003Cli>Your highlighting is limited to 500 words. Highlight This! will only use the first 500 words of your lists\u003C/li>\u003Cli>You have all highlighting styles\u003C/li>\u003Cli>You have no advertisements\u003C/li>"
+   },
+   "currentlicense_500_title": {
+      "message": "You are using the paid version with a limit of 500 words"
+   },
+   "currentlicense_ad_description": {
+      "message": "\u003Cli>Ads are shown in Highlight This!\u003C/li>\u003Cli>Includes unlimited word highlighting and all highlighting styles.\u003C/li>\u003Cli>Choose a paid license for an ad-free experience.\u003C/li>"
+   },
+   "currentlicense_ad_title": {
+      "message": "You are using the ad-supported version"
+   },
+   "currentlicense_free_description": {
+      "message": "\u003Cli>Your highlighting is limited to 200 words. Highlight This! will only use the first 200 words of your lists\u003C/li>\u003Cli>You have limited highlighting styles\u003C/li>\u003Cli>You have no advertisements\u003C/li>"
+   },
+   "currentlicense_free_title": {
+      "message": "You are using the free version"
+   },
+   "currentlicense_temp_description": {
+      "message": "\u003Cli>Your highlighting is unlimited\u003C/li>\u003Cli>You have all highlighting styles\u003C/li>\u003Cli>You have no advertisements\u003C/li>"
+   },
+   "currentlicense_temp_title": {
+      "message": "You are on the trial version, you have \u003Cb>{0}\u003C/b> days left"
+   },
+   "currentlicense_unlimited_description": {
+      "message": "\u003Cli>Your highlighting is unlimited\u003C/li>\u003Cli>You have all highlighting styles\u003C/li>\u003Cli>You have no advertisements\u003C/li>"
+   },
+   "currentlicense_unlimited_title": {
+      "message": "You are using the unlimited paid version"
+   },
+   "deleteGroupLink": {
+      "message": "Delete list"
+   },
+   "donate1": {
+      "message": "Hi, I hope you enjoy using Highlight This!"
+   },
+   "donate2": {
+      "message": "I'm developing the extension during my free time, support my work by donating 1&dollar; / 1&euro;."
+   },
+   "donate3": {
+      "message": "Highlight This! will always stay Free"
+   },
+   "donatebtn": {
+      "message": "Donate"
+   },
+   "dontdonate": {
+      "message": "I don't want to donate now, continue to use for free"
+   },
+   "download_backup": {
+      "message": "Click this link if the file did not download automatically"
+   },
+   "download_frequency": {
+      "message": "Download frequency (Premium feature)"
+   },
+   "download_frequency_1": {
+      "message": "Every 10 mins"
+   },
+   "download_frequency_2": {
+      "message": "Every 30 mins"
+   },
+   "download_frequency_3": {
+      "message": "Every 1 hour"
+   },
+   "download_frequency_4": {
+      "message": "Every 4 hours"
+   },
+   "download_frequency_5": {
+      "message": "Every 8 hours"
+   },
+   "download_frequency_6": {
+      "message": "Every day"
+   },
+   "duration": {
+      "message": "Duration"
+   },
+   "email": {
+      "message": "Email"
+   },
+   "enter_license": {
+      "message": "Enter a new license key"
+   },
+   "enterlicense_button": {
+      "message": "Validate"
+   },
+   "enterlicense_description": {
+      "message": "If you already have a license key you can enter it here."
+   },
+   "enterlicense_label": {
+      "message": "License key"
+   },
+   "enterlicense_title": {
+      "message": "Enter your license key"
+   },
+   "everytime": {
+      "message": "Every time"
+   },
+   "example": {
+      "message": "example"
+   },
+   "example1": {
+      "message": "This is an"
+   },
+   "example2": {
+      "message": "of highlighted text"
+   },
+   "field_autoBackupSettings": {
+      "message": "Automatic Backup"
+   },
+   "field_background": {
+      "message": "Background"
+   },
+   "field_boxColor": {
+      "message": "Border color for input fields"
+   },
+   "field_caseSensitive_label": {
+      "message": "Compare in case sensitive mode"
+   },
+   "field_clearSyncLists": {
+      "message": "Reset data and settings:"
+   },
+   "field_colors": {
+      "message": "Colors"
+   },
+   "field_colors_help": {
+      "message": "Select the colors in which the highlight should occur"
+   },
+   "field_containerSelector": {
+      "message": "Only highlight when the container matches this queryselector"
+   },
+   "field_detection": {
+      "message": "Detection"
+   },
+   "field_detection_help": {
+      "message": "Match whole words/terms"
+   },
+   "field_dontHighlight": {
+      "message": "Don't Highlight on these sites"
+   },
+   "field_export": {
+      "message": "Export"
+   },
+   "field_exportSettings": {
+      "message": "Create a backup"
+   },
+   "field_foreground": {
+      "message": "Foreground"
+   },
+   "field_highlightOn": {
+      "message": "Highlight on these sites"
+   },
+   "field_import": {
+      "message": "Import"
+   },
+   "field_importSettings": {
+      "message": "Restore a backup"
+   },
+   "field_limitations": {
+      "message": "Limitations"
+   },
+   "field_listname": {
+      "message": "List name"
+   },
+   "field_neverHighlightOn": {
+      "message": "Never highlight on these sites"
+   },
+   "field_neverHighlightOn_help": {
+      "message": "List the sites on which you never want highlights to occur. \u003Cbr />\u003Cbr />You can use wildcards such as * and ?.\u003Cbr /> examples *.google.com, www.google.com, www.google.com/something/page.html"
+   },
+   "field_printHighlights": {
+      "message": "Print highlights"
+   },
+   "field_rangeHighlighting": {
+      "message": "Modern highlighting"
+   },
+   "field_sendErrors": {
+      "message": "Report a bug to the developer"
+   },
+   "field_sendErrorsDescription": {
+      "message": "Issue description:"
+   },
+   "field_sendErrorsEmail": {
+      "message": "Email address:"
+   },
+   "field_showFoundWords": {
+      "message": "Show overview of found words"
+   },
+   "field_sitesToHighlight": {
+      "message": "Define on which sites to highlight"
+   },
+   "field_source": {
+      "message": "Source"
+   },
+   "field_useRegexTokens_help": {
+      "message": "Use Regex tokens instead of simple * and ? wildcards"
+   },
+   "field_words": {
+      "message": "Words"
+   },
+   "field_words_help": {
+      "message": "You can use * and ? wildcards. Each new line is considered as a word."
+   },
+   "field_words_regex_help": {
+      "message": "You can use Regex tokens such as [a-z], [1-9], \b"
+   },
+   "filterwords": {
+      "message": "Filter"
+   },
+   "first_list": {
+      "message": "My List"
+   },
+   "has_been_added_to": {
+      "message": "has been added to"
+   },
+   "has_been_updated": {
+      "message": "has been updated"
+   },
+   "highlight_editable_fields": {
+      "message": "Highlight in editable fields"
+   },
+   "importLocalRules": {
+      "message": "Restore \u003Cb>{0} non-synchronized list(s)\u003C/b> and settings"
+   },
+   "importSyncRules": {
+      "message": "Restore \u003Cb>{0} synchronized\u003C/b> list(s)"
+   },
+   "info_autoBackupSettings": {
+      "message": "Creates a backup in your Downloads folder"
+   },
+   "info_clearSyncLists": {
+      "message": "Make sure to create a backup before resetting your data and settings"
+   },
+   "jump_to_word": {
+      "message": "Jump to word"
+   },
+   "label_action": {
+      "message": "Action"
+   },
+   "label_link": {
+      "message": "Link"
+   },
+   "last_synced_on": {
+      "message": "Last downloaded on"
+   },
+   "launch_assistant": {
+      "message": "Launch the assistant"
+   },
+   "license_500": {
+      "message": "500"
+   },
+   "license_ad": {
+      "message": "Ad-supported version"
+   },
+   "license_confirm_temp_remove": {
+      "message": "Are you sure you want to switch away from the Trial version? You cannot switch back to the Trial version."
+   },
+   "license_expired": {
+      "message": "Your license has expired"
+   },
+   "license_expired_message": {
+      "message": "You are back on the free version"
+   },
+   "license_expires": {
+      "message": "Your license expires in {0} day(s). \u003Ca id=\"linkSubscription\" style=\"text-decoration: underline\">Change your subscription\u003C/a> to not miss any highlights"
+   },
+   "license_free": {
+      "message": "Free"
+   },
+   "license_message_temp": {
+      "message": "You are on a trial subscription with all features enabled. Your trial expires in \u003Cb>{0}\u003C/b> days. \u003Ca id=\"linkSubscription\" style=\"text-decoration: underline\">Change your subscription\u003C/a>"
+   },
+   "license_new": {
+      "message": "New License"
+   },
+   "license_new_until": {
+      "message": "Your new license is valid until "
+   },
+   "license_purchase_renew": {
+      "message": "Purchase or renew a license"
+   },
+   "license_temp": {
+      "message": "Trial"
+   },
+   "license_unlimited": {
+      "message": "Unlimited"
+   },
+   "license_updated": {
+      "message": "Updated License"
+   },
+   "list_synced": {
+      "message": "List downloaded"
+   },
+   "localLabel": {
+      "message": "Standard list"
+   },
+   "magicHighlighting": {
+      "message": "Speed optimized highlighting "
+   },
+   "maxwords_reached": {
+      "message": "You are at {0} % of words. \u003Ca id=\"linkSubscription\" style=\"text-decoration: underline\">Change your subscription\u003C/a> to not miss any highlights"
+   },
+   "menu_help_label": {
+      "message": "Help"
+   },
+   "menu_home_label": {
+      "message": "Home"
+   },
+   "menu_sendErrors_label": {
+      "message": "Report Bug"
+   },
+   "menu_settings_label": {
+      "message": "Settings"
+   },
+   "menu_subscription_label": {
+      "message": "Subscription"
+   },
+   "migrate_local_button": {
+      "message": "Make list local"
+   },
+   "migrate_local_text": {
+      "message": "Change this list to a local list, it will then only be available in this browser"
+   },
+   "migrate_sync_button": {
+      "message": "Synchronize list"
+   },
+   "migrate_sync_text": {
+      "message": "Change this list to a synchronised list, to make it available on all your browsers where you are logged in"
+   },
+   "migrate_sync_toobig_text": {
+      "message": "The list cannot be changed into a synchonised list because it is too large, limit the number of words to synchronise the list to all browsers where you are logged in"
+   },
+   "modern_highlighting_style_unavailable": {
+      "message": "Disabled because this style is incompatible with Modern highlighting."
+   },
+   "more": {
+      "message": "More"
+   },
+   "need_more_subscriptions": {
+      "message": "If you need more licenses, you can request them now"
+   },
+   "newGroupDetail": {
+      "message": "A standard list allows you to manage words directly.\u003Cbr />An external list, downloads a list of words from an exterrnal site (e.g. pastebin)"
+   },
+   "noReset": {
+      "message": "Cancel"
+   },
+   "no_subscription_request": {
+      "message": "If you don't have a license, you can request one now"
+   },
+   "non_unicode_chars": {
+      "message": "You've added characters from scripts typically not separated by spaces or symbols. This setting works best for languages with space-delimited words. For scripts like Chinese, Korean, or Japanese, which don't use spaces between words, this may reduce detection accuracy. Consider unchecking this option for highlighting in these languages."
+   },
+   "notif_allDisabled": {
+      "message": "Highlighting is disabled"
+   },
+   "notif_allEnabled": {
+      "message": "Highlighting is enabled"
+   },
+   "notif_backupDone": {
+      "message": "The backup is ready in your Downloads folder"
+   },
+   "notif_bugReportSent": {
+      "message": "Bug Report submitted"
+   },
+   "notif_licenseAd": {
+      "message": "You are now using the ad-supported version"
+   },
+   "notif_licenseAdfree": {
+      "message": "You are now on the Free version"
+   },
+   "notif_licensePaid": {
+      "message": "You are now on the \"Highlight This! {0}\" version"
+   },
+   "notif_listDeleted": {
+      "message": "List \"{0}\" is deleted"
+   },
+   "notif_listDisabled": {
+      "message": "List \"{0}\" is disabled"
+   },
+   "notif_listEnabled": {
+      "message": "List \"{0}\" is enabled"
+   },
+   "notif_listSaved": {
+      "message": "List \"{0}\" is saved"
+   },
+   "notif_restoreComplete": {
+      "message": "The restore is completed"
+   },
+   "notif_settingsSaved": {
+      "message": "The settings are saved"
+   },
+   "notify_when_found": {
+      "message": "Notify when a word is found"
+   },
+   "nr_users": {
+      "message": "# of users"
+   },
+   "once_per_page": {
+      "message": "Once per page"
+   },
+   "perf_100": {
+      "message": "Fast - requires a powerful machine"
+   },
+   "perf_200": {
+      "message": "Default - adapts highlighting speed based on page update frequency"
+   },
+   "perf_300": {
+      "message": "Slow - rehighlighting goes a bit slower to save on resources"
+   },
+   "perf_400": {
+      "message": "No rehightlighting - extension only highlights once when the page is loaded"
+   },
+   "performance": {
+      "message": "Performance"
+   },
+   "performanceHelp": {
+      "message": "Define how much impact Highlight This is allowed to have on your device resources (processing power)."
+   },
+   "popup_add": {
+      "message": "Add"
+   },
+   "popup_addnewlist": {
+      "message": "Add a new word list"
+   },
+   "popup_back": {
+      "message": "\u003C Back"
+   },
+   "popup_byline": {
+      "message": "The extension highlights all below words on the page"
+   },
+   "popup_cancel": {
+      "message": "Cancel"
+   },
+   "popup_collapseAll": {
+      "message": "Collapse all"
+   },
+   "popup_configureWords": {
+      "message": "\u003C Configure words"
+   },
+   "popup_confirmDelete": {
+      "message": "Are you sure you want to delete the list and its words?"
+   },
+   "popup_confirmReset": {
+      "message": "\u003Cdiv>Are you sure you want to reset all your data and settings?\u003C/div>\u003Cdiv>Make sure to have a backup before continuing\u003C/div>"
+   },
+   "popup_create1": {
+      "message": "Create a word list with words to have"
+   },
+   "popup_create2": {
+      "message": "detect and highlight them on web pages while browsing."
+   },
+   "popup_createWordList": {
+      "message": "Create a word list"
+   },
+   "popup_disabled": {
+      "message": "disabled"
+   },
+   "popup_dontshowwords": {
+      "message": "Stop showing this overview"
+   },
+   "popup_edit": {
+      "message": "Edit"
+   },
+   "popup_editWordlist": {
+      "message": "Edit"
+   },
+   "popup_expandAll": {
+      "message": "Expand all"
+   },
+   "popup_foundWords": {
+      "message": "We have highlighted these words on this page."
+   },
+   "popup_importFailed": {
+      "message": "Import failed"
+   },
+   "popup_labelListName": {
+      "message": "List name"
+   },
+   "popup_limitations": {
+      "message": "limitations"
+   },
+   "popup_next": {
+      "message": "Next"
+   },
+   "popup_no": {
+      "message": "No"
+   },
+   "popup_nowords": {
+      "message": "There are no word lists defined"
+   },
+   "popup_save": {
+      "message": "Save"
+   },
+   "popup_settings": {
+      "message": "Settings"
+   },
+   "popup_showDonate": {
+      "message": "Help & Donate!"
+   },
+   "popup_tip1": {
+      "message": "Tip: Use"
+   },
+   "popup_tip2": {
+      "message": "+Shift+Space"
+   },
+   "popup_tip3": {
+      "message": "to browse through words on the page"
+   },
+   "popup_title": {
+      "message": "Highlight This!"
+   },
+   "popup_yes": {
+      "message": "Yes"
+   },
+   "premium_feature": {
+      "message": "This is a premium feature"
+   },
+   "price_tier1": {
+      "message": "3 months (6 euro/user)"
+   },
+   "price_tier2": {
+      "message": "6 months (11 euro/user)"
+   },
+   "price_tier3": {
+      "message": "12 months (18 euro/user)"
+   },
+   "price_tier4": {
+      "message": "24 months (24 euro/user)"
+   },
+   "rangeHighlighting_help": {
+      "message": "Enable Modern highlighting for more stable highlighting on most modern websites, such as LinkedIn, YouTube and Salesforce. It highlights text without changing the page structure, helping prevent duplicated text and leftover highlights as pages update. Text colors, background colors and underline remain available. Bold, italic, borders, rounded corners and padding are unavailable in this mode; your saved styles are kept if you switch back. Older browsers without support use the standard method. Save this setting, then reload open pages."
+   },
+   "range_update_description": {
+      "message": "Enable our new highlighting engine for more stable highlighting on most modern websites, such as LinkedIn, YouTube and Salesforce. It highlights text without changing the page structure, helping prevent duplicated text and leftover highlights as pages update. We recommend enabling Modern highlighting for smoother everyday browsing. Text colors, background colors and underline remain available. Bold, italic, borders, rounded corners and padding aren’t supported in this mode. Your saved styles are kept if you switch back. Enable Modern highlighting in General settings, save, then reload your open pages."
+   },
+   "range_update_dismiss": {
+      "message": "Dismiss"
+   },
+   "range_update_settings": {
+      "message": "Open General settings"
+   },
+   "range_update_title": {
+      "message": "Upgrade to Modern highlighting"
+   },
+   "refresh_page": {
+      "message": "Refresh the page to see new highlights."
+   },
+   "regex_invalid": {
+      "message": "The regex is invalid"
+   },
+   "regex_mode": {
+      "message": "Regex mode"
+   },
+   "regex_too_many_matches": {
+      "message": "The regex is too broad it will make pages unresponsive"
+   },
+   "remoteLabel": {
+      "message": "External list (Web, Pastebin, Google Sheets)"
+   },
+   "request_extra_license": {
+      "message": "Request extra license keys"
+   },
+   "request_license": {
+      "message": "Request a license"
+   },
+   "request_license_form": {
+      "message": "You can request a license key using this form. Once we receive your request we will issue you a temporary license key and contact you for billing/payment information"
+   },
+   "request_licensekey": {
+      "message": "Request a license key"
+   },
+   "resetDataAndSettings": {
+      "message": "Reset Data and Settings"
+   },
+   "restoreWarning": {
+      "message": "Restoring a backup of synchronized lists will only delete and restore the synchronized lists. \u003Cbr /> A restore of the non-synchronized lists will restore your configuration, and delete and restore only your non-synchronized lists."
+   },
+   "sendErrorsButton": {
+      "message": "Send"
+   },
+   "sendErrorsHelp": {
+      "message": "\u003Cp>If you experience issues, send a bug report to the developer. \u003C/p>\u003Cp>Errors captured will also be sent, this information does not contain personal data or words.\u003C/p> "
+   },
+   "send_to": {
+      "message": "Send to"
+   },
+   "sheets_assistant": {
+      "message": "Google Sheets assistant"
+   },
+   "sheets_id": {
+      "message": "Sheets id"
+   },
+   "shortmonth_1": {
+      "message": "JAN"
+   },
+   "shortmonth_10": {
+      "message": "OCT"
+   },
+   "shortmonth_11": {
+      "message": "NOV"
+   },
+   "shortmonth_12": {
+      "message": "DEC"
+   },
+   "shortmonth_2": {
+      "message": "FEB"
+   },
+   "shortmonth_3": {
+      "message": "MAR"
+   },
+   "shortmonth_4": {
+      "message": "APR"
+   },
+   "shortmonth_5": {
+      "message": "MAY"
+   },
+   "shortmonth_6": {
+      "message": "JUN"
+   },
+   "shortmonth_7": {
+      "message": "JUL"
+   },
+   "shortmonth_8": {
+      "message": "AUG"
+   },
+   "shortmonth_9": {
+      "message": "SEP"
+   },
+   "sites_info": {
+      "message": "List the sites on which you want highlights to occur. You can define a white- and a blacklist, the blacklist has priority.\u003Cbr /> If nothing is defined, highlights are set on all pages. \u003Cbr />\u003Cbr />You can use wildcards such as * and ?.\u003Cbr /> examples: *.google.com, www.google.com, www.google.com/something/page.html, www.go?gle.com/*/page.html"
+   },
+   "submit_form": {
+      "message": "Submit form"
+   },
+   "subscription_enter_key": {
+      "message": "Enter a license key"
+   },
+   "subscription_enter_key_help": {
+      "message": "You can type or paste your license key, which you received by email, here"
+   },
+   "subscription_valid_until": {
+      "message": "Your subscription is valid until"
+   },
+   "sync": {
+      "message": "Download"
+   },
+   "sync_list_desc": {
+      "message": "A synchronized list is available in all your browsers when logged in to your browser, but it supports less words due to storage limitations."
+   },
+   "sync_list_header": {
+      "message": "Do you want to sync this list between your browsers?"
+   },
+   "sync_list_no": {
+      "message": "No, do not synchronize this list"
+   },
+   "sync_list_yes": {
+      "message": "Yes, synchronize this list"
+   },
+   "synchronizing": {
+      "message": "Downloading"
+   },
+   "tab_action": {
+      "message": "Action"
+   },
+   "tab_advanced": {
+      "message": "Advanced"
+   },
+   "tab_general": {
+      "message": "General"
+   },
+   "tab_limitations": {
+      "message": "Limitations"
+   },
+   "tab_settings_backup": {
+      "message": "Backup"
+   },
+   "tab_settings_general": {
+      "message": "General"
+   },
+   "tab_style": {
+      "message": "Style"
+   },
+   "term_conditions": {
+      "message": "Terms and conditions"
+   },
+   "thanks_request": {
+      "message": "Thanks for your request"
+   },
+   "thanks_request_info": {
+      "message": "We will contact you very soon to exchange billing and payment information."
+   },
+   "title_newGroupType": {
+      "message": "Where do you want to manage the words?"
+   },
+   "upgrade_feature1": {
+      "message": "Use Google sheets to manage words"
+   },
+   "upgrade_feature2": {
+      "message": "Define actions when you click a highlight"
+   },
+   "upgrade_feature3": {
+      "message": "More to come..."
+   },
+   "upgrade_price_title": {
+      "message": "Highlight This! Premium is available for"
+   },
+   "upgrade_tier1": {
+      "message": "3 months: 6 euro"
+   },
+   "upgrade_tier2": {
+      "message": "6 months: 11 euro"
+   },
+   "upgrade_tier3": {
+      "message": "12 months: 18 euro"
+   },
+   "upgrade_tier4": {
+      "message": "24 months: 24 euro"
+   },
+   "upgrade_to_premium": {
+      "message": "Upgrade to Premium"
+   },
+   "upgrade_to_premium_intro": {
+      "message": "Upgrade to Highlight This! Premium and benefit from more advanced highlighting features"
+   },
+   "url_invalid": {
+      "message": "The URL is invalid"
+   },
+   "word_found_on_page": {
+      "message": "Word found on page"
+   },
+   "wordlist_too_long_for_sync_storage": {
+      "message": "The list is too long for being synchronised to other browsers"
+   },
+   "yesReset": {
+      "message": "Reset all my data"
+   },
+   "you_are_premium": {
+      "message": "You are a Premium user"
+   }
+}

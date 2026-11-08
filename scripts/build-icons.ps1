@@ -1,56 +1,52 @@
-# Export the editable SVG paths as Chrome-compatible PNGs without dependencies.
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
-$assetDirectory = Join-Path $PSScriptRoot '../assets'
-[xml]$source = Get-Content -LiteralPath (Join-Path $assetDirectory 'icon.svg') -Raw
+$projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+$assetsPath = Join-Path $projectRoot 'assets'
+[IO.Directory]::CreateDirectory($assetsPath) | Out-Null
+
 foreach ($size in @(16, 32, 48, 128)) {
-    $scale = 4
-    $canvas = [System.Drawing.Bitmap]::new($size * $scale, $size * $scale)
-    $graphics = [System.Drawing.Graphics]::FromImage($canvas)
-    $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
-    $graphics.ScaleTransform($size * $scale / 128.0, $size * $scale / 128.0)
-    $tile = [System.Drawing.Drawing2D.GraphicsPath]::new()
-    $rect = $source.svg.rect
-    $x = [single]$rect.x; $y = [single]$rect.y
-    $width = [single]$rect.width; $height = [single]$rect.height; $diameter = 2 * [single]$rect.rx
-    $tile.AddArc($x, $y, $diameter, $diameter, 180, 90)
-    $tile.AddArc($x + $width - $diameter, $y, $diameter, $diameter, 270, 90)
-    $tile.AddArc($x + $width - $diameter, $y + $height - $diameter, $diameter, $diameter, 0, 90)
-    $tile.AddArc($x, $y + $height - $diameter, $diameter, $diameter, 90, 90)
-    $tile.CloseFigure()
-    $brush = [System.Drawing.SolidBrush]::new([System.Drawing.ColorTranslator]::FromHtml($rect.fill))
-    $graphics.FillPath($brush, $tile)
-    $brush.Dispose(); $tile.Dispose()
-    foreach ($shape in $source.svg.path) {
-        $tokens = [regex]::Matches($shape.d, '[MCZ]|-?\d+(?:\.\d+)?')
-        $path = [System.Drawing.Drawing2D.GraphicsPath]::new()
-        $position = 0; $pointX = 0; $pointY = 0
-        while ($position -lt $tokens.Count) {
-            $command = $tokens[$position++].Value
-            switch ($command) {
-                'M' { $pointX = [single]$tokens[$position++].Value; $pointY = [single]$tokens[$position++].Value }
-                'C' {
-                    $a = [single]$tokens[$position++].Value; $b = [single]$tokens[$position++].Value
-                    $c = [single]$tokens[$position++].Value; $d = [single]$tokens[$position++].Value
-                    $endX = [single]$tokens[$position++].Value; $endY = [single]$tokens[$position++].Value
-                    $path.AddBezier($pointX, $pointY, $a, $b, $c, $d, $endX, $endY)
-                    $pointX = $endX; $pointY = $endY
-                }
-                'Z' { $path.CloseFigure() }
-                default { throw "Unsupported SVG path command: $command" }
-            }
-        }
-        $brush = [System.Drawing.SolidBrush]::new([System.Drawing.ColorTranslator]::FromHtml($shape.fill))
-        $graphics.FillPath($brush, $path)
-        $brush.Dispose(); $path.Dispose()
-    }
+    $bitmap = [Drawing.Bitmap]::new($size * 4, $size * 4)
+    $graphics = [Drawing.Graphics]::FromImage($bitmap)
+    $graphics.SmoothingMode = [Drawing.Drawing2D.SmoothingMode]::AntiAlias
+    $graphics.ScaleTransform($size * 4 / 128, $size * 4 / 128)
+    $green = [Drawing.SolidBrush]::new([Drawing.ColorTranslator]::FromHtml('#147d66'))
+    $white = [Drawing.SolidBrush]::new([Drawing.Color]::White)
+    $pen = [Drawing.Pen]::new($green, 5)
+    $pen.StartCap = [Drawing.Drawing2D.LineCap]::Round
+    $pen.EndCap = [Drawing.Drawing2D.LineCap]::Round
+    $roundRect = [Drawing.Drawing2D.GraphicsPath]::new()
+    $roundRect.AddArc(0, 0, 60, 60, 180, 90)
+    $roundRect.AddArc(68, 0, 60, 60, 270, 90)
+    $roundRect.AddArc(68, 68, 60, 60, 0, 90)
+    $roundRect.AddArc(0, 68, 60, 60, 90, 90)
+    $roundRect.CloseFigure()
+    $graphics.FillPath($green, $roundRect)
+    $bubble = [Drawing.Drawing2D.GraphicsPath]::new()
+    $bubble.AddArc(26, 31, 18, 18, 180, 90)
+    $bubble.AddArc(84, 31, 18, 18, 270, 90)
+    $bubble.AddArc(84, 73, 18, 18, 0, 90)
+    $bubble.AddLine(93, 91, 59, 91)
+    $bubble.AddLine(59, 91, 36, 106)
+    $bubble.AddLine(36, 106, 36, 91)
+    $bubble.AddArc(26, 73, 18, 18, 90, 90)
+    $bubble.CloseFigure()
+    $graphics.FillPath($white, $bubble)
+    $graphics.DrawLine($pen, 78, 44, 78, 78)
+    $graphics.DrawLine($pen, 42, 51, 65, 51)
+    $graphics.DrawLine($pen, 42, 63, 58, 63)
+    $icon = [Drawing.Bitmap]::new($size, $size)
+    $outputGraphics = [Drawing.Graphics]::FromImage($icon)
+    $outputGraphics.InterpolationMode = [Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+    $outputGraphics.DrawImage($bitmap, 0, 0, $size, $size)
+    $icon.Save((Join-Path $assetsPath "icon-$size.png"), [Drawing.Imaging.ImageFormat]::Png)
+    $outputGraphics.Dispose()
+    $icon.Dispose()
+    $bubble.Dispose()
+    $roundRect.Dispose()
+    $pen.Dispose()
+    $green.Dispose()
+    $white.Dispose()
     $graphics.Dispose()
-    $output = [System.Drawing.Bitmap]::new($size, $size)
-    $resize = [System.Drawing.Graphics]::FromImage($output)
-    $resize.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
-    $resize.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality
-    $resize.DrawImage($canvas, 0, 0, $size, $size)
-    $output.Save((Join-Path $assetDirectory "icon-$size.png"), [System.Drawing.Imaging.ImageFormat]::Png)
-    $resize.Dispose(); $output.Dispose(); $canvas.Dispose()
+    $bitmap.Dispose()
 }
-Write-Output 'Created extension icons: 16, 32, 48, and 128 px.'
+Write-Output 'Generated extension icons.'

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Sidebar - Settings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="options.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Page Header with Logo -->
+        <div class="page-header">
+            <div class="logo-section">
+                <img src="../images/sideai-feature.png" alt="ChatGPT Sidebar" class="extension-logo">
+                <div class="header-text">
+                    <h1>SideAI: ChatGPT Sidebar</h1>
+                    <p>Settings & Preferences</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tabs-left">
+                <button class="tab active" data-tab="menu">
+                    <i class="fas fa-bars"></i>
+                    Menu Items
+                </button>
+                <!-- <button class="tab" data-tab="settings">Settings</button> -->
+                <button class="tab" data-tab="blocked-sites">
+                    <i class="fas fa-shield-alt"></i>
+                    Disabled Sites
+                </button>
+                <button class="tab" data-tab="usage">
+                    <i class="fas fa-crown"></i>
+                    Usage & License
+                </button>
+                <button class="tab" data-tab="shortcuts">
+                    <i class="fas fa-keyboard"></i>
+                    Shortcuts
+                </button>
+            </div>
+        </div>
+
+        <div id="menu-tab" class="tab-content active">
+            <p>Customize your text menu items and prompts. Drag items to reorder them or use the pin icon to show/hide items from the menu.</p>
+            <button id="newPromptBtn" class="new-item-btn"><i class="fas fa-plus"></i> Create New Item</button>
+
+            <div class="lists-container">
+                <div class="list-section">
+                    <h3>Visible Items</h3>
+                    <div id="showList" class="menu-list"></div>
+                </div>
+                <div class="list-section">
+                    <h3>Hidden Items</h3>
+                    <div id="hideList" class="menu-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="settings-tab" class="tab-content">
+            <div class="settings-section">
+                <h3>General Settings</h3>
+                <div class="setting-group">
+                    <label>
+                        Default Language
+                        <select id="defaultLanguage">
+                            <option value="English">English</option>
+                            <option value="Spanish">Spanish</option>
+                            <option value="French">French</option>
+                            <option value="German">German</option>
+                            <option value="Chinese">Chinese</option>
+                            <option value="Japanese">Japanese</option>
+                            <option value="Korean">Korean</option>
+                            <option value="Arabic">Arabic</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="setting-group">
+                    <label>
+                        Theme
+                        <select id="theme">
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="system">System</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div id="blocked-sites-tab" class="tab-content">
+            <div class="blocked-sites-container">
+
+                
+                <!-- Page Assistant Disable Section -->
+                <div class="disable-section">
+                    <h3>Page Assistant</h3>
+                    <div class="blocked-sites-header">
+                        <div class="global-status" id="pageAssistantStatus">Extension is enabled</div>
+                        <button id="unblockAllBtn" class="unblock-all-btn" style="display: none;">
+                            <i class="fas fa-unlock"></i> Unblock All Sites
+                        </button>
+                    </div>
+                    <div id="pageAssistantSitesList" class="blocked-sites-list">
+                        <!-- Page assistant blocked sites will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Text Menu Disable Section -->
+                <div class="disable-section">
+                    <h3>Text Selection Menu</h3>
+                    <div class="blocked-sites-header">
+                        <div class="global-status" id="textMenuStatus">Extension is enabled</div>
+                        <button id="unblockAllTextMenuBtn" class="unblock-all-btn" style="display: none;">
+                            <i class="fas fa-unlock"></i> Unblock All Sites
+                        </button>
+                    </div>
+                    <div id="textMenuSitesList" class="blocked-sites-list">
+                        <!-- Text menu blocked sites will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Writing Assistant Disable Section -->
+                <div class="disable-section">
+                    <h3>Writing Assistant</h3>
+                    <div class="blocked-sites-header">
+                        <div class="global-status" id="writingAssistantStatus">Writing Assistant is enabled</div>
+                        <button id="unblockAllWritingAssistantBtn" class="unblock-all-btn" style="display: none;">
+                            <i class="fas fa-unlock"></i> Unblock All Sites
+                        </button>
+                    </div>
+                    <div id="writingAssistantSitesList" class="blocked-sites-list">
+                        <!-- Writing Assistant blocked sites will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Google Search ChatGPT Section -->
+                <div class="disable-section">
+                    <h3>ChatGPT for Google Search</h3>
+                    <p class="disable-section-desc">Show ChatGPT Responses on Google search results pages.</p>
+                    <div class="toggle-row">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="googleChatgptEnabled">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-label" id="googleChatgptStatus">Enabled</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="usage-tab" class="tab-content">
+            <div class="settings-section">
+                <h3>Usage Status</h3>
+                <div class="usage-status-card usage-main-card">
+                    <div class="usage-header">
+                        <div class="usage-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="usage-info">
+                            <h4 id="usageStatus">Loading...</h4>
+                            <p id="usageRemaining"></p>
+                        </div>
+                    </div>
+                    <div class="usage-progress" id="sharedUsageProgress">
+                        <div class="progress-bar" id="sharedUsageBar" role="progressbar" aria-label="Daily uses" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0">
+                            <div class="progress-fill" id="progressFillTextMenu"></div>
+                        </div>
+                        <div class="usage-stats" id="usageDailyStats">0 / 3 uses today</div>
+                    </div>
+                    <div class="usage-reset" id="usageResetMain">
+                        <i class="fas fa-clock"></i>
+                        <span>Resets at: <span id="resetTime">--:--</span></span>
+                    </div>
+                </div>
+
+                <h3>License Management</h3>
+                <div class="license-section">
+                    <div class="license-status" id="licenseStatus">
+                        <div class="license-icon">
+                            <i class="fas fa-key" id="licenseIcon"></i>
+                        </div>
+                        <div class="license-info">
+                            <h4 id="licenseTitle">Free Version</h4>
+                            <p id="licenseDescription">Limited to 3 uses per day</p>
+                        </div>
+                    </div>
+
+                    <div class="license-input-section" id="licenseInputSection">
+                        <label for="licenseCode">Enter License Code</label>
+                        <div class="license-input-group">
+                            <input type="text" id="licenseCode" placeholder="Enter your license code here">
+                            <button id="activateLicense" class="activate-btn">
+                                <i class="fas fa-check"></i> Activate
+                            </button>
+                        </div>
+                        <p class="license-help">
+                            <i class="fas fa-info-circle"></i>
+                            Don't have a license? Choose a plan below:
+                        </p>
+                        <section class="website-pricing" id="pricingPlans">
+                            <div class="website-pricing-toggle-wrap">
+                                <div class="website-pricing-toggle" role="tablist" aria-label="Billing cycle">
+                                    <button type="button" class="website-pricing-toggle-btn" data-billing="monthly" aria-pressed="false">
+                                        <span>Monthly</span>
+                                    </button>
+                                    <button type="button" class="website-pricing-toggle-btn active" data-billing="yearly" aria-pressed="true">
+                                        <span>Annual</span>
+                                        <span class="website-pricing-toggle-pill">-67%</span>
+                                    </button>
+                                </div>
+                                <div class="website-pricing-savings-banner" id="websitePricingSavingsBanner">
+                                    8 months free with annual plan- save $40/year 🤩
+                                </div>
+                            </div>
+
+                            <div class="website-pricing-grid">
+                                <article class="website-plan website-plan-free">
+                                    <div class="website-plan-body">
+                                        <div class="website-plan-header-block">
+                                            <h4 class="website-plan-title">Free</h4>
+                                            <div class="website-plan-price-line">
+                                                <span class="website-plan-price">$0</span>
+                                            </div>
+                                            <p class="website-plan-description">
+                                                Try the essential SideAI browser experience before upgrading.
+                                            </p>
+                                        </div>
+
+
+                                        <div class="website-plan-divider"></div>
+
+                                        <ul class="website-plan-features">
+                                            <li>Install SideAI in Chrome</li>
+                                            <li>Use your own ChatGPT account</li>
+                                            <li>Basic daily SideAI usage limits</li>
+                                            <li>Core sidebar browsing workflows</li>
+                                            <li>Upgrade whenever you need Pro</li>
+                                        </ul>
+                                    </div>
+                                </article>
+
+                                <article class="website-plan website-plan-pro">
+                                    <div class="website-plan-topbar">RECOMMENDED</div>
+                                    <div class="website-plan-ribbon" id="websiteProRibbon">-67%</div>
+                                    <div class="website-plan-body website-plan-body-pro">
+                                        <div class="website-plan-header-meta website-plan-header-meta-pro">PRO</div>
+                                        <h4 class="website-plan-title website-plan-title-pro">Premium</h4>
+                                        <div class="website-plan-price-line website-plan-price-line-pro">
+                                            <span class="website-plan-price website-plan-price-pro" id="websiteProPrice">$1.67</span>
+                                            <span class="website-plan-cadence" id="websiteProCadence">/ month</span>
+                                        </div>
+                                        <p class="website-plan-description website-plan-description-pro" id="websiteProDescription">
+                                            $20 billed annually. Best value for regular SideAI users.
+                                        </p>
+
+                                        <a href="#" class="website-plan-cta website-plan-cta-pro plan-buy-btn" id="websiteProCta" data-plan="yearly">
+                                            Get Annual
+                                        </a>
+
+                                        <div class="website-plan-divider website-plan-divider-pro"></div>
+
+                                        <ul class="website-plan-features website-plan-features-pro">
+                                            <li>Premium SideAI access</li>
+                                            <li>Unlimited SideAI usage</li>
+                                            <li>Expanded assistant actions</li>
+                                            <li>Writing and page assistant workflows</li>
+                                            <li>Search insights and screenshot tools</li>
+                                            <li>Custom prompts and menu controls</li>
+                                        </ul>
+                                    </div>
+                                </article>
+
+                                <article class="website-plan website-plan-lifetime">
+                                    <div class="website-plan-body website-plan-body-lifetime">
+                                        <div class="website-plan-lifetime-header">
+                                            <div class="website-plan-header-meta website-plan-header-meta-lifetime">BEST OFFER</div>
+                                            <div class="website-plan-lifetime-pill">
+                                                <span class="website-plan-lifetime-pill-icon">∞</span>
+                                                <span>LIMITED TIME OFFER</span>
+                                            </div>
+                                        </div>
+
+                                        <h4 class="website-plan-title website-plan-title-lifetime">Lifetime</h4>
+
+                                        <div class="website-plan-old-price">$99.99</div>
+
+                                        <div class="website-plan-price-line website-plan-price-line-lifetime">
+                                            <span class="website-plan-price website-plan-price-lifetime">$39</span>
+                                            <span class="website-plan-cadence website-plan-cadence-lifetime">/ once</span>
+                                        </div>
+
+                                        <p class="website-plan-description website-plan-description-lifetime">
+                                            Pay once for long-term premium access with no recurring fees.
+                                        </p>
+
+                                        <a href="#" class="website-plan-cta website-plan-cta-lifetime plan-buy-btn" data-plan="lifetime">
+                                            Get Lifetime
+                                        </a>
+
+                                        <div class="website-plan-divider website-plan-divider-lifetime"></div>
+
+                                        <ul class="website-plan-features website-plan-features-lifetime">
+                                            <li>Everything in Pro</li>
+                                            <li>Unlimited SideAI usage forever</li>
+                                            <li>Lifetime premium access</li>
+                                            <li>No recurring subscription</li>
+                                            <li>Free extension updates</li>
+                                            <li>Best for early supporters</li>
+                                        </ul>
+                                    </div>
+                                </article>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div class="license-features" id="licenseFeatures" style="display: none;">
+                        <div class="license-plan-info" id="licensePlanInfo"></div>
+                        <h4>Premium Features Unlocked:</h4>
+                        <ul>
+                            <li><i class="fas fa-check"></i> Unlimited AI interactions</li>
+                            <li><i class="fas fa-check"></i> Priority support</li>
+                            <li><i class="fas fa-check"></i> Advanced customization</li>
+                            <li><i class="fas fa-check"></i> No daily limits</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="shortcuts-tab" class="tab-content">
+            <div class="settings-section shortcuts-section">
+                <h3>Keyboard Shortcuts</h3>
+                <p class="shortcuts-intro">Customize each SideAI shortcut separately. Uses <strong>Ctrl</strong> on Windows/Linux and <strong>⌘</strong> on Mac.</p>
+
+                <div class="shortcuts-grid"><p role="status">Loading Chrome shortcuts…</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Prompt Modal -->
+    <div id="promptModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>New Prompt</h2>
+                <button class="close-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Prompt Name<span class="required">*</span></label>
+                    <input type="text" id="promptName" placeholder="Name your prompt">
+                </div>
+                <div class="form-group">
+                    <label>Prompt Content<span class="required">*</span></label>
+                    <textarea id="promptContent" placeholder="Paste or input content here"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Icon</label>
+                    <div class="icon-selector">
+                        <div id="selectedIcon" class="selected-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <button class="icon-picker-btn">Change</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Use under the following conditions</label>
+                    <div class="scene-selector" style="display:flex;gap:16px;margin-top:6px;">
+                        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" id="sceneWriting" value="writing" checked> Writing scene</label>
+                        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" id="sceneReading" value="reading" checked> Reading scene</label>
+                        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" id="sceneAll" value="all" checked> All scenes</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="cancel-btn">Cancel</button>
+                    <button class="save-btn">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- License In Use Modal -->
+    <div id="licenseInUseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>License Already in Use</h3>
+            </div>
+            <div class="modal-body">
+                <p id="licenseInUseMessage" class="license-in-use-message">
+                    This license is already in use by another session. Activating here will deactivate the other session. To use on multiple browsers, please purchase an additional license.
+                </p>
+                <p class="license-in-use-question">Do you want to activate here and deactivate the other session?</p>
+                <div class="modal-footer license-in-use-footer">
+                    <button id="licenseInUseBuyBtn" class="buy-license-btn">
+                        <i class="fas fa-shopping-cart"></i> Buy new license
+                    </button>
+                    <button id="licenseInUseTakeoverBtn" class="takeover-btn">
+                        <i class="fas fa-check"></i> Take over
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Icon Picker Modal -->
+    <div id="iconPickerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Choose an Icon</h3>
+                <div class="modal-actions">
+                    <button class="done-btn">Done</button>
+                    <button class="close-btn"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="icon-search">
+                    <input type="text" id="iconSearch" placeholder="Search icons...">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <div id="iconPicker" class="icon-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../polar-config.js"></script>
+    <script src="../sideai-icons.js"></script>
+    <script src="../shortcut-settings.js"></script>
+    <script src="shortcuts.js"></script>
+    <script src="options.js"></script>
+</body>
+</html>

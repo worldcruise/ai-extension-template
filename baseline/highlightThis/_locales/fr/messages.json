@@ -1,0 +1,836 @@
+{
+   "action_example": {
+      "message": "Par exemple, si vous marquez le mot «surligner» avec la requête \"Hi?hL*\", vous obtiendrez:"
+   },
+   "action_intro": {
+      "message": "Spécifiez l'action à effectuer en cliquant sur un marqueur"
+   },
+   "action_newtab": {
+      "message": "Ouvrir dans un nouvel onglet"
+   },
+   "action_none": {
+      "message": "Aucune"
+   },
+   "action_sametab": {
+      "message": "Ouvrir dans l'onglet actuel"
+   },
+   "action_tip1": {
+      "message": "%t% est remplacé par le texte trouvé sur la page (par exemple, surlignage)"
+   },
+   "action_tip2": {
+      "message": "%s% est remplacé par le mot-clé (par exemple Hi?hL*)"
+   },
+   "action_tip3": {
+      "message": "%tu% ou %tl%, %su% ou %sl% applique le mot en majuscules ou en minuscules"
+   },
+   "action_tip4": {
+      "message": "quelques exemples: https://wikipedia.com/%t%, https://google.com/search?q=%t%"
+   },
+   "added_new_word": {
+      "message": "Nouveau mot ajouté"
+   },
+   "added_non_term": {
+      "message": "Attention, le mot peut ne pas être mis en évidence"
+   },
+   "added_non_term_description": {
+      "message": "Vous avez ajouté des caractères provenant de scripts, généralement non séparés par des espaces ou des symboles.\n\nVérifiez les paramètres de la liste pour spécifier la correspondance mot/terme."
+   },
+   "agree": {
+      "message": "Je suis d'accord avec les"
+   },
+   "already_in_wordlist": {
+      "message": "était déjà présent dans la liste des mots"
+   },
+   "application_description": {
+      "message": "Recherche automatiquement et met en surbrillance les mots et les phrases sur la page web selon votre liste"
+   },
+   "application_title": {
+      "message": "Highlight This: trouve et marque les mots"
+   },
+   "assistant_step_1": {
+      "message": "Créer ou ouvrir un document Google Sheets existant"
+   },
+   "assistant_step_2": {
+      "message": "Faites votre liste dans la première feuille, dans la première colonne"
+   },
+   "assistant_step_3": {
+      "message": "Partagez vos Google Sheets"
+   },
+   "assistant_step_4": {
+      "message": "Partager avec toute personne disposant du lien"
+   },
+   "assistant_step_5": {
+      "message": "Sélectionnez le lien via 'Copier le lien'"
+   },
+   "assistant_step_6": {
+      "message": "Collez le lien ici"
+   },
+   "autoBackup_Daily": {
+      "message": "Tous les jours"
+   },
+   "autoBackup_Monthly": {
+      "message": "Mensuel"
+   },
+   "autoBackup_Never": {
+      "message": "Jamais"
+   },
+   "autoBackup_Weekly": {
+      "message": "Hebdomadaire"
+   },
+   "changelicense_ad_button": {
+      "message": "Activer les publicités"
+   },
+   "changelicense_ad_description": {
+      "message": "\u003Cli>Des publicités sont affichées dans Highlight This!\u003C/li>\u003Cli>Comprend le surlignage illimité de mots et tous les styles de surlignage.\u003C/li>\u003Cli>Choisissez une licence payante pour une expérience sans publicité.\u003C/li>"
+   },
+   "changelicense_ad_moreinfo": {
+      "message": "À propos des publicités"
+   },
+   "changelicense_ad_title": {
+      "message": "Passer à la version avec publicités"
+   },
+   "changelicense_free_button": {
+      "message": "Activer la version gratuite"
+   },
+   "changelicense_free_description": {
+      "message": "\u003Cli>Votre surbrillance est limité à 200 mots. Highlight This! n'utilisera que les 200 premiers mots de vos listes\u003C/li>\u003Cli>Vous avez des styles de surbrillance limités\u003C/li>\u003Cli>Aucune publicité ne vous est affichée\u003C/li>"
+   },
+   "changelicense_free_title": {
+      "message": "Mise en surbrillance gratuite limitée à 200 mots"
+   },
+   "changelicense_paid_button": {
+      "message": "Acheter une licence"
+   },
+   "changelicense_paid_description": {
+      "message": "\u003Cli>Selon la version que vous choisissez, vous disposez d'un surlignage de 500 mots ou d'un nombre illimité de mots\u003C/li>\u003Cli>Vous avez des styles de surlignage limités\u003C/li>"
+   },
+   "changelicense_paid_title": {
+      "message": "Achetez une licence annuelle pour permettre de mettre en évidence plus de mots sans utiliser de publicités"
+   },
+   "changelicense_title": {
+      "message": "Changer de version"
+   },
+   "close_assistant": {
+      "message": "Fermer l'assistant"
+   },
+   "confirm_email": {
+      "message": "Confirmez votre email"
+   },
+   "create_new_list": {
+      "message": "Créer une nouvelle liste"
+   },
+   "currentlicense_500_description": {
+      "message": "\u003Cli>Votre surlignage est limité à 500 mots. Highlight This! n'utilisera que les 500 premiers mots de vos listes\u003C/li>\u003Cli>Vous avez tous les styles de surbrillance\u003C/li>\u003Cli>Aucune publicité ne vous est affichée\u003C/li>"
+   },
+   "currentlicense_500_title": {
+      "message": "Vous utilisez la version payante avec une limite de 500 mots"
+   },
+   "currentlicense_ad_description": {
+      "message": "\u003Cli>Des publicités sont affichées dans Highlight This!\u003C/li>\u003Cli>Comprend le surlignage illimité de mots et tous les styles de surlignage.\u003C/li>\u003Cli>Choisissez une licence payante pour une expérience sans publicité.\u003C/li>"
+   },
+   "currentlicense_ad_title": {
+      "message": "Vous utilisez la version avec publicités"
+   },
+   "currentlicense_free_description": {
+      "message": "\u003Cli>Votre surbrillance est limité à 200 mots. Highlight This! n'utilisera que les 200 premiers mots de vos listes\u003C/li>\u003Cli>Vous avez des styles de surbrillance limités\u003C/li>\u003Cli>Aucune publicité ne vous est affichée\u003C/li>"
+   },
+   "currentlicense_free_title": {
+      "message": "Vous utilisez la version gratuite"
+   },
+   "currentlicense_temp_description": {
+      "message": "\u003Cli>Votre surlignage est illimité\u003C/li>\u003Cli>Vous avez tous les styles de surlignage\u003C/li>\u003Cli>Aucune publicité ne vous est affichée\u003C/li>"
+   },
+   "currentlicense_temp_title": {
+      "message": "Vous êtes sur la version d'essai, il vous reste \u003Cb>{0}\u003C/b> jours"
+   },
+   "currentlicense_unlimited_description": {
+      "message": "\u003Cli>Votre surlignage est illimité\u003C/li>\u003Cli>Vous avez tous les styles de surlignage\u003C/li>\u003Cli>Aucune publicité ne vous est affichée\u003C/li>"
+   },
+   "currentlicense_unlimited_title": {
+      "message": "Vous utilisez la version payante illimitée"
+   },
+   "deleteGroupLink": {
+      "message": "Supprimer la liste"
+   },
+   "donate1": {
+      "message": "Bonjour, j'espère que vous appréciez l'utilisation de Highlight This!"
+   },
+   "donate2": {
+      "message": "Je développe l'extension pendant mon temps libre, soutenez mon travail en faisant un don de 1&dollar; / 1&euro;."
+   },
+   "donate3": {
+      "message": "Highlight This! restera toujours Gratuit"
+   },
+   "donatebtn": {
+      "message": "Faire un don"
+   },
+   "dontdonate": {
+      "message": "Je ne veux pas faire un don maintenant, continuer à utiliser gratuitement"
+   },
+   "download_backup": {
+      "message": "Cliquez sur ce lien si le fichier ne s'est pas téléchargé automatiquement"
+   },
+   "download_frequency": {
+      "message": "Fréquence de téléchargement"
+   },
+   "download_frequency_1": {
+      "message": "Toutes les 10 minutes"
+   },
+   "download_frequency_2": {
+      "message": "Toutes les 30 minutes"
+   },
+   "download_frequency_3": {
+      "message": "Toutes les heures"
+   },
+   "download_frequency_4": {
+      "message": "Toutes les 4 heures"
+   },
+   "download_frequency_5": {
+      "message": "Toutes les 8 heures"
+   },
+   "download_frequency_6": {
+      "message": "Tous les jours"
+   },
+   "duration": {
+      "message": "Licence"
+   },
+   "email": {
+      "message": "Email"
+   },
+   "enter_license": {
+      "message": "Insérez une nouvelle clé de licence"
+   },
+   "enterlicense_button": {
+      "message": "Valider"
+   },
+   "enterlicense_description": {
+      "message": "Si vous avez déjà une clé de licence, vous pouvez la saisir ici."
+   },
+   "enterlicense_label": {
+      "message": "Clé de licence"
+   },
+   "enterlicense_title": {
+      "message": "Entrez votre clé de licence"
+   },
+   "everytime": {
+      "message": "Chaque fois"
+   },
+   "example": {
+      "message": "exemple"
+   },
+   "example1": {
+      "message": "Ceci est un"
+   },
+   "example2": {
+      "message": "de texte en surbrillance"
+   },
+   "field_autoBackupSettings": {
+      "message": "Sauvegarde automatique"
+   },
+   "field_background": {
+      "message": "Couleur de fond"
+   },
+   "field_boxColor": {
+      "message": "Couleur de bordure pour les champs de saisie"
+   },
+   "field_caseSensitive_label": {
+      "message": "Comparer en mode sensible à la casse"
+   },
+   "field_clearSyncLists": {
+      "message": "Réinitialiser les données et les paramètres:"
+   },
+   "field_colors": {
+      "message": "Couleurs"
+   },
+   "field_colors_help": {
+      "message": "Sélectionner les couleurs de surbrillance"
+   },
+   "field_containerSelector": {
+      "message": "Mettre en surbrillance uniquement lorsque le conteneur correspond à ce sélecteur de requête"
+   },
+   "field_detection": {
+      "message": "Détection"
+   },
+   "field_detection_help": {
+      "message": "Seulement détecter des mots complets"
+   },
+   "field_dontHighlight": {
+      "message": "Ne pas surbriller sur ces sites"
+   },
+   "field_export": {
+      "message": "Export"
+   },
+   "field_exportSettings": {
+      "message": "Créer une sauvegarde"
+   },
+   "field_foreground": {
+      "message": "Couleur de premier plan"
+   },
+   "field_highlightOn": {
+      "message": "Surbriller sur ces sites"
+   },
+   "field_import": {
+      "message": "Import"
+   },
+   "field_importSettings": {
+      "message": "Restaurer une sauvegarde"
+   },
+   "field_limitations": {
+      "message": "Limites"
+   },
+   "field_listname": {
+      "message": "Nom de la liste"
+   },
+   "field_neverHighlightOn": {
+      "message": "Ne jamais surbriller sur ces sites"
+   },
+   "field_neverHighlightOn_help": {
+      "message": "Enumérer les sites sur lesquels vous ne voudriez jamais surbriller. \u003Cbr />\u003Cbr />Vous pouvez utiliser des caractères génériques comme * et ?.\u003Cbr /> exemples: *.google.com, www.google.com, www.google.com/something/page.html"
+   },
+   "field_printHighlights": {
+      "message": "Imprimer les surbrillances"
+   },
+   "field_sendErrors": {
+      "message": "Signaler un bogue au développeur"
+   },
+   "field_sendErrorsDescription": {
+      "message": "Description du problème:"
+   },
+   "field_sendErrorsEmail": {
+      "message": "Adresse e-mail:"
+   },
+   "field_showFoundWords": {
+      "message": "Afficher la vue d'ensemble des mots trouvés"
+   },
+   "field_sitesToHighlight": {
+      "message": "Sélectionner les sites sur lesquels agir"
+   },
+   "field_source": {
+      "message": "Source"
+   },
+   "field_useRegexTokens_help": {
+      "message": "Utilisez des jetons Regex au lieu de simples caractères génériques * et ? "
+   },
+   "field_words": {
+      "message": "Mots"
+   },
+   "field_words_help": {
+      "message": "Vous pouvez utiliser des caractères génériques comme * et ?. Chaque nouvelle ligne est considérée comme un mot."
+   },
+   "field_words_regex_help": {
+      "message": "Vous pouvez utilisez des jetons d'expression régulière tels que \b, [a-z], [1-9]"
+   },
+   "filterwords": {
+      "message": "Filtre"
+   },
+   "first_list": {
+      "message": "Ma liste"
+   },
+   "has_been_added_to": {
+      "message": "a été ajouté à"
+   },
+   "has_been_updated": {
+      "message": "a été mis à jour"
+   },
+   "highlight_editable_fields": {
+      "message": "Mettre en surbrillance dans les champs modifiables"
+   },
+   "importLocalRules": {
+      "message": "Restaurer \u003Cb>{0} listes non synchronisées\u003C/b> et les paramètres"
+   },
+   "importSyncRules": {
+      "message": "Restaurer \u003Cb>{0} listes synchronisées\u003C/b>"
+   },
+   "info_autoBackupSettings": {
+      "message": "Crée une sauvegarde dans votre dossier Téléchargements"
+   },
+   "info_clearSyncLists": {
+      "message": "Assurez-vous de créer une sauvegarde avant de réinitialiser vos données et paramètres"
+   },
+   "jump_to_word": {
+      "message": "Aller au mot"
+   },
+   "label_action": {
+      "message": "Action"
+   },
+   "label_link": {
+      "message": "Lien"
+   },
+   "last_synced_on": {
+      "message": "Dernier téléchargement le"
+   },
+   "launch_assistant": {
+      "message": "Lancer l'assistant"
+   },
+   "license_500": {
+      "message": "500"
+   },
+   "license_ad": {
+      "message": "Version avec publicités"
+   },
+   "license_confirm_temp_remove": {
+      "message": "Etes-vous sûr de vouloir quitter la version d'essai ? Vous ne pouvez pas revenir à la version d'essai."
+   },
+   "license_expired": {
+      "message": "Votre licence a expiré"
+   },
+   "license_expired_message": {
+      "message": "Vous êtes de retour sur la version gratuite"
+   },
+   "license_expires": {
+      "message": "Votre licence expire dans {0} jour(s). \u003Ca id=\"linkSubscription\" style=\"text-decoration: underline\">Modifiez votre abonnement\u003C/a> pour ne manquer aucun temps fort"
+   },
+   "license_free": {
+      "message": "gratuit"
+   },
+   "license_message_temp": {
+      "message": "Vous êtes sur un abonnement d'essai avec toutes les fonctionnalités activées. Votre essai expire dans \u003Cb>{0}\u003C/b> jours. \u003Ca id=\"linkSubscription\" style=\"text-decoration: underline\">Modifier votre abonnement\u003C/a>"
+   },
+   "license_new": {
+      "message": "Nouvelle licence"
+   },
+   "license_new_until": {
+      "message": "Votre licence est valable jusqu'au"
+   },
+   "license_temp": {
+      "message": "essai"
+   },
+   "license_unlimited": {
+      "message": "Illimité"
+   },
+   "license_updated": {
+      "message": "Licence renouvelée"
+   },
+   "list_synced": {
+      "message": "Liste téléchargée"
+   },
+   "localLabel": {
+      "message": "Liste standard"
+   },
+   "magicHighlighting": {
+      "message": "Mise en évidence optimisée en vitesse"
+   },
+   "maxwords_reached": {
+      "message": "Vous êtes à {0} % de mots. \u003Ca id=\"linkSubscription\" style=\"text-decoration: underline\">Modifiez votre abonnement\u003C/a> pour ne manquer aucune surbrillance"
+   },
+   "menu_help_label": {
+      "message": "Aider"
+   },
+   "menu_home_label": {
+      "message": "Maison"
+   },
+   "menu_sendErrors_label": {
+      "message": "Signaler un bogue"
+   },
+   "menu_settings_label": {
+      "message": "Paramètres"
+   },
+   "menu_subscription_label": {
+      "message": "Abonnement"
+   },
+   "migrate_local_button": {
+      "message": "Rendre la liste locale"
+   },
+   "migrate_local_text": {
+      "message": "Changez cette liste en liste locale, elle ne sera alors disponible que dans ce navigateur"
+   },
+   "migrate_sync_button": {
+      "message": "Synchroniser la liste"
+   },
+   "migrate_sync_text": {
+      "message": "Changer cette liste en liste synchronisée, pour la rendre disponible sur tous vos navigateurs où vous êtes connecté"
+   },
+   "migrate_sync_toobig_text": {
+      "message": "La liste ne peut pas être transformée en liste synchronisée car elle est trop grande, limitez le nombre de mots pour synchroniser la liste à tous les navigateurs où vous êtes connecté"
+   },
+   "more": {
+      "message": "Plus"
+   },
+   "need_more_subscriptions": {
+      "message": "Avez-vous besoin de licences supplémentaires? Demandez-les maintenant."
+   },
+   "newGroupDetail": {
+      "message": "Une liste standard vous permet de gérer les mots directement.\u003Cbr />Une liste externe télécharge une liste de mots d'un site externe (par exemple pastebin)"
+   },
+   "noReset": {
+      "message": "Annuler"
+   },
+   "no_subscription_request": {
+      "message": "Je n'ai pas encore de licence, demandez-en une"
+   },
+   "non_unicode_chars": {
+      "message": "Vous avez ajouté des caractères provenant de scripts qui ne sont généralement pas séparés par des espaces ou des symboles. Ce paramètre fonctionne mieux pour les langues contenant des mots délimités par des espaces. Pour les écritures comme le chinois, le coréen ou le japonais, qui n'utilisent pas d'espaces entre les mots, cela peut réduire la précision de la détection. Pensez à décocher cette option pour une meilleure mise en avant dans ces langues."
+   },
+   "notif_allDisabled": {
+      "message": "La surbrillance est désactivée"
+   },
+   "notif_allEnabled": {
+      "message": "La surbrillance est activée"
+   },
+   "notif_backupDone": {
+      "message": "La sauvegarde est prête dans votre dossier Téléchargements"
+   },
+   "notif_bugReportSent": {
+      "message": "Rapport de bogue soumis"
+   },
+   "notif_licenseAd": {
+      "message": "Vous utilisez maintenant la version avec publicités"
+   },
+   "notif_licenseAdfree": {
+      "message": "Vous êtes maintenant sur la version gratuite"
+   },
+   "notif_licensePaid": {
+      "message": "Vous êtes maintenant sur la version \"Highlight This! {0}\""
+   },
+   "notif_listDeleted": {
+      "message": "La liste \"{0}\" est supprimée"
+   },
+   "notif_listDisabled": {
+      "message": "La liste \"{0}\" est désactivée"
+   },
+   "notif_listEnabled": {
+      "message": "La liste \"{0}\" est activée"
+   },
+   "notif_listSaved": {
+      "message": "La liste \"{0}\" est enregistrée"
+   },
+   "notif_restoreComplete": {
+      "message": "La restauration est terminée"
+   },
+   "notif_settingsSaved": {
+      "message": "Les paramètres sont enregistrés"
+   },
+   "notify_when_found": {
+      "message": "Avertir lorsqu'un mot est trouvé"
+   },
+   "nr_users": {
+      "message": "Nombre d'utilisateurs"
+   },
+   "once_per_page": {
+      "message": "Une fois par page"
+   },
+   "perf_100": {
+      "message": "Rapide - Nécessite une machine puissante"
+   },
+   "perf_200": {
+      "message": "Par défaut - adapte la vitesse de surbrillance en fonction de la fréquence de mise à jour des pages"
+   },
+   "perf_300": {
+      "message": "Lent - le surbrillance va un peu plus lentement pour économiser sur les ressources"
+   },
+   "perf_400": {
+      "message": "Aucun surbrillance sur les mises à jour de page - Highlight This ne marque les mots qu'une seule fois lorsque la page est chargée"
+   },
+   "performance": {
+      "message": "Performance"
+   },
+   "performanceHelp": {
+      "message": "Définissez le niveau d'impact Highlight This est autorisé à avoir sur les ressources de votre appareil (puissance de traitement)."
+   },
+   "popup_add": {
+      "message": "Ajouter"
+   },
+   "popup_addnewlist": {
+      "message": "Ajouter une nouvelle liste de mots"
+   },
+   "popup_back": {
+      "message": "\u003C Retour"
+   },
+   "popup_byline": {
+      "message": "L'extension met en surbrillance tous les mots ci-dessous"
+   },
+   "popup_cancel": {
+      "message": "Annuler"
+   },
+   "popup_collapseAll": {
+      "message": "Tout réduire"
+   },
+   "popup_configureWords": {
+      "message": "\u003C Configuration des mots"
+   },
+   "popup_confirmDelete": {
+      "message": "Êtes-vous sûr de vouloir supprimer la liste et ses mots?"
+   },
+   "popup_confirmReset": {
+      "message": "\u003Cdiv>Voulez-vous vraiment réinitialiser toutes vos données et paramètres?\u003C/div>\u003Cdiv>Assurez-vous d'avoir une sauvegarde avant de continuer\u003C/div>"
+   },
+   "popup_create1": {
+      "message": "Créer une liste avec des mots que"
+   },
+   "popup_create2": {
+      "message": " détecte et mette en surbrillance sur les pages Web pendant la navigation."
+   },
+   "popup_createWordList": {
+      "message": "Créer une liste de mots"
+   },
+   "popup_disabled": {
+      "message": "désactivé"
+   },
+   "popup_dontshowwords": {
+      "message": "Arrêter d'afficher les mots trouvés sur la page"
+   },
+   "popup_edit": {
+      "message": "Modifier"
+   },
+   "popup_editWordlist": {
+      "message": "Modifier la liste"
+   },
+   "popup_expandAll": {
+      "message": "Tout afficher"
+   },
+   "popup_foundWords": {
+      "message": "Nous avons trouvé des mots sur cette page."
+   },
+   "popup_importFailed": {
+      "message": "L'importation a échoué"
+   },
+   "popup_labelListName": {
+      "message": "Nom de la liste"
+   },
+   "popup_limitations": {
+      "message": "limites"
+   },
+   "popup_next": {
+      "message": "Suivant"
+   },
+   "popup_no": {
+      "message": "Non"
+   },
+   "popup_nowords": {
+      "message": "Il n'y a aucune liste définie"
+   },
+   "popup_save": {
+      "message": "Sauvegarder"
+   },
+   "popup_settings": {
+      "message": "Paramètres"
+   },
+   "popup_showDonate": {
+      "message": "Aide & Don!"
+   },
+   "popup_tip1": {
+      "message": "Astuce: utiliser"
+   },
+   "popup_tip2": {
+      "message": "+Shift+Space"
+   },
+   "popup_tip3": {
+      "message": "pour parcourir les mots sur la page"
+   },
+   "popup_title": {
+      "message": "Highlight This!"
+   },
+   "popup_yes": {
+      "message": "Oui"
+   },
+   "premium_feature": {
+      "message": "Ceci est une fonctionnalité Premium"
+   },
+   "price_tier1": {
+      "message": "3 mois (6 euros / utilisateur)"
+   },
+   "price_tier2": {
+      "message": "6 mois (11 euros / utilisateur)"
+   },
+   "price_tier3": {
+      "message": "12 mois (18 euros / utilisateur)"
+   },
+   "price_tier4": {
+      "message": "24 mois (24 euros / utilisateur)"
+   },
+   "refresh_page": {
+      "message": "Actualiser la page"
+   },
+   "regex_invalid": {
+      "message": "L'expression régulière n'est pas valide"
+   },
+   "regex_mode": {
+      "message": "Regex mode"
+   },
+   "regex_too_many_matches": {
+      "message": "Le regex est trop large, cela rendra les pages bloquées"
+   },
+   "remoteLabel": {
+      "message": "Externe (Web, Pastebin, Google Sheets)"
+   },
+   "request_extra_license": {
+      "message": "Demander des clés de licence supplémentaires"
+   },
+   "request_license": {
+      "message": "Demander une licence"
+   },
+   "request_license_form": {
+      "message": "Vous pouvez demander une clé de licence avec ce formulaire. Dès réception de votre demande, nous vous enverrons une clé temporaire et nous vous contacterons pour les informations de paiement et de facturation"
+   },
+   "request_licensekey": {
+      "message": "Demander une licence"
+   },
+   "resetDataAndSettings": {
+      "message": "Réinitialiser les données et les paramètres"
+   },
+   "restoreWarning": {
+      "message": "La restauration d'une sauvegarde des listes synchronisées supprimera et restaurera uniquement les listes synchronisées. \u003Cbr /> Une restauration des listes non synchronisées restaurera votre configuration et supprimera et restaurera uniquement vos listes non synchronisées."
+   },
+   "sendErrorsButton": {
+      "message": "Envoyer"
+   },
+   "sendErrorsHelp": {
+      "message": "\u003Cp>Si vous rencontrez des problèmes, envoyez un rapport de bogue au développeur. \u003C/p>\u003Cp>Les erreurs capturées seront également envoyées, ces informations ne contiennent pas de données personnelles ni de mots.\u003C/p>"
+   },
+   "send_to": {
+      "message": "Envoyer vers"
+   },
+   "sheets_assistant": {
+      "message": "Assistant Google Sheets"
+   },
+   "sheets_id": {
+      "message": "Sheets id"
+   },
+   "shortmonth_1": {
+      "message": "JAN"
+   },
+   "shortmonth_10": {
+      "message": "OCT"
+   },
+   "shortmonth_11": {
+      "message": "NOV"
+   },
+   "shortmonth_12": {
+      "message": "DÉC"
+   },
+   "shortmonth_2": {
+      "message": "FÉV"
+   },
+   "shortmonth_3": {
+      "message": "MAR"
+   },
+   "shortmonth_4": {
+      "message": "AVR"
+   },
+   "shortmonth_5": {
+      "message": "MAI"
+   },
+   "shortmonth_6": {
+      "message": "JUI"
+   },
+   "shortmonth_7": {
+      "message": "JUL"
+   },
+   "shortmonth_8": {
+      "message": "AOÛ"
+   },
+   "shortmonth_9": {
+      "message": "SEP"
+   },
+   "sites_info": {
+      "message": "Lister les sites sur lesquels vous souhaitez mettre en surbrillance les mots. \u003Cbr />Vous pouvez définir une liste blanche et une liste noire, la liste noire est prioritaire.\u003Cbr /> Si rien n'est défini, la surbrillance se fait sur toutes les pages.\u003Cbr />\u003Cbr /> Vous pouvez utiliser des caractères génériques comme * et ?.\u003Cbr /> exemples: *.google.com, www.google.com, www.google.com/something/page.html, www.go?gle.com/*/page.html"
+   },
+   "submit_form": {
+      "message": "Envoyer"
+   },
+   "subscription_enter_key": {
+      "message": "Insérer une clé de licence"
+   },
+   "subscription_enter_key_help": {
+      "message": "Vous pouvez coller ou saisir la clé de licence que vous avez reçue par e-mail ici"
+   },
+   "subscription_valid_until": {
+      "message": "Votre licence est valable jusqu'au"
+   },
+   "sync": {
+      "message": "Télécharger"
+   },
+   "sync_list_desc": {
+      "message": "Une liste synchronisée est disponible dans tous vos navigateurs lorsque vous êtes connecté à votre navigateur, mais elle prend en charge moins de mots en raison des limitations de stockage."
+   },
+   "sync_list_header": {
+      "message": "Voulez-vous synchroniser cette liste entre vos navigateurs?"
+   },
+   "sync_list_no": {
+      "message": "Non, ne pas synchroniser cette liste"
+   },
+   "sync_list_yes": {
+      "message": "Oui, synchroniser cette liste"
+   },
+   "synchronizing": {
+      "message": "En train de synchroniser"
+   },
+   "tab_action": {
+      "message": "Action"
+   },
+   "tab_advanced": {
+      "message": "Avancé"
+   },
+   "tab_general": {
+      "message": "Général"
+   },
+   "tab_limitations": {
+      "message": "Limitations"
+   },
+   "tab_settings_backup": {
+      "message": "Sauvegarde"
+   },
+   "tab_settings_general": {
+      "message": "Général"
+   },
+   "tab_style": {
+      "message": "Style"
+   },
+   "term_conditions": {
+      "message": "Termes et conditions"
+   },
+   "thanks_request": {
+      "message": "Merci pour votre demande"
+   },
+   "thanks_request_info": {
+      "message": "Nous vous contacterons rapidement pour les informations de paiement et de facturation."
+   },
+   "title_newGroupType": {
+      "message": "Quel type de liste de mots souhaitez-vous créer?"
+   },
+   "upgrade_feature1": {
+      "message": "Utilisez Google Sheets pour gérer les mots"
+   },
+   "upgrade_feature2": {
+      "message": "Définissez des actions lorsque vous cliquez sur une surbrillance"
+   },
+   "upgrade_feature3": {
+      "message": "Il y a plus à venir ..."
+   },
+   "upgrade_price_title": {
+      "message": "Highlight This! Premium est disponible pour"
+   },
+   "upgrade_tier1": {
+      "message": "3 mois: 6 euros"
+   },
+   "upgrade_tier2": {
+      "message": "6 mois: 11 euros"
+   },
+   "upgrade_tier3": {
+      "message": "12 mois: 18 euros"
+   },
+   "upgrade_tier4": {
+      "message": "24 mois: 24 euros"
+   },
+   "upgrade_to_premium": {
+      "message": "Passer à la version premium"
+   },
+   "upgrade_to_premium_intro": {
+      "message": "Passer à la version Premium de Highlight This! et profitez de fonctionnalités plus avancées"
+   },
+   "url_invalid": {
+      "message": "L'URL n'est pas correcte"
+   },
+   "word_found_on_page": {
+      "message": "Mot trouvé sur la page"
+   },
+   "wordlist_too_long_for_sync_storage": {
+      "message": "La liste est trop longue pour être synchronisée avec d'autres navigateurs"
+   },
+   "yesReset": {
+      "message": "Réinitialiser toutes mes données"
+   },
+   "you_are_premium": {
+      "message": "Vous êtes un utilisateur Premium"
+   }
+}

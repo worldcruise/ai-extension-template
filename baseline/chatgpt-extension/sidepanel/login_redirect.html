@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login to ChatGPT</title>
+    <style>
+        :root {
+            --background-light: #ffffff;
+            --text-light: #333333;
+            --background-dark: #202123;
+            --text-dark: #ececf1;
+            --chatgpt-green: #10a37f;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            background-color: var(--background-light);
+            color: var(--text-light);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: var(--background-dark);
+                color: var(--text-dark);
+            }
+            .reopen-icon {
+                stroke: var(--text-dark);
+            }
+        }
+
+        .container {
+            max-width: 320px;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .icon {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 20px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 22px;
+            color: var(--chatgpt-green);
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .reopen-instruction {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .reopen-instruction {
+                background-color: rgba(255,255,255,0.05);
+            }
+        }
+
+        .reopen-icon {
+            width: 28px;
+            height: 28px;
+            stroke: var(--text-light);
+            flex-shrink: 0;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .reopen-instruction p {
+            margin: 0;
+        }
+
+        strong {
+            color: var(--chatgpt-green);
+        }
+        .login-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+        .login-actions button { padding: 12px 18px; border: 1px solid #aaa; border-radius: 24px; background: transparent; color: inherit; font: inherit; font-weight: 600; cursor: pointer; }
+        .login-actions button:first-child { background: #10a37f; border-color: #10a37f; color: white; }
+        button:focus-visible { outline: 3px solid #10a37f; outline-offset: 3px; }
+        button:disabled { opacity: .65; cursor: wait; }
+        @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="var(--chatgpt-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 4"/>
+        </svg>
+        <h1>Log in to ChatGPT to use SideAI</h1>
+        <p>Please complete the login process in the new tab that has opened.</p>
+        <div class="reopen-instruction">
+            <svg class="reopen-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            <p>After signing in, click <strong>I've logged in</strong> button below to continue.</p>
+        </div>
+        <div class="login-actions">
+            <button id="open-login" type="button">Log in on ChatGPT</button>
+            <button id="retry-chatgpt" type="button">I've logged in — try again</button>
+        </div>
+        <p id="login-status" role="status" aria-live="polite"></p>
+    </div>
+    <script src="login_status.js"></script>
+</body>
+</html>

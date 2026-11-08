@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
-  <title>AI Agent Template</title>
-  <rect x="4" y="4" width="120" height="120" rx="28" fill="#15243A"/>
-  <path d="M62 26C67 49 77 59 100 64C77 69 67 79 62 102C57 79 47 69 24 64C47 59 57 49 62 26Z" fill="#5EF0CA"/>
-  <path d="M101 16C103 24 106 27 114 29C106 31 103 34 101 42C99 34 96 31 88 29C96 27 99 24 101 16Z" fill="#EDF7F9"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="30" fill="#147d66"/>
+  <path d="M35 31h58a9 9 0 0 1 9 9v42a9 9 0 0 1-9 9H59L36 106V91h-1a9 9 0 0 1-9-9V40a9 9 0 0 1 9-9Z" fill="#fff"/>
+  <path d="M78 44v34" stroke="#147d66" stroke-width="5" stroke-linecap="round"/>
+  <path d="M42 51h23M42 63h16" stroke="#147d66" stroke-width="5" stroke-linecap="round"/>
 </svg>

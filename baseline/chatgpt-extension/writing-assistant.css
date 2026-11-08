@@ -1,0 +1,812 @@
+/* AI Writing Assistant - Dot, Tooltip & Panel (extension theme green) */
+#wa-root,
+#wa-root * {
+    box-sizing: border-box !important;
+}
+
+#wa-root {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    direction: ltr !important;
+}
+
+/* Wrapper around input/textarea that has the dot – no overflow so tooltip/dropdown can escape */
+.wa-field-wrap {
+    position: relative !important;
+    display: inline-block !important;
+    width: 100% !important;
+    overflow: visible !important;
+}
+
+/* Zone: dot by default; on hover replaced by pill. Overflow visible so content isn't clipped. */
+.wa-dot-zone {
+    position: absolute !important;
+    top: 50% !important;
+    right: 10px !important;
+    transform: translateY(-50%) !important;
+    width: 0px !important;
+    height: 0px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    z-index: 2147483646 !important;
+    direction: ltr !important;
+    overflow: visible !important;
+}
+
+.wa-dot-zone .wa-dot {
+    position: absolute !important;
+    top: 50% !important;
+    right: 0 !important;
+    left: auto !important;
+    transform: translateY(-50%) !important;
+}
+
+/* Pill: dark bar, X left and Brain right. Overflow visible so tooltip isn't clipped. */
+.wa-pill {
+    position: absolute !important;
+    top: 50% !important;
+    right: -6px !important;
+    left: auto !important;
+    transform: translateY(-50%) !important;
+    display: none !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 2px !important;
+    padding: 1px 0 !important;
+    background: #1e293b !important;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    z-index: 2147483647 !important;
+    transition: opacity 0.15s ease !important;
+    direction: ltr !important;
+    overflow: visible !important;
+}
+
+.wa-pill.wa-visible {
+    display: flex !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* Brain first (left) – hover hits brain first */
+.wa-pill-brain {
+    width: 28px !important;
+    height: 28px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    border-radius: 6px !important;
+}
+
+.wa-pill-brain:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Brain button – tooltip is shown via .wa-global-tooltip in #wa-root to avoid overflow clipping */
+.wa-pill-brain[data-tooltip] {
+    position: relative !important;
+}
+
+.wa-pill-brain[data-tooltip]::after {
+    display: none !important;
+}
+
+/* Global tooltip (in #wa-root) – never clipped by input overflow */
+.wa-global-tooltip {
+    position: fixed !important;
+    color: white !important;
+    font-size: 12px !important;
+    padding: 6px 10px !important;
+    border-radius: 6px !important;
+    background: rgba(0, 0, 0, 0.9) !important;
+    white-space: nowrap !important;
+    pointer-events: none !important;
+    z-index: 2147483647 !important;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 8px !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: opacity 0.2s, visibility 0.2s !important;
+}
+
+.wa-global-tooltip.wa-tooltip-visible {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.wa-pill-brain svg {
+    width: 15px !important;
+    height: 15px !important;
+    display: block !important;
+    /* filter: brightness(0) invert(1) !important; */
+}
+
+/* X in small rounded square (right of brain) */
+.wa-pill-x {
+    width: 24px !important;
+    height: 24px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #f1f5f9 !important;
+    font-size: 16px !important;
+    line-height: 1 !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    border-radius: 6px !important;
+}
+
+.wa-pill-x:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #fff !important;
+}
+
+/* Ctrl+J hint */
+.wa-pill-shortcut {
+    font-size: 11px !important;
+    color: rgba(248, 250, 252, 0.85) !important;
+    margin-left: 2px !important;
+    padding: 0 2px !important;
+    pointer-events: none !important;
+}
+
+.wa-dot {
+    position: absolute !important;
+    top: 50% !important;
+    right: 10px !important;
+    transform: translateY(-50%) !important;
+    width: 9px !important;
+    height: 9px !important;
+    border-radius: 50% !important;
+    background: #10a37f !important; /* extension theme green */
+    cursor: default !important;
+    z-index: 2147483646 !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+}
+
+.wa-dot:hover {
+    transform: translateY(-50%) scale(1.15) !important;
+    box-shadow: 0 0 0 3px rgba(16, 163, 127, 0.35) !important;
+    background: #0d8c6a !important;
+}
+
+.wa-dot:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.5) !important;
+}
+
+.wa-dot.wa-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+
+/* Disable dropdown (X menu) */
+.wa-disable-dropdown {
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    margin-top: 4px !important;
+    min-width: 160px !important;
+    background: #1e293b !important;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+    z-index: 2147483647 !important;
+    display: none !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+.wa-disable-dropdown.wa-dropdown-open {
+    display: flex !important;
+}
+
+/* Portaled dropdown: position fixed, left/top set by JS from X button rect (so it appears below the pill) */
+.wa-disable-dropdown-portaled {
+    position: fixed !important;
+    right: auto !important;
+    margin: 0 !important;
+}
+
+.wa-disable-dropdown button {
+    padding: 8px 12px !important;
+    border: none !important;
+    background: transparent !important;
+    color: #e2e8f0 !important;
+    font-size: 13px !important;
+    text-align: left !important;
+    cursor: pointer !important;
+}
+
+.wa-disable-dropdown button:hover {
+    background: rgba(148, 163, 184, 0.15) !important;
+}
+
+/* Floating panel – matches ai-tm-writing-panel design */
+.wa-panel {
+    position: fixed !important;
+    min-width: 320px !important;
+    max-width: 420px !important;
+    background: #1e1e1e !important;
+    border: 1px solid #3a3a3a !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+    z-index: 2147483647 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    animation: wa-panel-in 0.25s ease-out !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    color: #e0e0e0 !important;
+}
+
+.wa-panel.wa-panel-hidden {
+    display: none !important;
+}
+
+@keyframes wa-panel-in {
+    from {
+        opacity: 0;
+        transform: scale(0.96) translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.wa-panel-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 10px 12px !important;
+    border-bottom: 1px solid #3a3a3a !important;
+    cursor: move !important;
+    user-select: none !important;
+}
+
+.wa-panel-title {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #b0b0b0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.wa-panel-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+.wa-panel-btn-icon {
+    width: 32px !important;
+    height: 32px !important;
+    border: none !important;
+    background: transparent !important;
+    color: #888 !important;
+    cursor: pointer !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: background 0.15s, color 0.15s !important;
+}
+
+.wa-panel-btn-icon:hover {
+    background: #2a2a2a !important;
+    color: #e0e0e0 !important;
+}
+
+#wa-close {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.wa-panel-body {
+    padding: 12px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+}
+
+.wa-panel-prompt {
+    width: 100% !important;
+    min-height: 80px !important;
+    padding: 10px 12px !important;
+    border-radius: 8px !important;
+    border: 1px solid #3a3a3a !important;
+    background: #2a2a2a !important;
+    color: #e0e0e0 !important;
+    font-size: 13px !important;
+    font-family: inherit !important;
+    resize: vertical !important;
+    outline: none !important;
+}
+
+.wa-panel-prompt::placeholder {
+    color: #888 !important;
+}
+
+.wa-panel-prompt:focus {
+    border-color: #7c5cbf !important;
+    box-shadow: 0 0 0 2px rgba(124, 92, 191, 0.2) !important;
+}
+
+.wa-panel-footer {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    padding: 0 12px 12px !important;
+}
+
+.wa-generate-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 8px 16px !important;
+    background: #7c5cbf !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: background 0.2s, transform 0.15s !important;
+}
+
+.wa-generate-btn:hover:not(:disabled) {
+    background: #6b4ca8 !important;
+}
+
+.wa-generate-btn:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+}
+
+.wa-settings-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+}
+
+.wa-settings-select {
+    padding: 6px 10px !important;
+    border-radius: 6px !important;
+    border: 1px solid #3a3a3a !important;
+    background: #2a2a2a !important;
+    color: #e0e0e0 !important;
+    font-size: 12px !important;
+    cursor: pointer !important;
+    outline: none !important;
+}
+
+.wa-settings-select:focus {
+    border-color: #7c5cbf !important;
+}
+
+/* Length & format trigger */
+.wa-length-format-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 4px 8px !important;
+    background: #2a2a2a !important;
+    border: 1px solid #3a3a3a !important;
+    border-radius: 6px !important;
+    color: #b0b0b0 !important;
+    font-size: 11px !important;
+    cursor: pointer !important;
+}
+
+.wa-length-format-btn:hover {
+    background: #333 !important;
+    color: #e0e0e0 !important;
+}
+
+/* Result area – matches ai-tm-writing-panel; Insert/Replace fixed at bottom */
+.wa-result-area {
+    padding: 12px !important;
+    border-top: 1px solid #3a3a3a !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    overflow: hidden !important;
+}
+
+.wa-result-area.wa-hidden {
+    display: none !important;
+}
+
+.wa-result-text {
+    background: #2a2a2a !important;
+    border: 1px solid #3a3a3a !important;
+    border-radius: 8px !important;
+    padding: 12px !important;
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+    color: #e0e0e0 !important;
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+    max-height: 200px !important;
+    overflow-y: auto !important;
+    flex-shrink: 1 !important;
+}
+
+.wa-result-text.wa-loading-state {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    color: #999 !important;
+    min-height: 80px !important;
+}
+
+/* Custom dark scrollbar – shared by prompt, result-text, and dropdown */
+.wa-panel-prompt,
+.wa-result-text,
+.wa-dropdown {
+    scrollbar-width: thin !important;
+    scrollbar-color: #5a5a5a #2a2a2a !important;
+}
+
+.wa-panel-prompt::-webkit-scrollbar,
+.wa-result-text::-webkit-scrollbar,
+.wa-dropdown::-webkit-scrollbar {
+    width: 8px !important;
+}
+
+.wa-panel-prompt::-webkit-scrollbar-track,
+.wa-result-text::-webkit-scrollbar-track,
+.wa-dropdown::-webkit-scrollbar-track {
+    background: #2a2a2a !important;
+    border-radius: 4px !important;
+}
+
+.wa-panel-prompt::-webkit-scrollbar-thumb,
+.wa-result-text::-webkit-scrollbar-thumb,
+.wa-dropdown::-webkit-scrollbar-thumb {
+    background: #5a5a5a !important;
+    border-radius: 4px !important;
+}
+
+.wa-panel-prompt::-webkit-scrollbar-thumb:hover,
+.wa-result-text::-webkit-scrollbar-thumb:hover,
+.wa-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #6a6a6a !important;
+}
+
+.wa-panel-prompt::-webkit-scrollbar-corner,
+.wa-result-text::-webkit-scrollbar-corner,
+.wa-dropdown::-webkit-scrollbar-corner {
+    background: transparent !important;
+}
+
+.wa-result-actions {
+    display: flex !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
+}
+
+.wa-insert-btn,
+.wa-replace-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 6px 16px !important;
+    border-radius: 6px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: background 0.2s, color 0.2s !important;
+}
+
+.wa-insert-btn {
+    border: 1px solid #7c5cbf !important;
+    background: transparent !important;
+    color: #b39ddb !important;
+}
+
+.wa-insert-btn:hover {
+    background: rgba(124, 92, 191, 0.2) !important;
+}
+
+.wa-replace-btn {
+    border: none !important;
+    background: #7c5cbf !important;
+    color: #fff !important;
+}
+
+.wa-replace-btn:hover {
+    background: #6b4ca8 !important;
+}
+
+/* Dropdown / popover for Length & format – matches ai-tm-writing-panel */
+.wa-dropdown {
+    position: fixed !important;
+    background: #2a2a2a !important;
+    border: 1px solid #3a3a3a !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+    padding: 10px !important;
+    z-index: 2147483648 !important;
+    width: 100% !important;
+    max-width: 280px !important;
+    max-height: min(60vh, 320px) !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+}
+
+.wa-dropdown-section {
+    margin-bottom: 8px !important;
+}
+
+.wa-dropdown-section:last-child {
+    margin-bottom: 0 !important;
+}
+
+.wa-dropdown-label {
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    color: #888 !important;
+    margin-bottom: 4px !important;
+    display: block !important;
+}
+
+.wa-dropdown-options {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+}
+
+.wa-dropdown-option {
+    padding: 4px 8px !important;
+    border-radius: 4px !important;
+    border: 1px solid #3a3a3a !important;
+    background: #333 !important;
+    color: #b0b0b0 !important;
+    font-size: 11px !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+}
+
+.wa-dropdown-option:hover {
+    background: #404040 !important;
+}
+
+.wa-dropdown-option.wa-active {
+    background: #7c5cbf !important;
+    border-color: #7c5cbf !important;
+    color: #fff !important;
+}
+
+/* Loading state - hidden by default; show only when generating */
+.wa-spinner {
+    width: 16px !important;
+    height: 16px !important;
+    border: 2px solid #555 !important;
+    border-top-color: #7c5cbf !important;
+    border-radius: 50% !important;
+    animation: wa-spin 0.7s linear infinite !important;
+}
+
+@keyframes wa-spin {
+    to { transform: rotate(360deg); }
+}
+
+.wa-error {
+    color: #f87171 !important;
+    font-size: 12px !important;
+    padding: 8px 0 !important;
+}
+
+.wa-upgrade-btn {
+    margin-left: 6px !important;
+    padding: 4px 10px !important;
+    font-size: 12px !important;
+    background: #10b981 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    font-weight: 600 !important;
+}
+
+.wa-upgrade-btn:hover {
+    background: #059669 !important;
+}
+
+/* Guide modal (first-time disable) – same as content-menu, shared guideShown key */
+.guide-modal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(0, 0, 0, 0.9) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 2147483647 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
+
+.guide-modal-content {
+    background: white !important;
+    border-radius: 16px !important;
+    padding: 0 !important;
+    max-width: 520px !important;
+    width: 90% !important;
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    animation: guideSlideIn 0.3s ease-out !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+@keyframes guideSlideIn {
+    from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.guide-modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    padding: 20px !important;
+    text-align: center !important;
+    position: relative !important;
+    flex-shrink: 0 !important;
+}
+
+.guide-modal-header h2 {
+    margin: 0 !important;
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+}
+
+.guide-modal-header .guide-icon {
+    width: 28px !important;
+    height: 28px !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 14px !important;
+}
+
+.guide-modal-body {
+    padding: 20px !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+}
+
+.guide-step {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+    padding: 12px !important;
+    background: #f8f9fa !important;
+    border-radius: 8px !important;
+    border-left: 3px solid #667eea !important;
+}
+
+.guide-step:last-child { margin-bottom: 0 !important; }
+
+.guide-step-number {
+    background: #667eea !important;
+    color: white !important;
+    width: 24px !important;
+    height: 24px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    flex-shrink: 0 !important;
+    margin-top: 1px !important;
+}
+
+.guide-step-content h4 {
+    margin: 0 0 6px 0 !important;
+    color: #333 !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+}
+
+.guide-step-content p {
+    margin: 0 !important;
+    color: #666 !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+}
+
+.guide-modal-actions {
+    padding: 16px 20px !important;
+    background: #f8f9fa !important;
+    display: flex !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    flex-shrink: 0 !important;
+    border-top: 1px solid #e1e5ea !important;
+}
+
+.guide-btn {
+    padding: 10px 20px !important;
+    border: none !important;
+    border-radius: 6px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+.guide-btn-primary {
+    background: #667eea !important;
+    color: white !important;
+}
+
+.guide-btn-primary:hover {
+    background: #5a6fd8 !important;
+    transform: translateY(-1px) !important;
+}
+
+.guide-btn-secondary {
+    background: white !important;
+    color: #667eea !important;
+    border: 2px solid #667eea !important;
+}
+
+.guide-btn-secondary:hover {
+    background: #f8f9fa !important;
+}
+
+.guide-note {
+    background: #e3f2fd !important;
+    border: 1px solid #bbdefb !important;
+    border-radius: 6px !important;
+    padding: 12px !important;
+    margin-top: 16px !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+}
+
+.guide-note-icon { color: #1976d2 !important; font-size: 16px !important; margin-top: 1px !important; }
+.guide-note-content { flex: 1 !important; }
+.guide-note-content h5 { margin: 0 0 3px 0 !important; color: #1976d2 !important; font-size: 13px !important; font-weight: 600 !important; }
+.guide-note-content p { margin: 0 !important; color: #1976d2 !important; font-size: 12px !important; line-height: 1.3 !important; }

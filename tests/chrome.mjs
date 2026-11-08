@@ -1,216 +1,311 @@
-// Installed MV3 extension + the reused direct feasibility OAuth and streaming engine.
-// No signed-in profile, provider login, or live inference is used.
-import { chromium, expect } from '@playwright/test';
+// Exercise the installed extension with CDP and fixture ChatGPT documents.
+// Node's built-in WebSocket keeps this starter free of package dependencies.
 import assert from 'node:assert/strict';
-import {generateKeyPairSync,sign} from 'node:crypto';
-import { readFile, mkdir, writeFile } from 'node:fs/promises';
+import { spawn } from 'node:child_process';
+import { access, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { dirname, join, resolve } from 'node:path';
+import { setTimeout as delay } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
 import { buildExtension } from '../scripts/build-extension.mjs';
-import { ProtocolError } from '../src/protocol.mjs';
+import { serveFixture } from './fixtures/https-server.mjs';
+import { checkWorkspaceUI } from './workspace-ui.mjs';
 
-const root = new URL('../', import.meta.url), artifacts = new URL('../artifacts/', import.meta.url);
-let extensionId, account='A', modelFailure, runFailure, delayNext=false, delayed, inferenceRequests=0, lastRequest, authorizationParams;
-const errors=[],paths=[];
-const pair=generateKeyPairSync('rsa',{modulusLength:2048}),jwk={...pair.publicKey.export({format:'jwk'}),kid:'direct-fixture-key',alg:'RS256',use:'sig'};
-function identity(){
- const encode=value=>Buffer.from(JSON.stringify(value)).toString('base64url');
- const payload=encode({alg:'RS256',kid:jwk.kid})+'.'+encode({iss:'https://auth.openai.com',aud:'issued-client-'+account,sub:'fixture-user-'+account,name:'Same display name',nonce:authorizationParams.get('nonce'),exp:Math.floor(Date.now()/1000)+3600,iat:Math.floor(Date.now()/1000)});
- return payload+'.'+sign('RSA-SHA256',Buffer.from(payload),pair.privateKey).toString('base64url');
+const artifacts = fileURLToPath(new URL('../artifacts/', import.meta.url));
+const paths = [process.env.CHROME_PATH,
+  'C:/Program Files/Google/Chrome/Application/chrome.exe',
+  'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
+  '/usr/bin/google-chrome', '/usr/bin/chromium', '/usr/bin/chromium-browser',
+  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'].filter(Boolean);
+let executable;
+for (const path of paths) { try { await access(path); executable = path; break; } catch {} }
+if (!executable) throw new Error('Chrome not found. Set CHROME_PATH to your Chrome executable.');
+
+class CDP {
+  constructor(socket) {
+    this.socket = socket;
+    this.sequence = 0;
+    this.pending = new Map();
+    this.listeners = new Map();
+    socket.addEventListener('message', event => {
+      const message = JSON.parse(event.data);
+      if (message.id) {
+        const task = this.pending.get(message.id);
+        if (!task) return;
+        this.pending.delete(message.id);
+        clearTimeout(task.timer);
+        if (message.error) task.reject(new Error(message.error.message));
+        else task.resolve(message.result);
+      } else {
+        for (const handler of this.listeners.get(message.method) || []) handler(message.params, message.sessionId);
+      }
+    });
+  }
+  send(method, params = {}, sessionId) {
+    return new Promise((resolve, reject) => {
+      const id = ++this.sequence;
+      const timer = setTimeout(() => { this.pending.delete(id); reject(new Error(`CDP timeout: ${method}`)); }, 15000);
+      this.pending.set(id, { resolve, reject, timer });
+      this.socket.send(JSON.stringify({ id, method, params, ...(sessionId ? { sessionId } : {}) }));
+    });
+  }
+  on(method, callback) {
+    const callbacks = this.listeners.get(method) || [];
+    callbacks.push(callback);
+    this.listeners.set(method, callbacks);
+  }
 }
-const json=(data,status=200)=>({status,contentType:'application/json',body:JSON.stringify(data)});
-const event=data=>'data: '+JSON.stringify(data)+'\n\n';
-async function transport(request){
- const url=new URL(request.url);paths.push(url.pathname);
- if(url.origin==='https://auth.openai.com'){
-  if(url.pathname==='/.well-known/openid-configuration')return json({issuer:url.origin,authorization_endpoint:url.origin+'/api/accounts/authorize',token_endpoint:url.origin+'/api/accounts/oauth/token',jwks_uri:url.origin+'/.well-known/jwks.json',id_token_signing_alg_values_supported:['RS256'],revocation_endpoint:url.origin+'/oauth/revoke'});
-  if(url.pathname==='/.well-known/jwks.json')return json({keys:[jwk]});
-  if(url.pathname==='/api/accounts/oauth/token'){
-   const form=new URLSearchParams(request.postData);assert.equal(form.get('client_id'),'issued-client-'+account);
-   if(form.get('grant_type')==='authorization_code'){assert.equal(form.get('redirect_uri'),'http://127.0.0.1:1455/auth/callback');assert.ok(form.get('code_verifier'));}
-   return json({access_token:'FIXTURE_ACCESS_NEVER_SHOW_'+account,refresh_token:'FIXTURE_REFRESH_NEVER_SHOW_'+account,token_type:'Bearer',scope:'openid profile email offline_access resource.invoke chatgpt.tokens.use.direct',expires_in:3600,id_token:identity()});
+
+async function until(check, description, timeout = 15000) {
+  const start = Date.now();
+  while (Date.now() - start < timeout) {
+    const result = await check();
+    if (result) return result;
+    await delay(100);
   }
-  if(url.pathname==='/oauth/revoke')return {status:200,contentType:'application/json',body:'{}'};
- }
- if(url.origin==='https://api.openai.com'){
-  assert.match(request.headers.Authorization||request.headers.authorization,/^Bearer FIXTURE_ACCESS_NEVER_SHOW_[AB]$/);
-  if(url.pathname==='/v1/models'){
-   if(modelFailure){const failure=modelFailure;modelFailure=null;return json({error:{code:failure.code}},failure.status||401);}
-   return json({models:[{slug:'shared-model',display_name:'Fixture model',visibility:'list',supported_reasoning_levels:(account==='A'?['low','high']:['medium']).map(effort=>({effort})),default_reasoning_level:account==='A'?'high':'medium'}, {slug:'plain-model',display_name:'Fixture model without effort',visibility:'list'}]});
-  }
-  if(url.pathname==='/v1/responses'){
-   const body=JSON.parse(request.postData);assert.equal(body.store,false);assert.equal(body.stream,true);assert.equal(typeof body.input[0].content,'string');
-   lastRequest={instructions:body.instructions,input:body.input[0].content,...(body.reasoning?{thinkingEffort:body.reasoning.effort}:{})};inferenceRequests++;
-   const captured=account,reply=()=>{
-    if(runFailure){const failure=runFailure;runFailure=null;return {status:200,contentType:'text/event-stream',body:event({type:'response.failed',response:{error:{code:failure.code}}})};}
-    const output='Returned output for account '+captured+'\nPrompt: '+body.instructions+'\nInput: '+body.input[0].content;
-    return {status:200,contentType:'text/event-stream',body:event({type:'response.output_text.delta',delta:output})+event({type:'response.completed',response:{status:'completed',output:[]}})};
-   };
-   if(delayNext){delayNext=false;return new Promise(resolve=>{delayed=()=>resolve(reply());});}return reply();
-  }
- }
- throw Error('Unexpected network endpoint in isolated test: '+url.origin+url.pathname);
+  throw new Error(`Timed out: ${description}`);
 }
-let context;
-await buildExtension();
-try {
-  await mkdir(artifacts, { recursive: true });
-  context = await chromium.launchPersistentContext('', { channel: 'chrome', headless: true, viewport: { width: 480, height: 900 },
-    ignoreDefaultArgs: ['--disable-extensions'], args: ['--enable-unsafe-extension-debugging'] });
-  context.on('page', page => page.on('pageerror', error => errors.push(error.message)));
-  const cdp = await context.browser().newBrowserCDPSession(), version = await cdp.send('Browser.getVersion');
-  ({ id: extensionId } = await cdp.send('Extensions.loadUnpacked', { path: fileURLToPath(new URL('dist/', root)) }));
-  await expect.poll(() => context.serviceWorkers().some(worker => worker.url().includes(extensionId))).toBe(true);
-  const worker = context.serviceWorkers().find(worker => worker.url().includes(extensionId));
-  let sequence=0;const pendingCommands=new Map();
-  cdp.on('Target.receivedMessageFromTarget',event=>{const message=JSON.parse(event.message);const pending=pendingCommands.get(message.id);if(!pending)return;pendingCommands.delete(message.id);clearTimeout(pending.timer);if(message.error)pending.reject(new Error(message.error.message));else pending.resolve(message.result);});
-  async function attachPanel(targetId){
-    const {sessionId}=await cdp.send('Target.attachToTarget',{targetId,flatten:false});
-    const command=(method,params={})=>new Promise((resolve,reject)=>{const id=++sequence;const timer=setTimeout(()=>{pendingCommands.delete(id);reject(new Error('Panel CDP timeout: '+method));},5000);pendingCommands.set(id,{resolve,reject,timer});void cdp.send('Target.sendMessageToTarget',{sessionId,message:JSON.stringify({id,method,params})}).catch(reject);});
-    return {sessionId,command,async evaluate(expression){const response=await command('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true});if(response.exceptionDetails)throw new Error(response.exceptionDetails.exception?.description||response.exceptionDetails.text);return response.result.value;}};
-  }
 
-  const workerTarget=(await cdp.send('Target.getTargets')).targetInfos.find(target=>target.type==='service_worker'&&target.url.includes(extensionId));
-  const workerPipe=await attachPanel(workerTarget.targetId);
-  cdp.on('Target.receivedMessageFromTarget',event=>{
-   if(event.sessionId!==workerPipe.sessionId)return;const message=JSON.parse(event.message);if(message.method!=='Fetch.requestPaused')return;
-   void transport(message.params.request).then(response=>workerPipe.command('Fetch.fulfillRequest',{requestId:message.params.requestId,responseCode:response.status,responseHeaders:[{name:'Content-Type',value:response.contentType}],body:Buffer.from(response.body).toString('base64')})).catch(error=>{if(!/Invalid InterceptionId|Invalid requestId|Session closed|Target closed/i.test(error.message))errors.push(error.message);});
-  });
-  await workerPipe.command('Fetch.enable',{patterns:[{urlPattern:'https://auth.openai.com/*'},{urlPattern:'https://api.openai.com/*'}]});
-  await context.route('https://auth.openai.com/api/accounts/authorize*',async route=>{
-   const url=new URL(route.request().url());authorizationParams=url.searchParams;assert.equal(authorizationParams.get('redirect_uri'),'http://127.0.0.1:1455/auth/callback');
-   const callback=new URL(authorizationParams.get('redirect_uri'));callback.search=new URLSearchParams({code:'TEST_DIRECT_CODE',state:authorizationParams.get('state'),client_id:'issued-client-'+account});
-   await route.fulfill({contentType:'text/html',body:'<!doctype html><html><body><h1>Fixture authorization only</h1><a href="'+callback.href.replaceAll('&','&amp;')+'">Approve test sign-in</a></body></html>'});
-  });
-
-  const first = context.pages()[0] || await context.newPage(); await first.goto('about:blank#first');
-  const second = await context.newPage(); await second.goto('about:blank#second');
-  const third = await context.newPage(); await third.goto('about:blank#third'); await first.bringToFront();
-  async function trigger(url) {
-    const { targetInfos } = await cdp.send('Target.getTargets', { filter: [{ type: 'tab', exclude: false }] });
-    const target = targetInfos.find(target => target.url === url); assert.ok(target); await cdp.send('Extensions.triggerAction', { id: extensionId, targetId: target.targetId });
-  }
-  await trigger(first.url());
-  await expect.poll(async () => (await worker.evaluate(() => chrome.runtime.getContexts({ contextTypes: ['SIDE_PANEL'] }))).length).toBe(1);
-  const panelContexts = await worker.evaluate(() => chrome.runtime.getContexts({ contextTypes: ['SIDE_PANEL'] }));
-  const panelTarget = (await cdp.send('Target.getTargets')).targetInfos.find(target => target.url === `chrome-extension://${extensionId}/index.html`);
-  assert.ok(panelTarget);assert.equal(panelContexts[0].tabId,-1);
-  // Native side-panel targets are not exposed as Playwright pages. Exercise the
-  // actual dock through CDP, then run the existing full UI suite on the same
-  // packaged page in a tab (with its real extension CSP and worker).
-  const native=await attachPanel(panelTarget.targetId);
-  await expect.poll(()=>native.evaluate('Boolean(document.querySelector("[data-el=input]"))')).toBe(true);
-  const sourceWindow=await native.evaluate('(async()=> (await chrome.windows.getCurrent()).id)()');
-  assert.ok(Number.isInteger(sourceWindow)&&sourceWindow>=0);
-  await native.evaluate('(()=>{for(const [field,value] of [["prompt","Docked prompt"],["input","Docked input"]]){const node=document.querySelector(`[data-el="${field}"]`);node.value=value;node.dispatchEvent(new Event("input",{bubbles:true}));}})()');
-  await expect.poll(()=>native.evaluate('(async()=> (await chrome.runtime.sendMessage({type:"browser.status",windowId:(await chrome.windows.getCurrent()).id})).data?.count)()')).toBe(3);
-  const nativeDocument=panelContexts[0].documentId;
-  const nativeTabs=await worker.evaluate(windowId=>chrome.tabs.query({windowId}),sourceWindow);nativeTabs.sort((a,b)=>a.index-b.index);
-  const nativeExpected=nativeTabs[(nativeTabs.findIndex(tab=>tab.active)+1)%nativeTabs.length].id;
-  await expect.poll(()=>native.evaluate('!document.querySelector("[data-el=next]").disabled')).toBe(true);
-  await native.evaluate('document.querySelector("[data-el=next]").click()');
-  await expect.poll(()=>worker.evaluate(async windowId=>(await chrome.tabs.query({windowId,active:true}))[0].id,sourceWindow)).toBe(nativeExpected);
-  assert.equal(await native.evaluate('document.querySelector("[data-el=input]").value'),'Docked input');
-  assert.equal((await worker.evaluate(()=>chrome.runtime.getContexts({contextTypes:['SIDE_PANEL']})))[0].documentId,nativeDocument);
-  const page = await context.newPage();await page.goto(`chrome-extension://${extensionId}/index.html`);await page.waitForLoadState();
-  await page.evaluate(() => { globalThis.cspErrors = []; document.addEventListener('securitypolicyviolation', event => globalThis.cspErrors.push(event.violatedDirective)); });
-  const el = name => page.locator(`[data-el="${name}"]`), status = page.getByRole('status');
-  async function approveSignIn(){
-   const opened=context.waitForEvent('page');await el('signin').click();const authPage=await opened;
-   await authPage.getByRole('link',{name:'Approve test sign-in'}).click();await expect(authPage.locator('#callback-status')).toContainText('Connected to ChatGPT');
-   assert.equal(new URL(authPage.url()).search,'');await authPage.close();
-  }
-  await expect(status).toContainText('Sign in');await expect(page.locator('[data-el="connection-form"]')).toHaveCount(0);
-  // The actual browser authorization tab, redirect rule, packaged callback, code exchange and JWT verification all run.
-  const canceled=context.waitForEvent('page');await el('signin').click();const canceledPage=await canceled;await canceledPage.getByRole('link',{name:'Approve test sign-in'}).waitFor();await canceledPage.close();
-  await expect(status).toContainText('canceled');await expect(el('signin')).toBeEnabled();
-  await approveSignIn();await expect(el('account')).toContainText('Same display name');await expect(el('effort')).toHaveValue('high');
-  await page.getByRole('tab', { name: 'Agent', exact: true }).click();
-  await el('prompt').fill('Use only the input.'); await el('input').fill('<img src=x onerror="window.injected=true">');
-  await el('go').click(); await expect(status).toContainText('Test complete');
-  assert.equal(lastRequest.instructions, 'Use only the input.'); assert.equal(lastRequest.input, '<img src=x onerror="window.injected=true">'); assert.equal(lastRequest.thinkingEffort, 'high');
-  assert.equal(await el('result').locator('img,script').count(), 0); assert.equal(await page.evaluate(() => window.injected), undefined); await expect(el('result')).toContainText('<img src=x');
-  // Run the actual native dock too, including navigation while its request waits.
-  await expect.poll(()=>native.evaluate('!document.querySelector("[data-el=go]").disabled')).toBe(true);
-  delayNext=true;const beforeDock=inferenceRequests;await native.evaluate('document.querySelector("[data-el=go]").click()');
-  await expect.poll(()=>inferenceRequests).toBe(beforeDock+1);
-  await native.evaluate('document.querySelector("[data-el=next]").click()');
-  assert.equal(await native.evaluate('document.querySelector("[data-el=input]").value'),'Docked input');
-  assert.equal(await native.evaluate('document.querySelector("[data-el=cancel]").hidden'),false);
-  delayed();await expect.poll(()=>native.evaluate('document.querySelector("[data-el=result]").textContent')).toContain('Docked input');
-  const dockedOutput=await native.evaluate('document.querySelector("[data-el=result]").textContent');
-  await native.evaluate('document.querySelector("[data-el=previous]").click()');
-  assert.equal(await native.evaluate('document.querySelector("[data-el=result]").textContent'),dockedOutput);
-  const dockedScreenshot=await native.command('Page.captureScreenshot',{format:'png'});await writeFile(new URL('extension-docked.png',artifacts),Buffer.from(dockedScreenshot.data,'base64'));
-  const snapshot = async () => ({ prompt: await el('prompt').inputValue(), input: await el('input').inputValue(), model: await el('model').inputValue(), effort: await el('effort').inputValue(), output: await el('result').textContent() });
-  const original = await snapshot();
-  const browserState = await page.evaluate(async () => (await chrome.runtime.sendMessage({ type: 'browser.status' })).data); assert.equal(browserState.count, 3);
-  const activeUrl = () => worker.evaluate(async windowId => (await chrome.tabs.query({ windowId, active: true }))[0]?.id, sourceWindow);
-  const agentTabId=await page.evaluate(async()=> (await chrome.tabs.getCurrent()).id);
-  const sourceTabs = (await worker.evaluate(windowId => chrome.tabs.query({ windowId }), sourceWindow)).filter(tab=>tab.id!==agentTabId);
-  sourceTabs.sort((a, b) => a.index - b.index);
-  const firstTabId = sourceTabs[0].id, lastTabId = sourceTabs.at(-1).id;
-  await first.bringToFront();
-  await el('previous').click(); await expect.poll(activeUrl).toBe(lastTabId); assert.deepEqual(await snapshot(), original);
-  await el('next').click(); await expect.poll(activeUrl).toBe(firstTabId); assert.deepEqual(await snapshot(), original);
-  // A second dock belongs to its own window and cannot retarget the first dock.
-  const single = await worker.evaluate(() => chrome.windows.create({ url: 'about:blank#single', type: 'normal' }));
-  await trigger('about:blank#single');await expect.poll(async()=> (await worker.evaluate(()=>chrome.runtime.getContexts({contextTypes:['SIDE_PANEL']}))).length).toBe(2);
-  const targets=(await cdp.send('Target.getTargets')).targetInfos.filter(target=>target.url===`chrome-extension://${extensionId}/index.html`&&target.targetId!==panelTarget.targetId&&!target.attached);
-  assert.equal(targets.length,1);const singlePanel=await attachPanel(targets[0].targetId);
-  await expect.poll(()=>singlePanel.evaluate('Boolean(document.querySelector("[data-el=previous]")?.disabled&&document.querySelector("[data-el=next]")?.disabled)')).toBe(true);
-  assert.equal(await singlePanel.evaluate('(async()=> (await chrome.runtime.sendMessage({type:"browser.move",direction:1,windowId:(await chrome.windows.getCurrent()).id})).data.count)()'),1);
-  assert.equal(await native.evaluate('(async()=> (await chrome.windows.getCurrent()).id)()'),sourceWindow);assert.deepEqual(await snapshot(),original);
-  assert.equal((await worker.evaluate(()=>chrome.windows.getAll())).some(window=>window.type==='popup'),false);
-  await worker.evaluate(id => chrome.windows.remove(id), single.id); await expect(el('next')).toBeEnabled();
-  await trigger(first.url()); await expect(el('next')).toBeEnabled();
-  // Browser navigation during inference keeps the request, prompt and selections intact.
-  delayNext = true; const beforePending = inferenceRequests; await el('go').click(); await expect.poll(() => inferenceRequests).toBe(beforePending + 1);
-  await el('input').press('Control+Enter'); assert.equal(inferenceRequests, beforePending + 1);
-  await el('next').click(); assert.equal((await snapshot()).prompt, original.prompt); assert.equal((await snapshot()).effort, original.effort); await expect(el('cancel')).toBeVisible();
-  delayed(); await expect(status).toContainText('Test complete'); assert.equal(inferenceRequests, beforePending + 1);
-  await context.grantPermissions(['clipboard-read', 'clipboard-write']); await page.bringToFront(); await el('copy').click(); await expect(status).toContainText('Output copied'); assert.match(await page.evaluate(() => navigator.clipboard.readText()), /Returned output/);
-  // Cancel and editing release the slot and discard late output.
-  delayNext = true; await el('go').click(); await expect.poll(() => inferenceRequests).toBe(beforePending + 2); await el('cancel').click(); delayed(); await expect(el('result')).toBeHidden();
-  delayNext = true; await el('go').click(); await expect.poll(() => inferenceRequests).toBe(beforePending + 3); await el('input').fill('New input'); delayed(); await expect(el('result')).toBeHidden();
-  await el('model').selectOption('plain-model'); await expect(el('effort')).toBeDisabled(); await el('go').click(); await expect(status).toContainText('Test complete'); assert.equal(Object.hasOwn(lastRequest, 'thinkingEffort'), false);
-  await el('model').selectOption('shared-model');
-  // Register another selected account without reusing the first account's client registration or credentials.
-  async function selectNewRegistration(next){await el('signout').click();await expect(el('signin')).toBeVisible();await worker.evaluate(async()=>{const key='chatgpt-agent.registration';const record=(await chrome.storage.local.get(key))[key];await chrome.storage.local.set({[key]:{hostId:record.hostId}});});account=next;await approveSignIn();}
-  const beforeSwitch=inferenceRequests;await selectNewRegistration('B');await expect(el('effort')).toHaveValue('medium');assert.equal(inferenceRequests,beforeSwitch);
-  await el('go').click();await expect(status).toContainText('Test complete');assert.equal(lastRequest.thinkingEffort,'medium');
-  delayNext=true;await el('go').click();await expect.poll(()=>inferenceRequests).toBe(beforeSwitch+2);await selectNewRegistration('A');await expect(el('effort')).toHaveValue('high');delayed();await expect(el('result')).toBeHidden();
-  // Discovery 403 preserves identity; discovery and inference expiry restore sign-in.
-  await page.getByRole('tab', { name: 'Settings', exact: true }).click(); modelFailure = Object.assign(new ProtocolError('provider_request_failed'), { status: 403 }); await el('reload-models').click(); await expect(status).toContainText('cannot access'); await expect(el('signout')).toBeVisible();
-  modelFailure = new ProtocolError('SESSION_EXPIRED'); await el('reload-models').click(); await expect(el('signin')).toBeVisible(); await expect(el('model')).toBeDisabled();
-  modelFailure = Object.assign(new ProtocolError('provider_authorization_expired'), { status: 401 }); await approveSignIn(); await expect(status).toContainText('session expired'); await expect(el('signin')).toBeVisible();
-  await approveSignIn(); await expect(el('effort')).toHaveValue('high'); await page.getByRole('tab', { name: 'Agent', exact: true }).click();
-  runFailure = new ProtocolError('SESSION_EXPIRED'); await el('go').click(); await expect(el('signin')).toBeVisible(); await expect(el('result')).toBeHidden();
-  await approveSignIn(); await expect(el('effort')).toHaveValue('high');
-  await el('go').click(); await expect(status).toContainText('Test complete');
-  assert.equal(await page.locator('[role="status"], [role="alert"]').count(), 1); assert.equal(await page.locator('iframe, script:not([src])').count(), 0);
-  const layouts = [];
-  for (const width of [320, 390, 800, 1200]) {
-    await page.setViewportSize({ width, height: 900 });
-    for (const y of [0, 200]) {
-      const layout = await page.evaluate(y => { scrollTo(0, y); return { width: innerWidth, noOverflow: document.documentElement.scrollWidth <= innerWidth,
-        statusAfterNavigation: document.querySelector('[data-el="navigation"]').nextElementSibling === document.querySelector('[role="status"]'),
-        adjacent: Math.abs(document.querySelector('[data-el="navigation"]').getBoundingClientRect().bottom - document.querySelector('[role="status"]').getBoundingClientRect().top) < 1 }; }, y);
-      assert.equal(layout.noOverflow, true); assert.equal(layout.statusAfterNavigation, true); assert.equal(layout.adjacent, true); layouts.push(layout);
+let mode = 'ready';
+let requests = 0;
+const fixtureServer = await serveFixture((request, response) => {
+  requests++;
+  if (request.headers.host?.startsWith('jobs.example.test')) {
+    if (request.url === '/job.css') {
+      response.writeHead(200, { 'Content-Type':'text/css' });
+      response.end('body{font:16px/1.7 system-ui;color:#20292d;max-width:720px;margin:50px auto;padding:24px}h1{font-size:30px}textarea{width:100%;padding:12px}');
+    } else {
+      response.writeHead(200, { 'Content-Type':'text/html; charset=utf-8', 'Cache-Control':'no-store',
+        'Content-Security-Policy':"default-src 'self'; style-src 'self'; script-src 'none'" });
+      response.end('<!doctype html><html><head><title>Software Engineer · Job fixture</title><link rel="stylesheet" href="/job.css"></head><body><main><h1>Software Engineer</h1><p id="job-text">Build React apps with C++ and SQL. We value machine <strong>learning</strong>.</p><p>Treat &lt;img src=x onerror=alert(1)&gt; as a literal keyword.</p><p hidden>React SQL</p><textarea id="job-notes">React SQL private notes</textarea><div contenteditable="true">React draft</div><button type="button">React filter</button></main></body></html>');
     }
+    return;
   }
-  await page.setViewportSize({ width: 480, height: 1000 }); await page.evaluate(() => scrollTo(0, 0)); await page.screenshot({ path: fileURLToPath(new URL('extension.png', artifacts)), fullPage: true });
-  await page.emulateMedia({ colorScheme: 'dark', reducedMotion: 'reduce' }); await page.screenshot({ path: fileURLToPath(new URL('extension-dark.png', artifacts)), fullPage: true });
-  await page.getByRole('tab', { name: 'Agent', exact: true }).focus(); await page.keyboard.press('ArrowRight'); await expect(page.getByRole('tab', { name: 'Settings', exact: true })).toHaveAttribute('aria-selected', 'true'); await page.keyboard.press('Home');
-  await el('signout').click(); await expect(el('signin')).toBeVisible(); await expect(el('result')).toBeHidden(); await expect(el('go')).toBeDisabled();
-  assert.deepEqual(errors, []); assert.deepEqual(await page.evaluate(() => globalThis.cspErrors), []);
-  const storage=await worker.evaluate(async()=>({local:await chrome.storage.local.get(null),session:await chrome.storage.session.get(null),rules:await chrome.declarativeNetRequest.getSessionRules()}));
-  assert.deepEqual(storage.rules,[]);assert.ok(storage.local['chatgpt-agent.registration'].clientId);assert.ok(storage.local['chatgpt-agent.registration'].subjectHash);assert.ok(!JSON.stringify(storage).includes('FIXTURE_'));assert.ok(!(await page.locator('body').innerText()).includes('FIXTURE_'));
+  response.writeHead(200, {
+    'Content-Type': 'text/html; charset=utf-8',
+    'Cache-Control': 'no-store',
+    'X-Frame-Options': 'DENY',
+    'Content-Security-Policy': "frame-ancestors 'none'"
+  });
+  response.end(mode === 'slow' ? '<!doctype html><p>Loading fixture…</p>' : fixture(mode === 'guest'));
+});
+const profile = await mkdtemp(join(tmpdir(), 'sidebar-gpt-test-'));
+const browser = spawn(executable, [
+  '--headless=new', '--no-first-run', '--no-default-browser-check',
+  '--disable-background-networking', '--disable-component-update', '--disable-sync',
+  `--host-resolver-rules=MAP chatgpt.com 127.0.0.1:${fixtureServer.port}, MAP jobs.example.test 127.0.0.1:${fixtureServer.port}`,
+  '--no-proxy-server', '--ignore-certificate-errors',
+  '--enable-unsafe-extension-debugging', '--remote-debugging-port=0',
+  `--user-data-dir=${profile}`, 'about:blank'
+], { windowsHide: true, stdio: ['ignore', 'ignore', 'pipe'] });
+let browserError;
+browser.on('error', error => { browserError = error; });
+let cdp;
+const sessions = new Map();
+const activeSessions = new Set();
+const errors = [];
+const savedChats = [
+  { title: 'Resume planning', url: '/c/saved-resume' },
+  { title: 'Interview notes', url: '/c/saved-interview' },
+  { title: 'Resume <img src=x onerror=alert(1)>', url: '/c/saved-literal' },
+  { title: 'Unrelated external link', url: 'https://example.test/c/not-a-chat' }
+];
+const fixture = guest => `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>body{margin:0;background:#fff;color:#202526;font:15px system-ui;display:flex;flex-direction:column;min-height:100vh}main{flex:1;display:grid;place-content:center;text-align:center;padding:24px}h1{font-size:25px;font-weight:550}p{color:#727b7b;font-size:13px}form{margin:18px;border:1px solid #dce3df;border-radius:22px;padding:16px;background:#f6f8f7}textarea{border:0;resize:none;background:transparent;width:100%;font:14px system-ui;outline:none}button{border:0;background:#147d66;color:white;padding:8px 14px;border-radius:20px}</style>
+</head><body><button id="sidebar-open" type="button" data-testid="open-sidebar-button" aria-label="Open sidebar" style="position:absolute;top:12px;left:12px">Chats</button><button id="sidebar-close" type="button" data-testid="close-sidebar-button" aria-label="Close sidebar" hidden style="position:absolute;top:12px;left:12px">Close chats</button><nav id="history" aria-label="Chat history" hidden style="position:absolute;top:50px;left:12px;max-width:250px;background:white;padding:12px;border:1px solid #ddd"></nav><main><h1>What can I help with?</h1><p>Local ChatGPT fixture · no live account</p></main><form ${guest ? 'data-logged-out' : ''}><textarea id="prompt-textarea" placeholder="Ask anything"></textarea>${guest ? '<button type="button" data-testid="login-button">Log in</button>' : ''}</form><script>
+const sidebarHistory=document.getElementById('history'), sidebarOpen=document.getElementById('sidebar-open'), sidebarClose=document.getElementById('sidebar-close');
+sidebarOpen.addEventListener('click',()=>{sidebarHistory.replaceChildren(...${JSON.stringify(savedChats)}.map(chat=>{const link=document.createElement('a');link.href=chat.url;link.textContent=chat.title;link.style.display='block';return link}));sidebarHistory.hidden=false;sidebarOpen.hidden=true;sidebarClose.hidden=false;});
+sidebarClose.addEventListener('click',()=>{sidebarHistory.hidden=true;sidebarOpen.hidden=false;sidebarClose.hidden=true;});
+</script></body></html>`;
 
-  const contexts = await worker.evaluate(() => chrome.runtime.getContexts({ contextTypes: ['SIDE_PANEL'], documentUrls: [chrome.runtime.getURL('index.html')] })); assert.equal(contexts.length, 1);assert.equal(contexts[0].documentId,nativeDocument);
-  const report = { mode: 'mock_direct_chatgpt', liveAuthentication: false, providerInference: false, browser: version.product, inferenceRequests, layouts,
-    checks: ['MV3 external modules and CSP', 'direct OAuth callback/PKCE/RS256 sign-in and revocation', 'account models and effort', 'safe literal output', 'separate prompt/input', 'Previous/Next first-last wrapping', 'associated browser window', 'single/closed-window handling',
-      'navigation preserves prompt/input/model/effort/output', 'navigation preserves pending inference', 'native docked side panel', 'native dock Go/output and navigation during inference', 'panel survives tab navigation', 'panels scoped to their own browser windows', 'no popup created', 'copy', 'cancel', 'duplicate Go', 'editing/stale output', 'unsupported effort omitted', 'same-name/model account changes', 'late account output discarded', '403 retains account', 'initial/reload/inference expiry', 'one shared status bar', 'narrow layouts and scrolling', 'keyboard tabs', 'dark/reduced-motion rendering', 'no runtime/CSP errors', 'no draft/result/token persistence'] };
-  await writeFile(new URL('chrome-results.json', artifacts), JSON.stringify(report, null, 2) + '\n'); console.log(JSON.stringify(report, null, 2));
+try {
+  const port = await until(async () => {
+    if (browserError) throw browserError;
+    try { return (await readFile(join(profile, 'DevToolsActivePort'), 'utf8')).trim().split(/\r?\n/); }
+    catch { return null; }
+  }, 'Chrome debugging port');
+  const socket = new WebSocket(`ws://127.0.0.1:${port[0]}${port[1]}`);
+  await new Promise((resolve, reject) => { socket.addEventListener('open', resolve, { once: true }); socket.addEventListener('error', reject, { once: true }); });
+  cdp = new CDP(socket);
+  cdp.on('Runtime.exceptionThrown', params => errors.push(params.exceptionDetails.exception?.description || params.exceptionDetails.text));
+  cdp.on('Target.detachedFromTarget', ({ sessionId }) => activeSessions.delete(sessionId));
+  cdp.on('Target.attachedToTarget', ({ sessionId, targetInfo }) => {
+    activeSessions.add(sessionId);
+    const configuring = (async () => {
+      await cdp.send('Runtime.enable', {}, sessionId);
+      if (['page', 'iframe', 'other'].includes(targetInfo.type)) {
+        await cdp.send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: true, flatten: true }, sessionId);
+      }
+      await cdp.send('Runtime.runIfWaitingForDebugger', {}, sessionId);
+      return sessionId;
+    })();
+    sessions.set(targetInfo.targetId, configuring);
+    configuring.catch(error => {
+      // Navigation can discard a short-lived target while CDP configures it.
+      if (activeSessions.has(sessionId) && error.message !== 'Session with given id not found.') errors.push(error.message);
+    });
+  });
+  await cdp.send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: true, flatten: true });
+  const version = await cdp.send('Browser.getVersion');
+  const output = await buildExtension();
+  const { id } = await cdp.send('Extensions.loadUnpacked', { path: output });
+  const targets = async () => (await cdp.send('Target.getTargets')).targetInfos;
+  const worker = await until(async () => (await targets()).find(target => target.type === 'service_worker' && target.url.includes(id)), 'extension worker');
+  async function session(targetId) {
+    if (sessions.has(targetId)) return sessions.get(targetId);
+    const attached = await cdp.send('Target.attachToTarget', { targetId, flatten: true });
+    return sessions.get(targetId) || attached.sessionId;
+  }
+  const workerSession = await session(worker.targetId);
+  async function evaluate(sessionId, expression) {
+    const result = await cdp.send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true, userGesture: true }, sessionId);
+    if (result.exceptionDetails) throw new Error(result.exceptionDetails.exception?.description || result.exceptionDetails.text);
+    return result.result.value;
+  }
+  await until(() => evaluate(workerSession, 'typeof chrome !== "undefined" && Boolean(chrome.declarativeNetRequest) && chrome.declarativeNetRequest.getDynamicRules().then(rules => rules.length === 1)'), 'embed rule');
+  assert.equal(await evaluate(workerSession, '(async () => (await chrome.sidePanel.getPanelBehavior()).openPanelOnActionClick)()'), false);
+  const rules = await evaluate(workerSession, 'chrome.declarativeNetRequest.getDynamicRules()');
+  assert.deepEqual(rules[0].condition.initiatorDomains, [id]);
+  // Chrome evaluates the actual installed rule against representative requests.
+  for (const [initiator, type, count] of [[`chrome-extension://${id}`, 'sub_frame', 1], ['https://other.example', 'sub_frame', 0], [`chrome-extension://${id}`, 'main_frame', 0]]) {
+    const result = await evaluate(workerSession, `chrome.declarativeNetRequest.testMatchOutcome(${JSON.stringify({ url: 'https://chatgpt.com/', initiator, type })})`);
+    assert.equal(result.matchedRules.length, count);
+  }
+
+  const { targetId } = await cdp.send('Target.createTarget', { url: `chrome-extension://${id}/index.html` });
+  const panel = await session(targetId);
+  const read = expression => evaluate(panel, expression);
+  const click = selector => read(`document.querySelector(${JSON.stringify(selector)}).click()`);
+  const state = () => read('document.getElementById("connection").dataset.state');
+  await until(() => read('Boolean(document.querySelector("#resume-queue .job-request"))'), 'combined workspace startup');
+  await click('#chat-tab');
+  await until(async () => await state() === 'ready', 'embedded ChatGPT readiness');
+  assert.equal(await read('document.getElementById("connection").hidden'), true);
+  const iframeTarget = await until(async () => (await targets()).find(target => target.type === 'iframe' && target.url.startsWith('https://chatgpt.com/')), 'ChatGPT frame');
+  const frameSession = await session(iframeTarget.targetId);
+  const workspace = await checkWorkspaceUI({ cdp, panel, read, click, frameSession, evaluate, artifacts, until });
+  await evaluate(frameSession, 'history.pushState({}, "", "/c/fixture-chat?secret=do-not-relay"); dispatchEvent(new PopStateEvent("popstate"))');
+  await delay(200);
+  await click('#open-tab');
+  await until(async () => (await targets()).some(target => target.type === 'page' && target.url === 'https://chatgpt.com/c/fixture-chat'), 'open current conversation');
+  await click('#reload');
+  await until(async () => await read('document.getElementById("chatgpt-frame").src') === 'https://chatgpt.com/c/fixture-chat', 'reload conversation route');
+  await until(async () => await state() === 'ready', 'reload readiness');
+  await click('#new-chat');
+  await until(async () => await read('document.getElementById("chatgpt-frame").src') === 'https://chatgpt.com/', 'new chat');
+  await until(async () => await state() === 'ready', 'new chat readiness');
+
+  mode = 'guest';
+  await click('#reload');
+  await until(async () => await state() === 'guest', 'guest recovery');
+  assert.equal(await read('document.getElementById("recovery").hidden'), false);
+  await click('#chat-toolbar-reveal');
+  await click('#company-chat-toggle');
+  await until(async () => (await read('document.getElementById("company-chat-status").textContent')).includes('No connected company chats'), 'empty company chats after resetting examples');
+  assert.equal(await read('document.querySelectorAll("#company-chat-list button").length'), 0);
+  await click('#company-chat-toggle');
+  await click('#sign-in');
+  await until(async () => (await targets()).some(target => target.type === 'page' && target.url === 'https://chatgpt.com/auth/login'), 'first-party sign-in tab');
+  const loginTabs = (await targets()).filter(target => target.type === 'page' && target.url === 'https://chatgpt.com/auth/login').length;
+  await evaluate(frameSession, 'document.querySelector("[data-testid=login-button]").click()');
+  await until(async () => (await targets()).filter(target => target.type === 'page' && target.url === 'https://chatgpt.com/auth/login').length === loginTabs + 1, 'embedded sign-in handoff');
+  mode = 'slow';
+  await click('#retry');
+  await until(async () => await state() === 'slow', 'slow frame recovery without claiming logout', 35000);
+  assert.equal(await read('document.getElementById("chatgpt-frame").hidden'), false);
+  assert.equal(await read('document.getElementById("status").textContent.includes("Sign in")'), false);
+  assert.equal(await read('document.getElementById("sign-in").textContent'), 'Open ChatGPT');
+  mode = 'ready';
+  await click('#retry');
+  await until(async () => await state() === 'ready', 'retry after sign-in');
+
+  const layouts = [];
+  for (const width of [280, 360, 480, 800]) {
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false }, panel);
+    const layout = await read('({width: innerWidth, noOverflow: document.documentElement.scrollWidth <= innerWidth, frameHeight: document.querySelector("iframe").getBoundingClientRect().height})');
+    assert.equal(layout.noOverflow, true);
+    assert.ok(layout.frameHeight > 500);
+    layouts.push(layout);
+  }
+  await mkdir(artifacts, { recursive: true });
+  await cdp.send('Emulation.setDeviceMetricsOverride', { width: 390, height: 900, deviceScaleFactor: 1, mobile: false }, panel);
+  await cdp.send('Page.bringToFront', {}, panel);
+  await read('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
+  const screenshot = await cdp.send('Page.captureScreenshot', { format: 'png' }, panel);
+  await writeFile(join(artifacts, 'sidebar-gpt.png'), Buffer.from(screenshot.data, 'base64'));
+
+  // Exercise Chrome's real dock, separately from the extension page in a tab.
+  const sourceUrl = 'https://jobs.example.test/engineering';
+  const source = await cdp.send('Target.createTarget', { url: sourceUrl });
+  const sourceSession = await session(source.targetId);
+  await until(() => evaluate(sourceSession, 'Boolean(document.getElementById("job-text"))'), 'job page fixture loaded');
+  const jobMarkup = await evaluate(sourceSession, 'document.body.innerHTML');
+  const tab = await until(async () => (await cdp.send('Target.getTargets', { filter: [{ type: 'tab', exclude: false }] })).targetInfos.find(target => target.url === sourceUrl), 'source tab');
+  await cdp.send('Extensions.triggerAction', { id, targetId: tab.targetId });
+  await until(() => evaluate(workerSession, 'chrome.runtime.getContexts({contextTypes:["SIDE_PANEL"]}).then(items => items.length === 1)'), 'native side panel');
+  const dock = await until(async () => (await targets()).find(target => target.targetId !== targetId && target.url === `chrome-extension://${id}/index.html`), 'native dock target');
+  const dockSession = await session(dock.targetId);
+  await until(() => evaluate(dockSession, 'Boolean(document.querySelector("#resume-queue .job-request"))'), 'native workspace startup');
+  try {
+    await until(() => evaluate(sourceSession, 'CSS.highlights.get("ai-agent-job-keywords")?.size === 5'), 'job page keyword highlights');
+  } catch (error) {
+    const details = await evaluate(dockSession, `(async () => ({hint:document.getElementById('highlight-keywords').title,
+      enabled:document.getElementById('highlight-keywords').checked,
+      settings:await chrome.storage.local.get('keywordHighlights'),
+      tabs:await chrome.tabs.query({currentWindow:true,active:true})}))()`);
+    details.page = await evaluate(sourceSession, '({highlights:[...CSS.highlights.keys()],color:document.documentElement.style.getPropertyValue("--ai-agent-keyword-color")})');
+    throw new Error(`${error.message}: ${JSON.stringify(details)}`);
+  }
+  assert.equal(await evaluate(sourceSession, 'document.body.innerHTML'), jobMarkup);
+  assert.equal(await evaluate(sourceSession, 'document.getElementById("job-notes").value'), 'React SQL private notes');
+  assert.deepEqual(await evaluate(sourceSession, '[...CSS.highlights.get("ai-agent-job-keywords")].map(range => range.toString())'), ['React','C++','SQL','machine learning','<img src=x onerror=alert(1)>']);
+  assert.equal(await evaluate(sourceSession, 'getComputedStyle(document.documentElement).getPropertyValue("--ai-agent-keyword-color").trim()'), '#b7e4ca');
+  assert.equal(await evaluate(dockSession, 'CSS.highlights.has("ai-agent-job-keywords")'), false);
+  await evaluate(sourceSession, 'const extra=document.createElement("p"); extra.textContent="React SQL ReactNative"; document.querySelector("main").append(extra)');
+  await until(() => evaluate(sourceSession, 'CSS.highlights.get("ai-agent-job-keywords")?.size === 7'), 'new job content highlighted');
+  await evaluate(dockSession, 'document.getElementById("review-another").click()');
+  await until(() => evaluate(dockSession, 'document.getElementById("job-url").value === "https://jobs.example.test/engineering"'), 'accessible page URL autofills');
+  await until(() => evaluate(dockSession, '!document.getElementById("highlight-keywords").disabled'), 'native keyword toggle loaded');
+  assert.equal(await evaluate(dockSession, 'document.getElementById("highlight-keywords").checked'), true);
+  await evaluate(dockSession, 'document.getElementById("highlight-keywords").click()');
+  await until(() => evaluate(sourceSession, '!CSS.highlights.has("ai-agent-job-keywords")'), 'turn off page highlights');
+  await evaluate(dockSession, 'document.getElementById("highlight-keywords").click()');
+  await until(() => evaluate(sourceSession, 'CSS.highlights.get("ai-agent-job-keywords")?.size === 7'), 'turn on page highlights');
+  await cdp.send('Page.bringToFront', {}, sourceSession);
+  const jobShot = await cdp.send('Page.captureScreenshot', {format:'png'}, sourceSession);
+  await writeFile(join(artifacts, 'job-page-highlights.png'), Buffer.from(jobShot.data, 'base64'));
+  await cdp.send('Page.navigate', {url:'https://jobs.example.test/another-job'}, sourceSession);
+  await until(() => evaluate(sourceSession, 'CSS.highlights.get("ai-agent-job-keywords")?.size === 5'), 'highlighting survives same-site job navigation');
+  await evaluate(dockSession, 'document.getElementById("chat-tab").click()');
+  await until(async () => await evaluate(dockSession, 'document.getElementById("connection")?.dataset.state') === 'ready', 'native dock ChatGPT readiness');
+  const dockContexts = await evaluate(workerSession, 'chrome.runtime.getContexts({contextTypes:["SIDE_PANEL"]})');
+  await cdp.send('Page.navigate', { url: 'about:blank#another-page' }, await session(source.targetId));
+  assert.equal((await evaluate(workerSession, 'chrome.runtime.getContexts({contextTypes:["SIDE_PANEL"]})'))[0].documentId, dockContexts[0].documentId);
+  assert.equal(await evaluate(workerSession, 'chrome.windows.getAll().then(items => items.some(win => win.type === "popup"))'), false);
+  assert.deepEqual(errors, []);
+  const report = { browser: version.product, fixtureOnly: true, liveAuthentication: false, requests, layouts, workspace,
+    checks: ['unpacked extension loads', 'native dock opens from toolbar', 'dock survives tab navigation', 'installed header rule scope', 'embedding with restrictive response headers',
+      'frame readiness', 'current conversation in new tab', 'reload keeps conversation', 'new chat', 'guest sign-in tab', 'embedded sign-in handoff',
+      'job-page-only keyword highlighting with temporary page access', 'literal and cross-element phrases preserve page markup',
+      'stored settings load in a new dock', 'dynamic job content and toggle removal', 'same-site job navigation retains highlights',
+      'slow-loading recovery', 'retry', 'narrow layouts', 'no runtime errors'] };
+  await writeFile(join(artifacts, 'chrome-results.json'), JSON.stringify(report, null, 2) + '\n');
+  console.log(JSON.stringify(report, null, 2));
+} catch (error) {
+  await mkdir(artifacts, { recursive: true });
+  const targetInfos = cdp ? (await cdp.send('Target.getTargets')).targetInfos : [];
+  await writeFile(join(artifacts, 'chrome-failure.json'), JSON.stringify({ error: error.message, errors, requests, targets: targetInfos }, null, 2));
+  throw error;
 } finally {
-  delayed?.(); await context?.close(); await buildExtension();
+  if (cdp) { try { await cdp.send('Browser.close'); } catch {} cdp.socket.close(); }
+  if (browser.exitCode === null) {
+    await Promise.race([new Promise(resolve => browser.once('exit', resolve)), delay(5000)]);
+    if (browser.exitCode === null) browser.kill();
+  }
+  const absoluteProfile = resolve(profile);
+  if (dirname(absoluteProfile) !== resolve(tmpdir()) || !absoluteProfile.startsWith(join(resolve(tmpdir()), 'sidebar-gpt-test-'))) {
+    throw new Error('Refusing to remove an unexpected browser profile path.');
+  }
+  await rm(absoluteProfile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+  await fixtureServer.close();
 }

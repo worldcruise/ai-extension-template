@@ -1,0 +1,4 @@
+::highlight(ai-agent-job-keywords) {
+  background-color: var(--ai-agent-keyword-color, #fff2a8);
+  color: #20292d;
+}

@@ -1,0 +1,47 @@
+<html>
+    <head>
+        <style>
+            .message {
+                background-color: #6C62FE;
+                width: 800px;
+                margin: 100px auto;   
+                padding: 10;
+                border-radius: 4px;
+                font-size: 20;
+                color: white;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <h1><img src="Plugin96.png" style="width: 30px; margin-right: 10px;">Highlight This! Data conversion</h1>
+        <div id="migrationBusyMessage"  class="message" style="display: none;">
+            <h2>Data conversion ongoing</h2>
+            <p>We are processing a data conversion that is needed because of a major upgrade to better protect your privacy</p>
+            <p>Please do not close this page, it will close automatically when done</p>
+        </div>
+
+        <div id="migrationFailed"  class="message" style="display: none;">
+            <p>We failed to convert your data. You can retry with the links below</p>
+            <p>Please make a backup first before retrying</p>
+        </div>
+            
+        <h2>1. Download a backup</h2>
+        <p>Download a backup to ensure we are not losing any data during the conversion</p>
+        
+        <button id="btnDownload">Download</button>
+        <div id="divDownloadlocal"></div>
+        <div id="divDownloadsync"></div>
+        <h2>2. Convert the data</h2>
+        <p>Convert the data into the new structure</p>
+        <button id="btnMigrate">Convert</button>
+
+        <h2>Fix a transformation issue</h2>
+        Sometimes after a transformation there is can be an issue with synchronized lists, click the below button to fix the issue
+        <button id="fixTransformationIssue">Fix transformation issue</button>
+        <div id="feedbackFixTransformationIssue"></div>
+    </body>
+    <footer>
+        <script src="v3migration.js"></script>
+    </footer>
+</html>

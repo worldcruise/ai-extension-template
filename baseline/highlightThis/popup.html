@@ -1,0 +1,915 @@
+
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="common.js"></script>
+
+    <script src="popupEditor.js"></script>
+
+    <script src="libs/purify/purify.js"></script>
+    <script src="libs/invertColor/invertColor.js"></script>
+    <script src="libs/jscolor/jscolor.js"></script>
+    <script src="libs/notyf.min.js"></script>
+    
+
+
+    <link rel="stylesheet" href="/libs/notyf.min.css" type="text/css">
+    <!--link rel="stylesheet" href="/libs/font-awesome/css/all.css"-->
+    <link rel="stylesheet" href="application.css" type="text/css">
+    <link rel="stylesheet" href="/libs/materialSymbols/Outlined-Regular.css">
+
+</head>
+<body>
+<div class="header" id="header">
+<!-- HTML code for navigation menu with hamburger icon -->
+<nav>
+    <button id="hamburger-menu" type="button">
+        <span class="material-symbols-outlined">
+            menu
+        </span>
+    </button>
+        <ul>
+            <li>
+                <a id="homeLink" ><!--i class="fa fa-cog" aria-hidden="true"></i-->
+                    <span class="material-symbols-outlined">
+                        home
+                    </span>
+                    <span id="menu_home_label">Home</span>
+                </a>
+    
+            </li>
+
+        <li>
+            <a id="settingsLink" ><!--i class="fa fa-cog" aria-hidden="true"></i-->
+                <span class="material-symbols-outlined">
+                    settings
+                </span>
+                <span id="menu_settings_label">Settings</span>
+            </a>
+
+        </li>
+
+        <li>
+            <a id="licenseLink">
+                <span class="material-symbols-outlined">
+                    shopping_cart
+                </span>
+                <span  id="menu_subscription_label">Subscription</span>
+            </a>
+        </li>
+
+        <li>
+            <a id="sendErrorsLink">
+                <span class="material-symbols-outlined">
+                    bug_report
+                </span>
+                <span id="menu_sendErrors_label">Report Bug</span>
+            </a>
+        </li>
+
+        <li>
+            <a id="helpLink">
+                <span class="material-symbols-outlined">
+                    help
+                </span>
+                <span id="menu_help_label" >Help</span>
+            </a>
+        </li>
+
+    </ul>
+  </nav>
+  
+  
+  
+
+  
+
+    <div class="title"><span id="litTitle"></span> <span id="offDesc"></span></div>
+    
+
+    <div class="onoffswitch">
+        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked>
+        <label class="onoffswitch-label" for="myonoffswitch">
+            <div class="onoffswitch-inner"></div>
+            <div class="onoffswitch-switch"></div>
+        </label>
+    </div>
+
+</div>
+
+
+<section id="rangeUpdateNotice" class="range-update-notice" aria-labelledby="rangeUpdateTitle" hidden>
+    <strong id="rangeUpdateTitle">Upgrade to Modern highlighting</strong>
+    <p id="rangeUpdateDescription">Enable our new highlighting engine for more stable highlighting on most modern websites, such as LinkedIn, YouTube and Salesforce. It highlights text without changing the page structure, helping prevent duplicated text and leftover highlights as pages update. We recommend enabling Modern highlighting for smoother everyday browsing. Text colors, background colors and underline remain available. Bold, italic, borders, rounded corners and padding aren’t supported in this mode. Your saved styles are kept if you switch back. Enable Modern highlighting in General settings, save, then reload your open pages.</p>
+    <button id="rangeUpdateSettings" type="button">Open General settings</button>
+    <button id="rangeUpdateDismiss" type="button">Dismiss</button>
+</section>
+<div>
+    <div id="menu">
+        <div id="homeMesssage" class="homeMessage">
+            <span class="material-symbols-outlined" style="padding: 8; color: #6C62FE;">
+                warning
+            </span>
+            <div id="homeMesssage-text" class="homeMessage-text">Activate highlighting</div>
+        </div>
+        <div id="byline" style="text-align:center;">The extension highlights all below words on the page.</div>
+
+        <div id="intro" class="intro" style="display:none;"><h2 id="popup_nowords">There are no word lists defined</h2>
+
+            <p>
+                <span id="popup_create1">Create a word list with words to have </span>
+                <span id="popup_title" style="color:#7F0EC9;">Highlight This!</span>
+                <span id="popup_create2">detect and highlight them on web pages while browsing.</span>
+            </p>
+        </div>
+        <div class="addMenuLink" style="text-align:center;" ><span id="addGroupLink" class="addGroupLink material-symbols-outlined">add</span></div>
+        <div id="wordlistmenu" >
+            <span  id="collapseAll" class="expandButton" type="button">Collapse all</span>
+
+            <!--div style="flex:1;">
+                <input id="filterwords" type="search" placeholder="Filter">
+                <i id="filtersubmit" class="fa fa-search"></i>
+            </div-->
+            <div class="search-box" style="flex:1">
+                <input id="filterwords"  type="search" placeholder="Search">
+                <button type="submit"><span class="material-symbols-outlined">
+                    search
+                    </span></button>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="wordDisplay">
+        <div id="FreeVersion" style="display: none;"">
+            You are using the free version with ad support of Highlight This! <br />Click here to get the ad free version.
+        </div>
+        <div id="wordData" style=" margin-top:5px;"></div>
+    </div>
+
+    <div id="onPage" style="display:none;">
+        <div style="margin-top: 10px;"><a id="toConfig" class="secondaryLink" style="font-weight:bold;">< Go to configure words</a></div>
+        <h2 id="foundWords">We have found words on this page.</h2>
+
+        <div style="text-align:center;">
+            <table id="wordsfound" style="margin: 0 auto;"></table>
+            <div style="margin-top: 20px;">
+                <a id="dontshowwords" class="secondaryButton"><i class="far fa-check-square" style="margin-right: 5px;"></i><span id="dontShowWordsLabel">Stop showing the words found on the page</span></a>
+            </div>
+            <!--p class="wordsFoundTip">
+                <span id="popup_tip1">Tip: Use </span>
+                <a style="text-decoration:underline;" id="browseHighlight">
+                    <span id="OSKey">Control</span>
+                    <span id="popup_tip2">+Shift+Space</span></a>
+                <span id="popup_tip3">to browse through words on the page</span>
+            </p-->
+        </div>
+
+    </div>
+    <div id="newGroupType" style="display:none;">
+        <form id="createGroupForm"  style="margin-top: 20px;"></form>
+            <h2 id="titleCreateNewList">Create new list</h2>
+            <h3 id="newGroupTitleStorage" style="margin-bottom: 20px;">Do you want to sync this list between your browsers?</h3>
+            <div id="newGroupDetailStorage" class="inline-help">
+                A synchronized list is available in all your browsers when logged in to your browser, but it supports less words due to storage limitations.
+            </div>
+            <div>
+                <input type="radio" id="storageLocal" name="storage" value="local"><label for="storageLocal" id="storageLocalLabel">No, do not synchronize this list</label><br>
+                <input type="radio" id="storageSync" name="storage" value="sync"><label for="storageSync" id="storageSyncLabel">Yes, synchronize this list</label><br>
+            </div>
+            <div id="newGroupTypePart2">
+                <h3 id="newGroupTitle" style="margin-bottom: 20px;">Where do you want to manage the words?</h3>
+                <div id="newGroupDetail" class="inline-help">
+                    You can manage your list of words in Highlight This, or you can manage them outside of Highlight This (eg pastebin) and import them on a frequent bases.
+        
+                </div>
+                <div>
+                    <input type="radio" id="typeLocal" name="type" value="local" checked><label for="typeLocal" id="localLabel">In Highlight This</label><br>
+                    <input type="radio" id="typeRemote" name="type" value="remote"><label for="typeRemote" id="remoteLabel">External</label><br>
+                    <!--input type="radio" id="typeRegex" name="type" value="regex"><label for="typeRegex" id="regexLabel">Regex</label><br-->
+                </div>
+            </div>
+            <div style="text-align:center; margin-top: 20px;">
+                <span id="cancelCreateGroup" class="secondaryButton" style="margin-right: 30px;">Cancel</span>
+                <button id="createGroupLink" class="primaryLink"  type="button">Next</button>
+            </div>
+        </form>
+
+    </div>
+    <div id="newGroup" style="display:none;">
+        <h2 id="groupFormTitle"></h2>
+
+        <form id="groupForm">
+            <input type="hidden" id="editWordsGroupId">
+            <input type="hidden" id="field_listType">
+            <input type="hidden" id="field_storage">
+            <div>
+                <!--div id="deleteButton" class="deleteButton">
+                    <span id="deleteGroupLink"  style="text-align: right; margin-right:5px;">Delete word list</span>
+                    <i class="fa fa-trash"></i>
+                </div-->
+            </div>
+
+
+            <div class="tab">
+                <span class="general tablinks active" id="tabGeneral">General</span>
+                <span class="general tablinks" id="tabStyleScreen">Style</span>
+                <span class="general tablinks" id="tabLimitations">Limitations</span>
+                <span class="general tablinks" id="tabAction">Action</span>
+                <span class="general tablinks" id="tabAdvanced">Advanced <i id="advancedInfoIcon" class="fa fa-info-circle"></i></span>
+
+            </div>
+            <span id="firstScreen" class="general tabcontent">
+
+                
+                <div class="fieldRow">
+                    <div class="fieldLabel" id="field_listname">List name:</div>
+                    <input id="group">
+                </div>
+                <div class="fieldRow" id="extSource">
+                      <div class="fieldLabel" id="field_source">Source:</div>
+                      <div id="remotelist_help" class="inline-help">The remote source needs to return a text file where words are on individual lines, similar to how you would create a local list.</div>
+                        <table class="remoteConfigTable">
+                            <tr>
+                                <td>
+                                        <select id="field_remoteType">
+                                                <option value="web">Web</option>
+                                                <option value="pastebin">Pastebin</option>
+                                                <option value="googleSheets">Google Sheets</option>
+                                        </select>
+                                </td>
+                                <td style="border-left: 1px solid #555;padding-left: 5px;">
+                                        <div id="remoteSourceAttributes">
+                                                <div id="pastbinAttributes">
+                                                    <span>Pastebin id:</span>
+                                                    <input id="pastebinId">
+
+                                                </div>
+                                                <div id="webAttributes">
+                                                    <span>URL:</span>
+                                                    <input id="remoteWebUrl" size="50">
+                                                </div>
+                                                <div id="googleSheetsAttributes">
+                                                    <div style="margin-bottom: 7px;">
+                                                        <button id="launchGoogleSheetsAssisantbtn" type="button">Launch the assistant</button>
+                                                        <button id="closeGoogleSheetsAssisantbtn"  type="button" style="display: none;">Close the assistant</button>
+                                                    </div>
+                                                    <span id="googleSheetsIdContainer">
+                                                        <span id="labelSheetsId">Sheets id:</span>
+                                                        <input id="googleSheetsId">
+                                                    </span>
+                                                </div>
+
+                                        </div>
+
+                                </td>
+                            </tr>
+                           
+                            <tr id="syncRow"> 
+                                <td colspan="2">
+                                    <div class="fieldRow">
+                                        
+                                    </div>
+                                    <div class="fieldRow">
+                                        <button id="syncLink"  type="button"><i class="fas fa-sync"></i> <span id="syncLinkText">sync</span></button>
+                                        <span id="last_synced_on">Last synced on:</span>
+                                        <span id="syncStatusLastUpdated"></span>
+                                        <span id="syncStatusMessage" style="display: none;">sync status</span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        </table>
+
+                </div>
+                <div class="fieldRow" id="regexSection">
+                    <div id="regexSource">
+                        <div class="fieldLabel">Regex:</div>
+                        <textarea id="regex" style="width:100%; height:120px"></textarea>
+                    </div>
+                </div>
+                <div id="googleSheetsAssistant">
+                    <h2 id="googleSheetsAssistantTitle" style="margin-top: 0;">Google Sheets assistant</h2>
+                    <ol>
+                        <li><div id="googleAssist1">Make or open an existing a Google Sheets document.</div></li>
+                        <li><div id="googleAssist2">In the first sheet, first column create your list of words.</div></li>
+                        <li><div id="googleAssist3">Publish your sheet on the web</div><img src="images/GoogleAssistant1.png" style="height: 85px;"></li>
+                        <li><div id="googleAssist4">Share the Google sheets</div><img src="images/GoogleAssistant2.png" style="height: 85px;"></li>
+                        <li><div id="googleAssist5">Select the link from "Copy Link"</div></li>
+                        <li>
+                            <div id="googleAssist6">Paste the link here</div>
+                            <input id="googleAssistLink">
+                            <button id="googleAssistOKbtn"  type="button">ok</button>
+                            <div id="googleAssistInfo"></div>
+                        </li>
+
+                    </ol>
+                </div>
+                <div class="fieldRow" id="wordsSection">
+                    <div><span class="fieldLabel" id="field_words">Words: </span></div>
+                    
+                    <div id="field_words_help" class="inline-help">You can use * and ? wildcards, each new line is considered as a word</div>
+
+                    <!--textarea id="words" style="width:100%; height:250px"></textarea-->
+                    <div class="wordEditor">
+                        <table style="width: 100%; border-spacing: 0;" class="toolbar">
+                            <tr style="vertical-align: middle;" >
+                                <td id="editorMenuDefault">
+                                    <a id="wordsSelectBtn" href="">
+                                        <span id="WordsSelectIcon" class="material-symbols-outlined">
+                                        check_box
+                                        </span>
+                                    </a>
+                                    <a id="wordsDelete">
+                                        <span class="material-symbols-outlined">
+                                            delete
+                                        </span>
+                                    </a>
+                                    <div id="wordsMoveContainer">
+                                        <a id="wordsMove">
+                                            <span class="material-symbols-outlined">
+                                                send
+                                            </span>
+                                        </a>
+                                        <div id="wordsMoveMenu">
+                                            <div id="wordsMoveMenuTitle">Move to:</div>
+                                            <ul id="wordsMoveMenuList">
+    
+                                            </ul>
+                                        </div>
+
+                                    </div>
+                                    <a id="wordsSortAsc">
+                                        <span class="material-symbols-outlined flip-horizontal">
+                                            sort
+                                        </span>
+                                    </a>
+                                    <a id="wordsSortDesc">
+                                        <span class="material-symbols-outlined">
+                                            sort
+                                        </span>
+                                    </a>
+                                    <!--a id="wordsNotes">
+                                        <span class="material-symbols-outlined">
+                                            edit_note
+                                        </span>
+                                    </a -->
+                                </td>
+                                <!--td id="editorMenuDefaultNotes" style="display: none";>
+                                    <span>Notes</span>
+                                    <a id="wordsNotesBack">back</a>
+                                </td-->
+                                <td style="text-align: right; width:125px;">
+
+                                    <div class="search-box" style="flex:1">
+                                        <input id="filterwordlist"  type="search" placeholder="Filter">
+                                        <button id="searchicon"  type="submit"><span class="material-symbols-outlined">
+                                            search
+                                            </span></button>
+                                    </div>
+
+
+                                    <!--input id="filterwordlist" placeholder="Filter">
+                                    <i id="filterwordlistsubmit" class="fa fa-search"></i-->
+                                </td>
+                            </tr>
+
+                        </table>
+                        <!--div style="text-align:right; margin-right:5px;">
+                        
+
+
+                        </div-->
+                        <div id="words" style="display: block; height:225px" contenteditable="true" spellcheck="false" ondrop="return false;"></div>
+                        <!--div id="notesOnWords" style="display: none; height: 225px;resize: both;overflow: auto;">
+                        </div -->
+                    </div>
+                </div>
+
+                <div id="findWordsSection" class="fieldRow" style="line-height: 23px;">
+                  
+
+                    <input id="findwords" type="checkbox"><label for="findwords" id="field_detection_help">Only detect complete words</label>
+            
+                    <div id="hintNonUnicode" class="hint" style="display:none"><i class="fa fa-info-circle"></i> <span id="non_unicode_chars">you have added non unicode words to your list of words, uncheck the complete words detection to highlight them properly</span></div>
+                </div>
+            </span>
+            <span id="styleScreen" style="display:none;" class="general tabcontent">
+                <div class="fieldRow">
+                    <div class="fieldLabel" id="field_colors">Colors:</div>
+                    <div id="field_colors_help" class="inline-help" >Select colors or type an html color code e.g. "#ccc" or "green"</div>
+
+                    <div class="colorContainer">
+                        <div class="colorSelector">
+                            <div class="colorSelectorHeader">
+                                <div id="field_foreground"></div>
+                                <div id="groupFColorSelectorInput"></div>
+                            </div>
+                            <div class="colorSelectorPicker" id="groupFColorSelector"></div>
+                            
+                        </div>
+                        <div class="colorSelector">
+                            <div class="colorSelectorHeader">
+                                <div id="field_background"></div>
+                                <div id="groupColorSelectorInput"></div>
+                            </div>
+                            <div class="colorSelectorPicker"  id="groupColorSelector"></div>
+                        </div>
+
+                    </div>
+
+                    <!--input type="checkbox" id="onlyColorBorder" name="onlyColorBorder"><label for="onlyColorBorder">Only show a border</label>
+                    <input type="checkbox" id="noShadowBox" name="noShadowBox"><label for="noShadowBox">Do not show shadowbox</label-->
+
+                </div>
+                <div class="fieldRow">
+
+                    
+                                      
+                    <span id="bold-style-control" class="style-control"><button id="bold-state-button" class="state-button material-symbols-outlined" type="button">
+                        format_bold
+                   </button></span>
+                    <input type="checkbox" id="bold" class="state-checkbox">    
+                    
+                    <span id="italic-style-control" class="style-control"><button id="italic-state-button" class="state-button material-symbols-outlined" type="button">
+                        format_italic
+                    </button></span>
+                    <input type="checkbox" id="italic" class="state-checkbox">       
+
+                    <span id="underline-style-control" class="style-control"><button id="underline-state-button" class="state-button material-symbols-outlined" type="button">
+                        format_underlined
+                    </button></span>
+                    <input type="checkbox" id="underline" class="state-checkbox"> 
+
+                    <span id="border-style-control" class="style-control"><button id="border-state-button" class="state-button material-symbols-outlined" type="button">
+                        border_style
+                    </button></span>
+                    <input type="checkbox" id="border" class="state-checkbox">        
+
+                    <span id="radius-style-control" class="style-control"><button id="radius-state-button" class="state-button material-symbols-outlined" type="button">
+                        rounded_corner
+                    </button></span>
+                    <input type="checkbox" id="radius" class="state-checkbox">        
+
+                    <span id="padding-style-control" class="style-control"><button id="padding-state-button" class="state-button material-symbols-outlined" type="button">
+                        border_outer
+                    </button></span>
+                    <input type="checkbox" id="padding" class="state-checkbox">        
+                </div>
+    
+                <div class="fieldRow">
+                    <div class="colorContainer">
+                        <div class="colorSelector">
+                            <div class="colorSelectorHeader">
+                                <div id="field_boxColor"></div>
+                                <div id="groupBoxSelectorInput"></div>
+                            </div>
+                            <div class="colorSelectorPicker"  id="groupBoxSelector"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="highlightExample">
+                    <span id="example1">This is an</span>
+                    <span id="example">example</span>
+                    <span id="example2">of highlighted text</span>
+                </div>
+
+
+
+            </span>
+            <span id="secondScreen" style="display:none;" class="general tabcontent">
+                <div id="sites_info" class="inline-help">List the sites on which you want highlights to occur. You can define a white- and a blacklist. Blacklist has priority.
+                    If nothing is defined, highlights are set on all pages. You can use wildcards such as * and ?.
+                    <br /> examples: *.google.com, www.google.com, www.google.com/something/page.html, www.go?gle.com/*/page.html
+                </div>
+
+                <div class="flexContainer">
+                    <div class="fieldLabel" id="field_highlightOn">Highlight on</div>
+                    <select id="listLimitationHighlightOn"  class="limitationSelector"></select>
+                </div>
+                <textarea id="highlightOnSites" style="width:100%; height:80px" class="limitationsArea"></textarea>
+
+                <div class="flexContainer">
+                    <div class="fieldLabel" id="field_dontHighlight">Don't Highlight on:</div>
+                    <select id="listLimitationDontHighlightOn"  class="limitationSelector"></select>
+                </div>    
+                <textarea id="dontHighlightOnSites" style="width:100%; height:80px" class="limitationsArea"></textarea>
+
+                <div class="fieldLabel" id="field_containerSelector">Only highlight when the container matches this queryselector</div>
+
+                <input id="containerSelector" type="text">
+
+            </span>
+
+            <span id="actionScreen" style="display: none" class="general tabcontent">
+                
+                <div class="fieldRow" id="action_intro">
+                    Define the action to execute when clicking on a highlight
+                </div>
+               
+                <select id="action">
+                    <option value="0" id="action_none">None</option>
+                    <option value="1" id="action_newtab">Open in new tab</option>
+                    <option value="2" id="action_sametab">Open in current tab</option>
+                    <option value="3" id="action_newwindow">Open in new window</option>
+                </select>
+
+
+                <div id="action1Attributes">
+                    <div id="label_link" class="fieldLabel"></div>
+                    <input id="actionLink" type="text" style="width:100%">
+                    <div id="actionLinkValidation" style="display: none;"  class="statusError"></div>
+                    <div id="action1Info">
+                        <div class="actionExample" id="actionExample">
+                            <p id="actionExampleHelp">Example, a highlight of the word "highlight" by using the token "Hi?hL*", will result in:</p>
+                            <p id="actionExampleUrl">http://wikipedia.com/highlight</p>
+                        </div>
+                        <div>
+                            <ul class="actiontips">
+                                <li id="action_tip1"><strong>%t%</strong> gets replaced by the text found on the page (eg Highlight) </li>
+                                <li id="action_tip2"><strong>%s%</strong> gets replaced by your search word (eg Hi?hL*)</li>
+                                <li id="action_tip3"><strong>%tu%</strong> or <strong>%tl%</strong>, <strong>%su%</strong> or <strong>%sl%</strong> forces in uppercase or lowercase</li>
+                                <li id="action_tip4" style="margin-top:10px;">Some examples: https://wikipedia.com/%t% , https://google.com/search?q=%t%</li>
+                            </ul>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <span id="actionDetails">
+                    <!--table style="width:100%;">
+                        <tr>
+                            <td id="label_action">Action:</td>
+                            <td>
+                                
+                            </td>
+                        </tr>
+                        <tr id="action1Attributes">
+                            <td id="label_link">Link:</td>
+                            <td>
+                            
+                            </td>
+                        </tr>
+                        </tr>
+                    </table -->
+                    
+                </span>
+            </span>
+
+            <span id="thirdScreen" style="display: none" class="general tabcontent">
+                
+                <div>
+                    
+                    <div class="fieldRow">
+                        <input id="showInEditableFields" type="checkbox" checked><label for="showInEditableFields" id="field_showInEditableFields_help">Highlight in editable fields</label>
+                    </div>
+                    <div class="fieldRow">
+
+                        <input id="notifyOnHighlight" type="checkbox" checked><label for="notifyOnHighlight" id="field_notifyOnHighlight_help">Notify when a word is found</label>
+                        <select id="notifyFrequency"><option value="1" id="notifyFrequency_1">Once per page</option><option value="2" id="notifyFrequency_2">Every time</option></select>
+                    </div>
+                    <div class="fieldRow">
+                        <input id="regexTokens" type="checkbox"><label for="regexTokens" id="field_useRegexTokens_help">Use Regex tokens instead of simple * and ? wildcards</label>
+                    </div>
+                    <div class="fieldRow">
+                        <input id="caseSensitive" type="checkbox"><label for="caseSensitive" id="field_caseSensitive_label">Compare with case sensitive</label>
+                    </div>
+                    <div class="fieldRow" id="syncFrequencySetting">
+                        
+                            <label for="syncFrequency" id="syncFrequencyLabel">Download frequency:</label>
+                        
+                    
+                            <select id="syncFrequency" name="syncFrequency">
+                                <option value='10'>Every 10 mins</option>
+                                <option value='30'>Every 30 mins</option>
+                                <option value='60'>Every hour</option>
+                                <option value='240'>Every 4 hours</option>
+                                <option value='480' selected>Every 8 hours</option>
+                                <option value='1440'>Every day</option>
+                            </select>
+                    </div>
+                    <div id="migrateSuggestion" class="fieldRow" style="border-top: 1px solid #eee;padding-top: 5px;padding-bottom: 20px;">
+                        <table>
+                            <tr>
+                                <td>
+                                    <span id="migrateSuggestionText">Change this list to a synchronised list, to make it available on all your browsers where you are logged in</span>
+                                </td>
+                                <td style="text-align: right;
+                                white-space: nowrap;"> 
+                                    <button id="migrateSuggestionButton" type="submit" class="secondaryButton">Synchronize list</button>
+                                </td>
+                            </tr>
+                        </table>
+                        
+                        
+                    </div>
+                </div>
+            </span>
+            <div class="generalButtons">
+                <div id="validationErrors"></div>
+                <span id="cancelAddGroup" class="secondaryButton" style="margin-right: 30px;">Cancel</span>
+                <button id="formSubmitButton" type="submit" class="primaryLink">Add</button>
+            </div>
+
+        </form>
+    </div>
+
+    <div id="settingsGroup" style="display:none;">
+
+        <h2 id="popup_settings">Settings</h2>
+        <!--div style="position: absolute;top: 55px;">
+            <span id="backFromSettings" class="secondaryLink">< Back</span>
+        </div-->
+        <div class="tab">
+            <span class="settings tablinks active" id="tabSettingsGeneral">General</span>
+            <span class="settings tablinks" id="tabSettingsLimitations">Limitations</span>
+            <span class="settings tablinks" id="tabSettingsBackup">Backup</span>
+        </div>
+        
+        <span id="settingsGeneral" class="settings tabcontent">
+            <div style="margin:10px;">
+                <form>
+                    <div>
+                        <input type="checkbox" id="showFoundWords"><label for="showFoundWords"  id="field_showFoundWords">Show found words:</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="printHighlights"><label for="printHighlights" id="field_printHighlights">Print highlights:</label>
+                    </div>
+
+                    
+                   
+                    <div class="fieldRow">
+                        <div class="fieldLabel" id="field_performance" >Performance</div>
+                        <div class="inline-help" id="performanceHelp">
+                            Define how much impact Highlight This is allowed to have on your device resources (processing power).
+                        </div>
+                        <div>
+                            <input type="range" id="performance" list="perfticks" style="width: 100%" min="0" max="3">
+    
+                            <datalist id="perfticks">
+                                <option value="0" label="High">
+                                <option value="1">
+                                <option value="2">
+                                <option value="3">
+                            </datalist>
+                        </div>
+                        <div id="perfomanceDescription">High performance machine, the highlighter will refresh the page fast</div>
+                    </div>
+                    <div class="fieldRow">
+                        <input type="checkbox" id="rangeHighlighting" aria-describedby="rangeHighlightingHelp"><label for="rangeHighlighting" id="field_rangeHighlighting">Modern highlighting</label>
+                        <div class="inline-help" id="rangeHighlightingHelp">Enable Modern highlighting for more stable highlighting on most modern websites, such as LinkedIn, YouTube and Salesforce. It highlights text without changing the page structure, helping prevent duplicated text and leftover highlights as pages update. Text colors, background colors and underline remain available. Bold, italic, borders, rounded corners and padding are unavailable in this mode; your saved styles are kept if you switch back. Older browsers without support use the standard method. Save this setting, then reload open pages.</div>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="magicHighlighting"><label for="magicHighlighting" id="field_magicHighlighting">Faster Highlighting</label>
+                    </div>
+                </form>
+
+            </div>
+           
+        </span>
+
+        <span id="settingsLimitations" style="display: none" class="settings tabcontent">
+            <div style="margin:10px;">
+                
+                    <div>
+                        <div id="field_neverHighlightOn_help" class="inline-help">
+                            <br />List the sites on which you never want highlights to occur. You can use wildcards such as * and ?.
+                            <br /> examples: *.google.com, www.google.com, www.google.com/something/page.html
+                        </div>
+                        
+                        <div class="flexContainer">
+                            <div class="fieldLabel" id="field_onlyHighlightOn">Only highlight on:</div>
+                            <select id="globalLimitationHighlightOn" class="limitationSelector"></select>
+                        </div>    
+                        <textarea id="onlyHighlightOn" style="width:100%; height:80px" class="limitationsArea"></textarea>
+
+                        <div class="flexContainer">
+                            <div class="fieldLabel" id="field_neverHighlightOn">Never highlight on:</div>
+                            <select id="globalLimitationDontHighlightOn" class="limitationSelector"></select>
+                        </div>    
+                        <textarea id="neverHighlightOn" style="width:100%; height:80px" class="limitationsArea"></textarea>
+
+
+                    </div>
+            </div>
+        </span>
+        <span id="settingsBackup" style="display: none" class="settings tabcontent">
+            <div style="margin:10px;">
+                <div class="fieldContainer">
+                    <div class="fieldLabel" id="field_exportSettings">Export settings:</div>
+                    <div id="exportLink" class="primaryLink">Export</div><div id="exportLinkDownload"></div>
+                </div>
+                <div class="fieldContainer">
+                    <div class="fieldLabel" id="field_autoBackupSettings">Automatic Backup:</div>
+                    <div style="margin-bottom:10px;" id="info_autoBackupSettings">Creates a backup in your Downloads folder</div>
+                                        
+                    <select style="margin-bottom:10px;" id="autoBackupFrequency" name="autoBackupFrequency">
+                        <option value='never' id="autoBackup_Never">Never</option>
+                        <option value='daily' id="autoBackup_Daily">Daily</option>
+                        <option value='weekly' id="autoBackup_Weekly">Weekly</option>
+                        <option value='monthly' id="autoBackup_Monthly">Monthly</option>
+                    </select>
+                </div>
+
+                <div class="fieldContainer">
+                    <div    class="fieldLabel" id="field_importSettings">Import settings:</div>
+                    <form id="uploadform">
+                        <input type="file" id="importFile">
+                    </form>
+
+                    <div id="hintRestore" class="hint" style="display:none"><i class="fa fa-info-circle"></i> <span id="restoreWarning">restoreWarning</span></div>
+                    <span class="primaryLink" id="importFileLink"  style="display:none;">Import</span>
+                    <button class="primaryLink" id="importLocalFileLink"  type="button" style="display:none;margin-top: 10px;width: 100%;">Import Local</button>
+                    <button class="primaryLink" id="importSyncFileLink"  type="button"  style="display:none;margin-top: 10px;width: 100%;">Import Sync</button>
+                    <span id="importFFLink" class="secondaryButton">Import file</span>
+                    
+                    <span id="importError" style="color:red;"/>
+
+                </div>
+                <div class="fieldContainer">
+                    <div class="fieldLabel" id="field_clearSyncLists">Reset data and settings:</div>
+                    <div style="margin-bottom:10px;" id="info_clearSyncLists">Make sure to create a backup before resetting your data and settings</div>
+                    <div id="resetDataAndSettings" class="primaryLink">Reset Data and Settings</div>
+                </div>
+
+
+            </div>
+        </span>
+
+        <div class="generalButtons" >
+            <span id="cancelSettings" class="secondaryButton" style="margin-right: 30px;">Cancel</span>
+            <button id="saveSettings"  type="button" class="primaryLink">Save</button>
+        </div>
+        
+
+    </div>
+
+    <div id="sendErrorsGroup" style="display:none;">
+        <h2 id="field_sendErrors">Report a bug to the developer</h2>
+        <div style="margin: 10px;">
+            <div class="fieldContainer">
+                
+                <div class="inline-help" id="sendErrorsHelp">
+                    <p>If you experience issues, send a bug report to the developer. </p>   
+                    <p>Errors captured will also be sent, this information does not contain personal data or words.</p> 
+                </div>
+                
+                    <div class="fieldLabel" id="field_sendErrorsDescription">Issue description:</div>
+                    <textarea id="sendErrorsIssue" style="height: 75px; width: 100%;"></textarea>
+                    <div class="fieldLabel" id="field_sendErrorsEmail">Email address:</div>
+                    <input type="email" id="sendErrorsEmail"/>
+
+                    <button id="sendErrorsButton" class="primaryLink"  type="button" style="margin-top: 10px;">Send</button>
+                
+            </div>
+        </div>
+
+
+    </div>
+
+    <div id="licenseGroup" style="display:none;">
+        <div id="freeLicense" style="display: block;" class="currentLicenseInfo">
+            <div class="license-title" id="currentlicense-free-title">You are using the free version</div>
+            <ul class="license-description" id="currentlicense-free-description">
+               <li>Your highlighting is limited to 200 words. Highlight This! will only use the first 200 words of your lists</li>
+               <li>You have limited highlighting styles</li>
+               <li>You have no advertisements</li>
+            </ul> 
+        </div>        
+        <div id="tempLicense" style="display: block;" class="currentLicenseInfo">
+            <div class="license-title" id="currentlicense-temp-title">You are using the free version</div>
+            <ul class="license-description" id="currentlicense-temp-description">
+               <li>Your highlighting is limited to 200 words. Highlight This! will only use the first 200 words of your lists</li>
+               <li>You have limited highlighting styles</li>
+               <li>You have no advertisements</li>
+            </ul> 
+        </div>
+        <div id="adLicense" style="display: block;" class="currentLicenseInfo">
+            <div class="license-title" id="currentlicense-ad-title">You are using the ad-supported version</div>
+            <ul class="license-description" id="currentlicense-ad-description">
+                <li>Ads are shown in Highlight This!</li>
+                <li>Includes unlimited word highlighting and all highlighting styles.</li>
+                <li>Choose a paid license for an ad-free experience.</li>
+            </ul> 
+
+        </div>
+        <div id="500License" style="display: block;"  class="currentLicenseInfo">
+            <div class="license-title" id="currentlicense-500-title">You are using the paid version with a limit of 500 words</div>
+            <ul class="license-description" id="currentlicense-500-description">
+                <li>Your highlighting is limited to 500 words. Highlight This! will only use the first 500 words of your lists</li>
+                <li>You have all highlighting styles</li>
+                <li>You have no advertisements</li>
+             </ul> 
+        </div>
+        <div id="unlimitedLicense" style="display: block;"  class="currentLicenseInfo">
+            <div class="license-title" id="currentlicense-unlimited-title">You are using the unlimited paid version</div>
+            <ul class="license-description" id="currentlicense-unlimited-description">
+                <li>Your highlighting is unlimited</li>
+                <li>You have all highlighting styles</li>
+                <li>You have no advertisements</li>
+
+             </ul> 
+        </div> 
+        <div id="changeLicense" class="license-change">
+            <div class="license-title-white" id="changelicense-title">Change version</div>
+            <div id="changeLicenseFree">
+                <div class="new-license" id="changelicense-free-title">Disable advertisements, which will limit me to highlighting with 200 words</div>
+                <ul class="license-description" id="changelicense-free-description">
+                    <li>Your highlighting is limited to 200 words. Highlight This! will only use the first 200 words of your lists</li>
+                    <li>You have limited highlighting styles</li>
+                </ul> 
+                <div class="license-action"> 
+                    <button id="licenseDisableAds"  type="button">Disable Ads</button>
+                </div>               
+            </div>
+            <div id="changeLicensePaid">
+                <div class="new-license" id="changelicense-paid-title">Purchase a yearly license to allow highlighting more words without the use of advertisements</div>
+                <ul class="license-description" id="changelicense-paid-description">
+                    <li>Depending on the version you choose you have highlighting in either 500 or unlimited words</li>
+                    <li>You have limited highlighting styles</li>
+                </ul> 
+                <div class="license-action"> 
+                    <button id="licenseBuy"  type="button">Buy a license</button>
+                </div>   
+            </div>
+        </div>
+        
+        <div id="enterLicenseKey" class="license-enter">
+            <div class="license-title-white" id="enterlicense-title">Enter your license key</div>
+            <p id="enterlicense-description">If you already have a license key you can enter it here.</p>
+            <div class="fieldRow">
+                <label class="fieldLabel" id="enterlicense-label">License key:</label>
+                <input id="enteredLicenseKey"/>
+            </div>  
+            <div class="license-enter-submit">
+                <div id="enteredLicenseFeedback" style="display: none;"></div>
+                <button id="validateEnteredLicenseKey" type="button" class="primaryLink" enabled>Validate</button>
+            </div>
+        </div>
+        <div id="changeLicenseAd" class="license-change">
+            <div class="new-license" id="changelicense-ad-title">Switch to the ad-supported version</div>
+            <ul class="license-description" id="changelicense-ad-description">
+            <li>Ads are shown in Highlight This!</li>
+            <li>Includes unlimited word highlighting and all highlighting styles.</li>
+            <li>Choose a paid license for an ad-free experience.</li>
+        </ul> 
+            <div class="license-action"> 
+                <button id="licenseEnableAds"  type="button">Enable advertisements</button>
+            </div>   
+        </div>
+        <div class="license-purchase-footer">
+            <a id="licensePurchaseRenew" href="https://highlightthis.net/Subscription.html" target="_blank" rel="noopener noreferrer">Purchase or renew a license</a>
+        </div>
+    </div>
+    
+    <div id="deleteGroup" style="display:none;font-size: 16px;
+                               text-align: center;
+                               margin-top: 50%">
+        <span id="popup_confirmDelete">Are you sure you want to delete the word list and its words?</span>
+        <div>
+            <form id="orderForm">
+                <input type="hidden" id="deleteGroupId"/>
+            </form>
+            <span id="labelListName">List name</span> : <span id="deleteGroupName"/>
+        </div>
+        <div style="margin-top:30px">
+            
+
+            <span id="yesDeleteGroup" class="secondaryButton" style="margin-right: 30px;">Yes</span>
+            <button id="noDeleteGroup" class="primaryLink"  type="button">No</button>
+        </div>
+    </div>
+
+    <div id="resetSettings" style="display:none;font-size: 16px;
+                               text-align: center;
+                               margin-top: 50%">
+        <div id="popup_confirmReset">
+            <div>Are you sure you want to reset all your data and settings?</div>
+            <div>Make sure to have a backup before continuing</div>
+        </div>
+
+        <div style="margin-top:30px">
+            <span id="yesReset" class="secondaryButton" style="margin-right: 30px;">Reset all my data</span>
+            <button id="noReset" class="primaryLink"  type="button">Cancel</button>
+        </div>
+    </div>
+</div>
+    <aside id="popupAd" class="popup-ad" aria-label="Sponsored" hidden></aside>
+</body>
+<footer>
+    <script src="popup/eventListeners.js"></script>
+    <script src="popup/fillLiterals.js"></script>
+    <script src="popup/settingsManager.js"></script>
+    
+    
+    <script src="popup.js"></script>
+    <script src="popup/wordListManager.js"></script>
+    <script src="popup/syncListManager.js"></script>
+    <script src="popup/backupManager.js"></script>
+    <script src="popup/notificationsManager.js"></script>
+    <script src="popup/errorManager.js"></script>
+    <script src="popup/rangeHighlightingNotice.js"></script>
+</footer>
+</html>

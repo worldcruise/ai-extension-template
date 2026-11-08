@@ -1,50 +1,101 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { BrowserTabs } from '../src/browser-tabs.mjs';
-import { AgentController } from '../src/controller.mjs';
+import { createBrowserTabs } from '../src/browser-tabs.mjs';
 
-function setup(ids = [1, 2, 3]) {
-  let stored = {}, active = ids[0], closed = false;
-  const activations = [], focus = [];
-  const browser = {
-    windows: { async get(id) { if (closed) throw Error(); return { id, type: id === 10 ? 'normal' : 'popup' }; }, async update(id) { focus.push(id); } },
-    tabs: { async query({ windowId }) { assert.equal(windowId, 10); return ids.map((id, index) => ({ id, index, active: id === active })); }, async update(id) { activations.push(id); active = id; } },
+function fixture(initialTabs, ownTab) {
+  const rows = structuredClone(initialTabs);
+  const queries = [], updates = [];
+  let focusedWindow = 1;
+  function event() {
+    const handlers = new Set();
+    return { handlers, addListener: fn => handlers.add(fn), removeListener: fn => handlers.delete(fn),
+      emit: (...args) => { for (const handler of handlers) handler(...args); } };
+  }
+  const tabs = {
+    getCurrent: async () => ownTab,
+    query: async options => { queries.push(options); return structuredClone(rows.filter(row => row.windowId === options.windowId)); },
+    update: async (id, changes) => {
+      updates.push(id);
+      const target = rows.find(row => row.id === id);
+      if (!target) throw new Error('Tab closed');
+      for (const row of rows) if (row.windowId === target.windowId) row.active = row.id === id;
+      Object.assign(target, changes);
+      tabs.onActivated.emit({ tabId: id, windowId: target.windowId });
+      return structuredClone(target);
+    },
+    onActivated: event(), onCreated: event(), onRemoved: event(), onMoved: event(),
+    onAttached: event(), onDetached: event(), onUpdated: event()
   };
-  const storage = { async get() { return stored; }, async set(value) { stored = { ...stored, ...value }; } };
-  return { tabs: new BrowserTabs(browser, storage), browser, activations, focus, close() { closed = true; } };
+  return { rows, queries, updates, focus: id => { focusedWindow = id; }, browser: {
+    tabs, windows: { getCurrent: async () => ({ id: focusedWindow }) },
+    runtime: { getURL: path => `chrome-extension://workspace/${path}` }
+  } };
 }
-test('Previous/Next wrap first/last in the associated browser window and serialize rapid clicks', async () => {
-  const f = setup(); await f.tabs.bind(10);
-  assert.equal((await f.tabs.move(-1)).tabId, 3);
-  assert.equal((await f.tabs.move(1)).tabId, 1);
-  await Promise.all([f.tabs.move(1), f.tabs.move(1)]);
-  assert.deepEqual(f.activations, [3, 1, 2, 3]); assert.deepEqual(f.focus, [10, 10, 10, 10]);
+
+test('navigation wraps in tab order, excludes the workspace, and stays with its owning window', async () => {
+  const data = fixture([
+    { id: 11, windowId: 1, index: 3, active: true },
+    { id: 12, windowId: 1, index: 0, active: false },
+    { id: 99, windowId: 1, index: 4, url: 'chrome-extension://workspace/index.html' },
+    { id: 21, windowId: 2, index: 0, active: true }
+  ], { id: 99, windowId: 1 });
+  let latest;
+  const navigation = createBrowserTabs({ browser: data.browser, onChange: state => { latest = state; } });
+  await navigation.ready;
+  assert.equal(latest.count, 2);
+  assert.equal(latest.index, 2);
+  data.focus(2);
+  await navigation.move(1);
+  assert.equal(latest.tabId, 12);
+  assert.equal(latest.index, 1);
+  await navigation.move(-1);
+  assert.equal(latest.tabId, 11);
+  assert.equal(data.rows.find(row => row.id === 21).active, true);
+  assert.ok(data.queries.every(query => query.windowId === 1));
+  assert.deepEqual(data.updates, [12, 11]);
+  navigation.dispose();
+  assert.ok(Object.values(data.browser.tabs).filter(value => value?.handlers).every(event => event.handlers.size === 0));
 });
-test('single-tab navigation is a no-op; empty/closed windows cannot retarget another window', async () => {
-  const single = setup([7]); await single.tabs.bind(10);
-  assert.equal((await single.tabs.move(1)).count, 1); assert.deepEqual(single.activations, []);
-  single.close(); assert.equal((await single.tabs.state()).available, false);
-  await assert.rejects(single.tabs.move(-1), { code: 'browser_window_unavailable' });
-  const empty = setup([]); await empty.tabs.bind(10); await assert.rejects(empty.tabs.move(1), { code: 'browser_window_unavailable' });
+
+test('opening, closing and reordering tabs updates the count and selected position', async () => {
+  const data = fixture([{ id: 1, windowId: 1, index: 0, active: true }]);
+  let latest;
+  const navigation = createBrowserTabs({ browser: data.browser, onChange: state => { latest = state; } });
+  await navigation.ready;
+  await navigation.move(1);
+  assert.deepEqual(data.updates, []);
+  data.rows.push({ id: 2, windowId: 1, index: 1 });
+  data.browser.tabs.onCreated.emit(data.rows[1]);
+  await navigation.refresh();
+  assert.equal(latest.count, 2);
+  data.rows[0].index = 2;
+  data.browser.tabs.onMoved.emit(1, { windowId: 1 });
+  await navigation.refresh();
+  assert.equal(latest.index, 2);
+  data.rows.splice(1, 1);
+  data.browser.tabs.onRemoved.emit(2, { windowId: 1 });
+  await navigation.refresh();
+  assert.equal(latest.count, 1);
+  assert.equal(latest.index, 1);
+  data.rows.splice(0);
+  data.browser.tabs.onRemoved.emit(1, { windowId: 1 });
+  await navigation.refresh();
+  assert.equal(latest.count, 0);
+  assert.equal(latest.index, 0);
+  navigation.dispose();
 });
-test('popup windows cannot be bound and invalid directions never activate a tab', async () => {
-  const f = setup(); await assert.rejects(f.tabs.bind(20), { code: 'browser_window_unavailable' });
-  await f.tabs.bind(10); await assert.rejects(f.tabs.move(2), { code: 'invalid_request' }); assert.deepEqual(f.activations, []);
-});
-test('agent tabs are excluded from adjacency without reading titles or URLs', async () => {
-  const f = setup([1, 9, 2]); f.tabs.excludedTabs = async () => [9]; await f.tabs.bind(10);
-  assert.equal((await f.tabs.state()).count, 2); assert.equal((await f.tabs.move(1)).tabId, 2);
-});
-test('navigation preserves prompt/input/model/effort/output and pending inference', async () => {
-  const f = setup(); await f.tabs.bind(10); let finish;
-  const session = { authenticated: true, user: { id: 'account', name: 'Name' } };
-  const adapter = { async getSession() { return session; }, async signIn() {}, async signOut() {},
-    async getModels() { return [{ id: 'model', thinkingEfforts: ['medium'] }]; }, async run() { return { text: 'Output' }; } };
-  const c = new AgentController({ definition: { input: { value: 'Input' }, prompt: { value: 'Prompt' } }, adapter });
-  await c.start(); await c.run();
-  const snapshot = structuredClone(c.state); await f.tabs.move(1); await f.tabs.move(-1); assert.deepEqual(c.state, snapshot);
-  adapter.run = () => new Promise(resolve => { finish = resolve; });
-  const running = c.run(); await Promise.resolve(); const epoch = c.runEpoch;
-  await f.tabs.move(1); assert.equal(c.state.busy, 'running'); assert.equal(c.runEpoch, epoch); assert.equal(c.runAbort.signal.aborted, false);
-  finish('New output'); await running; assert.equal(c.state.result, 'New output');
+
+test('a failed tab switch releases the controls and a later refresh can recover', async () => {
+  const data = fixture([{ id: 1, windowId: 1, index: 0, active: true }, { id: 2, windowId: 1, index: 1 }]);
+  let latest, errors = 0;
+  const navigation = createBrowserTabs({ browser: data.browser, onChange: state => { latest = state; }, onError: () => { errors++; } });
+  await navigation.ready;
+  data.browser.tabs.update = async () => { throw new Error('Window closed'); };
+  await navigation.move(1);
+  assert.equal(errors, 1);
+  assert.equal(latest.busy, false);
+  assert.equal(latest.count, 0);
+  await navigation.refresh();
+  assert.equal(latest.count, 2);
+  navigation.dispose();
 });
