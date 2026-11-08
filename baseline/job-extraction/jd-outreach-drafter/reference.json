@@ -1,0 +1,15 @@
+{
+  "repository": "rakshathavasudev/jd-outreach-drafter",
+  "url": "https://github.com/rakshathavasudev/jd-outreach-drafter",
+  "branch": "main",
+  "commit": "558779d45cd029b253fa16acbe39d63f50629cb1",
+  "license": "MIT",
+  "retrievedOn": "2026-11-08",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "extractor.js",
+    "background.js",
+    "CHANGELOG.md"
+  ]
+}

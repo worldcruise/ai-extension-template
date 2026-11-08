@@ -82,6 +82,7 @@ for (const button of document.querySelectorAll('[data-close-dialog]')) {
 }
 
 let browserTabs;
+let browserWindowId;
 const studio = createStudio({
   openDialog,
   showStudio: panel => { selectView('studio'); selectStudioTab(panel); },
@@ -93,10 +94,34 @@ const studio = createStudio({
 const pageHighlights = createPageHighlights();
 createKeywordSettings({ onChange: pageHighlights.update });
 browserTabs = createBrowserTabs({
-  onChange: value => { studio.updateTabs(value); pageHighlights.setTarget(value); },
+  onChange: value => { browserWindowId = value.windowId; studio.updateTabs(value); pageHighlights.setTarget(value); },
   onError: studio.tabError
 });
-window.addEventListener('pagehide', () => browserTabs.dispose());
+async function readFromShortcut() {
+  await browserTabs.ready;
+  if (!Number.isInteger(browserWindowId)) return;
+  try {
+    // A development tab showing index.html must not consume the dock's command.
+    if (await chrome.tabs.getCurrent()) return;
+    const response = await chrome.runtime.sendMessage({ type: 'job.read-command.take', windowId: browserWindowId });
+    if (!response?.request) return;
+    await browserTabs.refresh();
+    selectView('studio');
+    selectStudioTab('job');
+    // Retain the shortcut's source tab if the user switches while opening.
+    await studio.readPage(response.request.tabId);
+  } catch (error) { studio.tabError(error.message || 'Could not read this job page.'); }
+}
+function onReadRequested(message, sender) {
+  if (sender.id === chrome.runtime.id && message?.type === 'job.read-requested' &&
+      message.windowId === browserWindowId) void readFromShortcut();
+}
+chrome.runtime.onMessage.addListener(onReadRequested);
+void readFromShortcut();
+window.addEventListener('pagehide', () => {
+  browserTabs.dispose();
+  chrome.runtime.onMessage.removeListener(onReadRequested);
+});
 
 chat = createChatSidebar({
   onOpenChat: () => selectView('chat'),

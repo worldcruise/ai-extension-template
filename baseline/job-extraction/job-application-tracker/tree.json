@@ -1,0 +1,749 @@
+{
+  "sha": "34cf2ef8b9af8be9aedecd0bde9a567047a36315",
+  "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/34cf2ef8b9af8be9aedecd0bde9a567047a36315",
+  "tree": [
+    {
+      "path": ".github",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c442a0166d61a333633ca50c89dbdda3cf42c63d",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/c442a0166d61a333633ca50c89dbdda3cf42c63d"
+    },
+    {
+      "path": ".github/workflows",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "69d1927d96e3a494935b1a7379ca9798d3b801f9",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/69d1927d96e3a494935b1a7379ca9798d3b801f9"
+    },
+    {
+      "path": ".github/workflows/release.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4e21211b43304432f62d7b931260c4f2a5165ea6",
+      "size": 1644,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/4e21211b43304432f62d7b931260c4f2a5165ea6"
+    },
+    {
+      "path": ".github/workflows/windows-release.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "04c755dd2baaf72555b91f403b4bbbbe510a3722",
+      "size": 1439,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/04c755dd2baaf72555b91f403b4bbbbe510a3722"
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "945552eac648cd268e6b8b7086257b1650391ab5",
+      "size": 815,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/945552eac648cd268e6b8b7086257b1650391ab5"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+      "size": 11357,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2bf6bb0c50600a714ff9bc90c3cfece7a583db75",
+      "size": 16906,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/2bf6bb0c50600a714ff9bc90c3cfece7a583db75"
+    },
+    {
+      "path": "deepScrape.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3c8a6f9db82fdd88c027d4917bc107372fdfd442",
+      "size": 65,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/3c8a6f9db82fdd88c027d4917bc107372fdfd442"
+    },
+    {
+      "path": "eslint.config.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "05e726d1b4201bc8c7716d2b058279676582e8c0",
+      "size": 465,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/05e726d1b4201bc8c7716d2b058279676582e8c0"
+    },
+    {
+      "path": "extension-firefox",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e6fb816d59e14c517cdc31fb8f6f47203f59a611",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/e6fb816d59e14c517cdc31fb8f6f47203f59a611"
+    },
+    {
+      "path": "extension-firefox/background.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c02ebc56ed91d4585fb2d195af6741e28a08befb",
+      "size": 817,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/c02ebc56ed91d4585fb2d195af6741e28a08befb"
+    },
+    {
+      "path": "extension-firefox/content.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "57221ba3bc4ae5eea15fc394a4a95ffce49e5d7a",
+      "size": 23698,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/57221ba3bc4ae5eea15fc394a4a95ffce49e5d7a"
+    },
+    {
+      "path": "extension-firefox/manifest.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b18a16eb2b5bfd3948f038c2645658c66305caef",
+      "size": 691,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/b18a16eb2b5bfd3948f038c2645658c66305caef"
+    },
+    {
+      "path": "extension-firefox/modal.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f97dbc578180ba142451a6b10ab09f38776a2449",
+      "size": 2883,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/f97dbc578180ba142451a6b10ab09f38776a2449"
+    },
+    {
+      "path": "extension-firefox/popup.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e73397bb395eff6a5b4d303d1e260ca4de7efba7",
+      "size": 2163,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/e73397bb395eff6a5b4d303d1e260ca4de7efba7"
+    },
+    {
+      "path": "extension-firefox/popup.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e0928e816f6d1e1aca14d842e3e80545cdc9098e",
+      "size": 3919,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/e0928e816f6d1e1aca14d842e3e80545cdc9098e"
+    },
+    {
+      "path": "extension",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "75f10c42977004f2bea752e0be189da958f8840e",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/75f10c42977004f2bea752e0be189da958f8840e"
+    },
+    {
+      "path": "extension/background.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "91082fab7a71b471c00838a82f925613da99ad50",
+      "size": 1393,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/91082fab7a71b471c00838a82f925613da99ad50"
+    },
+    {
+      "path": "extension/content.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "57221ba3bc4ae5eea15fc394a4a95ffce49e5d7a",
+      "size": 23698,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/57221ba3bc4ae5eea15fc394a4a95ffce49e5d7a"
+    },
+    {
+      "path": "extension/manifest.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "24f28b5e50197dc4fc9dbad95b4edf6190c437dd",
+      "size": 773,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/24f28b5e50197dc4fc9dbad95b4edf6190c437dd"
+    },
+    {
+      "path": "extension/modal.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f97dbc578180ba142451a6b10ab09f38776a2449",
+      "size": 2883,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/f97dbc578180ba142451a6b10ab09f38776a2449"
+    },
+    {
+      "path": "extension/popup.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e73397bb395eff6a5b4d303d1e260ca4de7efba7",
+      "size": 2163,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/e73397bb395eff6a5b4d303d1e260ca4de7efba7"
+    },
+    {
+      "path": "extension/popup.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e0928e816f6d1e1aca14d842e3e80545cdc9098e",
+      "size": 3919,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/e0928e816f6d1e1aca14d842e3e80545cdc9098e"
+    },
+    {
+      "path": "next.config.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "225e49520462b8b4b15841fc6752d5c72ff4ed4a",
+      "size": 129,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/225e49520462b8b4b15841fc6752d5c72ff4ed4a"
+    },
+    {
+      "path": "package-lock.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3a6f75477af45ef1ef9a39bf7a6b03bb2389afad",
+      "size": 333419,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/3a6f75477af45ef1ef9a39bf7a6b03bb2389afad"
+    },
+    {
+      "path": "package.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b9e0d49e9b27edf4530587dfdb912d1fc78ba7fd",
+      "size": 1336,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/b9e0d49e9b27edf4530587dfdb912d1fc78ba7fd"
+    },
+    {
+      "path": "public",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c88f389de09f418da376598c42e8788d4fb6d172",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/c88f389de09f418da376598c42e8788d4fb6d172"
+    },
+    {
+      "path": "public/file.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "004145cddf3f9db91b57b9cb596683c8eb420862",
+      "size": 391,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/004145cddf3f9db91b57b9cb596683c8eb420862"
+    },
+    {
+      "path": "public/globe.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "567f17b0d7c7fb662c16d4357dd74830caf2dccb",
+      "size": 1035,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/567f17b0d7c7fb662c16d4357dd74830caf2dccb"
+    },
+    {
+      "path": "public/next.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5174b28c565c285e3e312ec5178be64fbeca8398",
+      "size": 1375,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/5174b28c565c285e3e312ec5178be64fbeca8398"
+    },
+    {
+      "path": "public/vercel.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "77053960334e2e34dc584dea8019925c3b4ccca9",
+      "size": 128,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/77053960334e2e34dc584dea8019925c3b4ccca9"
+    },
+    {
+      "path": "public/window.svg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b2b2a44f6ebc70c450043c05a002e7a93ba5d651",
+      "size": 385,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/b2b2a44f6ebc70c450043c05a002e7a93ba5d651"
+    },
+    {
+      "path": "scratch.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "07f3fd989efa5d57eb54868abe91122fd793c2a3",
+      "size": 1336,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/07f3fd989efa5d57eb54868abe91122fd793c2a3"
+    },
+    {
+      "path": "scripts",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "da01cf5c88db040cf0d36eeabc4d2acdfc1da890",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/da01cf5c88db040cf0d36eeabc4d2acdfc1da890"
+    },
+    {
+      "path": "scripts/Start Application.bat",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e8ea623a2855b7e8c14994d3a1475ccf7107cf2e",
+      "size": 1082,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/e8ea623a2855b7e8c14994d3a1475ccf7107cf2e"
+    },
+    {
+      "path": "scripts/build-binary.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "307e65b5b84d2d97052d25a26f82124ed8b12701",
+      "size": 3140,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/307e65b5b84d2d97052d25a26f82124ed8b12701"
+    },
+    {
+      "path": "src",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "29c481a4d9d41ed1462593e3056be46ffc0f4c1c",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/29c481a4d9d41ed1462593e3056be46ffc0f4c1c"
+    },
+    {
+      "path": "src/app",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "008227bcd309d928379b7fca0b939f6a5c935dfa",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/008227bcd309d928379b7fca0b939f6a5c935dfa"
+    },
+    {
+      "path": "src/app/actions.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7c5f6920ce9eab16936815175a57bf7d888f7f01",
+      "size": 57804,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/7c5f6920ce9eab16936815175a57bf7d888f7f01"
+    },
+    {
+      "path": "src/app/ai-cleanup",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "08138a18f5b531ff929136c62860b0c4038a7fb2",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/08138a18f5b531ff929136c62860b0c4038a7fb2"
+    },
+    {
+      "path": "src/app/ai-cleanup/AiCleanupClient.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "777cef17ba632f82aa529ef22ed8e8e021ce2076",
+      "size": 11327,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/777cef17ba632f82aa529ef22ed8e8e021ce2076"
+    },
+    {
+      "path": "src/app/ai-cleanup/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4f69db3be6a94aa1151d4e7709caca4515788996",
+      "size": 764,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/4f69db3be6a94aa1151d4e7709caca4515788996"
+    },
+    {
+      "path": "src/app/api",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "789893546818668a9c02995357b8b29bb0668901",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/789893546818668a9c02995357b8b29bb0668901"
+    },
+    {
+      "path": "src/app/api/chat",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a2e805829396d1a9d4686e96c7322afb66993622",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/a2e805829396d1a9d4686e96c7322afb66993622"
+    },
+    {
+      "path": "src/app/api/chat/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fedf5e007a00430b08d86db09528fe7952765f5d",
+      "size": 2879,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/fedf5e007a00430b08d86db09528fe7952765f5d"
+    },
+    {
+      "path": "src/app/api/extension",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "4c39823fde179e5ac7c166e2e6ec7c52501a7182",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/4c39823fde179e5ac7c166e2e6ec7c52501a7182"
+    },
+    {
+      "path": "src/app/api/extension/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d80e1a41890165f0c838c7d30bb141a90de80050",
+      "size": 1452,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/d80e1a41890165f0c838c7d30bb141a90de80050"
+    },
+    {
+      "path": "src/app/api/jobs",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "20c6d8b12f2af8e239fe6bd0786626fd4185e853",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/20c6d8b12f2af8e239fe6bd0786626fd4185e853"
+    },
+    {
+      "path": "src/app/api/jobs/[id]",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "67f612391d6be0c46a600b01107643ddc9a81a59",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/67f612391d6be0c46a600b01107643ddc9a81a59"
+    },
+    {
+      "path": "src/app/api/jobs/[id]/download-materials",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e8e8bc1700d836c714e565918008a0716df09bf2",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/e8e8bc1700d836c714e565918008a0716df09bf2"
+    },
+    {
+      "path": "src/app/api/jobs/[id]/download-materials/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b1f9b8cd676afd07616337b41565484dd18e11ca",
+      "size": 2016,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/b1f9b8cd676afd07616337b41565484dd18e11ca"
+    },
+    {
+      "path": "src/app/api/recalc",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "84e62ec75f9e6b0442b4e952bcea62482e1d8a9b",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/84e62ec75f9e6b0442b4e952bcea62482e1d8a9b"
+    },
+    {
+      "path": "src/app/api/recalc/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "85658a14b25e79ab4eb7a33af353de53af0e529a",
+      "size": 5357,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/85658a14b25e79ab4eb7a33af353de53af0e529a"
+    },
+    {
+      "path": "src/app/bin",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7f5dddd7c010b040f252caae7489156be2d77f32",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/7f5dddd7c010b040f252caae7489156be2d77f32"
+    },
+    {
+      "path": "src/app/bin/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dddfdf48228860e5a8e06630aab452e6e27684fa",
+      "size": 4761,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/dddfdf48228860e5a8e06630aab452e6e27684fa"
+    },
+    {
+      "path": "src/app/board",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5cac624507a7ee7b93ef7e9731e683a7c2eddab6",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/5cac624507a7ee7b93ef7e9731e683a7c2eddab6"
+    },
+    {
+      "path": "src/app/board/[id]",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "deaa4e9af0feb6b0bece7db11ff9ddd4f51e06de",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/deaa4e9af0feb6b0bece7db11ff9ddd4f51e06de"
+    },
+    {
+      "path": "src/app/board/[id]/JobDetailsClient.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d94d398c49b8b754de0ce926efdcf0ee737b62ee",
+      "size": 25963,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/d94d398c49b8b754de0ce926efdcf0ee737b62ee"
+    },
+    {
+      "path": "src/app/board/[id]/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d2b15302aafcba7f020e1dd749e2da0d2139a351",
+      "size": 1014,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/d2b15302aafcba7f020e1dd749e2da0d2139a351"
+    },
+    {
+      "path": "src/app/board/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7f4714442a41fdd02e4d40e9035e08f51d885e64",
+      "size": 539,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/7f4714442a41fdd02e4d40e9035e08f51d885e64"
+    },
+    {
+      "path": "src/app/calendar",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1de669f77dd3fbb55b4c743a1bc99a645d0585f2",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/1de669f77dd3fbb55b4c743a1bc99a645d0585f2"
+    },
+    {
+      "path": "src/app/calendar/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "eeec7ffc314bab6eb4e9ed0c68caba35d24ec8f5",
+      "size": 6125,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/eeec7ffc314bab6eb4e9ed0c68caba35d24ec8f5"
+    },
+    {
+      "path": "src/app/extension",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ae7e5bfacba8a3c47543ee808dca28d2d20431d6",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/ae7e5bfacba8a3c47543ee808dca28d2d20431d6"
+    },
+    {
+      "path": "src/app/extension/ExtensionClient.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e3f68f946b4102e3587adddde8c353254ac8a200",
+      "size": 10558,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/e3f68f946b4102e3587adddde8c353254ac8a200"
+    },
+    {
+      "path": "src/app/extension/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "941ea82fb9ee3071fade2240266bb11ade014d7f",
+      "size": 292,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/941ea82fb9ee3071fade2240266bb11ade014d7f"
+    },
+    {
+      "path": "src/app/favicon.ico",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "718d6fea4835ec2d246af9800eddb7ffb276240c",
+      "size": 25931,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/718d6fea4835ec2d246af9800eddb7ffb276240c"
+    },
+    {
+      "path": "src/app/globals.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ab9eea62ad5cc06ae73926fb2664325c0c6b5170",
+      "size": 9454,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/ab9eea62ad5cc06ae73926fb2664325c0c6b5170"
+    },
+    {
+      "path": "src/app/layout.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cbbf599a4543b7176fced8ba07c8e0c5e3ce8c4d",
+      "size": 2681,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/cbbf599a4543b7176fced8ba07c8e0c5e3ce8c4d"
+    },
+    {
+      "path": "src/app/materials",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "69f879465d7119849c92536982b827ea8667b03b",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/69f879465d7119849c92536982b827ea8667b03b"
+    },
+    {
+      "path": "src/app/materials/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ab55216238a9d65792815619f5306c13e4a42275",
+      "size": 5096,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/ab55216238a9d65792815619f5306c13e4a42275"
+    },
+    {
+      "path": "src/app/page.module.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "643fe27de0e54b65475ba70c0e863da805ac0bd3",
+      "size": 2432,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/643fe27de0e54b65475ba70c0e863da805ac0bd3"
+    },
+    {
+      "path": "src/app/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "da2eee67b63cb767a1ab67eb981beb484f24d50a",
+      "size": 6044,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/da2eee67b63cb767a1ab67eb981beb484f24d50a"
+    },
+    {
+      "path": "src/app/scraper",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "17974dfc68b1f90b055018d05422a0906b2d183e",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/17974dfc68b1f90b055018d05422a0906b2d183e"
+    },
+    {
+      "path": "src/app/scraper/ScraperClient.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "33793189743f0e2cf3bcdb2ea6e575e75d98da44",
+      "size": 29318,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/33793189743f0e2cf3bcdb2ea6e575e75d98da44"
+    },
+    {
+      "path": "src/app/scraper/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f2d5c6de88ac8134c34574022598f556341c3f9",
+      "size": 450,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/6f2d5c6de88ac8134c34574022598f556341c3f9"
+    },
+    {
+      "path": "src/app/settings",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "df87bd19ad1cd5d424d595867c9343511fec2bd8",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/df87bd19ad1cd5d424d595867c9343511fec2bd8"
+    },
+    {
+      "path": "src/app/settings/SettingsClient.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "204d24e30d33dd2138f94cb003b7191a6d471e23",
+      "size": 48975,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/204d24e30d33dd2138f94cb003b7191a6d471e23"
+    },
+    {
+      "path": "src/app/settings/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e6a0785f017db088dd3c0edf07144b1288702140",
+      "size": 421,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/e6a0785f017db088dd3c0edf07144b1288702140"
+    },
+    {
+      "path": "src/components",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "799b97ec009d194f2d80e2b3764a09b77c5d0fc2",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/799b97ec009d194f2d80e2b3764a09b77c5d0fc2"
+    },
+    {
+      "path": "src/components/ActivityHeatmap.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "85d2e054fcae8f35d8d7447b1a066bfcf91b0ee0",
+      "size": 6064,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/85d2e054fcae8f35d8d7447b1a066bfcf91b0ee0"
+    },
+    {
+      "path": "src/components/BinActionButtons.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dd74673b02023220de433655cbc3bb7a33181232",
+      "size": 2546,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/dd74673b02023220de433655cbc3bb7a33181232"
+    },
+    {
+      "path": "src/components/ChatBot.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9392b72c85672134933fc32f0ad5a5946ef8046f",
+      "size": 13519,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/9392b72c85672134933fc32f0ad5a5946ef8046f"
+    },
+    {
+      "path": "src/components/DeleteJobButton.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "188a42ec4d737f78f8d7b920da7fb21af4473433",
+      "size": 674,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/188a42ec4d737f78f8d7b920da7fb21af4473433"
+    },
+    {
+      "path": "src/components/DeleteMaterialButton.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4aaa0ff0d63782feacd54f33ed30050db3781729",
+      "size": 530,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/4aaa0ff0d63782feacd54f33ed30050db3781729"
+    },
+    {
+      "path": "src/components/KanbanBoard.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dd89470ee55bbf2a0f8dd3c167855459a89a429d",
+      "size": 12975,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/dd89470ee55bbf2a0f8dd3c167855459a89a429d"
+    },
+    {
+      "path": "src/components/NewJobModal.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4f4bd7fb15ac68aa9ef2e49950bc578c38234383",
+      "size": 2401,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/4f4bd7fb15ac68aa9ef2e49950bc578c38234383"
+    },
+    {
+      "path": "src/components/OllamaCheckModal.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cbb427b383dce98424e5d0ea6c4b92240256ad64",
+      "size": 2717,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/cbb427b383dce98424e5d0ea6c4b92240256ad64"
+    },
+    {
+      "path": "src/components/OllamaCheckModal.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4f801e0b3891211ec5a68d8e155cec8c4fbd2fd7",
+      "size": 3827,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/4f801e0b3891211ec5a68d8e155cec8c4fbd2fd7"
+    },
+    {
+      "path": "src/components/UploadMaterialModal.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c1e0caf8edb776ed6bc4b1cf1881b7c74d89e432",
+      "size": 3137,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/c1e0caf8edb776ed6bc4b1cf1881b7c74d89e432"
+    },
+    {
+      "path": "src/lib",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "da609ce9e8ba017c123cccffb308ad659761fdef",
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/trees/da609ce9e8ba017c123cccffb308ad659761fdef"
+    },
+    {
+      "path": "src/lib/db.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b1b6c3032d3819bb6b5adafe3229e0aa64679cb6",
+      "size": 9896,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/b1b6c3032d3819bb6b5adafe3229e0aa64679cb6"
+    },
+    {
+      "path": "src/lib/ml.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d5a1f5bfb4c8d838a57932180167f926e22a0802",
+      "size": 5302,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/d5a1f5bfb4c8d838a57932180167f926e22a0802"
+    },
+    {
+      "path": "src/lib/pdf.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a6a2a664dfcefc546908d26fe7c71c1991ab9e06",
+      "size": 244,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/a6a2a664dfcefc546908d26fe7c71c1991ab9e06"
+    },
+    {
+      "path": "src/lib/scraper.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a0e6f2d18a9deae2f728dd32c2494d60c1e92bd9",
+      "size": 39718,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/a0e6f2d18a9deae2f728dd32c2494d60c1e92bd9"
+    },
+    {
+      "path": "start.sh",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "7e12a9f17a712de594fdcf9060781baba4cd852d",
+      "size": 50,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/7e12a9f17a712de594fdcf9060781baba4cd852d"
+    },
+    {
+      "path": "tsconfig.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7d553a8b57da393b72f12afdc229d4989dc68040",
+      "size": 670,
+      "url": "https://api.github.com/repos/LucasFenaux/job-application-tracker/git/blobs/7d553a8b57da393b72f12afdc229d4989dc68040"
+    }
+  ],
+  "truncated": false
+}

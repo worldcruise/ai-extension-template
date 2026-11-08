@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AI Agent Template",
   "short_name": "Sidebar GPT",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "ChatGPT and a Resume Studio UI preview together in your browser sidebar.",
   "minimum_chrome_version": "116",
   "permissions": [
@@ -35,6 +35,13 @@
     "128": "assets/icon-128.png"
   },
   "commands": {
+    "read-job-page": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S",
+        "mac": "Command+Shift+S"
+      },
+      "description": "Read job page into Resume Studio"
+    },
     "_execute_action": {
       "suggested_key": {
         "default": "Alt+Shift+G",

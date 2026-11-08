@@ -1,0 +1,196 @@
+{
+  "sha": "558779d45cd029b253fa16acbe39d63f50629cb1",
+  "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/trees/558779d45cd029b253fa16acbe39d63f50629cb1",
+  "tree": [
+    {
+      "path": ".github",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "09209c51caf0a15b52dea16240b7c10591618779",
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/trees/09209c51caf0a15b52dea16240b7c10591618779"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "635bc0a65841ead5d494b3179cf53269bfd4cdcb",
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/trees/635bc0a65841ead5d494b3179cf53269bfd4cdcb"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/bug-report.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e9123935c2c7daf52269493c9699786780ab5d83",
+      "size": 274,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/e9123935c2c7daf52269493c9699786780ab5d83"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/site-not-detected.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "21281528f3d5e87aac9a44266a4164aaed1abc1a",
+      "size": 416,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/21281528f3d5e87aac9a44266a4164aaed1abc1a"
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2450fed6dca019ccf2573ced19a57409c1465221",
+      "size": 57,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/2450fed6dca019ccf2573ced19a57409c1465221"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1b9decf0f202e913b3de6cf0bc2a797355ed14ea",
+      "size": 270,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/1b9decf0f202e913b3de6cf0bc2a797355ed14ea"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b0345b9f1e26491e08b70a6ea748a342c09d9707",
+      "size": 1201,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/b0345b9f1e26491e08b70a6ea748a342c09d9707"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c7a621cb4a4e6f7a5971cc4c8b1a44284b175ec1",
+      "size": 1074,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/c7a621cb4a4e6f7a5971cc4c8b1a44284b175ec1"
+    },
+    {
+      "path": "PRIVACY.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d3c65d5b7dc30c23fdbe1c5ac598416267f2b007",
+      "size": 997,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/d3c65d5b7dc30c23fdbe1c5ac598416267f2b007"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1736552e82b033f6dbd10f9882a34f44c96368e2",
+      "size": 4197,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/1736552e82b033f6dbd10f9882a34f44c96368e2"
+    },
+    {
+      "path": "background.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c856ad4703d6d1f6073317f882b3fa1da4753bd4",
+      "size": 7830,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/c856ad4703d6d1f6073317f882b3fa1da4753bd4"
+    },
+    {
+      "path": "defaults.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "24f67eff8d92585a8744c4d3eea5854d51a1a29a",
+      "size": 1238,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/24f67eff8d92585a8744c4d3eea5854d51a1a29a"
+    },
+    {
+      "path": "extractor.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8015f67a7f2b21d754c29a8ccf9831b239b7433a",
+      "size": 10913,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/8015f67a7f2b21d754c29a8ccf9831b239b7433a"
+    },
+    {
+      "path": "icons",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1cc531c59e1296445454f2656f2dd4a137134fba",
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/trees/1cc531c59e1296445454f2656f2dd4a137134fba"
+    },
+    {
+      "path": "icons/128.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "64de712b4b1c5efb5a5a1fc099c46c2da1ff2deb",
+      "size": 933,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/64de712b4b1c5efb5a5a1fc099c46c2da1ff2deb"
+    },
+    {
+      "path": "icons/16.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a114958504ffc7d5f1541837e8f0c6f562660616",
+      "size": 175,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/a114958504ffc7d5f1541837e8f0c6f562660616"
+    },
+    {
+      "path": "icons/32.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "51949fe0c3572ab84eab57fdf9041b1bd135bdfc",
+      "size": 272,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/51949fe0c3572ab84eab57fdf9041b1bd135bdfc"
+    },
+    {
+      "path": "icons/48.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6804245fa15e0beb0d635c49b2d072544fb18145",
+      "size": 381,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/6804245fa15e0beb0d635c49b2d072544fb18145"
+    },
+    {
+      "path": "manifest.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "efccd6fbd827b3790ea7aa0493dd753bf908e0d8",
+      "size": 823,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/efccd6fbd827b3790ea7aa0493dd753bf908e0d8"
+    },
+    {
+      "path": "options.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f77416293733c9fe7802367e8f91ec2de69c2c2c",
+      "size": 3928,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/f77416293733c9fe7802367e8f91ec2de69c2c2c"
+    },
+    {
+      "path": "options.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f6b05b2968a72602f8518e11c83a95daf711646b",
+      "size": 3801,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/f6b05b2968a72602f8518e11c83a95daf711646b"
+    },
+    {
+      "path": "popup.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c20385b37553845ba280630b7e2e5de07b03d66d",
+      "size": 5645,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/c20385b37553845ba280630b7e2e5de07b03d66d"
+    },
+    {
+      "path": "popup.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9cfde8605b17559f1d7e54ddd75c19d0ffa82c74",
+      "size": 8539,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/9cfde8605b17559f1d7e54ddd75c19d0ffa82c74"
+    },
+    {
+      "path": "styles.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6a7e1db8ec34a5650732dcb9e8a743814e527849",
+      "size": 2157,
+      "url": "https://api.github.com/repos/rakshathavasudev/jd-outreach-drafter/git/blobs/6a7e1db8ec34a5650732dcb9e8a743814e527849"
+    }
+  ],
+  "truncated": false
+}

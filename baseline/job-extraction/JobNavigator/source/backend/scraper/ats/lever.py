@@ -1,0 +1,73 @@
+"""Lever ATS handler: GET api.lever.co/v0/postings/{company}; matched on `jobs.lever.co/` (trailing
+slash guards against attacker-controlled paths) with department/team/location/commitment filters
+forwarded from the original query string."""
+import json
+import logging
+from urllib.parse import parse_qs, quote, urlparse
+
+import httpx
+
+from backend.scraper._shared.filters import _validate_job
+from backend.scraper._shared.errors import raise_if_board_gone
+
+logger = logging.getLogger("jobnavigator.scraper.ats.lever")
+
+
+def is_lever(url: str) -> bool:
+    """Check if URL is a Lever job board (jobs.lever.co/<company>)."""
+    return "jobs.lever.co/" in url.lower()
+
+
+async def scrape(url: str, debug: bool = False) -> list[dict] | tuple:
+    """Fetch jobs from Lever's public JSON API, forwarding department/team/location/commitment
+    filters from the original URL query string."""
+    parsed = urlparse(url)
+    path_parts = [p for p in parsed.path.strip("/").split("/") if p]
+    if not path_parts:
+        if debug:
+            return [], [{"title": "(none)", "url": url, "selector": "lever_api", "reason": "No company slug in URL"}]
+        return []
+    company_slug = path_parts[0]
+
+    api_url = f"https://api.lever.co/v0/postings/{company_slug}?mode=json"
+    qs = parse_qs(parsed.query)
+    for param in ("department", "team", "location", "commitment"):
+        if param in qs:
+            # parse_qs already decoded the value, so a filter with a space
+            # ("San Francisco") has to be re-encoded before it is appended.
+            api_url += f"&{param}={quote(qs[param][0], safe='')}"
+
+    jobs = []
+    rejected = []
+
+    async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
+        resp = await client.get(api_url)
+        if resp.status_code != 200:
+            logger.warning(f"Lever API returned {resp.status_code} for {company_slug}")
+            if not debug:
+                raise_if_board_gone(resp.status_code, "Lever", company_slug)
+            if debug:
+                return [], [{"title": "(none)", "url": api_url, "selector": "lever_api", "reason": f"HTTP {resp.status_code}"}]
+            return []
+
+        postings = json.loads(resp.text)
+        for p in postings:
+            title = (p.get("text") or "").strip()
+            job_url = p.get("hostedUrl") or ""
+            reason = _validate_job(title, job_url)
+            if reason is None:
+                categories = p.get("categories") or {}
+                # `allLocations` is the full list; 9 of 75 postings on one live
+                # board name more than one place.
+                every = [x for x in (categories.get("allLocations") or []) if x]
+                jobs.append({"title": title, "url": job_url,
+                             "location": categories.get("location") or None,
+                             "locations": every,
+                             "arrangement": p.get("workplaceType") or None})
+            elif debug:
+                rejected.append({"title": title, "url": job_url, "selector": "lever_api", "reason": reason})
+
+    logger.info(f"Lever API: fetched {len(jobs)} jobs for {company_slug}")
+    if debug:
+        return jobs, rejected
+    return jobs

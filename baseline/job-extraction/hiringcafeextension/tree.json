@@ -1,0 +1,218 @@
+{
+  "sha": "ae0f5d683dd3b8d96148920029ad44da5a298cac",
+  "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/trees/ae0f5d683dd3b8d96148920029ad44da5a298cac",
+  "tree": [
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "16cf3c16d6c3fbdd66688f75dc9d13e3c4be567a",
+      "size": 97,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/16cf3c16d6c3fbdd66688f75dc9d13e3c4be567a"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "582cbb83dd81037add6bdb63527de95b9192e2e1",
+      "size": 1067,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/582cbb83dd81037add6bdb63527de95b9192e2e1"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1e097084d12d29273931abbe6a2ed1867de1ed8c",
+      "size": 1183,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/1e097084d12d29273931abbe6a2ed1867de1ed8c"
+    },
+    {
+      "path": "background.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bb3822ada789ef42d4558742d0774651c43c2a5c",
+      "size": 27867,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/bb3822ada789ef42d4558742d0774651c43c2a5c"
+    },
+    {
+      "path": "content",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f6108810d1ee5802f9500262171c178669061d0f",
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/trees/f6108810d1ee5802f9500262171c178669061d0f"
+    },
+    {
+      "path": "content/content.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4cbd8ff428e72ee57588f0bc147f286c4a4c9929",
+      "size": 21965,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/4cbd8ff428e72ee57588f0bc147f286c4a4c9929"
+    },
+    {
+      "path": "content/core.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0377422e68b877f155cf3fbf2041f63000816388",
+      "size": 52829,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/0377422e68b877f155cf3fbf2041f63000816388"
+    },
+    {
+      "path": "content/features.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fbc4aca1305b180db0c4268a5a010dbb6bc3a280",
+      "size": 43804,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/fbc4aca1305b180db0c4268a5a010dbb6bc3a280"
+    },
+    {
+      "path": "content/glassdoor-proxy.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b1d85794283afbcc42ef72584c107d5f201f92ad",
+      "size": 839,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/b1d85794283afbcc42ef72584c107d5f201f92ad"
+    },
+    {
+      "path": "content/indeed-proxy.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fb3ba10543894003e1e0f968586f432558cad1a4",
+      "size": 874,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/fb3ba10543894003e1e0f968586f432558cad1a4"
+    },
+    {
+      "path": "content/inject.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "751f7835024c209673816c10e15094501bddc183",
+      "size": 3219,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/751f7835024c209673816c10e15094501bddc183"
+    },
+    {
+      "path": "content/ui.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f221930b656689e9214153339f71fde2e6bb989b",
+      "size": 40311,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/f221930b656689e9214153339f71fde2e6bb989b"
+    },
+    {
+      "path": "docs",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5380da36162ad4e330fba12e1b6d15c55acb52b1",
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/trees/5380da36162ad4e330fba12e1b6d15c55acb52b1"
+    },
+    {
+      "path": "docs/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ae246271df5a2f90a6187f4f11f28f371332e34c",
+      "size": 6067,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/ae246271df5a2f90a6187f4f11f28f371332e34c"
+    },
+    {
+      "path": "icons",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d1b8820d1d4b3f51739b08caff31657d799dec40",
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/trees/d1b8820d1d4b3f51739b08caff31657d799dec40"
+    },
+    {
+      "path": "icons/icon128.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "169ac9b1f8279818eb5d49289bd82e914dbd65d9",
+      "size": 4134,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/169ac9b1f8279818eb5d49289bd82e914dbd65d9"
+    },
+    {
+      "path": "icons/icon16.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9ca85be358308e151859ef6290fa675f6470f452",
+      "size": 574,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/9ca85be358308e151859ef6290fa675f6470f452"
+    },
+    {
+      "path": "icons/icon48.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "703850b3e004269ec1e6be151965e6ffc1a4424d",
+      "size": 1605,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/703850b3e004269ec1e6be151965e6ffc1a4424d"
+    },
+    {
+      "path": "lib",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "48da50e935b07c960c3374beb4d7b7883d9541b4",
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/trees/48da50e935b07c960c3374beb4d7b7883d9541b4"
+    },
+    {
+      "path": "lib/match.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "15858e5cecd72f1f8bb94eb01821507a52f6fd66",
+      "size": 6804,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/15858e5cecd72f1f8bb94eb01821507a52f6fd66"
+    },
+    {
+      "path": "lib/ratings.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "06b26a2cf7ff2f8535c5380559db257288976f4d",
+      "size": 8313,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/06b26a2cf7ff2f8535c5380559db257288976f4d"
+    },
+    {
+      "path": "lib/staticdata.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d607e5e2028263978d4187f7bbab9bc27f47018f",
+      "size": 30491,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/d607e5e2028263978d4187f7bbab9bc27f47018f"
+    },
+    {
+      "path": "manifest.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3d86f79020961401b047d688962424a862286acd",
+      "size": 2594,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/3d86f79020961401b047d688962424a862286acd"
+    },
+    {
+      "path": "popup",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "65b5c9f9b813c331740b0da2c3b8c8cc54a48db2",
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/trees/65b5c9f9b813c331740b0da2c3b8c8cc54a48db2"
+    },
+    {
+      "path": "popup/popup.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a7b9a2138d9f465ac870d3c43badbe95bdc619ee",
+      "size": 2517,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/a7b9a2138d9f465ac870d3c43badbe95bdc619ee"
+    },
+    {
+      "path": "popup/popup.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "86ed251b4126e1377516f8a0516e223428acc5bc",
+      "size": 826,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/86ed251b4126e1377516f8a0516e223428acc5bc"
+    },
+    {
+      "path": "popup/popup.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "06efe30200a496c10f432cd1cf9bb7b23adc31bf",
+      "size": 9420,
+      "url": "https://api.github.com/repos/rickyhires/hiringcafeextension/git/blobs/06efe30200a496c10f432cd1cf9bb7b23adc31bf"
+    }
+  ],
+  "truncated": false
+}

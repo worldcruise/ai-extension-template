@@ -10,6 +10,9 @@ import { fileURLToPath } from 'node:url';
 import { buildExtension } from '../scripts/build-extension.mjs';
 import { serveFixture } from './fixtures/https-server.mjs';
 import { checkWorkspaceUI } from './workspace-ui.mjs';
+import { checkJobReader } from './job-reader-ui.mjs';
+import { checkReadPageShortcut } from './read-page-shortcut-ui.mjs';
+import { jobPageFixtures, jobFixtureResponse } from './fixtures/job-pages.mjs';
 
 const artifacts = fileURLToPath(new URL('../artifacts/', import.meta.url));
 const paths = [process.env.CHROME_PATH,
@@ -70,6 +73,12 @@ let mode = 'ready';
 let requests = 0;
 const fixtureServer = await serveFixture((request, response) => {
   requests++;
+  const extractionPage=jobFixtureResponse(request.headers.host?.split(':')[0],request.url);
+  if (extractionPage) {
+    response.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store',
+      'Content-Security-Policy':"default-src 'self'; script-src 'none'; style-src 'self'"});
+    response.end(extractionPage);return;
+  }
   if (request.headers.host?.startsWith('jobs.example.test')) {
     if (request.url === '/job.css') {
       response.writeHead(200, { 'Content-Type':'text/css' });
@@ -93,7 +102,7 @@ const profile = await mkdtemp(join(tmpdir(), 'sidebar-gpt-test-'));
 const browser = spawn(executable, [
   '--headless=new', '--no-first-run', '--no-default-browser-check',
   '--disable-background-networking', '--disable-component-update', '--disable-sync',
-  `--host-resolver-rules=MAP chatgpt.com 127.0.0.1:${fixtureServer.port}, MAP jobs.example.test 127.0.0.1:${fixtureServer.port}`,
+  `--host-resolver-rules=${[...new Set(['chatgpt.com','jobs.example.test','blocked.jobs.example.test',...jobPageFixtures.map(item=>item.host)])].map(host=>`MAP ${host} 127.0.0.1:${fixtureServer.port}`).join(', ')}`,
   '--no-proxy-server', '--ignore-certificate-errors',
   '--enable-unsafe-extension-debugging', '--remote-debugging-port=0',
   `--user-data-dir=${profile}`, 'about:blank'
@@ -244,7 +253,7 @@ try {
   await cdp.send('Extensions.triggerAction', { id, targetId: tab.targetId });
   await until(() => evaluate(workerSession, 'chrome.runtime.getContexts({contextTypes:["SIDE_PANEL"]}).then(items => items.length === 1)'), 'native side panel');
   const dock = await until(async () => (await targets()).find(target => target.targetId !== targetId && target.url === `chrome-extension://${id}/index.html`), 'native dock target');
-  const dockSession = await session(dock.targetId);
+  let dockSession = await session(dock.targetId);
   await until(() => evaluate(dockSession, 'Boolean(document.querySelector("#resume-queue .job-request"))'), 'native workspace startup');
   try {
     await until(() => evaluate(sourceSession, 'CSS.highlights.get("ai-agent-job-keywords")?.size === 5'), 'job page keyword highlights');
@@ -276,6 +285,9 @@ try {
   await writeFile(join(artifacts, 'job-page-highlights.png'), Buffer.from(jobShot.data, 'base64'));
   await cdp.send('Page.navigate', {url:'https://jobs.example.test/another-job'}, sourceSession);
   await until(() => evaluate(sourceSession, 'CSS.highlights.get("ai-agent-job-keywords")?.size === 5'), 'highlighting survives same-site job navigation');
+  const extraction=await checkJobReader({cdp,id,sourceSession,dockSession,evaluate,until});
+  const shortcut = await checkReadPageShortcut({cdp,id,workerSession,sourceSession,dockSession,evaluate,until,session});
+  dockSession = shortcut.dockSession;
   await evaluate(dockSession, 'document.getElementById("chat-tab").click()');
   await until(async () => await evaluate(dockSession, 'document.getElementById("connection")?.dataset.state') === 'ready', 'native dock ChatGPT readiness');
   const dockContexts = await evaluate(workerSession, 'chrome.runtime.getContexts({contextTypes:["SIDE_PANEL"]})');
@@ -283,7 +295,8 @@ try {
   assert.equal((await evaluate(workerSession, 'chrome.runtime.getContexts({contextTypes:["SIDE_PANEL"]})'))[0].documentId, dockContexts[0].documentId);
   assert.equal(await evaluate(workerSession, 'chrome.windows.getAll().then(items => items.some(win => win.type === "popup"))'), false);
   assert.deepEqual(errors, []);
-  const report = { browser: version.product, fixtureOnly: true, liveAuthentication: false, requests, layouts, workspace,
+  const report = { browser: version.product, fixtureOnly: true, liveAuthentication: false, requests, layouts, workspace, extraction,
+    shortcut: { assigned: shortcut.shortcut, warmDock: shortcut.warmDock, coldDock: shortcut.coldDock, physicalKeyboard: shortcut.physicalKeyboard },
     checks: ['unpacked extension loads', 'native dock opens from toolbar', 'dock survives tab navigation', 'installed header rule scope', 'embedding with restrictive response headers',
       'frame readiness', 'current conversation in new tab', 'reload keeps conversation', 'new chat', 'guest sign-in tab', 'embedded sign-in handoff',
       'job-page-only keyword highlighting with temporary page access', 'literal and cross-element phrases preserve page markup',

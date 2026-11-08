@@ -1,0 +1,20 @@
+{
+  "repository": "LucasFenaux/job-application-tracker",
+  "url": "https://github.com/LucasFenaux/job-application-tracker",
+  "branch": "main",
+  "commit": "34cf2ef8b9af8be9aedecd0bde9a567047a36315",
+  "license": "Apache-2.0",
+  "retrievedOn": "2026-11-08",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "extension-firefox/content.js",
+    "extension/content.js",
+    "extension-firefox/background.js",
+    "extension/background.js",
+    "src/lib/scraper.ts",
+    "deepScrape.js",
+    "src/app/scraper/page.tsx",
+    "src/app/scraper/ScraperClient.tsx"
+  ]
+}

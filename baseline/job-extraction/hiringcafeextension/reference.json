@@ -1,0 +1,17 @@
+{
+  "repository": "rickyhires/hiringcafeextension",
+  "url": "https://github.com/rickyhires/hiringcafeextension",
+  "branch": "main",
+  "commit": "ae0f5d683dd3b8d96148920029ad44da5a298cac",
+  "license": "MIT",
+  "retrievedOn": "2026-11-08",
+  "files": [
+    "content/core.js",
+    "content/features.js",
+    "content/inject.js",
+    "LICENSE",
+    "README.md",
+    "background.js",
+    "content/indeed-proxy.js"
+  ]
+}

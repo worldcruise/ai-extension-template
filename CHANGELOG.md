@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.0 — 2026-11-08
+
+Job extraction and keyboard shortcut checkpoint. Bulk ChatGPT generation remains planned.
+
+- Add Ctrl+Shift+S (Command+Shift+S on macOS) to open Studio and run the same extraction as Read page.
+- Connect Read page to background extraction of Company, Job title, URL, and Job Description.
+- Combine JobPosting JSON-LD/microdata, ATS adapters, embedded job JSON, and generic content ranking.
+- Preserve edits and source-tab drafts during asynchronous reads; handle delayed and inaccessible pages.
+- Add pinned extraction references and a review of the supplied repositories and product documentation.
+- Validate extraction with 29 unit tests, 20 Chrome fixture cases, and shortcut delivery to open and freshly opened docks.
+
 ## 0.3.0 — 2026-11-08
 
 Checkpoint of the combined ChatGPT and Resume Studio workspace.

@@ -1,4 +1,11 @@
 import { EMBED_RULE_ID, embedRules } from './sidebar-protocol.mjs';
+import { createJobExtractionService } from './job-extraction-service.mjs';
+import { createReadPageCommands } from './read-page-commands.mjs';
+
+const extractJob = createJobExtractionService();
+const readPageCommands = createReadPageCommands();
+const handleReadPageCommand = readPageCommands.handle;
+chrome.commands.onCommand.addListener(handleReadPageCommand);
 
 let configuring;
 function configureSidebar() {
@@ -33,8 +40,19 @@ chrome.action.onClicked.addListener(tab => {
 });
 
 chrome.runtime.onMessage.addListener((message, sender, respond) => {
-  if (message?.type !== 'sidebar.initialize' || sender.id !== chrome.runtime.id ||
-      sender.url !== chrome.runtime.getURL('index.html')) return false;
+  if (sender.id !== chrome.runtime.id || sender.url !== chrome.runtime.getURL('index.html')) return false;
+  if (message?.type === 'job.read-command.take' && Number.isInteger(message.windowId)) {
+    respond({ ok: true, request: readPageCommands.take(message.windowId) });
+    return false;
+  }
+  if (message?.type === 'job.extract' && typeof message.requestId==='string' && /^[\w-]{1,100}$/.test(message.requestId)) {
+    extractJob(message.tabId).then(
+      result => respond({ok:true,requestId:message.requestId,...result}),
+      error => respond({ok:false,requestId:message.requestId,error:{code:error.code || 'extraction-failed',message:error.message || 'Could not read this job page. Try again.'}})
+    );
+    return true;
+  }
+  if (message?.type !== 'sidebar.initialize') return false;
   configureSidebar().then(
     () => respond({ ok: true }),
     () => respond({ ok: false, error: 'The sidebar could not start. Reload the extension and try again.' })

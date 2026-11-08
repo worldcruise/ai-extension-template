@@ -1,7 +1,7 @@
 # AI Agent Template
 
 A Chrome Manifest V3 extension with a combined **ChatGPT + Resume Studio** workspace.
-Current version: **0.3.0**. See [CHANGELOG.md](CHANGELOG.md) for this checkpoint.
+Current version: **0.4.0**. See [CHANGELOG.md](CHANGELOG.md) for this checkpoint.
 The Chat view embeds ChatGPT using your browser's session. Resume Studio is an
 interactive UI preview based on `baseline/combined-chatgpt-resume-studio-code`.
 
@@ -9,7 +9,7 @@ Studio includes Review Job and Review resume views, example candidate selection,
 job-description drafts, template/prompt previews, example queue actions, request
 details, resume previews, and JSON copy. Its sample data stays in memory and resets
 when the panel closes. It does not submit AI requests or persist resumes. Profile
-import, page capture, real generation, and PDF/DOCX export are
+import, real generation, and PDF/DOCX export are
 not connected yet; their controls show their current availability.
 
 ChatGPT stays mounted when switching views, preserving its conversation and composer.
@@ -50,8 +50,16 @@ Previous/Next switches the actual open tabs in the sidebar's associated browser
 window, wrapping at either end. The counter updates when tabs open, close, move,
 or become active. Company, job title, URL, and JD drafts are retained per tab while
 the panel is open. URLs fill from permitted page metadata; manually entered URLs
-are retained and included in queued request snapshots. Navigation uses tab IDs and positions and does not request page-content
-access; Read page remains unavailable until capture is connected.
+are retained and included in queued request snapshots. Navigation uses tab IDs and
+positions. Read page uses temporary page access to fill Company, Job title, URL,
+and Job Description from the selected tab, including with tailoring off. Press
+**Ctrl+Shift+S** (**Command+Shift+S** on macOS) for the same action from the job
+page; it opens the sidebar and selects Studio's Review Job view automatically.
+Shortcuts can be customized at `chrome://extensions/shortcuts`. It
+combines JobPosting metadata, ATS/board selectors, embedded job JSON, and generic
+content-region ranking. Fields stay editable, and edits made during a read are
+preserved. See the [repository review and extraction notes](docs/job-extraction-review.md)
+for source pins, coverage, validation, and limits.
 
 Highlight feedback appears in the toggle's hover hint. The fixed footer uses a
 compact queue row with icon controls; action messages remain available to screen
@@ -89,6 +97,8 @@ also load the repository root directly during development.
 | `src/chat-toolbar.mjs` | Hover toolbar and connected company-chat dropdown |
 | `src/company-chats.mjs` | Saved company source links scoped to the selected candidate |
 | `src/browser-tabs.mjs` | Window-scoped open-tab navigation and live tab counts |
+| `src/job-page-evidence.mjs`, `src/job-site-adapters.mjs` | Read-only page evidence and ATS/board selector configurations |
+| `src/job-extraction-core.mjs`, `src/job-extraction-service.mjs` | Posting selection, normalization, and background read coordination |
 | `src/keyword-settings.mjs`, `src/keyword-matcher.js` | Local keyword preferences and literal matching |
 | `src/page-highlights.mjs`, `src/job-page-highlighter.js` | Opt-in job-page highlighting with temporary page access |
 | `src/studio.mjs`, `src/studio-examples.mjs` | Studio interactions and explicitly labeled example data |

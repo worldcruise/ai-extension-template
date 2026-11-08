@@ -13,6 +13,7 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab,
   let previewId = null;
   let detailRequestId = null;
   let paused = false;
+  let reading = null;
   const jobDrafts = new Map();
   const manualUrls = new Set();
   const jobFields = { company: '#job-company', role: '#job-title', url: '#job-url', description: '#job-description' };
@@ -112,7 +113,58 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab,
     q('#job-position').textContent = `${index} / ${count}`;
     q('#job-position').title = `${count} open tab${count === 1 ? '' : 's'} in this browser window`;
     q('#previous-job').disabled = q('#next-job').disabled = busy || count < 2;
+    renderReadButton();
   }
+  function renderReadButton() {
+    const busy = reading?.tabId===currentTabId;
+    const button = q('#read-page');
+    button.disabled = currentTabId===null || busy;
+    button.setAttribute('aria-busy',String(busy));
+    button.replaceChildren(icon(busy ? 'refresh' : 'scan'),document.createTextNode(busy ? 'Reading…' : 'Read page'));
+  }
+  async function readPage(tabId = currentTabId) {
+    if (!Number.isInteger(tabId) || reading?.tabId === tabId) return;
+    const before = tabId === currentTabId ? jobDraft() : jobDrafts.get(tabId) ||
+      Object.fromEntries(Object.keys(jobFields).map(key => [key, '']));
+    const request = {id:crypto.randomUUID(),tabId,before};
+    reading = request; renderReadButton();
+    let timeout;
+    try {
+      const response = await Promise.race([
+        chrome.runtime.sendMessage({type:'job.extract',requestId:request.id,tabId:request.tabId}),
+        new Promise((_,reject) => { timeout=setTimeout(()=>reject(new Error('The page is taking too long to respond. Try Read page again.')),12000); })
+      ]);
+      if (reading!==request) return;
+      if (!response || response.requestId!==request.id) throw new Error('The page did not respond. Try Read page again.');
+      if (!response.ok) throw new Error(response.error?.message || 'Could not read this job page.');
+      const active = currentTabId===request.tabId;
+      const current = active ? jobDraft() : jobDrafts.get(request.tabId) || request.before;
+      const merged = {...current};
+      let filled=0;
+      for (const [key,selector] of Object.entries(jobFields)) {
+        const value = response.fields?.[key];
+        if (!value || current[key]!==request.before[key]) continue;
+        merged[key] = value; filled++;
+        if (active) { q(selector).value=value; q(selector).setCustomValidity(''); }
+        if (key==='url') manualUrls.delete(request.tabId);
+      }
+      jobDrafts.set(request.tabId,merged);
+      const missing = response.missing?.filter(key=>key!=='url') || [];
+      const names = {company:'company name',role:'job title',description:'Job Description'};
+      const message = missing.length ? `Read ${filled} fields. Review missing ${missing.map(key=>names[key] || key).join(', ')}.` : 'Job details read. Review the fields before adding to queue.';
+      if (active) q('#read-page').title=message;
+      status(active ? message : 'Job details saved to the source tab’s draft.');
+    } catch (error) {
+      if (reading===request && currentTabId===request.tabId) {
+        q('#read-page').title=error.message;
+        status(error.message);
+      }
+    } finally {
+      clearTimeout(timeout);
+      if (reading===request) { reading=null; renderReadButton(); }
+    }
+  }
+  q('#read-page').addEventListener('click', () => { void readPage(); });
   function tabError(message) {
     q('#previous-job').disabled = q('#next-job').disabled = true;
     status(message);
@@ -301,6 +353,7 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab,
   });
   q('#export-resume').addEventListener('click', () => openDialog('export-dialog'));
   q('#reset-examples').addEventListener('click', () => {
+    reading=null; renderReadButton();
     q('#profile-dialog').close();
     requests = createExamples(); nextId = 4; paused = false;
     jobDrafts.clear();
@@ -318,5 +371,5 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab,
     status('Example workspace reset. Your ChatGPT conversation is unchanged.');
   });
   renderQueue(); renderTemplate();
-  return { updateTabs, tabError, getCompanyChats: () => savedCompanyChats(requests, candidateId()) };
+  return { updateTabs, tabError, readPage, getCompanyChats: () => savedCompanyChats(requests, candidateId()) };
 }

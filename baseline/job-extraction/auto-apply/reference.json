@@ -1,0 +1,19 @@
+{
+  "repository": "omkar3602/auto-apply",
+  "url": "https://github.com/omkar3602/auto-apply",
+  "branch": "master",
+  "commit": "96248c602214fbe8dfd44f93182584d1e6a952d9",
+  "license": "Not declared in repository metadata",
+  "retrievedOn": "2026-11-08",
+  "files": [
+    "README.md",
+    "scrapers/jobright.py",
+    "scrapers/zapplyjobs.py",
+    "scrapers/__init__.py",
+    "scrapers/common.py",
+    "scrapers/description_fetch.py",
+    "scrapers/markdown_table.py",
+    "scrapers/simplify.py",
+    "scrapers/speedyapply.py"
+  ]
+}

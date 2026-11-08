@@ -1,0 +1,130 @@
+[
+  {
+    "repository": "rakshathavasudev/jd-outreach-drafter",
+    "url": "https://github.com/rakshathavasudev/jd-outreach-drafter",
+    "branch": "main",
+    "commit": "558779d45cd029b253fa16acbe39d63f50629cb1",
+    "license": "MIT",
+    "retrievedOn": "2026-11-08",
+    "files": [
+      "LICENSE",
+      "README.md",
+      "extractor.js",
+      "background.js",
+      "CHANGELOG.md"
+    ]
+  },
+  {
+    "repository": "muhammad-saadd/applyai",
+    "url": "https://github.com/muhammad-saadd/applyai",
+    "branch": "main",
+    "commit": "d4a97b5643aa219592883a43b068fc18dff94678",
+    "license": "MIT",
+    "retrievedOn": "2026-11-08",
+    "files": [
+      "LICENSE",
+      "README.md",
+      "utils/parser.js",
+      "content_scripts/ashby.js",
+      "content_scripts/greenhouse.js",
+      "content_scripts/lever.js",
+      "content_scripts/workday.js"
+    ]
+  },
+  {
+    "repository": "LucasFenaux/job-application-tracker",
+    "url": "https://github.com/LucasFenaux/job-application-tracker",
+    "branch": "main",
+    "commit": "34cf2ef8b9af8be9aedecd0bde9a567047a36315",
+    "license": "Apache-2.0",
+    "retrievedOn": "2026-11-08",
+    "files": [
+      "LICENSE",
+      "README.md",
+      "extension-firefox/content.js",
+      "extension/content.js",
+      "extension-firefox/background.js",
+      "extension/background.js",
+      "src/lib/scraper.ts",
+      "deepScrape.js",
+      "src/app/scraper/page.tsx",
+      "src/app/scraper/ScraperClient.tsx"
+    ]
+  },
+  {
+    "repository": "vesaias/JobNavigator",
+    "url": "https://github.com/vesaias/JobNavigator",
+    "branch": "main",
+    "commit": "623822529389d6919d86be07271e0ea94e20b514",
+    "license": "MIT",
+    "retrievedOn": "2026-11-08",
+    "files": [
+      "backend/scraper/_shared/postings.py",
+      "backend/scraper/ats/_descriptions.py",
+      "backend/scraper/ats/ashby.py",
+      "backend/scraper/ats/generic.py",
+      "backend/scraper/ats/greenhouse.py",
+      "backend/scraper/ats/lever.py",
+      "backend/scraper/ats/oracle_hcm.py",
+      "backend/scraper/ats/phenom.py",
+      "backend/scraper/ats/smartrecruiters.py",
+      "backend/scraper/ats/workday.py",
+      "CHANGELOG.md",
+      "extension/content_linkedin.js",
+      "LICENSE",
+      "README.md",
+      "backend/analyzer/salary_extractor.py",
+      "backend/scraper/_shared/job_boards.py",
+      "backend/scraper/_shared/levels_jobs.py",
+      "backend/scraper/sources/caribbeanjobs.py",
+      "backend/scraper/sources/jobright.py",
+      "backend/scraper/sources/jobspy.py",
+      "extension/content_autofill_fill.js",
+      "extension/content_autofill.js",
+      "backend/accounts/background.py",
+      "extension/background.js"
+    ]
+  },
+  {
+    "repository": "rickyhires/hiringcafeextension",
+    "url": "https://github.com/rickyhires/hiringcafeextension",
+    "branch": "main",
+    "commit": "ae0f5d683dd3b8d96148920029ad44da5a298cac",
+    "license": "MIT",
+    "retrievedOn": "2026-11-08",
+    "files": [
+      "content/core.js",
+      "content/features.js",
+      "content/inject.js",
+      "LICENSE",
+      "README.md",
+      "background.js",
+      "content/indeed-proxy.js"
+    ]
+  },
+  {
+    "repository": "HumbleIgnite/hiring-cafe-scraper",
+    "url": "https://github.com/HumbleIgnite/hiring-cafe-scraper",
+    "error": "HTTP 404: https://api.github.com/repos/HumbleIgnite/hiring-cafe-scraper",
+    "retrievedOn": "2026-11-08"
+  },
+  {
+    "repository": "omkar3602/auto-apply",
+    "url": "https://github.com/omkar3602/auto-apply",
+    "branch": "master",
+    "commit": "96248c602214fbe8dfd44f93182584d1e6a952d9",
+    "license": "Not declared in repository metadata",
+    "retrievedOn": "2026-11-08",
+    "files": [
+      "README.md",
+      "scrapers/jobright.py",
+      "scrapers/zapplyjobs.py",
+      "scrapers/__init__.py",
+      "scrapers/common.py",
+      "scrapers/description_fetch.py",
+      "scrapers/markdown_table.py",
+      "scrapers/simplify.py",
+      "scrapers/speedyapply.py"
+    ]
+  }
+]

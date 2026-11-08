@@ -1,0 +1,241 @@
+{
+  "sha": "d4a97b5643aa219592883a43b068fc18dff94678",
+  "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/trees/d4a97b5643aa219592883a43b068fc18dff94678",
+  "tree": [
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "314707f50502652ab6d18e76863e50cb49efb5a8",
+      "size": 312,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/314707f50502652ab6d18e76863e50cb49efb5a8"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "52f8108517056adbf0eea5e10a15ac4075ded83d",
+      "size": 1070,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/52f8108517056adbf0eea5e10a15ac4075ded83d"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9dea457ab996ef124bc94584bc5f381b21848bf8",
+      "size": 19222,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/9dea457ab996ef124bc94584bc5f381b21848bf8"
+    },
+    {
+      "path": "background",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "546c91363c033a43002918947485f6cb6b7699ab",
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/trees/546c91363c033a43002918947485f6cb6b7699ab"
+    },
+    {
+      "path": "background/service_worker.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d2a1673f877a85980b8100e8de9a676929551876",
+      "size": 5620,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/d2a1673f877a85980b8100e8de9a676929551876"
+    },
+    {
+      "path": "content_scripts",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "899e80b1ad8b5c385801686a4b67734a7790696e",
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/trees/899e80b1ad8b5c385801686a4b67734a7790696e"
+    },
+    {
+      "path": "content_scripts/ashby.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d71059a232b5c4abcd2fdff49f1b018b232bec0a",
+      "size": 2269,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/d71059a232b5c4abcd2fdff49f1b018b232bec0a"
+    },
+    {
+      "path": "content_scripts/detector.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "10f3f85dcbd0f5cad357b5c9f5961177bc22fd9f",
+      "size": 6831,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/10f3f85dcbd0f5cad357b5c9f5961177bc22fd9f"
+    },
+    {
+      "path": "content_scripts/generic.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4a4f35fd215676c12b94cc0fb901bc2500d3bc8e",
+      "size": 2667,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/4a4f35fd215676c12b94cc0fb901bc2500d3bc8e"
+    },
+    {
+      "path": "content_scripts/greenhouse.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6e58333cec5d4e7ea074a99eb9ee2c1fd30816fd",
+      "size": 2210,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/6e58333cec5d4e7ea074a99eb9ee2c1fd30816fd"
+    },
+    {
+      "path": "content_scripts/lever.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "345b3270c46c9911469d6aea3c48fa00db77b10f",
+      "size": 2382,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/345b3270c46c9911469d6aea3c48fa00db77b10f"
+    },
+    {
+      "path": "content_scripts/modal.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "db301983ff711fc70936806f4a3754633b80479e",
+      "size": 10734,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/db301983ff711fc70936806f4a3754633b80479e"
+    },
+    {
+      "path": "content_scripts/workday.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "97479a99a3005f4526eb8cd152efbcf0349a1f6b",
+      "size": 2892,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/97479a99a3005f4526eb8cd152efbcf0349a1f6b"
+    },
+    {
+      "path": "icons",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "82ec88f84366dfbc970f4c66b56b308dd96311d4",
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/trees/82ec88f84366dfbc970f4c66b56b308dd96311d4"
+    },
+    {
+      "path": "icons/icon128.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bf9c788ce15d522a8d303ff74cf3cbe948d74206",
+      "size": 307,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/bf9c788ce15d522a8d303ff74cf3cbe948d74206"
+    },
+    {
+      "path": "icons/icon16.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "33715a01b05d56c2fb32904dc97004b42f3e9135",
+      "size": 79,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/33715a01b05d56c2fb32904dc97004b42f3e9135"
+    },
+    {
+      "path": "icons/icon48.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f2d8126400f78c3493c1a5e26c843a7dfe249b2e",
+      "size": 124,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/f2d8126400f78c3493c1a5e26c843a7dfe249b2e"
+    },
+    {
+      "path": "manifest.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5a4cc02d58b154859c9b91b38597c650a6a0bcde",
+      "size": 1227,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/5a4cc02d58b154859c9b91b38597c650a6a0bcde"
+    },
+    {
+      "path": "options",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6ab4cc69d3602bb7e4673e79b2fae1f3593a0497",
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/trees/6ab4cc69d3602bb7e4673e79b2fae1f3593a0497"
+    },
+    {
+      "path": "options/options.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0c484f6055bf5a857dc1e1a3a5ab9ef5ad9eb81d",
+      "size": 5397,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/0c484f6055bf5a857dc1e1a3a5ab9ef5ad9eb81d"
+    },
+    {
+      "path": "options/options.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4ec494b96790eb29f0cb5dfbbd1f2916640c0dad",
+      "size": 5221,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/4ec494b96790eb29f0cb5dfbbd1f2916640c0dad"
+    },
+    {
+      "path": "options/options.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "30d51184b4f0ce00c4bbccaf3a453ac1d1111049",
+      "size": 5657,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/30d51184b4f0ce00c4bbccaf3a453ac1d1111049"
+    },
+    {
+      "path": "popup",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f4d0a7f65c4a9708ae5b80ac7cbea68ae94c9144",
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/trees/f4d0a7f65c4a9708ae5b80ac7cbea68ae94c9144"
+    },
+    {
+      "path": "popup/popup.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f3dba12c8f4486845d561982aa5a111c34319832",
+      "size": 4604,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/f3dba12c8f4486845d561982aa5a111c34319832"
+    },
+    {
+      "path": "popup/popup.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0320b9f3a5fcb3313233f448f708d519f69a313f",
+      "size": 1956,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/0320b9f3a5fcb3313233f448f708d519f69a313f"
+    },
+    {
+      "path": "popup/popup.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "420769d1296a1e707facd06fc325f6b72dfadd6f",
+      "size": 4535,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/420769d1296a1e707facd06fc325f6b72dfadd6f"
+    },
+    {
+      "path": "utils",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8601962d96b5907c531c2725df4181899d1aa96d",
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/trees/8601962d96b5907c531c2725df4181899d1aa96d"
+    },
+    {
+      "path": "utils/ai.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5a1d37c3718830e6ce69d712f42fb7d2f7ecfa4c",
+      "size": 3411,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/5a1d37c3718830e6ce69d712f42fb7d2f7ecfa4c"
+    },
+    {
+      "path": "utils/parser.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aa681c89dcac318081f7789a1cdcf6ffdcaf1533",
+      "size": 1828,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/aa681c89dcac318081f7789a1cdcf6ffdcaf1533"
+    },
+    {
+      "path": "utils/storage.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2143ab3cd0fbf12f7c49e81b18bdbe53eeca5ec0",
+      "size": 715,
+      "url": "https://api.github.com/repos/muhammad-saadd/applyai/git/blobs/2143ab3cd0fbf12f7c49e81b18bdbe53eeca5ec0"
+    }
+  ],
+  "truncated": false
+}

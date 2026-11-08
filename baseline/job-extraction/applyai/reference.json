@@ -1,0 +1,17 @@
+{
+  "repository": "muhammad-saadd/applyai",
+  "url": "https://github.com/muhammad-saadd/applyai",
+  "branch": "main",
+  "commit": "d4a97b5643aa219592883a43b068fc18dff94678",
+  "license": "MIT",
+  "retrievedOn": "2026-11-08",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "utils/parser.js",
+    "content_scripts/ashby.js",
+    "content_scripts/greenhouse.js",
+    "content_scripts/lever.js",
+    "content_scripts/workday.js"
+  ]
+}

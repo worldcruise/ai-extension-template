@@ -1,0 +1,189 @@
+"""Classify emails as positive/rejection/auto-reply/ambiguous."""
+import logging
+
+logger = logging.getLogger("jobnavigator.email_parser")
+
+# STRONG positive = an unambiguous advance (scheduling / invitation / offer). These
+# essentially never appear in a "thanks for applying" acknowledgment.
+STRONG_POSITIVE_PHRASES = [
+    "would like to schedule",
+    "like to invite",
+    "would like to invite",
+    "schedule a call",
+    "schedule an interview",
+    "schedule a time",
+    "set up a time",
+    "set up a call",
+    "availability for",
+    "your availability",
+    "preliminary phone screen",
+    "phone screen",
+    "pleased to inform",
+]
+
+# WEAK positive = friendly boilerplate that acknowledgment emails ALSO contain
+# ("we're excited to review", "we'll connect with you about next steps"). On its own
+# this is NOT enough to call an email a real advance.
+WEAK_POSITIVE_PHRASES = [
+    "next steps",
+    "move forward",
+    "we'd like to",
+    "we would like to",
+    "connect with you",
+    "meet with",
+    "excited to",
+]
+
+REJECTION_PHRASES = [
+    "unfortunately",
+    "not moving forward",
+    "other candidates",
+    "position has been filled",
+    "decided not to",
+    "not a match",
+    "pursuing other",
+    "regret to inform",
+    "will not be moving",
+    "after careful consideration",
+    "competitive pool",
+    "decided to go with",
+    "not proceed",
+    "no longer being considered",
+]
+
+AUTO_REPLY_PHRASES = [
+    "thank you for applying",
+    "thanks for applying",
+    "thank you for your application",
+    "thanks for your application",
+    "we received your application",
+    "received your application",
+    "application has been received",
+    "thank you for your interest",
+    "thanks for your interest",
+    "confirming receipt",
+    "application received",
+    "auto-reply",
+    "do not reply",
+    "noreply",
+    "no-reply",
+]
+
+
+def classify_email(subject: str, body: str) -> dict:
+    """Classify an email response; returns dict with classification and confidence."""
+    combined = f"{subject} {body}".lower()
+
+    strong_positive = sum(1 for p in STRONG_POSITIVE_PHRASES if p in combined)
+    weak_positive = sum(1 for p in WEAK_POSITIVE_PHRASES if p in combined)
+    rejection_count = sum(1 for p in REJECTION_PHRASES if p in combined)
+    auto_reply_count = sum(1 for p in AUTO_REPLY_PHRASES if p in combined)
+
+    # Rejection wins over everything except a co-present strong advance (rejections
+    # often contain boilerplate like "thank you for your interest").
+    if rejection_count > 0 and strong_positive == 0:
+        confidence = min(0.5 + rejection_count * 0.15, 0.95)
+        return {"classification": "rejection", "confidence": confidence}
+
+    # A genuine advance requires a STRONG signal (scheduling / invitation / offer).
+    if strong_positive > 0 and rejection_count == 0:
+        confidence = min(0.5 + strong_positive * 0.15, 0.95)
+        return {"classification": "positive", "confidence": confidence}
+
+    if strong_positive > 0 and rejection_count > 0:
+        return {"classification": "ambiguous", "confidence": 0.4}
+
+    # No strong signal: an acknowledgment is an auto-reply even if it contains friendly
+    # weak-positive boilerplate (e.g. "we're excited to ... connect with you").
+    if auto_reply_count > 0:
+        return {"classification": "auto_reply", "confidence": 0.9}
+
+    # Only weak boilerplate and nothing else — too soft to auto-act on; let the LLM decide.
+    if weak_positive > 0:
+        return {"classification": "ambiguous", "confidence": 0.35}
+
+    return {"classification": "ambiguous", "confidence": 0.2}
+
+
+async def classify_email_llm(from_header: str, subject: str, body: str, active_apps: list) -> dict | None:
+    """Classify an ambiguous email via LLM; returns dict with match_index/status/confidence/summary, or None on failure.
+    active_apps: list of dicts with keys index (1-based), id, company, title, status, applied_at."""
+    from backend.models.db import SessionLocal
+    from backend.accounts.settings import get_setting
+
+    db = SessionLocal()
+    try:
+        if get_setting(db, "email_llm_enabled") != "true":
+            return None
+
+        prompt_template = get_setting(db, "email_llm_prompt")
+        if not prompt_template:
+            logger.warning("email_llm_prompt setting is empty, skipping LLM classification")
+            return None
+    finally:
+        db.close()
+
+    app_lines = []
+    for app in active_apps:
+        app_lines.append(f"{app['index']}. {app['company']} — {app['title']} ({app['status']} since {app['applied_at']})")
+    applications_text = "\n".join(app_lines) if app_lines else "(no active applications)"
+
+    truncated_body = body[:1500] if body else ""
+    prompt = prompt_template.replace("{applications}", applications_text)
+    prompt = prompt.replace("{from}", from_header)
+    prompt = prompt.replace("{subject}", subject)
+    prompt = prompt.replace("{body}", truncated_body)
+
+    system = "You classify recruiter emails and match them to job applications. Return only valid JSON."
+
+    try:
+        from backend.analyzer.llm_client import call_email_llm
+        from backend.analyzer.llm_logger import track_llm_call
+        import json
+        # Use the same resolver call_email_llm dispatches with, so the log row can't
+        # name a model that was never called.
+        from backend.analyzer.llm_client import resolve_llm_config
+        _cfg = resolve_llm_config("email")
+        _provider, _model = _cfg["provider"], _cfg["model"]
+        async with track_llm_call("email", _provider, _model) as _tracker:
+            _resp = await call_email_llm(prompt, system, max_tokens=150)
+            _tracker.record(_resp)
+            raw = _resp["text"]
+
+        # Extract JSON from response — handles markdown fences and trailing commentary
+        import re
+        text = raw.strip()
+        match = re.search(r'\{[^{}]*\}', text, re.DOTALL)
+        if match:
+            text = match.group(0)
+        else:
+            # Fallback: strip markdown fences
+            if text.startswith("```"):
+                text = text.split("\n", 1)[1] if "\n" in text else text[3:]
+            if "```" in text:
+                text = text[:text.index("```")]
+            text = text.strip()
+
+        result = json.loads(text)
+
+        if not isinstance(result.get("confidence"), (int, float)):
+            logger.warning(f"Email LLM: missing/invalid confidence in response: {raw[:200]}")
+            return None
+        if result.get("status") not in ("interview", "offer", "rejected", "no_change"):
+            logger.warning(f"Email LLM: invalid status '{result.get('status')}' in response")
+            result["status"] = "no_change"
+
+        match_idx = result.get("match_index")
+        if match_idx is not None:
+            if not isinstance(match_idx, int) or match_idx < 1 or match_idx > len(active_apps):
+                logger.warning(f"Email LLM: invalid match_index {match_idx}, setting to null")
+                result["match_index"] = None
+
+        return result
+
+    except json.JSONDecodeError as e:
+        logger.warning(f"Email LLM: failed to parse JSON: {e}. Raw: {raw[:300]}")
+        return None
+    except Exception as e:
+        logger.warning(f"Email LLM classification failed: {e}")
+        return None

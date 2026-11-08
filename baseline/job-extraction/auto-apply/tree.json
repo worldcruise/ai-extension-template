@@ -1,0 +1,485 @@
+{
+  "sha": "96248c602214fbe8dfd44f93182584d1e6a952d9",
+  "url": "https://api.github.com/repos/omkar3602/auto-apply/git/trees/96248c602214fbe8dfd44f93182584d1e6a952d9",
+  "tree": [
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ac049b1282b95da82b6a3ccd9f8f2da2de89714f",
+      "size": 113,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/ac049b1282b95da82b6a3ccd9f8f2da2de89714f"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0e79305d4ecf7cc8273e072d51a9c3091564afaf",
+      "size": 13660,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/0e79305d4ecf7cc8273e072d51a9c3091564afaf"
+    },
+    {
+      "path": "TODO.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "52fb2cbc8d91ea881f344b18c1f2299f1d7b0a1c",
+      "size": 5614,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/52fb2cbc8d91ea881f344b18c1f2299f1d7b0a1c"
+    },
+    {
+      "path": "app.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1c0d3d9a11e4f28f34d7d0fef4c4ecdce596d062",
+      "size": 3455,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/1c0d3d9a11e4f28f34d7d0fef4c4ecdce596d062"
+    },
+    {
+      "path": "autoapply",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "22725cabda0fb592a0a799aa2387fd768f40a19b",
+      "size": 7055,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/22725cabda0fb592a0a799aa2387fd768f40a19b"
+    },
+    {
+      "path": "automation",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "06e0cd0894dfb7ed64b1bd7094b8f0c328f579f8",
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/trees/06e0cd0894dfb7ed64b1bd7094b8f0c328f579f8"
+    },
+    {
+      "path": "automation/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "automation/auto_apply_schedule.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87c7079087092f34ff29343759c8978d547821f2",
+      "size": 12884,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/87c7079087092f34ff29343759c8978d547821f2"
+    },
+    {
+      "path": "automation/browser.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "80d631aa36afa0ee335539d72fc268767518ec79",
+      "size": 4912,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/80d631aa36afa0ee335539d72fc268767518ec79"
+    },
+    {
+      "path": "automation/push.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "045a38587ecfd98da099a43874d19c6e1ebb891e",
+      "size": 3616,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/045a38587ecfd98da099a43874d19c6e1ebb891e"
+    },
+    {
+      "path": "automation/reminders.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c6733ac3b13fad84fe244a95b4ca11d41ae13c6e",
+      "size": 3003,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/c6733ac3b13fad84fe244a95b4ca11d41ae13c6e"
+    },
+    {
+      "path": "automation/schedule_state.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3ea26f2ca306b5ba968cd3d1b2e976450304a03f",
+      "size": 1297,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/3ea26f2ca306b5ba968cd3d1b2e976450304a03f"
+    },
+    {
+      "path": "automation/tasks.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "94f6002181083ebce78f4820eafb3c208d2d0718",
+      "size": 8870,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/94f6002181083ebce78f4820eafb3c208d2d0718"
+    },
+    {
+      "path": "automation/tsenta.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bbb6295907957f380385cb36416a275ef5dd10cb",
+      "size": 6973,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/bbb6295907957f380385cb36416a275ef5dd10cb"
+    },
+    {
+      "path": "automation/user_settings.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2f23c88a6c8e0dc5c08897520051a01bb553c9af",
+      "size": 1387,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/2f23c88a6c8e0dc5c08897520051a01bb553c9af"
+    },
+    {
+      "path": "browser_profiles",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d564d0bc3dd917926892c55e3706cc116d5b165e",
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/trees/d564d0bc3dd917926892c55e3706cc116d5b165e"
+    },
+    {
+      "path": "browser_profiles/.gitkeep",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": 0,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "config.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "08137b12d6588adf2f2edbf870d1d92f7f5796da",
+      "size": 3287,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/08137b12d6588adf2f2edbf870d1d92f7f5796da"
+    },
+    {
+      "path": "db.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "268693e68ac40811b79f108484e65b9055b86e76",
+      "size": 999,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/268693e68ac40811b79f108484e65b9055b86e76"
+    },
+    {
+      "path": "job_boards.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3af3f68b36d0ed1f1b017b9e521f9628f3819a5a",
+      "size": 1574,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/3af3f68b36d0ed1f1b017b9e521f9628f3819a5a"
+    },
+    {
+      "path": "models.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a6f78fcbc02e95a55469d602d75c66df0cc68699",
+      "size": 3125,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/a6f78fcbc02e95a55469d602d75c66df0cc68699"
+    },
+    {
+      "path": "requirements.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "16a8a227e6bc550e6e3489e31d3fdaff4ed554fe",
+      "size": 44,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/16a8a227e6bc550e6e3489e31d3fdaff4ed554fe"
+    },
+    {
+      "path": "routes",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "219cf70ebbc9b10632472973be6c8267cb71e7c4",
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/trees/219cf70ebbc9b10632472973be6c8267cb71e7c4"
+    },
+    {
+      "path": "routes/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a478bac7104d4878c8e1a48237788bd2488b01d3",
+      "size": 396,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/a478bac7104d4878c8e1a48237788bd2488b01d3"
+    },
+    {
+      "path": "routes/history.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d59a145467fca5a0eb7016727ae0f1b00546d910",
+      "size": 1809,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/d59a145467fca5a0eb7016727ae0f1b00546d910"
+    },
+    {
+      "path": "routes/jobs.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "81ce53d85b86d7654642751ab79ec78742abde8a",
+      "size": 2902,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/81ce53d85b86d7654642751ab79ec78742abde8a"
+    },
+    {
+      "path": "routes/push.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "89a70a13c9a78819147922029e6ed2e3583dcb63",
+      "size": 1192,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/89a70a13c9a78819147922029e6ed2e3583dcb63"
+    },
+    {
+      "path": "routes/settings.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dd5d7b6876c30d6c6a71b13a9302e434a7c66187",
+      "size": 978,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/dd5d7b6876c30d6c6a71b13a9302e434a7c66187"
+    },
+    {
+      "path": "routes/swipe.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fb1c795d08b41196ae38a7f55984d8165d75735d",
+      "size": 651,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/fb1c795d08b41196ae38a7f55984d8165d75735d"
+    },
+    {
+      "path": "scrapers",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8dd1a9da5201880b54671ef4de1045425e7d8982",
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/trees/8dd1a9da5201880b54671ef4de1045425e7d8982"
+    },
+    {
+      "path": "scrapers/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "79beb9b4394887025eb4dbea01d4e9bd1a501a40",
+      "size": 511,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/79beb9b4394887025eb4dbea01d4e9bd1a501a40"
+    },
+    {
+      "path": "scrapers/common.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1347e32b66f88e35a0433712ad82b27d67664008",
+      "size": 3417,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/1347e32b66f88e35a0433712ad82b27d67664008"
+    },
+    {
+      "path": "scrapers/description_fetch.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "55cc0859076ad5aeb8a5840d7ce4fcb4bfcae789",
+      "size": 3604,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/55cc0859076ad5aeb8a5840d7ce4fcb4bfcae789"
+    },
+    {
+      "path": "scrapers/jobright.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "167e69217bd54fb7258b778bfb64b3f5d84a898a",
+      "size": 11928,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/167e69217bd54fb7258b778bfb64b3f5d84a898a"
+    },
+    {
+      "path": "scrapers/markdown_table.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7c1dfe2aabf8d2ef3ba9b3f77faedef45d792e57",
+      "size": 2360,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/7c1dfe2aabf8d2ef3ba9b3f77faedef45d792e57"
+    },
+    {
+      "path": "scrapers/simplify.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1afa029466d22ccb604579369616f17f77dee017",
+      "size": 4503,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/1afa029466d22ccb604579369616f17f77dee017"
+    },
+    {
+      "path": "scrapers/speedyapply.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "66cc9f65a0ce6a3ed785901cf22e2dbe12302fd4",
+      "size": 3139,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/66cc9f65a0ce6a3ed785901cf22e2dbe12302fd4"
+    },
+    {
+      "path": "scrapers/zapplyjobs.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3945c697ded119a9b967fcc5a5136556df16e60a",
+      "size": 4795,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/3945c697ded119a9b967fcc5a5136556df16e60a"
+    },
+    {
+      "path": "static",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ab67541714b4cae2e873dfe7738368790ffeb23f",
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/trees/ab67541714b4cae2e873dfe7738368790ffeb23f"
+    },
+    {
+      "path": "static/css",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "475dbb2ccbf7bef5699386c242db8abf948aeed0",
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/trees/475dbb2ccbf7bef5699386c242db8abf948aeed0"
+    },
+    {
+      "path": "static/css/style.css",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "239a098c8c44c39a1e4bf32025b515a55af95152",
+      "size": 16093,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/239a098c8c44c39a1e4bf32025b515a55af95152"
+    },
+    {
+      "path": "static/icons",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1cefd8a3ea11f6717d83bd2cda100033a86e00f9",
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/trees/1cefd8a3ea11f6717d83bd2cda100033a86e00f9"
+    },
+    {
+      "path": "static/icons/icon-192.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c71e95450465cd43e0b9d212240e293a961f0b32",
+      "size": 7980,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/c71e95450465cd43e0b9d212240e293a961f0b32"
+    },
+    {
+      "path": "static/icons/icon-512.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d5ad20cbf1abb997ac940bc9d5126d6f5618abf2",
+      "size": 21773,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/d5ad20cbf1abb997ac940bc9d5126d6f5618abf2"
+    },
+    {
+      "path": "static/icons/icon-maskable-512.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5946382a05fd28c9bc35674691cfa078cd886ade",
+      "size": 18296,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/5946382a05fd28c9bc35674691cfa078cd886ade"
+    },
+    {
+      "path": "static/js",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "c88305b099c4209564316ab3328914a0e2b01b5b",
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/trees/c88305b099c4209564316ab3328914a0e2b01b5b"
+    },
+    {
+      "path": "static/js/app.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1edaa1a72b14bf161e9d380b41339907b3517976",
+      "size": 6810,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/1edaa1a72b14bf161e9d380b41339907b3517976"
+    },
+    {
+      "path": "static/js/history.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "21559c1a31ada8ce9c2264899bee3a1973d07b06",
+      "size": 1956,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/21559c1a31ada8ce9c2264899bee3a1973d07b06"
+    },
+    {
+      "path": "static/js/push.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "48a5adcee268b3894b8b303fda2e3c1e74ffc882",
+      "size": 3099,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/48a5adcee268b3894b8b303fda2e3c1e74ffc882"
+    },
+    {
+      "path": "static/js/swipe.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "05881b0665a8f4ba287d0edde37d241c6fd91a12",
+      "size": 10574,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/05881b0665a8f4ba287d0edde37d241c6fd91a12"
+    },
+    {
+      "path": "static/manifest.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6218928438d186caa15156d695748d44b3c71c28",
+      "size": 608,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/6218928438d186caa15156d695748d44b3c71c28"
+    },
+    {
+      "path": "static/sw.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "05ebbbae185640a62ea8f0c1498bc2c6e9f9b42d",
+      "size": 2216,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/05ebbbae185640a62ea8f0c1498bc2c6e9f9b42d"
+    },
+    {
+      "path": "templates",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "27e3b6abc052558350b188f61cacc0f3eb7b4249",
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/trees/27e3b6abc052558350b188f61cacc0f3eb7b4249"
+    },
+    {
+      "path": "templates/auto_history.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "630ea1039196e13d0324666624bd94b99a7aa908",
+      "size": 2039,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/630ea1039196e13d0324666624bd94b99a7aa908"
+    },
+    {
+      "path": "templates/base.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "554dfd1e4dcb8ac991ca35b3f7dc50ac49116f11",
+      "size": 3674,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/554dfd1e4dcb8ac991ca35b3f7dc50ac49116f11"
+    },
+    {
+      "path": "templates/history.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1dba7f5004db344055c9fd41e1e30789fb2b3fa8",
+      "size": 2181,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/1dba7f5004db344055c9fd41e1e30789fb2b3fa8"
+    },
+    {
+      "path": "templates/job_detail.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "907b9f8295d7c1a4420f3352a6497e10fa54dbd8",
+      "size": 2079,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/907b9f8295d7c1a4420f3352a6497e10fa54dbd8"
+    },
+    {
+      "path": "templates/swipe.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a1d0e1993d1cf83779b25a2d5ca96ad551e5cc3f",
+      "size": 3051,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/a1d0e1993d1cf83779b25a2d5ca96ad551e5cc3f"
+    },
+    {
+      "path": "templates/tab.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1c36b476626a65d718d03274dfbc6516d93125bb",
+      "size": 3085,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/1c36b476626a65d718d03274dfbc6516d93125bb"
+    },
+    {
+      "path": "tools",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5f5047718a7cfa8972bc01f8abf4b0d40519976d",
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/trees/5f5047718a7cfa8972bc01f8abf4b0d40519976d"
+    },
+    {
+      "path": "tools/make_icons.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7afc07c2e5273c92b5422403f18cb3a356fc769b",
+      "size": 3137,
+      "url": "https://api.github.com/repos/omkar3602/auto-apply/git/blobs/7afc07c2e5273c92b5422403f18cb3a356fc769b"
+    }
+  ],
+  "truncated": false
+}
