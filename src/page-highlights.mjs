@@ -1,3 +1,5 @@
+import './keyword-matcher.js';
+
 export function createPageHighlights({ browser = globalThis.chrome } = {}) {
   const toggle = document.getElementById('highlight-keywords');
   const label = toggle.closest('.keyword-page-toggle');
@@ -11,7 +13,7 @@ export function createPageHighlights({ browser = globalThis.chrome } = {}) {
     const run = ++generation;
     const tabId = target;
     if (!settings?.enabled) { say(''); return; }
-    if (!settings.keywords.length) { say('Add keywords in Settings → Keyword highlights.'); return; }
+    if (!settings.groups.some(group => group.keywords.length)) { say('Add keywords in Settings → Keyword highlights.'); return; }
     if (!Number.isInteger(target)) { say('Select a job web page to highlight.'); return; }
     try {
       const tab = await browser.tabs.get(tabId);
@@ -41,6 +43,6 @@ export function createPageHighlights({ browser = globalThis.chrome } = {}) {
   });
   return {
     setTarget({ tabId }) { if (tabId !== target) { target = tabId; return apply(); } },
-    update(value) { settings = value; return apply(); }
+    update(value) { settings = globalThis.AiAgentKeywords.normalize(value); return apply(); }
   };
 }

@@ -1,6 +1,6 @@
 # Job extraction review and implementation
 
-Reviewed on 2026-11-08. This work connects **Read page** and **Ctrl+Shift+S** to the four existing
+Reviewed on 2026-11-08. This work connects **Read page** and **Ctrl+Shift+F** to the four existing
 Studio fields: Company, Job title, URL, and Job Description.
 
 ## Repository findings
@@ -37,7 +37,7 @@ These are product/workflow references, not public extractor implementations.
 ```mermaid
 flowchart TD
   A[Read page] --> B[Background validates the request and tab]
-  S[Ctrl+Shift+S] --> O[Open Studio and queue source tab until panel is ready]
+  S[Ctrl+Shift+F] --> O[Open Studio and queue source tab until panel is ready]
   O --> B
   B --> C[Collect accessible page evidence]
   C --> D[JobPosting JSON-LD and microdata]
@@ -65,17 +65,22 @@ parameters are retained.
 
 `src/job-extraction-service.mjs` coordinates the read in the service worker. It
 retries briefly for client-rendered content, detects navigation during a read,
-and returns actionable errors for inaccessible or unsupported pages. It uses the
-existing `activeTab` and `scripting` permissions; no new host permissions or API
-keys are needed.
+and returns actionable errors for inaccessible or unsupported pages. The Read page
+button requests optional HTTP/HTTPS host permissions directly from its click handler
+and resumes after approval. `src/job-page-access.mjs` cancels that read if its tab
+navigates or closes during the permission prompt. The keyboard shortcut retains the
+temporary `activeTab` path. No API keys are needed.
 
 Studio keeps fields editable. A missing field does not erase an existing value.
 Edits made after the read starts are preserved. If the user changes tabs, the
 result is saved to the original tab's draft instead of filling the new tab.
-Feedback uses the existing hover/accessibility channels without adding a
-persistent status row. Reading works with tailoring on or off.
+Progress stays in the button and actual read failures open a dialog. Feedback also
+uses the existing hover/accessibility channels without a persistent status row.
+Reading works with tailoring on or off.
 
-The `read-job-page` Chrome command uses Ctrl+Shift+S (Command+Shift+S on macOS).
+The `read-job-page` Chrome command defaults to Ctrl+Shift+F (Command+Shift+F on macOS).
+Settings → Keyboard shortcuts displays the actual Chrome assignment and opens Chrome’s
+shortcut editor. Existing user assignments remain intact and can be changed there.
 It opens the native panel in the command's window and selects Review Job. A
 one-shot request waits up to 30 seconds for panel startup, so a closed dock can
 run the same Studio read handler as the button. Requests stay with their source
@@ -111,8 +116,9 @@ local fixture documents, not the user's signed-in job-board accounts.
 
 - Use an individual job page, or a board detail pane with a clear selected job.
   An ambiguous list of jobs is not sufficient evidence to invent a selection.
-- Click the extension icon on the job page to grant temporary page access, then
-  click Read page, or press Ctrl+Shift+S to grant access and read in one action.
+- Click Read page and approve Chrome’s optional website-access prompt once. It
+  then reads across job sites without another extension-icon click. Alternatively,
+  press Ctrl+Shift+F to grant temporary access and read in one action.
   Opening the dock on another origin does not grant access here. If another
   extension already uses the shortcut, assign it at `chrome://extensions/shortcuts`.
 - Cross-origin embedded job pages require their own access. Open the embedded

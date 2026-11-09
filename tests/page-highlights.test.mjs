@@ -37,6 +37,10 @@ test('only an enabled configuration with keywords injects into the selected top-
   assert.equal(fixture.calls.length, 1);
   assert.deepEqual(fixture.calls[0].target, {tabId:7});
   assert.match(fixture.status.title, /on for this job page/);
+  await fixture.controller.update({enabled:true,groups:[{id:'red',keywords:['SQL']}]});
+  assert.equal(fixture.calls.length, 2, 'grouped settings also inject');
+  await fixture.controller.update({enabled:true,groups:[{id:'red',keywords:[]}]});
+  assert.equal(fixture.calls.length, 2, 'empty grouped settings do not inject');
 });
 
 test('missing page permission gives an actionable tooltip without claiming highlights were applied', async () => {

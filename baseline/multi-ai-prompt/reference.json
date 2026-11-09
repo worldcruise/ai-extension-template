@@ -1,0 +1,20 @@
+{
+  "name": "Multi-AI-Prompt",
+  "extensionId": "ddebobakhbknpcmiobbpkgbhhccmdmop",
+  "version": "1.6.1",
+  "reviewedOn": "2026-11-08",
+  "storeUrl": "https://chromewebstore.google.com/detail/multi-ai-prompt/ddebobakhbknpcmiobbpkgbhhccmdmop",
+  "privacyUrl": "https://gist.github.com/codeandquestion/c31f44f68e8735802c0281894a17e4a1",
+  "packageSource": "https://clients2.google.com/service/update2/crx?response=redirect&prodversion=157.0.8103.38&acceptformat=crx2,crx3&x=id%3Dddebobakhbknpcmiobbpkgbhhccmdmop%26uc",
+  "packageBytes": 1101736,
+  "packageSha256": "4223f694b5f58602b6e85787f7ecb6189e761a894c720f5a750dd91d181a27f0",
+  "reviewedFiles": [
+    "manifest.json",
+    "content-scripts/chatgpt.js",
+    "content-scripts/content-script-base.js",
+    "popup/modules/prompt-sender.js",
+    "utils/bg-tab-operations.js"
+  ],
+  "license": "No license file found in the distributed package; no source code copied into this project.",
+  "handling": "Downloaded from Google for read-only inspection; not installed or executed. Package and extracted scripts remain in ignored artifacts/reference-review."
+}

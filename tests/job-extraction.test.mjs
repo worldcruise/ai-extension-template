@@ -85,4 +85,8 @@ test('background extraction targets only the requested tab and rejects navigatio
   browser.tabs.get=async()=>({url:evidence.url});
   browser.scripting.executeScript=async()=>{throw new Error('No permission');};
   await assert.rejects(()=>read(7),error=>error.code==='page-access');
+  browser.scripting.executeScript=async()=>{throw new Error('Cannot access a chrome:// URL');};
+  await assert.rejects(()=>read(7),error=>error.code==='unsupported-page');
+  browser.scripting.executeScript=async()=>{throw new Error('A script execution failure');};
+  await assert.rejects(()=>read(7),error=>error.code==='extraction-failed');
 });

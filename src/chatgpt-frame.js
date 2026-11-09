@@ -11,6 +11,27 @@
   let fontPercent = 100;
   let fontStyle;
   let fontTargets = new Set();
+  const heldShortcuts = new Set();
+  const consume = event => { event.preventDefault(); event.stopImmediatePropagation(); };
+  window.addEventListener('keydown', event => {
+    const key = event.code || event.key;
+    if (event.repeat && heldShortcuts.has(key)) { consume(event); return; }
+    const action = globalThis.AiAgentWorkspaceKeys?.action(event);
+    if (!action || document.querySelector('dialog[open], [role="dialog"][aria-modal="true"]')) {
+      if (!event.repeat) heldShortcuts.delete(key);
+      return;
+    }
+    heldShortcuts.add(key); consume(event);
+    // Reserve the chord during the handshake too: Ctrl+Enter must never fall
+    // through to ChatGPT's Send behavior while the sidebar is connecting.
+    if (!nonce) return;
+    // Runtime messaging authenticates this isolated content script. A page's
+    // postMessage cannot manufacture a queue action or a trusted key press.
+    void chrome.runtime.sendMessage({ type: 'workspace.shortcut', nonce, action, pressId: crypto.randomUUID() }).catch(() => {});
+  }, true);
+  window.addEventListener('keyup', event => {
+    if (event.isTrusted && heldShortcuts.delete(event.code || event.key)) consume(event);
+  }, true);
 
   function resizeText() {
     if (fontPercent === 100) {
@@ -64,13 +85,17 @@
   function post(data) {
     if (nonce) window.parent.postMessage({ channel, nonce, ...data }, extensionOrigin);
   }
+  const queueAdapter = globalThis.AiAgentChatQueue?.createPageAdapter(post);
+  const historyReader = globalThis.AiAgentChatHistory.createReader({ getConnection: () => queueAdapter?.inspectConnection() || {} });
 
   function sendState(force = false) {
     if (!nonce) return;
     const editor = document.querySelector('#prompt-textarea, [data-composer-markdown][contenteditable="true"], textarea[data-mobile-composer-prompt]');
-    const ready = Boolean(editor?.getClientRects().length);
-    const guest = Boolean(document.querySelector('form[data-logged-out]'));
-    const state = { type: 'state', url: location.origin + location.pathname, ready, guest };
+    const ready = Boolean(editor?.isConnected && !editor.closest('[hidden], [inert]') &&
+      getComputedStyle(editor).display !== 'none' && getComputedStyle(editor).visibility !== 'hidden');
+    const connection = queueAdapter?.inspectConnection();
+    const guest = connection?.authState === 'signed-out' || Boolean(document.querySelector('form[data-logged-out]'));
+    const state = { type: 'state', url: location.origin + location.pathname, ready, guest, authState: connection?.authState, buildId: connection?.buildId, history:historyReader.peek() };
     const serialized = JSON.stringify(state);
     if (force || serialized !== lastState) { lastState = serialized; post(state); }
   }
@@ -83,6 +108,22 @@
       nonce = event.data.nonce;
       setFontSize(event.data.fontScale);
       sendState(true);
+    }
+    if (event.data.nonce !== nonce) return;
+    const operationId = event.data.operationId;
+    if (typeof operationId !== 'string' || !/^[\w-]{1,100}$/.test(operationId)) return;
+    if (event.data.type === 'history.command' && event.isTrusted) {
+      const reply = value => post({type:'history.reply',operationId,ok:true,value});
+      if (event.data.action === 'inspect') void historyReader.inspect().then(reply).catch(() => post({type:'history.reply',operationId,ok:false}));
+      else if (event.data.action === 'open') void historyReader.open(event.data.data || {}, reply).catch(() => post({type:'history.reply',operationId,ok:false}));
+      return;
+    }
+    if (event.data.type === 'queue.authorize') queueAdapter?.authorize(operationId, event.data.allowed);
+    if (event.data.type === 'queue.command' && queueAdapter) {
+      queueAdapter.execute(event.data.action, event.data.data, operationId).then(
+        value => post({ type: 'queue.reply', operationId, ok: true, value }),
+        error => post({ type: 'queue.reply', operationId, ok: false, error: { code: error.code || 'chat-error', message: error.message.slice(0, 2000), diagnostics: error.diagnostics } })
+      );
     }
   });
 
@@ -125,5 +166,6 @@
   else document.addEventListener('DOMContentLoaded', observe, { once: true });
   window.addEventListener('popstate', () => sendState(true));
   window.addEventListener('resize', scheduleUpdate);
-  window.addEventListener('pagehide', () => { observer.disconnect(); clearTimeout(timer); });
+  document.addEventListener('input', scheduleUpdate, true);
+  window.addEventListener('pagehide', () => { queueAdapter?.dispose(); observer.disconnect(); clearTimeout(timer); });
 })();

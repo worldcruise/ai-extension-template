@@ -17,8 +17,15 @@ export function createJobExtractionService(browser=globalThis.chrome) {
       try {
         const frames=await browser.scripting.executeScript({target:{tabId},func:collectJobEvidence,args:[jobSiteAdapters]});
         capture=frames.find(frame=>frame.frameId===0)?.result || frames[0]?.result;
-      } catch {
-        throw failure('page-access','Click the extension icon on this job page, then try Read page again.');
+      } catch (error) {
+        const details = String(error?.message || '');
+        if (/chrome:\/\/|chrome-extension:\/\/|extensions gallery|chrome web store/i.test(details)) {
+          throw failure('unsupported-page','Chrome does not allow this page to be read. Open a job listing on a regular website and try again.');
+        }
+        if (/cannot access|permission|not allowed|not permitted/i.test(details)) {
+          throw failure('page-access','Chrome is blocking website access. Open this extension’s Site access settings and allow the job site, then try Read page again.');
+        }
+        throw failure('extraction-failed','The page could not be read. Reload the job page and try Read page again.');
       }
       const current=await browser.tabs.get(tabId).catch(()=>null);
       if (!current || (tab.url && current.url!==tab.url) || (tab.url && capture?.url!==tab.url)) {

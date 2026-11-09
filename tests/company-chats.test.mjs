@@ -28,3 +28,14 @@ test('distinct saved companies can share a conversation and keep their literal c
     'Northstar', '<img src=x onerror=alert(1)>'
   ]);
 });
+
+test('an acknowledged job conversation is registered while its result is still generating', () => {
+  const request = { ...createExamples()[0], isExample: false, state: 'generating', resume: null,
+    sourceChatUrl: 'https://chatgpt.com/c/in-progress', attempts: [{ submitted: false }] };
+  assert.deepEqual(savedCompanyChats([request], 'morgan'), []);
+  request.attempts[0].submitted = true;
+  assert.equal(savedCompanyChats([request], 'morgan')[0].url, request.sourceChatUrl);
+  assert.deepEqual(savedCompanyChats([request], 'jordan'), []);
+  request.state = 'cancelled';
+  assert.deepEqual(savedCompanyChats([request], 'morgan'), []);
+});

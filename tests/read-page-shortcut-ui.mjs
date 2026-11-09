@@ -39,7 +39,7 @@ export async function checkReadPageShortcut({ cdp, id, workerSession, sourceSess
   });
   const commands = await worker('chrome.commands.getAll()');
   const shortcut = commands.find(command => command.name === 'read-job-page')?.shortcut;
-  assert.ok(['Ctrl+Shift+S', 'Command+Shift+S', '\u2318\u21e7S'].includes(shortcut), `Read page shortcut assigned: ${shortcut}`);
+  assert.ok(['Ctrl+Shift+F', 'Command+Shift+F', '\u2318\u21e7F'].includes(shortcut), `Read page shortcut assigned: ${shortcut}`);
   const url = 'https://jobs.example.test/extract/jsonld-graph';
   await cdp.send('Page.navigate', { url }, sourceSession);
   await until(() => evaluate(sourceSession, 'document.body?.dataset.extractionFixture === "jsonld-graph"'), 'shortcut job fixture');

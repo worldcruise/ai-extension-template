@@ -86,8 +86,10 @@ function documentJob(evidence) {
   const parsed = titleParts(evidence);
   let company = companyText(evidence.company) || companyText(primary?.company) || companyText(evidence.semanticCompany) || parsed.company;
   let role = roleText(evidence.role) || roleText(primary?.title) || roleText(evidence.semanticRole);
+  let roleKind = !roleText(evidence.role) && roleText(primary?.title) ? 'structured' : 'page';
   if (!role || normalized(role)===normalized(company)) {
     role = (evidence.headings || []).map(roleText).find(text=>text && normalized(text)!==normalized(company)) || parsed.role;
+    roleKind = 'page';
   }
   if (!company) company = companyText(evidence.meta?.company,false) || companyText(evidence.meta?.['og:site_name'],false);
   const dom = (evidence.descriptions || []).map(item => {
@@ -108,7 +110,10 @@ function documentJob(evidence) {
   if (!description || (!primary && !(semantic && (role || company)) && !(native?.hits>=2 && role))) return null;
   if (state && !structured && !evidence.site && cues(description)<2 && !semantic) return null;
   const certainty = structured ? 100 : state ? 92 : semantic ? 85 : 55;
-  return {company,role,description,url:cleanJobUrl(evidence.url),source,
+  const provenance = { company: !company ? { kind: 'missing' } : { kind: !companyText(evidence.company) && companyText(primary?.company) ? 'structured' : 'page',
+    source: !companyText(evidence.company) && companyText(primary?.company) ? structured ? 'JobPosting' : 'Embedded job JSON' : 'Page metadata or DOM' },
+    role: !role ? { kind: 'missing' } : { kind: roleKind, source: roleKind === 'structured' ? structured ? 'JobPosting' : 'Embedded job JSON' : 'Page metadata or DOM' } };
+  return {company,role,description,url:cleanJobUrl(evidence.url),source,provenance,
     score:certainty + (company ? 5 : 0) + (role ? 5 : 0) + Math.min(description.length/1000,10)};
 }
 
@@ -117,6 +122,6 @@ export function extractJobFromEvidence(capture) {
   const job = jobs[0];
   if (!job) return null;
   const fields = {company:job.company,role:job.role,url:cleanJobUrl(capture.url),description:job.description};
-  return {fields,source:job.source,missing:Object.entries(fields).filter(([,value])=>!value).map(([key])=>key),
+  return {fields,source:job.source,provenance:job.provenance,missing:Object.entries(fields).filter(([,value])=>!value).map(([key])=>key),
     blockedFrames:(capture.blockedFrames || []).length};
 }

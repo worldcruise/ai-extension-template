@@ -13,6 +13,12 @@ import { checkWorkspaceUI } from './workspace-ui.mjs';
 import { checkJobReader } from './job-reader-ui.mjs';
 import { checkReadPageShortcut } from './read-page-shortcut-ui.mjs';
 import { jobPageFixtures, jobFixtureResponse } from './fixtures/job-pages.mjs';
+import { queueFixtureScript } from './fixtures/queue-chatgpt.mjs';
+import { checkBulkQueue } from './bulk-queue-ui.mjs';
+import { checkTabQueue } from './tab-queue-ui.mjs';
+import { checkEditorBoundaries } from './editor-boundary-ui.mjs';
+import { checkManualPromptUI } from './manual-prompt-ui.mjs';
+import { MANUAL_QUEUE_MODE } from '../src/queue-mode.mjs';
 
 const artifacts = fileURLToPath(new URL('../artifacts/', import.meta.url));
 const paths = [process.env.CHROME_PATH,
@@ -47,7 +53,7 @@ class CDP {
   send(method, params = {}, sessionId) {
     return new Promise((resolve, reject) => {
       const id = ++this.sequence;
-      const timer = setTimeout(() => { this.pending.delete(id); reject(new Error(`CDP timeout: ${method}`)); }, 15000);
+      const timer = setTimeout(() => { this.pending.delete(id); reject(new Error(`CDP timeout: ${method}`)); }, method === 'Runtime.evaluate' ? 30000 : 15000);
       this.pending.set(id, { resolve, reject, timer });
       this.socket.send(JSON.stringify({ id, method, params, ...(sessionId ? { sessionId } : {}) }));
     });
@@ -113,6 +119,7 @@ let cdp;
 const sessions = new Map();
 const activeSessions = new Set();
 const errors = [];
+const contexts = new Map();
 const savedChats = [
   { title: 'Resume planning', url: '/c/saved-resume' },
   { title: 'Interview notes', url: '/c/saved-interview' },
@@ -123,9 +130,9 @@ const fixture = guest => `<!doctype html><html><head><meta name="viewport" conte
 <style>body{margin:0;background:#fff;color:#202526;font:15px system-ui;display:flex;flex-direction:column;min-height:100vh}main{flex:1;display:grid;place-content:center;text-align:center;padding:24px}h1{font-size:25px;font-weight:550}p{color:#727b7b;font-size:13px}form{margin:18px;border:1px solid #dce3df;border-radius:22px;padding:16px;background:#f6f8f7}textarea{border:0;resize:none;background:transparent;width:100%;font:14px system-ui;outline:none}button{border:0;background:#147d66;color:white;padding:8px 14px;border-radius:20px}</style>
 </head><body><button id="sidebar-open" type="button" data-testid="open-sidebar-button" aria-label="Open sidebar" style="position:absolute;top:12px;left:12px">Chats</button><button id="sidebar-close" type="button" data-testid="close-sidebar-button" aria-label="Close sidebar" hidden style="position:absolute;top:12px;left:12px">Close chats</button><nav id="history" aria-label="Chat history" hidden style="position:absolute;top:50px;left:12px;max-width:250px;background:white;padding:12px;border:1px solid #ddd"></nav><main><h1>What can I help with?</h1><p>Local ChatGPT fixture · no live account</p></main><form ${guest ? 'data-logged-out' : ''}><textarea id="prompt-textarea" placeholder="Ask anything"></textarea>${guest ? '<button type="button" data-testid="login-button">Log in</button>' : ''}</form><script>
 const sidebarHistory=document.getElementById('history'), sidebarOpen=document.getElementById('sidebar-open'), sidebarClose=document.getElementById('sidebar-close');
-sidebarOpen.addEventListener('click',()=>{sidebarHistory.replaceChildren(...${JSON.stringify(savedChats)}.map(chat=>{const link=document.createElement('a');link.href=chat.url;link.textContent=chat.title;link.style.display='block';return link}));sidebarHistory.hidden=false;sidebarOpen.hidden=true;sidebarClose.hidden=false;});
+sidebarOpen.addEventListener('click',()=>{sidebarHistory.replaceChildren(...${JSON.stringify(savedChats)}.map(chat=>{const link=document.createElement('a');link.href=chat.url;link.textContent=chat.title;link.style.display='block';link.addEventListener('click',event=>{if(link.origin===location.origin && /^\\/c\\//.test(link.pathname)){event.preventDefault();window.history.pushState({},'',link.pathname);dispatchEvent(new PopStateEvent('popstate'));}});return link}));sidebarHistory.hidden=false;sidebarOpen.hidden=true;sidebarClose.hidden=false;});
 sidebarClose.addEventListener('click',()=>{sidebarHistory.hidden=true;sidebarOpen.hidden=false;sidebarClose.hidden=true;});
-</script></body></html>`;
+</script><script>(${queueFixtureScript.toString()})();</script></body></html>`;
 
 try {
   const port = await until(async () => {
@@ -137,6 +144,11 @@ try {
   await new Promise((resolve, reject) => { socket.addEventListener('open', resolve, { once: true }); socket.addEventListener('error', reject, { once: true }); });
   cdp = new CDP(socket);
   cdp.on('Runtime.exceptionThrown', params => errors.push(params.exceptionDetails.exception?.description || params.exceptionDetails.text));
+  cdp.on('Runtime.executionContextCreated', ({ context }, sessionId) => {
+    const current = contexts.get(sessionId) || new Map(); current.set(context.id, context); contexts.set(sessionId, current);
+  });
+  cdp.on('Runtime.executionContextDestroyed', ({ executionContextId }, sessionId) => contexts.get(sessionId)?.delete(executionContextId));
+  cdp.on('Runtime.executionContextsCleared', (_, sessionId) => contexts.delete(sessionId));
   cdp.on('Target.detachedFromTarget', ({ sessionId }) => activeSessions.delete(sessionId));
   cdp.on('Target.attachedToTarget', ({ sessionId, targetInfo }) => {
     activeSessions.add(sessionId);
@@ -166,8 +178,8 @@ try {
     return sessions.get(targetId) || attached.sessionId;
   }
   const workerSession = await session(worker.targetId);
-  async function evaluate(sessionId, expression) {
-    const result = await cdp.send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true, userGesture: true }, sessionId);
+  async function evaluate(sessionId, expression, contextId) {
+    const result = await cdp.send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true, userGesture: true, ...(contextId ? { contextId } : {}) }, sessionId);
     if (result.exceptionDetails) throw new Error(result.exceptionDetails.exception?.description || result.exceptionDetails.text);
     return result.result.value;
   }
@@ -184,9 +196,14 @@ try {
   const { targetId } = await cdp.send('Target.createTarget', { url: `chrome-extension://${id}/index.html` });
   const panel = await session(targetId);
   const read = expression => evaluate(panel, expression);
-  const click = selector => read(`document.querySelector(${JSON.stringify(selector)}).click()`);
+  const click = async selector => {
+    await read(`document.querySelector(${JSON.stringify(selector)}).click()`);
+    await until(() => read('document.documentElement.dataset.studioBusy !== "true"'), 'Studio action saved');
+  };
   const state = () => read('document.getElementById("connection").dataset.state');
-  await until(() => read('Boolean(document.querySelector("#resume-queue .job-request"))'), 'combined workspace startup');
+  await until(() => read('document.documentElement.dataset.studioReady === "true"'), 'combined workspace startup');
+  assert.equal(await read('document.querySelectorAll(".job-request").length'), 0, 'real queue starts empty');
+  await click('#review-another'); await click('#profile-details'); await click('#reset-examples');
   await click('#chat-tab');
   await until(async () => await state() === 'ready', 'embedded ChatGPT readiness');
   assert.equal(await read('document.getElementById("connection").hidden'), true);
@@ -197,9 +214,27 @@ try {
   await delay(200);
   await click('#open-tab');
   await until(async () => (await targets()).some(target => target.type === 'page' && target.url === 'https://chatgpt.com/c/fixture-chat'), 'open current conversation');
+  await click('#chat-toolbar-pin');
   await click('#reload');
   await until(async () => await read('document.getElementById("chatgpt-frame").src') === 'https://chatgpt.com/c/fixture-chat', 'reload conversation route');
   await until(async () => await state() === 'ready', 'reload readiness');
+  assert.equal(await read('document.getElementById("chat-toolbar-shell").dataset.open'), 'true', 'toolbar remains pinned after frame reload');
+  assert.equal(await read('document.getElementById("chat-toolbar-pin").getAttribute("aria-pressed")'), 'true');
+  assert.equal(await read('document.getElementById("chatgpt-frame").getBoundingClientRect().top >= document.getElementById("chat-toolbar").getBoundingClientRect().bottom'), true, 'pinned toolbar reserves space after reloading the chat');
+  // A second extension page starts with the stored pin preference. Closing this
+  // isolated page leaves the original fixture panel and conversation mounted.
+  const restoredToolbar = await cdp.send('Target.createTarget', { url: `chrome-extension://${id}/index.html` });
+  try {
+    const restoredSession = await session(restoredToolbar.targetId);
+    await until(() => evaluate(restoredSession, 'document.getElementById("chat-toolbar-pin")?.getAttribute("aria-pressed") === "true"'), 'saved toolbar pin restored in a new panel');
+    assert.equal(await evaluate(restoredSession, 'document.getElementById("chat-toolbar-shell").dataset.open'), 'true');
+    await evaluate(restoredSession, 'document.getElementById("chat-tab").click()');
+    assert.equal(await evaluate(restoredSession, 'document.getElementById("chatgpt-frame").getBoundingClientRect().top >= document.getElementById("chat-toolbar").getBoundingClientRect().bottom'), true, 'restored pin reserves space in the new panel');
+  } finally {
+    await cdp.send('Target.closeTarget', { targetId: restoredToolbar.targetId });
+    await cdp.send('Page.bringToFront', {}, panel);
+  }
+  await click('#chat-toolbar-pin');
   await click('#new-chat');
   await until(async () => await read('document.getElementById("chatgpt-frame").src') === 'https://chatgpt.com/', 'new chat');
   await until(async () => await state() === 'ready', 'new chat readiness');
@@ -209,10 +244,11 @@ try {
   await until(async () => await state() === 'guest', 'guest recovery');
   assert.equal(await read('document.getElementById("recovery").hidden'), false);
   await click('#chat-toolbar-reveal');
-  await click('#company-chat-toggle');
+  await read('document.getElementById("company-chat-search").focus()');
   await until(async () => (await read('document.getElementById("company-chat-status").textContent')).includes('No connected company chats'), 'empty company chats after resetting examples');
   assert.equal(await read('document.querySelectorAll("#company-chat-list button").length'), 0);
-  await click('#company-chat-toggle');
+  await read('document.getElementById("company-chat-search").blur()');
+  await until(() => read('document.getElementById("company-chat-menu").hidden'), 'company search closes on blur');
   await click('#sign-in');
   await until(async () => (await targets()).some(target => target.type === 'page' && target.url === 'https://chatgpt.com/auth/login'), 'first-party sign-in tab');
   const loginTabs = (await targets()).filter(target => target.type === 'page' && target.url === 'https://chatgpt.com/auth/login').length;
@@ -255,39 +291,71 @@ try {
   const dock = await until(async () => (await targets()).find(target => target.targetId !== targetId && target.url === `chrome-extension://${id}/index.html`), 'native dock target');
   let dockSession = await session(dock.targetId);
   await until(() => evaluate(dockSession, 'Boolean(document.querySelector("#resume-queue .job-request"))'), 'native workspace startup');
+  const totalHighlights = () => evaluate(sourceSession, '[...CSS.highlights].filter(([name]) => name.startsWith("ai-agent-job-keywords-")).reduce((count, [, ranges]) => count + ranges.size, 0)');
   try {
-    await until(() => evaluate(sourceSession, 'CSS.highlights.get("ai-agent-job-keywords")?.size === 5'), 'job page keyword highlights');
+    await until(async () => await totalHighlights() === 5, 'job page keyword highlights');
   } catch (error) {
     const details = await evaluate(dockSession, `(async () => ({hint:document.getElementById('highlight-keywords').title,
       enabled:document.getElementById('highlight-keywords').checked,
       settings:await chrome.storage.local.get('keywordHighlights'),
       tabs:await chrome.tabs.query({currentWindow:true,active:true})}))()`);
-    details.page = await evaluate(sourceSession, '({highlights:[...CSS.highlights.keys()],color:document.documentElement.style.getPropertyValue("--ai-agent-keyword-color")})');
+    details.page = await evaluate(sourceSession, '({highlights:[...CSS.highlights.keys()]})');
     throw new Error(`${error.message}: ${JSON.stringify(details)}`);
   }
   assert.equal(await evaluate(sourceSession, 'document.body.innerHTML'), jobMarkup);
   assert.equal(await evaluate(sourceSession, 'document.getElementById("job-notes").value'), 'React SQL private notes');
-  assert.deepEqual(await evaluate(sourceSession, '[...CSS.highlights.get("ai-agent-job-keywords")].map(range => range.toString())'), ['React','C++','SQL','machine learning','<img src=x onerror=alert(1)>']);
-  assert.equal(await evaluate(sourceSession, 'getComputedStyle(document.documentElement).getPropertyValue("--ai-agent-keyword-color").trim()'), '#b7e4ca');
-  assert.equal(await evaluate(dockSession, 'CSS.highlights.has("ai-agent-job-keywords")'), false);
-  await evaluate(sourceSession, 'const extra=document.createElement("p"); extra.textContent="React SQL ReactNative"; document.querySelector("main").append(extra)');
-  await until(() => evaluate(sourceSession, 'CSS.highlights.get("ai-agent-job-keywords")?.size === 7'), 'new job content highlighted');
+  assert.deepEqual(await evaluate(sourceSession, 'Object.fromEntries([...CSS.highlights].filter(([name]) => name.startsWith("ai-agent-job-keywords-")).map(([name, ranges]) => [name.replace("ai-agent-job-keywords-", ""), [...ranges].map(range => range.toString())]))'), {
+    yellow:['C++'], green:['React'], blue:['machine learning'], red:['SQL'], purple:['<img src=x onerror=alert(1)>']
+  });
+  assert.equal(await evaluate(sourceSession, 'getComputedStyle(document.documentElement).getPropertyValue("--ai-agent-keyword-color-red").trim()'), '#ff5252');
+  assert.equal(await evaluate(sourceSession, 'getComputedStyle(document.documentElement).getPropertyValue("--ai-agent-keyword-color-green").trim()'), '#b7e4ca');
+  assert.equal(await evaluate(dockSession, '[...CSS.highlights.keys()].some(name => name.startsWith("ai-agent-job-keywords"))'), false);
+  await evaluate(sourceSession, 'const extra=document.createElement("p"); extra.textContent="React SQL ReactNative AWS Kubernetes"; document.querySelector("main").append(extra)');
+  await until(async () => await totalHighlights() === 9, 'new job content highlighted in all seven colors');
+  assert.deepEqual(await evaluate(sourceSession, '[...CSS.highlights.get("ai-agent-job-keywords-orange")].map(range => range.toString())'), ['AWS']);
+  assert.deepEqual(await evaluate(sourceSession, '[...CSS.highlights.get("ai-agent-job-keywords-custom")].map(range => range.toString())'), ['Kubernetes']);
+  assert.equal(await evaluate(sourceSession, 'getComputedStyle(document.documentElement).getPropertyValue("--ai-agent-keyword-color-custom").trim()'), '#c7f0ed');
+  const storedHighlights = await evaluate(dockSession, 'chrome.storage.local.get("keywordHighlights").then(data => data.keywordHighlights)');
+  const withoutOrange = structuredClone(storedHighlights);
+  withoutOrange.groups.find(group => group.id === 'orange').keywords = [];
+  await evaluate(dockSession, `chrome.storage.local.set({keywordHighlights:${JSON.stringify(withoutOrange)}})`);
+  await until(async () => await totalHighlights() === 8, 'clearing one list removes only that color');
+  assert.equal(await evaluate(sourceSession, 'CSS.highlights.has("ai-agent-job-keywords-orange")'), false);
+  const emptyHighlights = structuredClone(storedHighlights);
+  for (const group of emptyHighlights.groups) group.keywords = [];
+  await evaluate(dockSession, `chrome.storage.local.set({keywordHighlights:${JSON.stringify(emptyHighlights)}})`);
+  await until(async () => await totalHighlights() === 0, 'clearing every list removes all highlights while enabled');
+  await evaluate(dockSession, `chrome.storage.local.set({keywordHighlights:${JSON.stringify(storedHighlights)}})`);
+  await until(async () => await totalHighlights() === 9, 'saved color groups restored');
   await evaluate(dockSession, 'document.getElementById("review-another").click()');
   await until(() => evaluate(dockSession, 'document.getElementById("job-url").value === "https://jobs.example.test/engineering"'), 'accessible page URL autofills');
   await until(() => evaluate(dockSession, '!document.getElementById("highlight-keywords").disabled'), 'native keyword toggle loaded');
   assert.equal(await evaluate(dockSession, 'document.getElementById("highlight-keywords").checked'), true);
   await evaluate(dockSession, 'document.getElementById("highlight-keywords").click()');
-  await until(() => evaluate(sourceSession, '!CSS.highlights.has("ai-agent-job-keywords")'), 'turn off page highlights');
+  await until(async () => await totalHighlights() === 0, 'turn off page highlights');
   await evaluate(dockSession, 'document.getElementById("highlight-keywords").click()');
-  await until(() => evaluate(sourceSession, 'CSS.highlights.get("ai-agent-job-keywords")?.size === 7'), 'turn on page highlights');
+  await until(async () => await totalHighlights() === 9, 'turn on page highlights');
   await cdp.send('Page.bringToFront', {}, sourceSession);
   const jobShot = await cdp.send('Page.captureScreenshot', {format:'png'}, sourceSession);
   await writeFile(join(artifacts, 'job-page-highlights.png'), Buffer.from(jobShot.data, 'base64'));
   await cdp.send('Page.navigate', {url:'https://jobs.example.test/another-job'}, sourceSession);
-  await until(() => evaluate(sourceSession, 'CSS.highlights.get("ai-agent-job-keywords")?.size === 5'), 'highlighting survives same-site job navigation');
+  await until(async () => await totalHighlights() === 5, 'highlighting survives same-site job navigation');
   const extraction=await checkJobReader({cdp,id,sourceSession,dockSession,evaluate,until});
   const shortcut = await checkReadPageShortcut({cdp,id,workerSession,sourceSession,dockSession,evaluate,until,session});
   dockSession = shortcut.dockSession;
+  let bulkQueue = { checks: [], fixtureOnly: true, liveAccount: false, submissions: 0, paused: true };
+  let tabQueue = { ...bulkQueue };
+  let editorBoundaries = { checks: [], fixtureOnly: true, liveAccount: false, paused: true };
+  let manualQueue;
+  if (MANUAL_QUEUE_MODE) {
+    manualQueue = await checkManualPromptUI({ cdp, dockSession, evaluate, until, session });
+  } else {
+    bulkQueue = await checkBulkQueue({cdp,id,workerSession,sourceSession,dockSession,panelSession:panel,evaluate,until,session});
+    dockSession = bulkQueue.dockSession;
+    tabQueue = await checkTabQueue({ cdp, id, workerSession, dockSession, evaluate, until, session });
+    dockSession = tabQueue.dockSession;
+    editorBoundaries = await checkEditorBoundaries({ cdp, id, evaluate, until, session, contexts });
+  }
   await evaluate(dockSession, 'document.getElementById("chat-tab").click()');
   await until(async () => await evaluate(dockSession, 'document.getElementById("connection")?.dataset.state') === 'ready', 'native dock ChatGPT readiness');
   const dockContexts = await evaluate(workerSession, 'chrome.runtime.getContexts({contextTypes:["SIDE_PANEL"]})');
@@ -297,6 +365,10 @@ try {
   assert.deepEqual(errors, []);
   const report = { browser: version.product, fixtureOnly: true, liveAuthentication: false, requests, layouts, workspace, extraction,
     shortcut: { assigned: shortcut.shortcut, warmDock: shortcut.warmDock, coldDock: shortcut.coldDock, physicalKeyboard: shortcut.physicalKeyboard },
+    bulkQueue: {checks:bulkQueue.checks,fixtureOnly:bulkQueue.fixtureOnly,liveAccount:bulkQueue.liveAccount,submissions:bulkQueue.submissions},
+    tabQueue: { checks: tabQueue.checks, fixtureOnly: tabQueue.fixtureOnly, liveAccount: tabQueue.liveAccount, submissions: tabQueue.submissions },
+    editorBoundaries,
+    ...(manualQueue ? { manualQueue } : {}),
     checks: ['unpacked extension loads', 'native dock opens from toolbar', 'dock survives tab navigation', 'installed header rule scope', 'embedding with restrictive response headers',
       'frame readiness', 'current conversation in new tab', 'reload keeps conversation', 'new chat', 'guest sign-in tab', 'embedded sign-in handoff',
       'job-page-only keyword highlighting with temporary page access', 'literal and cross-element phrases preserve page markup',

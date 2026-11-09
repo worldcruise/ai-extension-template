@@ -3,6 +3,17 @@ export const CHATGPT_HOME = `${CHATGPT_ORIGIN}/`;
 export const FRAME_CHANNEL = 'ai-agent-template.sidebar';
 export const EMBED_RULE_ID = 1;
 
+export function frameShortcutMessage(message, sender, extensionId, nonce) {
+  if (!nonce || sender?.id !== extensionId || message?.type !== 'workspace.shortcut' || message.nonce !== nonce ||
+      !globalThis.AiAgentWorkspaceKeys.isAction(message.action) ||
+      typeof message.pressId !== 'string' || !/^[\w-]{1,100}$/.test(message.pressId)) return null;
+  try {
+    const source = new URL(sender.url);
+    if (source.origin !== CHATGPT_ORIGIN || source.username || source.password) return null;
+  } catch { return null; }
+  return { action: message.action, pressId: message.pressId };
+}
+
 // Only keep conversation routes. Never relay auth URLs, query strings or hashes.
 export function conversationUrl(value) {
   try {
@@ -44,8 +55,45 @@ export function frameMessage(event, frameWindow, nonce) {
   if (event.source !== frameWindow || event.origin !== CHATGPT_ORIGIN ||
       !data || data.channel !== FRAME_CHANNEL || data.nonce !== nonce) return null;
   if (data.type === 'sign-in') return { type: 'sign-in' };
+  if (data.type === 'history.reply') {
+    if (typeof data.operationId !== 'string' || !/^[\w-]{1,100}$/.test(data.operationId) || typeof data.ok !== 'boolean') return null;
+    if (!data.ok) return {type:data.type,operationId:data.operationId,ok:false};
+    const value = globalThis.AiAgentChatHistory.snapshot(data.value);
+    return value ? {type:data.type,operationId:data.operationId,ok:true,value} : null;
+  }
+  if (['queue.reply', 'queue.progress'].includes(data.type)) return queueMessage(data);
   if (data.type !== 'state') return null;
   const url = conversationUrl(data.url);
   if (!url) return null;
-  return { type: 'state', url, ready: data.ready === true, guest: data.guest === true };
+  return { type: 'state', url, ready: data.ready === true, guest: data.guest === true,
+    ...(typeof data.buildId === 'string' && /^[\w.-]{1,100}$/.test(data.buildId) ? { buildId: data.buildId } : {}),
+    ...(['signed-in', 'signed-out', 'unknown'].includes(data.authState) ? { authState: data.authState } : {}),
+    ...(globalThis.AiAgentChatHistory.snapshot(data.history) ? {history:globalThis.AiAgentChatHistory.snapshot(data.history)} : {}) };
 }
+
+export function queueMessage(data) {
+  if (data && ['queue.reply', 'queue.progress'].includes(data.type)) {
+    if (typeof data.operationId !== 'string' || !/^[\w-]{1,100}$/.test(data.operationId)) return null;
+    if (data.type === 'queue.progress') {
+      const url = conversationUrl(data.url);
+      if (!url || !['prepared', 'dispatched', 'registered', 'submitted', 'generating'].includes(data.phase)) return null;
+      return { type: data.type, operationId: data.operationId, phase: data.phase, url,
+        userMessageId: typeof data.userMessageId === 'string' ? data.userMessageId.slice(0, 300) : '',
+        assistantMessageId: typeof data.assistantMessageId === 'string' ? data.assistantMessageId.slice(0, 300) : '',
+        ...(redactedDiagnostic(data.diagnostics) ? { diagnostics: redactedDiagnostic(data.diagnostics) } : {}) };
+    }
+    if (typeof data.ok !== 'boolean') return null;
+    if (!data.ok) return { type: data.type, operationId: data.operationId, ok: false,
+      error: { code: String(data.error?.code || 'chat-error').slice(0, 100), message: String(data.error?.message || 'ChatGPT could not complete this request.').slice(0, 2000),
+        ...(redactedDiagnostic(data.error?.diagnostics) ? { diagnostics: redactedDiagnostic(data.error.diagnostics) } : {}) } };
+    if (!data.value || typeof data.value !== 'object' || Array.isArray(data.value)) return null;
+    if (data.value.raw !== undefined && (typeof data.value.raw !== 'string' || data.value.raw.length > 500000)) return null;
+    const value = { ...data.value };
+    if ('diagnostics' in value) value.diagnostics = redactedDiagnostic(value.diagnostics);
+    return { type: data.type, operationId: data.operationId, ok: true, value };
+  }
+  return null;
+}
+import { redactedDiagnostic } from './queue-diagnostics.mjs';
+import './workspace-shortcut-keys.js';
+import './chat-history.js';

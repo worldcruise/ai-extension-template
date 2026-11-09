@@ -1,5 +1,9 @@
 const paths = {
   plus: 'M12 5v14M5 12h14',
+  pin: 'M9 3h6M10 3v7l-3 3v4h10v-4l-3-3V3M12 17v5',
+  'pin-off': 'M2 2l20 20M9 3h6M14 3v7l3 3v4M10 10l-3 3v4h10M12 17v5',
+  keyboard: 'M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1ZM7 9h.01M12 9h.01M17 9h.01M7 12h.01M12 12h.01M17 12h.01M7 15h10',
+  search: 'M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-2 6 6 6',
   'zoom-in': 'M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-2 6 6 6M6 10h8M10 6v8',
   'zoom-out': 'M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-2 6 6 6M6 10h8',
   highlight: 'm15 3 6 6-9 9H6v-6l9-9ZM6 18l-3 3M3 22h10M12 6l6 6',
@@ -10,6 +14,7 @@ const paths = {
   'file-pen': 'M14 3H5a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10M14 3v6h6M14 3l6 6M8 8h2M8 12h3M15 19l6-6-3-3-6 6-1 4 4-1Z',
   user: 'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM4 21v-2a8 8 0 0 1 16 0v2',
   'chevron-down': 'm7 10 5 5 5-5',
+  'chevron-up': 'm7 14 5-5 5 5',
   'chevron-left': 'm14 6-6 6 6 6',
   'chevron-right': 'm10 6 6 6-6 6',
   'arrow-right': 'M4 12h16m-6-6 6 6-6 6',

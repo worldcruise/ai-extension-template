@@ -1,4 +1,28 @@
-::highlight(ai-agent-job-keywords) {
-  background-color: var(--ai-agent-keyword-color, #fff2a8);
+::highlight(ai-agent-job-keywords-yellow) {
+  background-color: var(--ai-agent-keyword-color-yellow, #fff2a8);
+  color: #20292d;
+}
+::highlight(ai-agent-job-keywords-green) {
+  background-color: var(--ai-agent-keyword-color-green, #b7e4ca);
+  color: #20292d;
+}
+::highlight(ai-agent-job-keywords-blue) {
+  background-color: var(--ai-agent-keyword-color-blue, #bde0fe);
+  color: #20292d;
+}
+::highlight(ai-agent-job-keywords-red) {
+  background-color: var(--ai-agent-keyword-color-red, #ff5252);
+  color: #20292d;
+}
+::highlight(ai-agent-job-keywords-purple) {
+  background-color: var(--ai-agent-keyword-color-purple, #ddd0f5);
+  color: #20292d;
+}
+::highlight(ai-agent-job-keywords-orange) {
+  background-color: var(--ai-agent-keyword-color-orange, #ffd4a8);
+  color: #20292d;
+}
+::highlight(ai-agent-job-keywords-custom) {
+  background-color: var(--ai-agent-keyword-color-custom, #e2e8f0);
   color: #20292d;
 }

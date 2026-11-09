@@ -1,5 +1,54 @@
 # Changelog
 
+## 0.5.0 — 2026-11-08
+
+Manual resume queue, grouped keyword highlights, sidebar shortcuts, and ChatGPT history navigation checkpoint. Automatic sending remains paused. Live ChatGPT account behavior remains unverified.
+
+- Add vertically stacked ChatGPT history arrows beside search, following native history order with disabled newest/new-chat and oldest boundaries.
+- Protect drafts and ongoing responses during history navigation, restore native sidebar visibility, and require observed URL changes after a single native link click.
+
+- Use a stronger Red (#ff5252) for its color swatch and job-page keyword highlights, preserving existing Red keyword lists.
+
+- Rename Review resume to Job Queues and add Ctrl+Up/Down view navigation, Ctrl+Left/Right browser-tab navigation, and Ctrl+Enter Add to queue shortcuts in the sidebar and embedded ChatGPT.
+- List sidebar shortcuts in Settings, suppress held-key repeats, preserve modal controls and composer drafts, and validate frame shortcut messages through the extension runtime.
+- Reserve a separate row for the pinned Chat toolbar so it does not cover iframe content; unpin restores the full chat height and hover controls.
+
+- Request optional HTTP/HTTPS website access directly from Read page, resume the same read after consent, and cancel if its tab changes during the prompt.
+- Remove the inline Read page status panel; keep progress in the button and show actual failures in an error dialog.
+- Add Yellow, Green, Blue, Red, Purple, Orange, and Custom groups with separate saved keyword lists and simultaneous page highlighting.
+- Preserve existing single-color keywords in the matching group, migrate the former Pink preset to Red, and retain exact custom colors.
+
+- Move Chat’s New chat and Reload buttons to the left, and add a saved pin preference to keep the toolbar open.
+
+- Change Read page’s default shortcut to Ctrl+Shift+F (Command+Shift+F on macOS), add Keyboard shortcuts to Settings, and show the actual Chrome binding on the button.
+
+- Replace the Company chats button with a compact search field that expands on focus, supports keyboard selection, and preserves the saved-company scope.
+
+- Add clipboard-only Copy prompt actions on request cards and in Details, with a readonly selection fallback.
+- Temporarily pause automatic queue sending in both UI and runner; copying preserves request and delivery state.
+
+- Add JSON candidate-profile import and a downloadable format example.
+- Persist profiles, queue snapshots, delivery attempts, captured replies, results, and company chat links locally.
+- Add an explicit Start queue action and sequential ChatGPT sidebar submission, coordinated across extension windows.
+- Protect unsent drafts and require a persisted send intent before clicking Send.
+- Capture only the reply associated with the current delivery; validate resume structure and fixed profile facts.
+- Archive confirmed completed invalid/error responses without automatic correction or resend; pause on uncertain delivery.
+- Recover an existing result after the sidebar closes without submitting again, and retry failed saves from retained output.
+- Keep demonstration results opt-in and excluded from the runner.
+- Replace the single account-menu assumption with multiple public UI signals and add a self-contained Check connection dialog with a one-panel confirmation fallback.
+- Restore unsent authentication-blocked jobs after a successful connection check; keep signed-out pages and uncertain deliveries blocked.
+- Handle rich-text paragraph formatting and modern Send controls without failing an unchanged queued draft.
+- Continue a verified unsent draft with its original delivery marker; record dispatch and acknowledgement separately and register company chats during generation.
+- Review Multi-AI-Prompt's distributed package and add an optional normal ChatGPT tab connection controlled by the existing Studio queue.
+- Preserve personal tabs, save the connection choice, pin each delivery to its connection, and reconnect to the owned tab after sidebar closure.
+- Add deterministic host/adapter build fingerprints and bounded redacted phase diagnostics; fail closed on missing or mismatched runtime identity.
+- Reacquire connected editors before readback, authorization, and dispatch, preserving unexpected drafts without blind reinsertion.
+- Separate composer readiness, authentication evidence, and panel-session confirmation in connection inspection.
+- Make reconciliation single-request and regeneration deliberate; preserve history and save-only retries.
+- Keep Add available during runs, open recorded conversations from Review, and retain separate Details and completed-failure history.
+- Preserve company/title provenance, missing values, and historical labels without guessing their origins.
+- Validate with focused unit tests and isolated Chrome checks; live account behavior remains unverified.
+
 ## 0.4.0 — 2026-11-08
 
 Job extraction and keyboard shortcut checkpoint. Bulk ChatGPT generation remains planned.
