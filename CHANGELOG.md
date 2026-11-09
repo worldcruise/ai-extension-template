@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+- Replace candidate/company search suggestions with the current ChatGPT session's saved chat titles and native links, with refresh, keyboard selection and candidate-independent results.
+- Keep chat titles in panel memory, validate bounded history messages, and preserve draft, generation and stale-navigation protections when choosing a conversation.
+- Reduce queue handoff latency with verified empty-chat reuse, native New chat navigation, event-driven readiness, and direct DOM response reads.
+- Shorten settling for matching completed JSON to 180 ms while retaining conservative handling for ambiguous output, single-send guards, and validation before Ready.
+- Persist send authorization checks atomically, omit redundant acknowledgement writes, and capture redacted completion timing for latency checks.
+- Add a default-on, saved company/URL duplicate check for Add and Ctrl+Enter, with a visible Already applied status and transactional protection across panels.
+- Check the selected candidate's queued jobs and saved results before saving, copying or sending, preserving job URL identities and metadata provenance.
+- Make Add to queue save and copy the exact prompt, open Chat, and send that new request once in a fresh Sidebar Chat, with response monitoring and validated local results.
+- Serialize additional Adds without including older queued jobs; preserve drafts and stop on Pause, navigation, uncertain delivery, or persistence failure.
+- Keep Copy prompt clipboard-only and bulk Start/Continue paused; Review uses the originating delivery's connection.
+- Verify the handoff, duplicate guard, draft protection, cancellation, and single-send acknowledgement with unit tests and isolated browser fixtures.
+
 ## 0.5.0 — 2026-11-08
 
 Manual resume queue, grouped keyword highlights, sidebar shortcuts, and ChatGPT history navigation checkpoint. Automatic sending remains paused. Live ChatGPT account behavior remains unverified.

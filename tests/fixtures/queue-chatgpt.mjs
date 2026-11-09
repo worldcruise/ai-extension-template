@@ -40,6 +40,24 @@ export function queueFixtureScript() {
   const threadId = location.pathname.split('/c/')[1];
   if (threadId && threads()[threadId]) render(threads()[threadId]);
   const changed = () => { send.disabled = localStorage.getItem('fixtureBlockSend') === 'true' || !value().trim() || Boolean(document.querySelector('[data-testid="stop-button"]')); };
+  if (localStorage.getItem('fixtureNativeNewChat') !== 'missing') {
+    const newChat = document.createElement('button'); newChat.type = 'button'; newChat.dataset.testid = 'create-new-chat-button';
+    newChat.setAttribute('aria-label', 'New chat'); newChat.textContent = 'New chat'; form.before(newChat);
+    newChat.addEventListener('click', () => {
+      localStorage.setItem('fixtureNewChatClicks', String(Number(localStorage.getItem('fixtureNewChatClicks') || 0) + 1));
+      if (document.documentElement.dataset.fixtureNativeNoop) return;
+      const navigate = () => {
+        history.pushState({}, '', document.documentElement.dataset.fixtureNativeUnexpectedRoute ? '/c/unexpected-route' : '/');
+        document.querySelectorAll('article[data-fixture-turn]').forEach(node => node.remove());
+        documentValue = '';
+        if (composer.matches('textarea')) composer.value = document.documentElement.dataset.fixtureNativeDraft ? 'Synthetic restored draft' : '';
+        else composer.textContent = document.documentElement.dataset.fixtureNativeDraft ? 'Synthetic restored draft' : '';
+        changed(); dispatchEvent(new PopStateEvent('popstate'));
+      };
+      const delay = Number(document.documentElement.dataset.fixtureNativeDelay || 0);
+      if (delay) setTimeout(navigate, delay); else navigate();
+    });
+  }
   function onInput(event) {
     document.documentElement.dataset.fixtureInputs = String(Number(document.documentElement.dataset.fixtureInputs || 0) + 1);
     if (structured && typeof event.data === 'string') {
@@ -93,7 +111,10 @@ export function queueFixtureScript() {
       const alert = document.createElement('p'); alert.setAttribute('role', 'alert'); alert.textContent = 'You have reached your usage limit. Try again after 10 minutes.'; form.append(alert);
       return;
     }
-    const timer = setTimeout(() => { render(thread); stop.remove(); changed(); }, prompt.includes('FIXTURE_LONG') ? 3000 : 350);
+    const timer = setTimeout(() => {
+      render(thread); stop.remove(); changed();
+      document.documentElement.dataset.fixtureCompletedAt = String(Date.now());
+    }, prompt.includes('FIXTURE_LONG') ? 3000 : 350);
     stop.addEventListener('click', () => { clearTimeout(timer); stop.remove(); changed(); });
     };
     const ackDelay = Number(document.documentElement.dataset.fixtureAckDelay || 0);

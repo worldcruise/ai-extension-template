@@ -6,6 +6,7 @@ import { compatibleRequest, deliveryEvidence, hasSubmissionEvidence, recoverable
 import { metadataProvenance } from './job-metadata.mjs';
 import { redactedDiagnostic } from './queue-diagnostics.mjs';
 import { MANUAL_QUEUE_MODE, MANUAL_QUEUE_MESSAGE } from './queue-mode.mjs';
+import { findExistingJob } from './job-duplicates.mjs';
 
 const runningStates = ['preparing', 'sending', 'generating', 'validating'];
 export const activeStates = [...runningStates, 'saving'];
@@ -19,6 +20,10 @@ export function createResumeQueue({ store = createQueueStore(), locks = globalTh
   uuid = () => crypto.randomUUID(), now = Date.now, manualOnly = MANUAL_QUEUE_MODE } = {}) {
   let state = { requests: [], profiles: [], control: { paused: true } };
   let starting = false, disposed = false, lastError = '', activeChat;
+  // Add grants a one-shot, panel-local permission for this new request only.
+  // Reload/recovery never recreates these permissions from stored records.
+  const addPermissions = new Map(), addedRequests = [];
+  let drainingAdds = false, addEpoch = 0;
   const listeners = new Set(), captures = new Map();
   const ownerId = uuid();
   const notify = () => { if (!disposed) for (const listener of listeners) listener(snapshot()); };
@@ -148,7 +153,8 @@ export function createResumeQueue({ store = createQueueStore(), locks = globalTh
     });
     return id;
   }
-  async function add(input) {
+  async function add(input, { sendOnAdd = false, checkExisting = false } = {}) {
+    const permissionEpoch = addEpoch;
     await ready;
     const copy = structuredClone(input); copy.profile = normalizeProfile(copy.profile);
     copy.job = { ...copy.job, provenance: metadataProvenance(copy.job) };
@@ -157,15 +163,26 @@ export function createResumeQueue({ store = createQueueStore(), locks = globalTh
     if (JSON.stringify(copy).length > 300000) throw new Error('This request is too large. Shorten the job description.');
     const request = { id: uuid(), input: copy, state: 'queued', resume: null, attempts: [], createdAt: now(), updatedAt: now(), repairCount: 0 };
     if (buildResumePrompt(request, uuid()).length > 350000) throw new Error('The combined profile and job produce a prompt over 350 KB. Shorten the profile or job description.');
-    await edit(draft => {
+    if (sendOnAdd) {
+      request.deliveryId = uuid();
+      request.attempts.push({ deliveryId: request.deliveryId, prompt: buildResumePrompt(request, request.deliveryId),
+        connection: 'sidebar', initiatedBy: 'add', createdAt: now(), submitted: false });
+    }
+    const pauseRevision = await edit(draft => {
       if (!draft.profiles.some(profile => profile.id === copy.candidateId)) throw new Error('Import or select a candidate first.');
+      // Check inside the write transaction, not a possibly stale panel snapshot.
+      const duplicate = checkExisting && findExistingJob(copy, draft.requests);
+      if (duplicate) throw Object.assign(new Error('Already applied'), { code: 'already-applied', duplicate });
       draft.requests.push({ ...request, sequence: Math.max(0, ...draft.requests.map(item => item.sequence || 0)) + 1 });
+      return draft.control.pauseRevision || 0;
     });
+    if (sendOnAdd && permissionEpoch === addEpoch) addPermissions.set(request.id, pauseRevision);
     return request.id;
   }
   async function pause() {
+    addEpoch++; addedRequests.length = 0; addPermissions.clear();
     await ready;
-    await edit(draft => { draft.control = { ...draft.control, paused: true }; });
+    await edit(draft => { draft.control = { ...draft.control, paused: true, pauseRevision: (draft.control.pauseRevision || 0) + 1 }; });
   }
   async function selectCandidate(id) {
     await ready;
@@ -178,13 +195,15 @@ export function createResumeQueue({ store = createQueueStore(), locks = globalTh
   }
   function deliveryProgress(requestId, deliveryId) {
     return async progress => {
-      if (progress.phase === 'prepared' && !(await canSubmit(requestId))) return false;
-      await patch(requestId, current => {
+      return edit(draft => {
+        const current = draft.requests.find(request => request.id === requestId);
+        if (progress.phase === 'prepared' && (disposed || draft.control.paused || draft.control.ownerId !== ownerId || !activeStates.includes(current?.state))) return false;
+        if (!current) throw new Error('This request no longer exists.');
         if (current.deliveryId !== deliveryId) throw new Error('The active attempt changed.');
         const sourceChatUrl = linkedConversationUrl(progress.url) || current.sourceChatUrl;
         const acknowledged = ['registered', 'submitted', 'generating'].includes(progress.phase);
         const diagnostic = redactedDiagnostic(progress.diagnostics);
-        return { state: acknowledged ? 'generating' : 'sending', sourceChatUrl,
+        replace(draft, requestId, { state: acknowledged ? 'generating' : 'sending', sourceChatUrl,
           attempts: current.attempts.map(attempt => attempt.deliveryId === deliveryId ? { ...attempt,
             sendIntent: progress.phase === 'prepared' || attempt.sendIntent === true, submitted: acknowledged || attempt.submitted,
             ...(progress.phase === 'prepared' ? { preparedAt: now() } : {}),
@@ -194,12 +213,12 @@ export function createResumeQueue({ store = createQueueStore(), locks = globalTh
             assistantMessageId: progress.assistantMessageId || attempt.assistantMessageId, url: sourceChatUrl,
             ...(diagnostic ? { diagnostics: [...(attempt.diagnostics || []), { ...diagnostic, send: {
               intent: progress.phase === 'prepared' || attempt.sendIntent === true,
-              dispatched: progress.phase === 'dispatched' || Boolean(attempt.dispatchedAt), acknowledged: acknowledged || attempt.submitted === true } }].slice(-16) } : {}) } : attempt) };
+              dispatched: progress.phase === 'dispatched' || Boolean(attempt.dispatchedAt), acknowledged: acknowledged || attempt.submitted === true } }].slice(-16) } : {}) } : attempt) });
+        return true;
       });
-      return true;
     };
   }
-  async function delivery(request, repairError = '', prepared = null) {
+  async function delivery(request, repairError = '', prepared = null, fresh = false) {
     const chat = activeChat;
     if (!chat?.queue) throw new Error('ChatGPT is still starting. Open Chat, then start the queue again.');
     const deliveryId = prepared?.deliveryId || uuid();
@@ -207,18 +226,27 @@ export function createResumeQueue({ store = createQueueStore(), locks = globalTh
     await patch(request.id, current => {
       if (current.state === 'cancelled') throw new Error('This request was cancelled.');
       return { state: 'preparing', deliveryId, rawOutput: '', captureCompleted: false, captureKind: null, regenerationAuthorized: false,
-      sourceChatUrl: repairError || prepared ? current.sourceChatUrl : null,
+      sourceChatUrl: !fresh && (repairError || prepared) ? current.sourceChatUrl : null,
       repairCount: repairError ? current.repairCount + 1 : current.repairCount,
-      attempts: prepared ? current.attempts : [...current.attempts, { deliveryId, prompt, connection: chat.queue.kind || 'sidebar', startedAt: now(), repair: Boolean(repairError), submitted: false }] };
+      attempts: prepared ? current.attempts.map(attempt => attempt.deliveryId === deliveryId && fresh
+        ? { ...attempt, startedAt: now() } : attempt)
+        : [...current.attempts, { deliveryId, prompt, connection: chat.queue.kind || 'sidebar', startedAt: now(), repair: Boolean(repairError), submitted: false }] };
     });
     if (!(await canSubmit(request.id))) throw new Error('Queue paused before preparing the chat.');
-    if (!repairError && !prepared) await chat.queue.newConversation();
+    if (!repairError && (!prepared || fresh)) await chat.queue.newConversation();
     if (!(await canSubmit(request.id))) throw new Error('Queue paused before sending.');
-    return chat.queue.submit({ requestId: request.id, deliveryId, prompt, resumePrepared: Boolean(prepared) }, deliveryProgress(request.id, deliveryId));
+    return chat.queue.submit({ requestId: request.id, deliveryId, prompt, resumePrepared: Boolean(prepared) && !fresh }, deliveryProgress(request.id, deliveryId));
   }
-  async function process(request) {
+  async function process(request, fresh = false) {
     let capture;
-    if (request.state === 'interrupted') {
+    if (fresh) {
+      const attempt = request.attempts.at(-1);
+      if (request.state !== 'queued' || attempt?.initiatedBy !== 'add' || hasSubmissionEvidence(request) || request.rawOutput ||
+          attempt.deliveryId !== request.deliveryId || attempt.prompt !== buildResumePrompt(request, attempt.deliveryId)) {
+        throw new Error('This Add handoff is no longer a fresh, unsent request. Nothing was resent.');
+      }
+      capture = await delivery(request, '', attempt, true);
+    } else if (request.state === 'interrupted') {
       const attempt = request.attempts.at(-1);
       if (!request.rawOutput && attempt && (attempt.connection || 'sidebar') !== (activeChat.queue.kind || 'sidebar')) {
         throw Object.assign(new Error(`This delivery used ${attempt.connection === 'tab' ? 'ChatGPT tab' : 'Sidebar Chat'}. Choose that connection in Settings before continuing or recovering it.`), { code: 'connection-mismatch' });
@@ -247,36 +275,47 @@ export function createResumeQueue({ store = createQueueStore(), locks = globalTh
   }
   async function start(candidateId, onlyRequestId = null) {
     if (manualOnly) throw Object.assign(new Error(MANUAL_QUEUE_MESSAGE), { code: 'manual-mode' });
+    return run(candidateId, onlyRequestId);
+  }
+  async function run(candidateId, onlyRequestId = null, epoch = null, pauseRevision = null) {
+    const fresh = epoch !== null;
+    const authorized = () => !fresh || epoch === addEpoch;
+    const eligibleState = request => onlyRequestId
+      ? request.id === onlyRequestId && (fresh ? request.state === 'queued' : recoverableStates.includes(request.state))
+      : ['queued', 'interrupted', ...runningStates].includes(request.state);
     await ready;
-    if (starting) return;
+    if (starting) throw new Error('A generation operation is already running. This request was left in the queue.');
     if (!locks) throw new Error('This browser cannot coordinate the queue safely. Use Chrome 116 or later.');
     starting = true; lastError = ''; notify();
     try {
       await locks.request(QUEUE_LOCK, { ifAvailable: true }, async lock => {
         if (!lock) throw new Error('The queue is running in another extension window. Pause it there first.');
-        activeChat = await getChat();
+        activeChat = await getChat({ fromAdd: fresh });
         await refresh();
-        if (!onlyRequestId && state.requests.some(item => !item.isExample && item.state === 'uncertain')) {
+        if ((!onlyRequestId || fresh) && state.requests.some(item => !item.isExample && item.state === 'uncertain')) {
           throw new Error('Reconcile uncertain deliveries before starting more generation. No prompt was sent.');
         }
-        await edit(draft => { draft.control = { ...draft.control, ownerId, candidateId, paused: false }; });
+        if (!authorized()) return;
+        await edit(draft => {
+          if (fresh && (draft.control.pauseRevision || 0) !== pauseRevision) throw Object.assign(new Error('Pause or navigation cancelled this Add handoff. The job remains saved.'), { code: 'interrupted' });
+          draft.control = { ...draft.control, ownerId, candidateId, paused: false };
+        });
         try {
           while (!disposed) {
             await refresh();
-            if (state.control.paused) break;
-            const request = state.requests.find(item => item.input.candidateId === candidateId && !item.isExample &&
-              (onlyRequestId ? item.id === onlyRequestId && recoverableStates.includes(item.state) : ['queued', 'interrupted', ...runningStates].includes(item.state)));
+            if (state.control.paused || !authorized()) break;
+            const request = state.requests.find(item => item.input.candidateId === candidateId && !item.isExample && eligibleState(item));
             if (!request) break;
-            const work = onlyRequestId || runningStates.includes(request.state) ? { ...request, state: 'interrupted' } : request;
+            const work = !fresh && (onlyRequestId || runningStates.includes(request.state)) ? { ...request, state: 'interrupted' } : request;
             const claimed = await edit(draft => {
               const current = draft.requests.find(item => item.id === request.id);
-              if (draft.control.paused || !current || !(onlyRequestId ? recoverableStates.includes(current.state) : ['queued', 'interrupted', ...runningStates].includes(current.state))) return false;
+              if (!authorized() || draft.control.paused || !current || !eligibleState(current)) return false;
               draft.control = { ...draft.control, activeId: request.id };
               replace(draft, request.id, { state: 'preparing' });
               return true;
             });
             if (!claimed) continue;
-            try { await process(work); }
+            try { await process(work, fresh); }
             catch (error) {
               lastError = errorText(error);
               if (state.requests.find(item => item.id === request.id)?.state !== 'saving' && !captures.has(request.id)) {
@@ -298,6 +337,39 @@ export function createResumeQueue({ store = createQueueStore(), locks = globalTh
         }
       });
     } finally { activeChat = null; starting = false; notify(); }
+  }
+  function sendAddedRequest(id) {
+    if (disposed || !addPermissions.has(id)) throw new Error('This request has no unused Add permission. It was not resent.');
+    const pauseRevision = addPermissions.get(id); addPermissions.delete(id);
+    addedRequests.push({ id, pauseRevision });
+    void drainAddedRequests();
+  }
+  async function drainAddedRequests() {
+    if (drainingAdds) return;
+    drainingAdds = true;
+    const epoch = addEpoch;
+    try {
+      while (!disposed && epoch === addEpoch && addedRequests.length) {
+        const { id, pauseRevision } = addedRequests.shift();
+        try {
+          await refresh();
+          const request = state.requests.find(item => item.id === id);
+          if (!request || request.state === 'cancelled') continue;
+          await run(request.input.candidateId, id, epoch, pauseRevision);
+          await refresh();
+          const outcome = state.requests.find(item => item.id === id);
+          if (!['ready', ...terminalStates].includes(outcome?.state)) break;
+        } catch (error) {
+          lastError = errorText(error);
+          await patch(id, current => current.state === 'queued' && !hasSubmissionEvidence(current)
+            ? { state: 'unsent', error: lastError, errorCode: error.code || 'handoff-blocked' } : {}).catch(() => {});
+          break;
+        }
+      }
+    } finally {
+      // Failure, Pause or navigation leaves later jobs saved, never auto-retried.
+      addedRequests.length = 0; drainingAdds = false; notify();
+    }
   }
   async function generateAgain(id, { confirmed = false, expectedDeliveryId, expectedUpdatedAt } = {}) {
     await ready;
@@ -368,8 +440,8 @@ export function createResumeQueue({ store = createQueueStore(), locks = globalTh
       draft.requests.push(...createExamples().map(request => ({ ...request, sequence: ++sequence, isExample: true, createdAt: now(), updatedAt: now(), attempts: [], repairCount: 0 })));
     });
   }
-  function dispose() { disposed = true; clearInterval(ownerWatcher); channel?.close(); listeners.clear(); }
+  function dispose() { disposed = true; addEpoch++; addedRequests.length = 0; addPermissions.clear(); clearInterval(ownerWatcher); channel?.close(); listeners.clear(); }
   return { ready, snapshot, refresh, subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); },
-    add, importProfile, selectCandidate, start, pause, generateAgain, retry: generateAgain, recover, continueRequest, retryConnectionBlocked, cancel, retrySave, connect, loadExamples, dispose,
+    add, sendAddedRequest, importProfile, selectCandidate, start, pause, generateAgain, retry: generateAgain, recover, continueRequest, retryConnectionBlocked, cancel, retrySave, connect, loadExamples, dispose,
     profileOptions: () => state.profiles.map(record => ({ ...record.data, id: record.id, filename: record.filename, isExample: record.isExample, initials: initials(record.data.name) })) };
 }

@@ -96,7 +96,10 @@ const tabChat = createChatgptTabConnection({ getWindowId: async () => { await br
   onReport: report => { q('#runtime-selected-build').textContent = `${report.confirmationScope} · ${report.adapterBuild}`; } });
 let connectionSettings;
 const selectedConnection = () => connectionSettings?.mode() === 'tab' ? tabChat : chat;
-const queue = createResumeQueue({ getChat: async () => { await connectionSettings.ready; return selectedConnection(); } });
+const queue = createResumeQueue({ getChat: async ({ fromAdd = false } = {}) => {
+  await connectionSettings.ready;
+  return fromAdd ? chat : selectedConnection();
+} });
 connectionSettings = createQueueConnectionSettings({
   canChange: () => !queue.snapshot().control.ownerId && !queue.snapshot().starting,
   openConnection: () => openSelectedChat()
@@ -117,14 +120,14 @@ const studio = createStudio({
   queue,
   openDialog,
   showStudio: panel => { selectView('studio'); selectStudioTab(panel); },
-  showChat: url => {
+  showChat: (url, { connection = connectionSettings.mode() } = {}) => {
+    if (!url) { selectView('chat'); return; }
     void (async () => {
-      if (connectionSettings.mode() === 'tab') { await queue.pause(); await tabChat.queue.openConversation(url); await tabChat.open(); }
+      if (connection === 'tab') { await queue.pause(); await tabChat.queue.openConversation(url); await tabChat.open(); }
       else await chat?.openConversation(url);
     })().catch(error => studio.tabError(error.message));
   },
   getCurrentChat: () => selectedConnection()?.getCurrentChat(),
-  onCompanyChatsChange: () => chat?.refreshCompanies(),
   moveTab: direction => browserTabs?.move(direction)
 });
 const pageHighlights = createPageHighlights();
@@ -163,7 +166,6 @@ window.addEventListener('pagehide', () => {
 chat = createChatSidebar({
   onOpenChat: () => selectView('chat'),
   onShortcut: action => workspaceShortcuts?.run(action),
-  getCompanyChats: studio.getCompanyChats
 });
 chat.setNavigationGuard(() => queue.pause());
 workspaceShortcuts = createWorkspaceShortcuts({ selectView, selectJob: () => selectStudioTab('job') });

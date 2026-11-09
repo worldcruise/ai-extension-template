@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { exampleProfile, buildResumePrompt } from '../src/resume-data.mjs';
+import { exampleProfile } from '../src/resume-data.mjs';
+import { promptForManualCopy } from '../src/manual-prompt.mjs';
 
 export async function checkManualPromptUI({ cdp, dockSession, evaluate, until, session }) {
   const dock = code => evaluate(dockSession, code);
@@ -26,12 +27,16 @@ export async function checkManualPromptUI({ cdp, dockSession, evaluate, until, s
   const candidateId = await dock('document.getElementById("candidate").value');
   await dock(`for(const [key,value] of Object.entries(${JSON.stringify({company:'Manual Company',title:'Platform Engineer',url:'https://jobs.example.test/manual',description:'Synthetic original TypeScript job description.'})})){
     const field=document.getElementById('job-'+key);field.value=value;field.dispatchEvent(new Event('input',{bubbles:true}));}`);
+  await dock('globalThis.manualClipboardWrites=[];Object.defineProperty(navigator,"clipboard",{configurable:true,value:{writeText:async value=>{manualClipboardWrites.push(value)}}})');
   await click('#add-request');
+  await until(async () => (await state()).requests.some(item => item.input.candidateId === candidateId && item.state === 'unsent') && !(await state()).control.ownerId, 'Add preserves the personal draft and records the unsent handoff');
+  assert.equal(await dock('document.getElementById("chat-view").hidden'), false);
   const request = (await state()).requests.find(item => item.input.candidateId === candidateId);
   assert.ok(request);
-  const expected = buildResumePrompt(request, 'manual-' + request.id);
+  const expected = promptForManualCopy(request);
   const before = await state();
-  await dock('globalThis.manualClipboardWrites=[];Object.defineProperty(navigator,"clipboard",{configurable:true,value:{writeText:async value=>{manualClipboardWrites.push(value)}}})');
+  assert.equal(await dock('manualClipboardWrites.at(-1)'), expected);
+  await click('#studio-tab'); await click('#view-queue');
   const card = `#resume-queue [data-request-id="${request.id}"]`;
   assert.equal(await dock('document.getElementById("start-queue").disabled && document.getElementById("start-queue").hidden'), true);
   assert.equal(await dock('document.getElementById("pause-queue").disabled'), true);
@@ -67,7 +72,7 @@ export async function checkManualPromptUI({ cdp, dockSession, evaluate, until, s
   assert.equal(await chat('document.getElementById("prompt-textarea").value'), 'Synthetic personal draft to preserve');
   assert.equal(await chat('JSON.parse(localStorage.getItem("fixtureSubmissionLog")||"[]").length'), submissions, 'manual copy never clicks Send');
   return { fixtureOnly: true, liveAccount: false, clipboardMocked: true, submissions: 0,
-    checks: ['complete prompt copied from immutable request', 'card and Details copy actions', 'stable delivery marker without recording an attempt',
-      'clipboard failure offers selected readonly prompt', 'duplicate copy guard', 'Add remains available', 'manual mode blocks sending controls',
+    checks: ['complete prompt copied from immutable request', 'card and Details copy actions', 'copy retains the existing delivery without recording another attempt',
+      'clipboard failure offers selected readonly prompt', 'duplicate copy guard', 'Add remains available', 'bulk sending controls remain paused',
       'existing composer draft and request state unchanged'] };
 }

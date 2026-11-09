@@ -209,8 +209,11 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await cdp.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: chatBounds.width / 2, y: chatBounds.y + 180 }, panel);
   await read('new Promise(resolve => setTimeout(resolve, 220))');
   assert.equal(await read('document.getElementById("chat-toolbar-shell").dataset.open'), 'true', 'focused search remains open when the pointer leaves');
-  assert.equal(await read('document.querySelectorAll("#company-chat-list button").length'), 0);
-  assert.match(await text('#company-chat-status'), /No connected company chats/);
+  await until(() => read('document.querySelectorAll("#company-chat-list button").length===3'), 'search loads native ChatGPT chats while preserving the current draft');
+  assert.match(await text('#company-chat-status'), /draft is preserved/);
+  assert.equal(await read('[...document.querySelectorAll("#company-chat-list button")].every(button=>button.disabled)'), true);
+  assert.equal(await evaluate(frameSession, 'document.getElementById("prompt-textarea").value'), 'Zoom preserves my draft');
+  await evaluate(frameSession, 'document.getElementById("prompt-textarea").value="";document.getElementById("prompt-textarea").dispatchEvent(new Event("input",{bubbles:true}))');
   assert.equal(await evaluate(frameSession, 'document.getElementById("history").hidden'), true, 'company search does not leave ChatGPT history open');
   await click('#studio-tab');
   assert.equal(await read('document.querySelector(\'[data-request-id="1"] [data-action="review"]\').disabled'), true, 'a result without a source cannot open an unrelated chat');
@@ -231,39 +234,41 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await click('#chat-tab');
   await read('document.getElementById("chat-toolbar-reveal").focus()');
   await read('document.getElementById("company-chat-search").focus()');
-  assert.equal(await read('document.querySelectorAll("#company-chat-list button").length'), 2);
-  assert.deepEqual(await read('[...document.querySelectorAll("#company-chat-list strong")].map(node => node.textContent)'), ['Northstar', 'Aster Labs']);
+  await until(() => read('!document.getElementById("company-chat-refresh").disabled'), 'native chat search refresh finishes');
+  assert.equal(await read('document.querySelectorAll("#company-chat-list button").length'), 3);
+  assert.deepEqual(await read('[...document.querySelectorAll("#company-chat-list strong")].map(node => node.textContent)'), ['Resume planning', 'Interview notes', 'Resume <img src=x onerror=alert(1)>']);
   assert.equal(await read('document.querySelectorAll("#company-chat-list img, #company-chat-list script").length'), 0);
   await until(() => read('getComputedStyle(document.getElementById("chat-toolbar")).opacity === "1"'), 'company picker fully revealed');
   const chatScroll = await read('({window:scrollY,body:document.body.scrollTop,view:document.getElementById("chat-view").scrollTop,headerTop:document.querySelector(".toolbar").getBoundingClientRect().top})');
   assert.deepEqual(chatScroll, {window:0,body:0,view:0,headerTop:0});
   await screenshot('workspace-company-chats.png');
-  await setValue('#company-chat-search', 'Northstar', 'input');
+  await setValue('#company-chat-search', 'Planning', 'input');
   assert.equal(await read('document.querySelectorAll("#company-chat-list button").length'), 1);
   await click('#company-chat-refresh');
+  await until(() => read('!document.getElementById("company-chat-refresh").disabled'), 'ChatGPT list refresh preserves the search query');
   assert.equal(await read('document.querySelectorAll("#company-chat-list button").length'), 1);
   await click('#company-chat-list button');
-  await until(() => read('document.getElementById("chatgpt-frame").src === "https://chatgpt.com/c/company-northstar" && document.getElementById("connection").dataset.state === "ready"'), 'company source conversation navigation');
-  assert.match(await read('document.getElementById("company-chat-search").title'), /Northstar/);
+  await until(async () => await path()==='/c/saved-resume', 'search selection opens the native saved ChatGPT conversation');
+  await until(() => read('document.getElementById("company-chat-search").title.includes("Resume planning")'), 'current ChatGPT conversation title is shown');
   await cdp.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: chatBounds.width / 2, y: chatBounds.y + 180 }, panel);
   await until(() => read('document.getElementById("chat-toolbar-shell").dataset.open === "false"'), 'toolbar hides away from top edge');
   assert.equal(await read('getComputedStyle(document.querySelector(".chat-toolbar-handle")).visibility'), 'visible');
   await read('document.getElementById("chat-toolbar-reveal").focus()');
   assert.equal(await read('document.getElementById("chat-toolbar").inert'), false);
   await read('document.getElementById("company-chat-search").focus()');
-  await setValue('#company-chat-search', 'Unknown company', 'input');
-  assert.match(await text('#company-chat-status'), /No companies match/);
+  await setValue('#company-chat-search', 'Unknown chat', 'input');
+  assert.match(await text('#company-chat-status'), /No chats match/);
   await cdp.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 }, panel);
   await cdp.send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 }, panel);
   await until(() => read(`document.getElementById("company-chat-menu").hidden && document.querySelector(".company-chat-searchbox").getBoundingClientRect().width <= ${compactSearchWidth + 1}`), 'Escape collapses the search and closes suggestions');
   await read('document.getElementById("company-chat-search").focus()');
-  await setValue('#company-chat-search', 'Aster', 'input');
+  await setValue('#company-chat-search', 'Interview', 'input');
   await cdp.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'ArrowDown', code: 'ArrowDown', windowsVirtualKeyCode: 40 }, panel);
   await cdp.send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'ArrowDown', code: 'ArrowDown', windowsVirtualKeyCode: 40 }, panel);
   assert.equal(await read('document.getElementById("company-chat-search").getAttribute("aria-activedescendant")'), 'company-chat-option-0');
   await cdp.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 }, panel);
   await cdp.send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 }, panel);
-  await until(() => read('document.getElementById("chatgpt-frame").src === "https://chatgpt.com/c/company-aster" && document.getElementById("connection").dataset.state === "ready"'), 'keyboard selection opens the saved company chat');
+  await until(async () => await path()==='/c/saved-interview', 'keyboard selection opens the native ChatGPT chat');
   for (const width of [280, 360, 800]) {
     await cdp.send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false }, panel);
     await read('document.getElementById("chat-toolbar-reveal").focus()');
@@ -278,10 +283,13 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   }
   await cdp.send('Emulation.setDeviceMetricsOverride', { width: 390, height: 900, deviceScaleFactor: 1, mobile: false }, panel);
   await read('document.getElementById("chat-toolbar-reveal").focus();document.getElementById("company-chat-search").focus()');
-  await setValue('#company-chat-search', 'Northstar', 'input');
+  await setValue('#company-chat-search', 'Planning', 'input');
   await cdp.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 }, panel);
   await cdp.send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 }, panel);
-  await until(() => read('document.getElementById("chatgpt-frame").src === "https://chatgpt.com/c/company-northstar" && document.getElementById("connection").dataset.state === "ready"'), 'single-result Enter restores the original conversation before draft-preservation checks');
+  await until(async () => await path()==='/c/saved-resume', 'single-result Enter restores the native chat before draft-preservation checks');
+  // The following Details checks exercise the saved request's own source URL.
+  await evaluate(frameSession, 'history.pushState({},"","/c/company-northstar");dispatchEvent(new PopStateEvent("popstate"))');
+  await until(() => read('document.getElementById("company-chat-search").title==="Search saved ChatGPT chats"'), 'request source is current before draft-preservation checks');
   const sourceWindow = await read('chrome.windows.getCurrent().then(window => window.id)');
   await cdp.send('Target.createTarget', { url: 'about:blank#job-two' });
   await cdp.send('Target.createTarget', { url: 'about:blank#job-three' });
@@ -380,7 +388,8 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await click('#chat-tab');
   await read('document.getElementById("chat-toolbar-reveal").focus()');
   await read('document.getElementById("company-chat-search").focus()');
-  assert.equal(await read('document.querySelectorAll("#company-chat-list button").length'), 0);
+  await setValue('#company-chat-search', '', 'input');
+  await until(() => read('document.querySelectorAll("#company-chat-list button").length===3'), 'native ChatGPT list is independent of candidate selection');
   await click('#studio-tab');
   await click('#profile-details');
   assert.equal(await text('#profile-name'), 'Jordan Lee');
@@ -391,14 +400,31 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   assert.equal(await read('document.getElementById("empty-queue").hidden'), false);
   await click('#empty-prepare');
   await shortcut('ArrowDown');
+  await read('globalThis.addClipboardWrites=[];Object.defineProperty(navigator,"clipboard",{configurable:true,value:{writeText:async text=>addClipboardWrites.push(text)}})');
   await evaluate(frameSession, `globalThis.nativeCtrlEnterForTest = 0;
     document.addEventListener('keydown', event => { if (event.ctrlKey && event.key === 'Enter') nativeCtrlEnterForTest++; });`);
   await shortcut('Enter', {inChat:true,repeat:true});
-  await until(() => read('document.documentElement.dataset.studioBusy !== "true" && !document.getElementById("studio-view").hidden && document.getElementById("results-tab").getAttribute("aria-selected") === "true"'), 'Ctrl+Enter adds once and opens Job Queues');
+  await until(() => read('document.documentElement.dataset.studioBusy !== "true" && !document.getElementById("chat-view").hidden'), 'Ctrl+Enter adds once and opens Chat');
+  await until(() => read('Boolean(document.querySelector(".state-pill[data-state=unsent]"))'), 'unrelated Chat draft blocks the handoff');
   assert.equal(await read('document.querySelectorAll(".job-request").length'), 1);
   assert.equal(await evaluate(frameSession, 'nativeCtrlEnterForTest'), 0);
   assert.equal(await evaluate(frameSession, 'document.getElementById("prompt-textarea").value'), 'Keep this ChatGPT draft');
-  assert.match(await text('#resume-queue .job-request'), /Queued/);
+  assert.match(await text('#resume-queue .job-request'), /Not sent/);
+  assert.equal(await read('addClipboardWrites.length'), 1);
+  assert.equal(await read('document.getElementById("check-existing-jobs").checked'), true);
+  await shortcut('Enter', { inChat: true, repeat: true });
+  await until(() => read('document.documentElement.dataset.studioBusy!=="true" && !document.getElementById("queue-notice").hidden'), 'Ctrl+Enter reports a duplicate already in the queue');
+  assert.equal(await text('#queue-notice-title'), 'Already applied');
+  assert.match(await text('#queue-notice-message'), /candidate.*queue/);
+  assert.equal(await read('document.querySelectorAll(".job-request").length'), 1);
+  assert.equal(await read('addClipboardWrites.length'), 1, 'duplicate shortcut never copies another prompt');
+  assert.equal(await evaluate(frameSession, 'document.getElementById("prompt-textarea").value'), 'Keep this ChatGPT draft');
+  assert.equal(await evaluate(frameSession, 'nativeCtrlEnterForTest'), 0);
+  assert.equal(await read('(() => {const rect=document.getElementById("queue-notice").getBoundingClientRect();return rect.width>0&&rect.left>=0&&rect.right<=innerWidth;})()'), true);
+  await screenshot('workspace-already-applied.png');
+  await click('#queue-notice-dismiss');
+  assert.equal(await read('document.getElementById("queue-notice").hidden'), true);
+  await click('#studio-tab'); await click('#view-queue');
   await click('#resume-queue .job-request [data-action="details"]');
   await read('document.getElementById("request-full-prompt").focus()');
   await shortcut('Enter');
@@ -437,6 +463,8 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await click('#tailor');
   await setValue('#job-description', '', 'input');
   await click('#add-request');
+  await until(() => read('Boolean(document.querySelector(".state-pill[data-state=unsent]")) && !document.getElementById("chat-view").hidden'), 'base resume uses the same draft-protected handoff');
+  await click('#studio-tab'); await click('#view-queue');
   await click('#resume-queue .job-request [data-action="details"]');
   assert.match(await text('#request-metadata'), /Base resume/);
   assert.match(await text('#request-prompt'), /without tailoring to a job/);
@@ -587,7 +615,7 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await click('#chat-tab');
   return { layouts, checks: ['combined workspace tabs', 'ChatGPT frame and draft retained', 'Studio form retained',
     'vertical ChatGPT history arrows follow native order from the top', 'Up disabled on new and most recent chats with no boundary wrapping', 'history navigation blocks drafts and generation and restores native sidebar visibility',
-    'Job Queues label and sidebar shortcuts in Settings', 'trusted Ctrl+Up/Down and Ctrl+Left/Right work in the host and ChatGPT iframe', 'Ctrl+Enter adds a validated job once while preserving the ChatGPT draft and blocking native send handlers', 'dialogs preserve their own keyboard controls',
+    'Job Queues label and sidebar shortcuts in Settings', 'trusted Ctrl+Up/Down and Ctrl+Left/Right work in the host and ChatGPT iframe', 'Ctrl+Enter adds a validated job once while preserving the ChatGPT draft and blocking native send handlers', 'duplicate Ctrl+Enter shows Already applied without adding, copying or changing the Chat draft', 'dialogs preserve their own keyboard controls',
     'live open-tab navigation and per-tab drafts', 'hover toolbar reveal and dismissal without resizing chat',
     'new chat and refresh on the left with a far-right pin', 'pin saves its preference and survives pointer leave, outside clicks, Escape and view switches', 'pinned toolbar reserves its own row without covering the iframe at narrow and wide widths', 'unpin restores hover behavior and full iframe height',
     'text sizing preserves iframe size, viewport, layout spacing, and drafts', 'new and nested messages scale without compounding',
@@ -596,7 +624,7 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
     'keyword settings persistence and far-right Read page control', 'dock and ChatGPT never receive keyword highlights',
     'separate color lists retain unsaved edits and save together', 'legacy Pink keywords migrate to Red', 'hidden invalid lists block saving and receive focus',
     'per-tab job URLs and immutable source URL snapshots', 'compact footer without visible status rows',
-    'saved-company chat connection, search, and navigation', 'search expands on focus and collapses on Escape', 'focused search stays open without moving chat controls or resizing iframe', 'keyboard suggestion selection', 'general ChatGPT history untouched', 'empty company-chat guidance',
+    'saved company source links remain available in Details; search uses native ChatGPT chats', 'search expands on focus and collapses on Escape', 'focused search stays open without moving chat controls or resizing iframe', 'keyboard suggestion selection', 'general ChatGPT history untouched', 'ChatGPT chat titles are literal and candidate-independent',
     'Chat has no Studio footer', 'fixed Studio action buttons',
     'candidate isolation and empty state', 'template and prompt previews', 'immutable request snapshots', 'queued example cancellation',
     'save-retry example without generation', 'base resume example', 'resume preview and JSON copy', 'export availability',

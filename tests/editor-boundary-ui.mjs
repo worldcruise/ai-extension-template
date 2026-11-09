@@ -50,7 +50,8 @@ export async function checkEditorBoundaries({ cdp, id, evaluate, until, session,
       const result={code:error?.code||null,diagnostics:error?.diagnostics||value?.diagnostics,completed:value?.completed,kind:value?.kind,
         clicks:JSON.parse(localStorage.getItem('fixtureSubmissionLog')||'[]').length-initialLog,prepared,staleIgnored,
         preserved:current?.value==='Synthetic unrelated draft'||current?.value==='Synthetic changed draft'||current?.value==='Synthetic draft changed while waiting',
-        inputs:Number(document.documentElement.dataset.fixtureInputs||0)};
+        inputs:Number(document.documentElement.dataset.fixtureInputs||0),
+        captureTailMs:value?.diagnostics?.timestamps?.capturedAt-Number(document.documentElement.dataset.fixtureCompletedAt||0)};
       adapter.dispose();localStorage.removeItem('fixtureBlockSend');return result;
     })()`);
     assert.equal(result.code, expectedCode, name);
@@ -61,6 +62,7 @@ export async function checkEditorBoundaries({ cdp, id, evaluate, until, session,
   }
   const retained = await executeCase('replacement editor retaining the exact prompt', { dataset: { fixtureRemount: 'retained' } });
   assert.equal(retained.diagnostics.editor.identityChanged, true); assert.equal(retained.inputs, 1);
+  assert.ok(retained.captureTailMs >= 170 && retained.captureTailMs < 1000, 'confirmed JSON capture settles promptly');
   const discarded = await executeCase('detached old editor is not authoritative when insertion is discarded', { dataset: { fixtureRemount: 'discarded' } }, 'composer-changed');
   assert.equal(discarded.diagnostics.editor.identityChanged, true); assert.equal(discarded.diagnostics.editor.observedLength, 0); assert.equal(discarded.inputs, 1);
   const unexpected = await executeCase('replacement with an unexpected draft is preserved without reinsertion', { dataset: { fixtureRemount: 'unexpected' } }, 'composer-changed');
@@ -79,6 +81,7 @@ export async function checkEditorBoundaries({ cdp, id, evaluate, until, session,
   assert.equal(unacknowledged.diagnostics.send.dispatched, true); assert.equal(unacknowledged.diagnostics.send.acknowledged, false);
   const refusal = await executeCase('only a completed owned refusal is classified as an error response', { refusal: true });
   assert.equal(refusal.completed, true); assert.equal(refusal.kind, 'error');
+  assert.ok(refusal.captureTailMs >= 1200, 'invalid/non-JSON responses retain conservative settling');
   const unfinished = await executeCase('stable text without final controls is not a confirmed completed response', { dataset: { fixtureNoFinalActions: 'true' }, cancelAfterMs: 2600, expectedClicks: 1 }, 'interrupted');
   assert.equal(unfinished.completed, undefined);
   const auth = await page();
@@ -95,5 +98,39 @@ export async function checkEditorBoundaries({ cdp, id, evaluate, until, session,
   assert.deepEqual(report, { authState: 'unknown', present: true, rejected: 'login-unverified', confirmed: true, authenticated: false, signedOut: 'signed-out' });
   checks.push('unknown authentication with and without confirmation; explicit sign-out wins');
   await cdp.send('Target.closeTarget', { targetId: auth.targetId });
+  async function navigationCase(name, settings = {}) {
+    const fixture = await page();
+    const result = await fixture.run(`(async()=>{
+      const settings=${JSON.stringify(settings)}, adapter=AiAgentChatQueue.createPageAdapter(()=>{});
+      const started=performance.timeOrigin, initial=Number(localStorage.getItem('fixtureNewChatClicks')||0);
+      if(!settings.empty)history.pushState({},'', '/c/navigation-fixture');
+      if(settings.missing)document.querySelector('[data-testid="create-new-chat-button"]').remove();
+      if(settings.draft)document.getElementById('prompt-textarea').value='Preserved personal draft';
+      Object.assign(document.documentElement.dataset,settings.dataset||{});
+      if(settings.cancel)setTimeout(()=>adapter.dispose(),30);
+      let value,code;
+      try{value=await adapter.execute('fresh-conversation',{hostBuildId:AiAgentBuild.id},crypto.randomUUID());}catch(error){code=error.code;}
+      const result={fresh:value?.fresh,dispatched:value?.dispatched,method:value?.method,code:code||null,
+        clicks:Number(localStorage.getItem('fixtureNewChatClicks')||0)-initial,sameDocument:started===performance.timeOrigin,
+        draft:document.getElementById('prompt-textarea').value};
+      adapter.dispose();return result;
+    })()`);
+    assert.equal(result.code, settings.code || null, name);
+    assert.equal(result.clicks, settings.clicks ?? 1, name);
+    assert.equal(result.sameDocument, true, name);
+    checks.push(name); await cdp.send('Target.closeTarget', {targetId:fixture.targetId}); return result;
+  }
+  const empty = await navigationCase('verified empty Home is reused without clicking or reloading', {empty:true,clicks:0});
+  assert.equal(empty.fresh,true); assert.equal(empty.method,'empty-chat');
+  const native = await navigationCase('native New chat resolves from observed fresh editor without reload', {dataset:{fixtureNativeDelay:'75'}});
+  assert.equal(native.fresh,true); assert.equal(native.method,'native');
+  const missing = await navigationCase('missing native control explicitly permits the guarded full-load fallback', {missing:true,clicks:0});
+  assert.equal(missing.dispatched,false); assert.equal(missing.fresh,false);
+  const protectedDraft = await navigationCase('native fresh-chat preflight never clears a personal draft', {draft:true,clicks:0,code:'existing-draft'});
+  assert.equal(protectedDraft.draft,'Preserved personal draft');
+  await navigationCase('unexpected native navigation does not become send authorization', {dataset:{fixtureNativeUnexpectedRoute:'true'},code:'navigation'});
+  const restored = await navigationCase('a draft restored by the new chat is preserved', {dataset:{fixtureNativeDraft:'true'},code:'existing-draft'});
+  assert.equal(restored.draft,'Synthetic restored draft');
+  await navigationCase('cancelled native navigation cannot trigger insertion or a delayed Send', {dataset:{fixtureNativeDelay:'100'},cancel:true,code:'interrupted'});
   return { checks, fixtureOnly: true, liveAccount: false };
 }

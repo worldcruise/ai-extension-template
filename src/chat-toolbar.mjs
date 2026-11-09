@@ -1,7 +1,7 @@
 import { icon } from './icons.mjs';
 import './chat-history.js';
 
-export function createChatToolbar({ getCompanyChats, selectConversation, currentUrl, onHistoryNeeded = () => {}, moveHistory = () => {}, browser = globalThis.chrome }) {
+export function createChatToolbar({ selectConversation, currentUrl, onHistoryNeeded = () => {}, onChatsRefresh = () => {}, moveHistory = () => {}, browser = globalThis.chrome }) {
   const q = selector => document.querySelector(selector);
   const shell = q('#chat-toolbar-shell');
   const toolbar = q('#chat-toolbar');
@@ -90,13 +90,15 @@ export function createChatToolbar({ getCompanyChats, selectConversation, current
   }).catch(() => {});
   function updateCurrent() {
     renderHistory();
-    const matching = chats.find(chat => chat.id === selectionId && chat.url === currentUrl()) ||
-      chats.find(chat => chat.url === currentUrl());
+    const current = globalThis.AiAgentChatHistory.conversation(currentUrl());
+    const matching = chats.find(chat => chat.id === selectionId && chat.url === current) ||
+      chats.find(chat => chat.url === current);
     selectionId = matching?.id || null;
-    search.title = matching ? `Current company chat: ${matching.title}. Search saved company chats.` : 'Search saved company chats';
+    search.title = matching ? `Current ChatGPT chat: ${matching.title}. Search saved ChatGPT chats.` : 'Search saved ChatGPT chats';
     for (const button of q('#company-chat-list').querySelectorAll('button')) {
-      if (button.dataset.companyRequest === selectionId) button.setAttribute('aria-current', 'page');
+      if (button.dataset.chatUrl === selectionId) button.setAttribute('aria-current', 'page');
       else button.removeAttribute('aria-current');
+      button.querySelector('small').textContent = button.dataset.chatUrl === current ? 'Current chat' : 'Saved conversation';
     }
   }
   function renderHistory() {
@@ -113,9 +115,27 @@ export function createChatToolbar({ getCompanyChats, selectConversation, current
   }
   newer.addEventListener('click', () => moveHistory(-1));
   older.addEventListener('click', () => moveHistory(1));
+  // A cached row may be selected while refreshing: the host waits for that
+  // inspection and revalidates the native link before a single navigation.
+  const canOpenChat = () => history.enabled && history.ready && !history.navigating && !history.hasDraft && !history.busy && history.reason !== 'signed-out';
+  function updateListState() {
+    const count = q('#company-chat-list').children.length;
+    for (const button of q('#company-chat-list').querySelectorAll('button')) button.disabled = !canOpenChat();
+    refresh.disabled = Boolean(history.pending);
+    q('#company-chat-status').textContent = history.reason === 'signed-out' ? 'Sign in to ChatGPT to view saved chats.'
+      : !history.enabled || !history.ready ? 'Waiting for ChatGPT…'
+      : history.hasDraft ? 'Your draft is preserved. Finish or clear it before opening another chat.'
+      : history.busy ? 'Wait for the response to finish before opening another chat.'
+      : history.pending ? 'Loading ChatGPT chats…'
+      : history.reason === 'unavailable' ? 'ChatGPT history is unavailable. Open its sidebar and refresh this list.'
+      : !history.loaded ? 'Open or refresh the list to load ChatGPT chats.'
+      : !chats.length ? 'No saved ChatGPT chats found.'
+      : !count ? 'No chats match your search.'
+      : `${count} saved chat${count === 1 ? '' : 's'}`;
+  }
   function renderCompanies() {
     const query = search.value.trim().toLocaleLowerCase();
-    const filtered = chats.filter(chat => `${chat.title} ${chat.role}`.toLocaleLowerCase().includes(query));
+    const filtered = chats.filter(chat => chat.title.toLocaleLowerCase().includes(query));
     activeIndex = -1; search.removeAttribute('aria-activedescendant');
     q('#company-chat-list').replaceChildren(...filtered.map((chat, index) => {
       const row = document.createElement('li');
@@ -126,38 +146,31 @@ export function createChatToolbar({ getCompanyChats, selectConversation, current
       button.setAttribute('role', 'option'); button.setAttribute('aria-selected', 'false'); button.tabIndex = -1;
       button.title = chat.title;
       button.dataset.chatUrl = chat.url;
-      button.dataset.companyRequest = chat.id;
       const title = document.createElement('span');
       const company = document.createElement('strong');
       company.textContent = chat.title;
       const role = document.createElement('small');
-      role.textContent = `${chat.role} · #${String(chat.id).padStart(3, '0')}`;
+      role.textContent = chat.url === currentUrl() ? 'Current chat' : 'Saved conversation';
       title.append(company, role);
       button.append(icon('link'), title);
       button.addEventListener('pointerdown', event => { event.preventDefault(); });
       button.addEventListener('pointermove', () => setActive(index));
       button.addEventListener('click', () => {
+        if (!canOpenChat()) return;
         selectionId = chat.id;
         search.value = ''; closeCompanyMenu(); search.blur(); selectConversation(chat); updateCurrent();
       });
       row.append(button);
       return row;
     }));
-    q('#company-chat-status').textContent = !chats.length
-      ? 'No connected company chats yet. Open a saved company’s Details and connect its chat.'
-      : filtered.length ? `${filtered.length} connected chat${filtered.length === 1 ? '' : 's'}`
-      : 'No companies match your search.';
+    updateListState();
     updateCurrent();
-  }
-  function refreshCompanies() {
-    chats = getCompanyChats();
-    renderCompanies();
   }
   function openCompanyMenu() {
     show();
     menu.hidden = false;
     search.setAttribute('aria-expanded', 'true');
-    refreshCompanies();
+    renderCompanies(); onChatsRefresh();
   }
 
   shell.addEventListener('pointerenter', show);
@@ -187,7 +200,7 @@ export function createChatToolbar({ getCompanyChats, selectConversation, current
       else if (options.length === 1) options[0].click();
     }
   });
-  refresh.addEventListener('click', refreshCompanies);
+  refresh.addEventListener('click', onChatsRefresh);
   search.addEventListener('input', () => { if (menu.hidden) openCompanyMenu(); else renderCompanies(); });
   document.addEventListener('pointerdown', event => {
     keyboardMode = false;
@@ -204,7 +217,13 @@ export function createChatToolbar({ getCompanyChats, selectConversation, current
     clearTimeout(hideTimer); clearTimeout(blurTimer);
   });
 
-  refreshCompanies();
-  return { refreshCompanies, updateCurrent, hide, isOpen: () => shell.dataset.open === 'true',
-    updateHistory(value) { history = value; renderHistory(); } };
+  renderCompanies();
+  return { updateCurrent, hide, isOpen: () => shell.dataset.open === 'true',
+    updateHistory(value) {
+      history = value;
+      const next = (value.chats || []).map(chat => ({...chat,id:chat.url}));
+      if (JSON.stringify(next) !== JSON.stringify(chats)) { chats = next; renderCompanies(); }
+      else updateListState();
+      renderHistory();
+    } };
 }

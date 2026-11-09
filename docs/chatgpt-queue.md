@@ -6,23 +6,44 @@ isolated content script and reads the reply associated with its own submitted
 delivery marker. This is a browser UI integration, so site markup and account
 behavior need live verification and ongoing maintenance.
 
-## Current mode: manual sending
+## Current mode: explicit Add handoff
 
-Automatic sending is paused. Add a job and choose Copy prompt on its card or in
-Details. The full prompt comes from the immutable queued snapshot or its exact
-recorded attempt, with a stable delivery marker. Clipboard success is not recorded
-as a delivery, acknowledgement, or generated result. Paste and send in ChatGPT
-manually. Details provides a readonly selected-text fallback if clipboard access
-fails. No composer content or queue state is changed by copying.
+Add to queue saves an immutable request with a delivery ID and exact prompt, copies
+that prompt, switches to Chat, and schedules only that new request. Under the shared
+runner lock it preflights Sidebar Chat, opens a new conversation, inserts the prompt
+into the empty active composer, verifies retention, and invokes the native Send
+control once. It monitors the matching delivery and saves valid resume JSON before
+Ready. A native Send click is used instead of a synthetic Enter key, which websites
+may ignore. Existing draft equality, authorization and acknowledgement checks apply.
 
-Start and Continue are blocked at both the UI and runner entry points. The
-following connection/automation implementation is retained for later use; it does
-not run while manual mode is enabled. Mock runner tests explicitly opt out of
-manual mode; the default browser suite verifies the manual UI without submitting.
+Permission is panel-local and consumed once. New Adds during collection are saved
+and copied immediately, then processed sequentially. Older queued jobs are not
+selected. Reload, Pause and manual navigation discard pending permissions. Unknown
+authentication, a personal draft/attachment, uncertain delivery, or save failure
+stops advancement. There is no blind draft clearing, automatic reinsertion or resend.
+A new conversation provides an empty composer; unexpected restored text is preserved.
+
+Clipboard failure leaves the request saved without scheduling Send and opens a
+selected readonly prompt. Card/Details Copy prompt remains clipboard-only. Bulk
+Start/Continue/regeneration sending stays paused; Add is a separate explicit action.
+Browser tests use only synthetic HTTPS documents in a disposable Chrome profile.
+
+The default-on **Check existing company or URL** option is stored locally. Both
+Add and Ctrl+Enter check all current queue entries and saved results for the
+selected candidate inside the IndexedDB write transaction. Matching either a
+company name (case/space normalized) or a job URL (tracking parameters removed,
+job selectors preserved) rejects the entire Add before its Send permission is
+created. A dismissible **Already applied** status identifies queue or saved
+results; no clipboard write, navigation, composer insertion or submission occurs.
+There is no separate application tracker in this runtime. Examples, cancelled
+requests, confirmed terminal failures and base resumes do not block new jobs.
+Turning the option off permits deliberate repeat companies. Historical metadata
+and provenance are never rewritten by the check.
 
 ## Connection choice
 
-Settings → ChatGPT queue selects Sidebar Chat (default) or ChatGPT tab. The latter
+Add always uses Sidebar Chat. Settings → ChatGPT queue selects Sidebar Chat (default)
+or ChatGPT tab for inspection and the retained bulk/recovery tools. The latter
 adapts the normal-tab messaging workflow reviewed in
 [Multi-AI-Prompt](../baseline/multi-ai-prompt/README.md). It uses a dedicated tab in
 the panel's window and activates it before sending. Existing personal tabs are
@@ -43,10 +64,10 @@ that this means Send failed. Starting recovery reads the recorded conversation.
 2. Sign in to ChatGPT normally and check Chat in the sidebar.
 3. Open Profile, download the example format, and import your completed JSON.
 4. Read a job or paste its description, select instructions, and Add to queue.
-5. Review the queued inputs and click Copy prompt for the selected job.
-6. Paste and send it in your chosen ChatGPT conversation yourself.
+5. Chat opens, the prompt is copied, and the new request is sent in a fresh conversation.
+6. Open Job Queues to inspect progress; Review opens the saved originating chat.
 
-Adding a job does not submit it. Existing Chat drafts and attachments block the
+Adding a job explicitly authorizes that new request. Existing Chat drafts and attachments block the
 runner. Pause finishes the current response, then stops; a correction is not sent
 after Pause. Opening another conversation or manually reloading pauses the queue.
 The sidebar must stay open for progress, but Chat and Studio can switch views.
@@ -56,17 +77,26 @@ The sidebar must stay open for progress, but Chat and Studio can switch views.
 The user menu's Check connection action inspects the embedded ChatGPT page without
 sending a message. It reports composer availability, generation activity, whether
 there is an unsent draft, and which public account UI signals were found. It does
-not read authentication tokens, cookies, private session endpoints, or chat-history
-contents. Saved-conversation links and loaded conversation structure are used as
+not read authentication tokens, cookies, private session endpoints, or chat message
+contents for authentication. Saved-conversation links and loaded conversation structure are used as
 additional UI signals so a missing profile-button selector is not treated as proof
 that the user is signed out.
+
+The toolbar search separately reads bounded titles and URLs from ChatGPT's rendered
+history, independent of candidate/queue records. It refreshes on focus or Refresh
+and filters titles locally. Those titles stay in panel memory and are excluded
+from storage and delivery diagnostics. Selecting a row performs the same current
+route, draft, generation and native-link checks as history arrows. A cached row
+can be selected while refreshing; the host waits for inspection and revalidates
+the target before its single navigation click. Reading the list can preserve an
+existing draft, but opening another chat remains blocked until it is cleared or sent.
 
 When the layout remains unknown, the user can verify their account in Chat and
 choose Use this signed-in session. That confirmation is held only in the current
 panel's memory and is cleared by sign-in/logged-out signals or panel closure.
 An explicit signed-out page is always blocked, including immediately before Send;
 confirmation cannot override it. Successful checks restore only authentication-
-blocked requests with no persisted send intent, and still require Start queue.
+blocked requests with no persisted send intent, without authorizing an automatic retry.
 Previously submitted or ambiguous deliveries remain on the recovery path.
 
 The template is self-contained. The optional official OpenAI browser-control
@@ -135,6 +165,26 @@ Collection tracks the next assistant turn in that conversation, idle/final
 UI signals, and stable text. Results must include the original request UUID and
 schema version. Each delivery has a separate marker so separate attempts and old replies
 cannot be confused.
+
+The fresh-chat command verifies the current draft before choosing an empty Home,
+a single native New chat click, or a full-load fallback when no safe control is
+available. A dispatched native navigation must resolve to Home with an editable,
+empty composer and no old turns; unexpected routes, restored drafts or cancellation
+stop the handoff. No fallback/reclick occurs after an uncertain native dispatch.
+Host readiness is signalled directly rather than polling every 100 ms. Adapter
+waiters observe input/change, route events, aria-disabled and streaming attributes;
+the 250 ms fallback remains for unobservable property changes, with deadlines intact.
+
+Capture reads DOM text without forcing rendered `innerText` layout. For a parseable
+schemaVersion 1 JSON envelope matching the request, enabled turn-level completion
+controls and idle streaming must remain stable for 180 ms. Generic Copy controls
+or invalid/non-JSON output keep the original 1.25 s quiet period. The settling timer
+wakes at its deadline rather than waiting for a polling tick. Host validation,
+durable capture, save retry and Ready semantics are unchanged. Pre-Send Pause,
+owner and request checks share the transaction that persists send intent. Redundant
+same-turn acknowledgement writes are omitted; intent/dispatch/acknowledgement stay
+distinct. Diagnostics include completionObservedAt and capturedAt timestamps without
+storing response content in diagnostic logs.
 
 Captured output is journaled in extension session storage as an additional
 recovery aid, then saved to IndexedDB before validation. Session storage survives

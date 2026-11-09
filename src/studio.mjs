@@ -1,7 +1,6 @@
 import { icon } from './icons.mjs';
 import { profiles as exampleProfiles, prompts } from './studio-examples.mjs';
 import { exampleProfile } from './resume-data.mjs';
-import { savedCompanyChats } from './company-chats.mjs';
 import { linkedConversationUrl } from './sidebar-protocol.mjs';
 import { resumeTemplates, resumeTemplate } from './resume-templates.mjs';
 import { terminalStates, recoverableStates, deliveryEvidence } from './queue-outcomes.mjs';
@@ -11,9 +10,10 @@ import { MANUAL_QUEUE_MODE, MANUAL_QUEUE_MESSAGE } from './queue-mode.mjs';
 import { copyRequestPrompt, promptForManualCopy } from './manual-prompt.mjs';
 import { updateReadPageHint } from './shortcut-settings.mjs';
 import { requestJobPageAccess } from './job-page-access.mjs';
+import { duplicateCheckStorageKey } from './job-duplicates.mjs';
 
 export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
-  getCurrentChat = () => null, onCompanyChatsChange = () => {} }) {
+  getCurrentChat = () => null }) {
   const q = selector => document.querySelector(selector);
   let requests = [];
   let profiles = { ...exampleProfiles };
@@ -23,6 +23,32 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
   let regenerationTarget = null;
   let copiedRequestId = null;
   let copyFeedbackTimer;
+  let noticeTimer, duplicateOptionSaving = false;
+  function showNotice(title, message) {
+    clearTimeout(noticeTimer);
+    q('#queue-notice-title').textContent = title;
+    q('#queue-notice-message').textContent = message;
+    q('#queue-notice').hidden = false;
+    q('.queue-bar').title = `${title}. ${message}`;
+    noticeTimer = setTimeout(() => { q('#queue-notice').hidden = true; }, 7000);
+  }
+  q('#queue-notice-dismiss').addEventListener('click', () => { clearTimeout(noticeTimer); q('#queue-notice').hidden = true; });
+  const duplicateOptionReady = chrome.storage.local.get(duplicateCheckStorageKey)
+    .then(value => { q('#check-existing-jobs').checked = value[duplicateCheckStorageKey] !== false; })
+    .catch(() => { q('#check-existing-jobs').checked = true; })
+    .finally(() => { q('#check-existing-jobs').disabled = false; });
+  q('#check-existing-jobs').addEventListener('change', () => {
+    if (duplicateOptionSaving) return;
+    duplicateOptionSaving = true; q('#check-existing-jobs').disabled = true;
+    void chrome.storage.local.set({ [duplicateCheckStorageKey]: q('#check-existing-jobs').checked }).catch(() => {
+      q('#check-existing-jobs').checked = true;
+      showNotice('Check option could not be saved', 'Duplicate checking stays on. Try changing the option again.');
+    }).finally(() => { duplicateOptionSaving = false; q('#check-existing-jobs').disabled = false; });
+  });
+  const duplicateOptionChanged = (changes, area) => {
+    if (area === 'local' && changes[duplicateCheckStorageKey] && !duplicateOptionSaving) q('#check-existing-jobs').checked = changes[duplicateCheckStorageKey].newValue !== false;
+  };
+  chrome.storage.onChanged.addListener(duplicateOptionChanged);
   const manualOnly = () => queueState.manualOnly ?? MANUAL_QUEUE_MODE;
   let selectionLoaded = false;
   let currentTabId = null;
@@ -48,7 +74,12 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     const reflectPending = () => { document.documentElement.dataset.studioBusy = String([...pendingActions].some(key => !key.startsWith('continue-send:') && !key.startsWith('recover:'))); };
     pendingActions.add(key); reflectPending(); renderQueue();
     try { return await task(); }
-    catch (error) { status(error.message); q('#profile-import-status').textContent = error.message; }
+    catch (error) {
+      if (error.code === 'already-applied') {
+        const field = error.duplicate.matchedBy.includes('company') ? 'Company' : 'Job URL';
+        showNotice('Already applied', `${field} already exists in this candidate’s ${error.duplicate.location}. Nothing was added or sent.`);
+      } else { status(error.message); q('#profile-import-status').textContent = error.message; }
+    }
     finally { pendingActions.delete(key); reflectPending(); renderQueue(); }
   }
   function renderCandidate() {
@@ -189,13 +220,13 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     pause.setAttribute('aria-label', pause.title);
     pause.replaceChildren(icon(paused ? 'play' : 'pause'));
     const eligible = !requests.some(request => !request.isExample && request.state === 'uncertain') && own.some(request => !request.isExample && ['queued', 'interrupted'].includes(request.state));
-    pause.disabled = manualOnly() || !initialized || (paused && (!eligible || Boolean(queueState.control.ownerId)));
-    if (manualOnly()) { pause.title = MANUAL_QUEUE_MESSAGE; pause.setAttribute('aria-label', 'Automatic sending paused'); }
+    pause.disabled = !initialized || (paused && (manualOnly() || !eligible || Boolean(queueState.control.ownerId)));
+    if (manualOnly() && paused) { pause.title = MANUAL_QUEUE_MESSAGE; pause.setAttribute('aria-label', 'Bulk sending paused'); }
     q('#start-queue').disabled = manualOnly() || !initialized || !eligible || Boolean(queueState.control.ownerId) || queueState.starting;
     q('#start-queue').hidden = manualOnly();
     q('#manual-queue-note').hidden = !manualOnly();
+    q('#manual-queue-note').textContent = MANUAL_QUEUE_MESSAGE;
     q('#start-queue').textContent = queueState.control.ownerId ? 'Queue running' : 'Start queue';
-    onCompanyChatsChange();
   }
 
   function updateTabs({ count, index, tabId, url, busy }) {
@@ -416,7 +447,7 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     if (button.dataset.action === 'details') requestDetails(request);
     if (button.dataset.action === 'review') {
       const url = linkedConversationUrl(request.sourceChatUrl);
-      if (request.state === 'ready' && url) showChat(url);
+      if (request.state === 'ready' && url) showChat(url, { connection: request.attempts?.at(-1)?.connection });
     }
     if (button.dataset.action === 'connection') q('#account-check').click();
     if (button.dataset.action === 'preview') preview(request);
@@ -482,6 +513,7 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     document.getElementById(id).addEventListener('change', () => renderTemplate(kind));
   }
   q('#add-request').addEventListener('click', () => { void perform(async () => {
+    q('#queue-notice').hidden = true; clearTimeout(noticeTimer);
     const description = q('#job-description').value.trim();
     if (q('#tailor').checked && !description) {
       status('Add a job description before preparing a tailored resume.');
@@ -512,10 +544,21 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
       job: { company: tailor ? q('#job-company').value.trim() : 'Base resume',
         role: tailor ? q('#job-title').value.trim() || profile().role : profile().role, url, tabId: currentTabId, description, provenance }, tailor,
       resumeTemplate: q('#resume-template').value, promptTemplate, prompt: prompts[promptTemplate].text });
-    await queue.add(input);
-    clearPreview(); renderQueue(); showStudio('results');
-    q('#studio-scroll').scrollTop = 0;
-    status(manualOnly() ? 'Added to queue. Copy its prompt, then paste and send it in ChatGPT yourself.' : 'Added to queue. Click Start queue to send the selected candidate’s jobs to ChatGPT.');
+    const id = await queue.add(input, { sendOnAdd: true, checkExisting: q('#check-existing-jobs').checked });
+    const request = queue.snapshot().requests.find(item => item.id === id);
+    clearPreview(); renderQueue();
+    try { await copyRequestPrompt(request); }
+    catch {
+      showChat(); requestDetails(request);
+      q('#request-full-prompt').focus(); q('#request-full-prompt').select();
+      q('#request-copy-status').textContent = 'The job was saved, but clipboard access failed. Nothing was sent. Copy this prompt manually.';
+      status('Job saved. Clipboard access failed; nothing was sent.');
+      return;
+    }
+    copiedRequestId = id;
+    showChat();
+    queue.sendAddedRequest(id);
+    status('Job saved and prompt copied. Opening a new Sidebar Chat to send this request. Earlier queued jobs are unchanged.');
   }, 'add'); });
 
   for (const id of ['review-another', 'empty-prepare']) document.getElementById(id).addEventListener('click', () => showStudio('job'));
@@ -523,7 +566,7 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
   const startQueue = () => { if (manualOnly()) { status(MANUAL_QUEUE_MESSAGE); return; } void queue.start(candidateId()).catch(error => status(error.message)); };
   q('#start-queue').addEventListener('click', startQueue);
   q('#pause-queue').addEventListener('click', () => {
-    if (manualOnly()) { status(MANUAL_QUEUE_MESSAGE); return; }
+    if (manualOnly() && paused) { status(MANUAL_QUEUE_MESSAGE); return; }
     if (paused) startQueue();
     else void perform(async () => { await queue.pause(); status('Queue will pause after the current response.'); }, 'pause');
   });
@@ -531,7 +574,7 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     const request = requests.find(item => item.id === detailRequestId && item.input.candidateId === candidateId());
     const url = linkedConversationUrl(request?.sourceChatUrl);
     if (!url) return;
-    q('#request-dialog').close(); showChat(url);
+    q('#request-dialog').close(); showChat(url, { connection: request.attempts?.at(-1)?.connection });
   });
   q('#request-connect-chat').addEventListener('click', () => {
     const request = requests.find(item => item.id === detailRequestId && item.input.candidateId === candidateId());
@@ -569,12 +612,13 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     event.target.value = '';
   });
   const unsubscribe = queue.subscribe(updateQueue);
-  const ready = queue.ready.then(() => {
+  const ready = Promise.all([queue.ready, duplicateOptionReady]).then(() => {
     initialized = true; updateQueue(queue.snapshot());
     document.documentElement.dataset.studioReady = 'true';
   }).catch(error => { status(error.message); q('#empty-queue p').textContent = error.message; });
   window.addEventListener('pagehide', unsubscribe, { once: true });
   window.addEventListener('pagehide', () => clearTimeout(copyFeedbackTimer), { once: true });
+  window.addEventListener('pagehide', () => { clearTimeout(noticeTimer); chrome.storage.onChanged.removeListener(duplicateOptionChanged); }, { once: true });
   renderQueue(); renderTemplate();
-  return { ready, updateTabs, tabError, readPage, getCompanyChats: () => savedCompanyChats(requests, candidateId()) };
+  return { ready, updateTabs, tabError, readPage };
 }

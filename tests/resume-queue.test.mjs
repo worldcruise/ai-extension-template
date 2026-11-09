@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { normalizeProfile, parseProfile, parseResume, buildResumePrompt, exampleProfile } from '../src/resume-data.mjs';
 import { createResumeQueue } from '../src/resume-queue.mjs';
 import { defaultControl } from '../src/queue-store.mjs';
+import { promptForManualCopy } from '../src/manual-prompt.mjs';
 
 class MemoryStore {
   state = { profiles: [], requests: [], control: defaultControl() };
@@ -28,6 +29,13 @@ class Locks {
     if (this.held) return callback(null);
     this.held = true;
     try { return await callback({ name }); } finally { this.held = false; }
+  }
+}
+class SerializedStore extends MemoryStore {
+  tail = Promise.resolve();
+  change(edit) {
+    const next = this.tail.then(() => super.change(edit));
+    this.tail = next.catch(() => {}); return next;
   }
 }
 class Journal {
@@ -74,7 +82,7 @@ test('profile import validates shape, sizes and fixed fields without accepting e
   assert.throws(() => normalizeProfile({ ...exampleProfile, schemaVersion: 2 }), /schemaVersion/);
 });
 
-test('manual mode is the default and blocks all generation/reconciliation entry points without acquiring a chat', async () => {
+test('bulk manual mode blocks Start and Continue without acquiring a chat', async () => {
   const store = new MemoryStore(), locks = new Locks(); let chats = 0;
   const queue = createResumeQueue({ store, locks, channel: null, journal: new Journal(), getChat: () => { chats++; throw new Error('Must not acquire Chat'); } });
   await queue.ready; const id = await queue.add(input());
@@ -129,6 +137,158 @@ test('queue starts empty, imports profiles, snapshots requests, and never submit
   assert.equal(queue.profileOptions().find(profile => profile.id === candidateId).filename, 'real.json');
 });
 
+test('duplicate checking rejects before creating a request, copying or granting Add send permission', async () => {
+  const fixture = setup(); await fixture.queue.ready;
+  await fixture.queue.add(input());
+  const before = structuredClone(fixture.store.state);
+  const duplicate = input(); duplicate.job.company = ' NORTHSTAR '; duplicate.job.url = 'https://other.test/different-job';
+  await assert.rejects(fixture.queue.add(duplicate, { sendOnAdd: true, checkExisting: true }), error =>
+    error.code === 'already-applied' && error.message === 'Already applied' && error.duplicate.matchedBy.includes('company'));
+  assert.deepEqual(fixture.store.state, before); assert.equal(fixture.sent.length, 0);
+  await fixture.queue.add(duplicate, { checkExisting: false });
+  assert.equal(fixture.store.state.requests.length, 2, 'the explicit option can be turned off');
+  fixture.queue.dispose();
+});
+
+test('duplicate checking uses the latest transactional records across panels and concurrent Adds', async () => {
+  const store = new SerializedStore(), locks = new Locks();
+  const first = setup({ store, locks }), other = setup({ store, locks }); await Promise.all([first.queue.ready, other.queue.ready]);
+  const outcomes = await Promise.allSettled([
+    first.queue.add(input(), { sendOnAdd: true, checkExisting: true }),
+    other.queue.add(input(), { sendOnAdd: true, checkExisting: true })
+  ]);
+  assert.equal(outcomes.filter(item => item.status === 'fulfilled').length, 1);
+  assert.equal(outcomes.find(item => item.status === 'rejected').reason.code, 'already-applied');
+  assert.equal(store.state.requests.length, 1); assert.equal(first.sent.length + other.sent.length, 0);
+  first.queue.dispose(); other.queue.dispose();
+});
+
+function waitForQueue(queue, check) {
+  if (check(queue.snapshot())) return Promise.resolve(queue.snapshot());
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => { unsubscribe(); reject(new Error('Queue did not reach the expected outcome')); }, 3000);
+    const unsubscribe = queue.subscribe(state => {
+      if (check(state)) { clearTimeout(timer); unsubscribe(); resolve(state); }
+    });
+  });
+}
+
+test('explicit Add copies the persisted delivery and sends only that new request once, despite bulk manual mode', async () => {
+  const fixture = setup({ manualOnly: true }); await fixture.queue.ready;
+  const old = await fixture.queue.add(input());
+  const id = await fixture.queue.add(input(), { sendOnAdd: true });
+  const prepared = fixture.queue.snapshot().requests.find(item => item.id === id);
+  const copied = promptForManualCopy(prepared);
+  assert.equal(fixture.sent.length, 0, 'saving/copying alone never grants Send');
+  fixture.queue.sendAddedRequest(id);
+  assert.throws(() => fixture.queue.sendAddedRequest(id), /unused Add permission/);
+  await waitForQueue(fixture.queue, state => !state.starting && state.requests.find(item => item.id === id).state === 'ready');
+  assert.equal(fixture.sent.length, 1); assert.equal(fixture.sent[0].prompt, copied);
+  assert.equal(fixture.sent[0].deliveryId, prepared.deliveryId); assert.equal(fixture.sent[0].resumePrepared, false);
+  assert.equal(fixture.queue.snapshot().requests.find(item => item.id === id).attempts.length, 1);
+  assert.equal(fixture.queue.snapshot().requests.find(item => item.id === old).state, 'queued');
+  assert.throws(() => fixture.queue.sendAddedRequest(old), /unused Add permission/);
+  fixture.queue.dispose();
+});
+
+test('additional explicit Adds serialize behind the response without processing older jobs', async () => {
+  const entered = Promise.withResolvers(), finish = Promise.withResolvers();
+  let replies = 0;
+  const fixture = setup({ manualOnly: true, beforeReply: async () => { if (!replies++) { entered.resolve(); await finish.promise; } } });
+  await fixture.queue.ready;
+  const old = await fixture.queue.add(input());
+  const first = await fixture.queue.add(input(), { sendOnAdd: true }); fixture.queue.sendAddedRequest(first); await entered.promise;
+  const next = await fixture.queue.add(input(), { sendOnAdd: true }); fixture.queue.sendAddedRequest(next);
+  assert.equal(fixture.sent.length, 1); assert.equal(fixture.queue.snapshot().requests.find(item => item.id === next).state, 'queued');
+  finish.resolve();
+  await waitForQueue(fixture.queue, state => !state.starting && state.requests.find(item => item.id === next).state === 'ready');
+  assert.deepEqual(fixture.sent.map(item => item.requestId), [first, next]);
+  assert.equal(fixture.queue.snapshot().requests.find(item => item.id === old).state, 'queued');
+  fixture.queue.dispose();
+});
+
+test('Pause and panel reopening revoke Add permissions rather than reconstructing permission from storage', async () => {
+  const fixture = setup({ manualOnly: true }); await fixture.queue.ready;
+  const id = await fixture.queue.add(input(), { sendOnAdd: true });
+  await fixture.queue.pause();
+  assert.throws(() => fixture.queue.sendAddedRequest(id), /unused Add permission/);
+  const reopened = setup({ store: fixture.store, manualOnly: true }); await reopened.queue.ready;
+  assert.throws(() => reopened.queue.sendAddedRequest(id), /unused Add permission/);
+  assert.equal(reopened.sent.length, 0); fixture.queue.dispose(); reopened.queue.dispose();
+});
+
+test('Add handoffs stop on uncertain dispatch and do not resend or advance pending additions', async () => {
+  const entered = Promise.withResolvers(), finish = Promise.withResolvers();
+  const fixture = setup({ manualOnly: true }); await fixture.queue.ready;
+  fixture.chat.queue.submit = async (data, progress) => {
+    fixture.sent.push(data); await progress({ phase: 'prepared' }); await progress({ phase: 'dispatched' });
+    entered.resolve(); await finish.promise;
+    throw Object.assign(new Error('Acknowledgement missing'), { code: 'send-unacknowledged' });
+  };
+  const first = await fixture.queue.add(input(), { sendOnAdd: true }); fixture.queue.sendAddedRequest(first); await entered.promise;
+  const next = await fixture.queue.add(input(), { sendOnAdd: true }); fixture.queue.sendAddedRequest(next); finish.resolve();
+  await waitForQueue(fixture.queue, state => !state.starting && state.requests.find(item => item.id === first).state === 'uncertain');
+  assert.equal(fixture.sent.length, 1); assert.equal(fixture.queue.snapshot().requests.find(item => item.id === next).state, 'queued');
+  assert.throws(() => fixture.queue.sendAddedRequest(first), /unused Add permission/);
+  const third = await fixture.queue.add(input(), { sendOnAdd: true }); fixture.queue.sendAddedRequest(third);
+  await waitForQueue(fixture.queue, state => state.requests.find(item => item.id === third).state === 'unsent');
+  assert.equal(fixture.sent.length, 1); fixture.queue.dispose();
+});
+
+test('Pause during a response retains later Adds without navigating or sending them', async () => {
+  const entered = Promise.withResolvers(), finish = Promise.withResolvers();
+  const fixture = setup({ manualOnly: true, beforeReply: async () => { entered.resolve(); await finish.promise; } }); await fixture.queue.ready;
+  const first = await fixture.queue.add(input(), { sendOnAdd: true }); fixture.queue.sendAddedRequest(first); await entered.promise;
+  const next = await fixture.queue.add(input(), { sendOnAdd: true }); fixture.queue.sendAddedRequest(next);
+  await fixture.queue.pause(); finish.resolve();
+  await waitForQueue(fixture.queue, state => !state.starting && state.requests.find(item => item.id === first).state === 'ready');
+  assert.equal(fixture.sent.length, 1); assert.equal(fixture.queue.snapshot().requests.find(item => item.id === next).state, 'queued');
+  fixture.queue.dispose();
+});
+
+test('Pause in another extension window invalidates queued Add permissions across runner boundaries', async () => {
+  const entered = Promise.withResolvers(), finish = Promise.withResolvers();
+  const fixture = setup({ manualOnly: true, beforeReply: async () => { entered.resolve(); await finish.promise; } }); await fixture.queue.ready;
+  const first = await fixture.queue.add(input(), { sendOnAdd: true }); fixture.queue.sendAddedRequest(first); await entered.promise;
+  const next = await fixture.queue.add(input(), { sendOnAdd: true }); fixture.queue.sendAddedRequest(next);
+  const other = setup({ store: fixture.store, locks: fixture.locks, manualOnly: true }); await other.queue.ready;
+  await other.queue.pause(); finish.resolve();
+  await waitForQueue(fixture.queue, state => !state.starting && state.requests.find(item => item.id === next).state === 'unsent');
+  assert.equal(fixture.sent.length, 1); assert.equal(other.sent.length, 0);
+  assert.equal(fixture.queue.snapshot().requests.find(item => item.id === next).errorCode, 'interrupted');
+  fixture.queue.dispose(); other.queue.dispose();
+});
+
+test('Add respects the shared runner lock and never acquires a second Chat connection', async () => {
+  const entered = Promise.withResolvers(), finish = Promise.withResolvers();
+  const first = setup({ manualOnly: true, beforeReply: async () => { entered.resolve(); await finish.promise; } }); await first.queue.ready;
+  const running = await first.queue.add(input(), { sendOnAdd: true }); first.queue.sendAddedRequest(running); await entered.promise;
+  const other = setup({ store: first.store, locks: first.locks, manualOnly: true }); await other.queue.ready;
+  const blocked = await other.queue.add(input(), { sendOnAdd: true }); other.queue.sendAddedRequest(blocked);
+  await waitForQueue(other.queue, state => state.requests.find(item => item.id === blocked).state === 'unsent');
+  assert.equal(other.sent.length, 0); finish.resolve();
+  await waitForQueue(first.queue, state => !state.starting && state.requests.find(item => item.id === running).state === 'ready');
+  assert.equal(first.sent.length, 1); first.queue.dispose(); other.queue.dispose();
+});
+
+test('terminal Add output advances safely while a save failure pauses later Add handoffs', async () => {
+  for (const saveFailure of [false, true]) {
+    const entered = Promise.withResolvers(), finish = Promise.withResolvers();
+    let replies = 0;
+    const fixture = setup({ manualOnly: true, reply: (data, count) => !saveFailure && count === 1 ? 'Invalid JSON' : JSON.stringify(expected(data.prompt)),
+      beforeReply: async () => { if (!replies++) { entered.resolve(); await finish.promise; } } }); await fixture.queue.ready;
+    const first = await fixture.queue.add(input(), { sendOnAdd: true }); fixture.queue.sendAddedRequest(first); await entered.promise;
+    const next = await fixture.queue.add(input(), { sendOnAdd: true }); fixture.queue.sendAddedRequest(next);
+    if (saveFailure) fixture.store.failReady = 1;
+    finish.resolve();
+    await waitForQueue(fixture.queue, state => !state.starting && state.requests.find(item => item.id === first).state === (saveFailure ? 'saving' : 'invalid-output') &&
+      state.requests.find(item => item.id === next).state === (saveFailure ? 'queued' : 'ready'));
+    if (saveFailure) { await fixture.queue.retrySave(first); assert.equal(fixture.sent.length, 1); }
+    else assert.equal(fixture.sent.length, 2);
+    fixture.queue.dispose();
+  }
+});
+
 test('an explicit Start processes jobs sequentially, saves source links and leaves other candidates untouched', async () => {
   const { queue, sent } = setup(); await queue.ready;
   await queue.add(input()); await queue.add(input());
@@ -166,6 +326,21 @@ test('Pause finishes the current response and another window cannot acquire the 
   await first.queue.pause(); finish.resolve(); await running;
   assert.deepEqual(first.queue.snapshot().requests.map(item => item.state), ['ready', 'queued']);
   assert.equal(first.sent.length, 1);
+});
+
+test('prepared authorization checks Pause in the same transaction that would persist send intent', async () => {
+  const fixture = setup(); await fixture.queue.ready; await fixture.queue.add(input());
+  let clicks = 0;
+  fixture.chat.queue.submit = async (data, progress) => {
+    // Another panel changed the persisted control after the preflight reads.
+    fixture.store.state.control.paused = true;
+    if (await progress({ phase: 'prepared', url: 'https://chatgpt.com/' })) clicks++;
+    throw Object.assign(new Error('Paused before Send'), { code: 'paused' });
+  };
+  await fixture.queue.start('morgan');
+  assert.equal(clicks, 0);
+  assert.equal(fixture.queue.snapshot().requests[0].attempts[0].sendIntent, undefined);
+  assert.equal(fixture.queue.snapshot().requests[0].state, 'unsent'); fixture.queue.dispose();
 });
 
 test('interrupted delivery recovers a recorded conversation without sending another prompt', async () => {

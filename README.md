@@ -8,17 +8,39 @@ on `baseline/combined-chatgpt-resume-studio-code` and now has a persistent gener
 Studio includes JSON candidate-profile import, job-description extraction,
 template/prompt previews, request details, resume previews, and JSON copy.
 Profiles, immutable queued inputs, captured replies, results, and company chat
-links are saved locally in IndexedDB. Sending is manual for now. Add a job, choose
-**Copy prompt** on its request card or in **Details**, then paste and send the full
-prompt in ChatGPT yourself. Copying includes the saved candidate profile, instructions,
-job description, and output schema; it does not insert text, create an attempt,
-mark a request sent, collect a response, or change queue status. If clipboard access
-fails, Details opens with the readonly full prompt selected for manual copying.
+links are saved locally in IndexedDB. **Add to queue** saves the job and its exact
+prompt, copies it, switches to Chat, opens a new Sidebar Chat, and submits it once.
+The extension records the originating conversation, monitors the matching response,
+and saves valid resume JSON before marking it Ready. Additional Adds wait their
+turn; older queued jobs are not included. Existing unrelated drafts and attachments
+are preserved and block sending. Clipboard failure leaves the job saved without
+sending and opens Details with the prompt selected.
 
-Automatic Start/Continue/regeneration controls are paused in this build, with a
-runner guard behind the UI. Existing automation and recovery code is retained for
-later use. Saved results, Details, Review, preview, save retry, and cancellation
-remain available. PDF/DOCX export remains unavailable.
+Fresh-chat preparation reuses an already empty Home or clicks ChatGPT's native
+New chat control without reloading the app. A missing control uses the guarded
+full-load fallback; a clicked but unconfirmed navigation stops without retrying.
+Readiness and Send controls wake from events. Matching complete JSON with enabled
+turn-level completion controls settles for 180 ms; ambiguous/non-JSON output
+keeps the 1.25 s quiet check. Streaming must stop, the delivery must match, and
+the result must still pass local validation and saving. ChatGPT's generation time
+is outside the extension's control.
+
+**Check existing company or URL** is on by default in Review Job and is saved on
+this device. Add to queue and Ctrl+Enter check the selected candidate's existing
+queue entries and saved results. A matching company name or job URL shows
+**Already applied** with the matching list and stops before saving, copying, or
+sending. Company names ignore case and extra spaces; URLs ignore tracking
+parameters but keep distinct job IDs and hash routes. Example results, cancelled
+jobs, completed failures and base resumes are excluded. Turn the option off to
+intentionally add another job from the same company. There is no separate
+application-tracker store in the current runtime; saved results are checked here.
+
+Bulk Start/Continue/regeneration controls remain paused. Each Add grants permission
+only for its new request while this panel stays open. Pause, manual navigation,
+uncertain delivery, or persistence failure stops subsequent handoffs. Copy prompt
+on cards and in Details remains a clipboard-only action; it never resends a job.
+Saved results, Details, Review, preview, save retry, and cancellation remain
+available. PDF/DOCX export remains unavailable.
 
 ChatGPT stays mounted when switching views, preserving its conversation and composer.
 The header holds Resume Studio, Chat, and account controls. New chat, reload, and
@@ -29,20 +51,24 @@ to keep it open in its own row above ChatGPT across chat reloads and view switch
 The iframe uses the remaining height, keeping its top content fully visible. This preference is saved
 on this device; unpin to restore hover behavior. A small downward chevron
 marks the hidden controls. Keyboard focus or a tap on the top edge also reveals
-them. The compact search field between the controls expands when focused and shows the
-selected candidate's saved company conversations. Type a company or job title to
-filter; use Arrow keys and Enter to select, or Escape to collapse. Selecting a
-company opens its connected chat. To connect one, open its conversation in Chat,
-then use Details → Connect current chat on the saved company in Studio. Links
-are saved with their requests locally. Generated results connect their source
-conversation automatically.
+them. The compact search field between the controls expands when focused and shows
+the current ChatGPT session's saved conversation titles in native history order,
+independent of the selected candidate. Type a chat title to filter; use Arrow keys
+and Enter to select, or Escape to collapse. Focus and Refresh read the latest
+rendered list. Selecting a chat rechecks the current route, draft and generation,
+then clicks its native conversation link once. Titles are held only in panel
+memory; chat message contents are not read for this list. The list covers the
+history ChatGPT has loaded, up to 300 chats, without private endpoints.
+
+Resume results still keep their originating conversation links in Details and
+Review. These saved request links are separate from the ChatGPT search list.
 
 Stacked Up/Down controls immediately to the right of search browse ChatGPT's own
 loaded conversation history in its displayed order. Down from a new chat opens the
 most recent conversation; Up stops at the most recent conversation and is disabled
 on a new chat. The oldest loaded conversation disables Down. Navigation pauses
 while a draft or generation is active. Reading history restores the native sidebar's
-previous visibility and keeps the company search scoped to saved companies.
+previous visibility. Drafts and active responses block search selection too.
 
 Chat uses the full remaining panel height, with no Studio footer. Studio queue actions stay fixed
 below the scrolling content. Model and thinking settings are managed inside
@@ -103,7 +129,7 @@ or the embedded ChatGPT has focus, these sidebar shortcuts are available:
 | Ctrl+Down | Open Chat |
 | Ctrl+Left | Previous browser tab (the `<` action) |
 | Ctrl+Right | Next browser tab (the `>` action) |
-| Ctrl+Enter | Add the prepared job to Job Queues |
+| Ctrl+Enter | Save, copy, and send the prepared job in a new Sidebar Chat |
 
 Settings → Keyboard shortcuts lists these bindings. Ctrl+Enter uses the same job
 validation and Add action as the button, preserves the ChatGPT draft, and adds one
@@ -116,8 +142,8 @@ preserved. See the [repository review and extraction notes](docs/job-extraction-
 for source pins, coverage, validation, and limits.
 
 For generation, open **Profile → Download example format**, fill the JSON with
-your own facts, and use **Import profile JSON**. Add jobs and use **Copy prompt**.
-The automation behavior described below is retained but paused while manual mode is enabled.
+your own facts, and use **Import profile JSON**. Add jobs to copy and send each new
+request in Sidebar Chat. Bulk Start and recovery sending remain paused.
 Pause finishes the current response before stopping. Closing the sidebar preserves
 the queue and marks unresolved deliveries for reconciliation. Continue sending or
 Reconcile delivery handles one request only: it verifies the original prepared
@@ -135,7 +161,8 @@ conversation; Details is separate. A missing conversation reference never opens
 an unrelated chat. See [queue implementation notes](docs/chatgpt-queue.md).
 
 For the normal-tab workflow inspired by Multi-AI-Prompt, open **Settings → ChatGPT
-queue** and choose **ChatGPT tab**. Automated sending remains paused for now.
+queue** and choose **ChatGPT tab** for connection inspection and the retained
+normal-tab recovery workflow. Add to queue always uses Sidebar Chat.
 The extension creates its own ChatGPT tab in this window and activates it to send;
 your personal ChatGPT tabs are preserved. Keep the sidebar open while it runs.
 **Sidebar Chat** remains available and is the default. The selected connection is
@@ -147,7 +174,7 @@ menu → **Check connection**. The check recognizes account controls, saved-chat
 links, and loaded conversations. For an unrecognized layout, **Use this signed-in
 session** confirms the current panel session after you check your account in Chat.
 Explicit sign-in prompts still block sending. A successful check restores jobs
-that were blocked before any send, ready for an explicit Start queue.
+that were blocked before any send, without sending or retrying them automatically.
 The check runs inside this extension; no desktop app or browser-control extension
 is required. Install this extension and sign in separately in each browser profile
 where you use it; no other extension files or login data belong in the project.
@@ -187,10 +214,10 @@ also load the repository root directly during development.
 | `manifest.json` | Extension permissions, entry points and shortcut |
 | `index.html`, `src/sidebar.css`, `src/workspace.mjs` | Combined shell, themes, accessible tabs, and dialogs |
 | `src/sidebar.mjs` | Live ChatGPT frame loading/recovery and toolbar controls |
-| `src/chat-toolbar.mjs` | Hover toolbar and connected company-chat dropdown |
+| `src/chat-toolbar.mjs` | Hover toolbar and searchable native ChatGPT conversation list |
 | `src/company-chats.mjs` | Saved company source links scoped to the selected candidate |
 | `src/resume-data.mjs` | Candidate format, prompt construction, and strict result/fact validation |
-| `src/manual-prompt.mjs`, `src/queue-mode.mjs` | Clipboard-only full prompts and temporary manual sending policy |
+| `src/manual-prompt.mjs`, `src/queue-mode.mjs` | Clipboard-only copy helpers and bulk sending policy; Add has a separate one-shot handoff |
 | `src/queue-store.mjs`, `src/resume-queue.mjs` | Transactional local queue, shared runner lock, capture recovery, terminal outcomes, and explicit regeneration |
 | `src/chatgpt-queue.js` | Isolated ChatGPT composer submission and matching response collection |
 | `src/chatgpt-tab-connection.mjs`, `src/chatgpt-tab.js` | Dedicated ChatGPT tab, content-script messaging, and reconnectable result collection |

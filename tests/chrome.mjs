@@ -18,6 +18,7 @@ import { checkBulkQueue } from './bulk-queue-ui.mjs';
 import { checkTabQueue } from './tab-queue-ui.mjs';
 import { checkEditorBoundaries } from './editor-boundary-ui.mjs';
 import { checkManualPromptUI } from './manual-prompt-ui.mjs';
+import { checkAddChatUI } from './add-chat-ui.mjs';
 import { MANUAL_QUEUE_MODE } from '../src/queue-mode.mjs';
 
 const artifacts = fileURLToPath(new URL('../artifacts/', import.meta.url));
@@ -245,7 +246,7 @@ try {
   assert.equal(await read('document.getElementById("recovery").hidden'), false);
   await click('#chat-toolbar-reveal');
   await read('document.getElementById("company-chat-search").focus()');
-  await until(async () => (await read('document.getElementById("company-chat-status").textContent')).includes('No connected company chats'), 'empty company chats after resetting examples');
+  await until(async () => (await read('document.getElementById("company-chat-status").textContent')).includes('Sign in to ChatGPT'), 'saved ChatGPT chats clear when signed out');
   assert.equal(await read('document.querySelectorAll("#company-chat-list button").length'), 0);
   await read('document.getElementById("company-chat-search").blur()');
   await until(() => read('document.getElementById("company-chat-menu").hidden'), 'company search closes on blur');
@@ -347,15 +348,17 @@ try {
   let tabQueue = { ...bulkQueue };
   let editorBoundaries = { checks: [], fixtureOnly: true, liveAccount: false, paused: true };
   let manualQueue;
+  let addChat;
   if (MANUAL_QUEUE_MODE) {
     manualQueue = await checkManualPromptUI({ cdp, dockSession, evaluate, until, session });
+    addChat = await checkAddChatUI({ cdp, dockSession, evaluate, until, session });
   } else {
     bulkQueue = await checkBulkQueue({cdp,id,workerSession,sourceSession,dockSession,panelSession:panel,evaluate,until,session});
     dockSession = bulkQueue.dockSession;
     tabQueue = await checkTabQueue({ cdp, id, workerSession, dockSession, evaluate, until, session });
     dockSession = tabQueue.dockSession;
-    editorBoundaries = await checkEditorBoundaries({ cdp, id, evaluate, until, session, contexts });
   }
+  editorBoundaries = await checkEditorBoundaries({ cdp, id, evaluate, until, session, contexts });
   await evaluate(dockSession, 'document.getElementById("chat-tab").click()');
   await until(async () => await evaluate(dockSession, 'document.getElementById("connection")?.dataset.state') === 'ready', 'native dock ChatGPT readiness');
   const dockContexts = await evaluate(workerSession, 'chrome.runtime.getContexts({contextTypes:["SIDE_PANEL"]})');
@@ -369,6 +372,7 @@ try {
     tabQueue: { checks: tabQueue.checks, fixtureOnly: tabQueue.fixtureOnly, liveAccount: tabQueue.liveAccount, submissions: tabQueue.submissions },
     editorBoundaries,
     ...(manualQueue ? { manualQueue } : {}),
+    ...(addChat ? { addChat } : {}),
     checks: ['unpacked extension loads', 'native dock opens from toolbar', 'dock survives tab navigation', 'installed header rule scope', 'embedding with restrictive response headers',
       'frame readiness', 'current conversation in new tab', 'reload keeps conversation', 'new chat', 'guest sign-in tab', 'embedded sign-in handoff',
       'job-page-only keyword highlighting with temporary page access', 'literal and cross-element phrases preserve page markup',

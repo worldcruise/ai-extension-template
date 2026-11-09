@@ -25,12 +25,25 @@ test('history identities are bounded, deduplicated, and restricted to ChatGPT co
   for (const extra of [{urls:['https://evil.test/c/chat']},{urls:Array(301).fill(url('a'))},{currentUrl:'https://chatgpt.com/auth/login'},{hasDraft:'false'},{dispatched:true,target:url('missing')}]) assert.equal(snapshot({...value,...extra}),null);
 });
 
+test('history snapshots forward only bounded titles and known conversation references', () => {
+  const value = {loaded:true,ready:true,hasDraft:false,busy:false,currentUrl:url('a'),urls:[url('a'),url('b')],
+    chats:[{url:url('a')+'?private=query',title:'Resume <img src=x onerror=alert(1)>',messages:['private'],html:'private'},
+      {url:url('a'),title:'Duplicate'}, {url:url('b'),title:'Interview prep'}]};
+  assert.deepEqual(snapshot(value).chats, [
+    {url:url('a'),title:'Resume <img src=x onerror=alert(1)>'}, {url:url('b'),title:'Interview prep'}
+  ]);
+  for (const chats of [[{url:url('missing'),title:'Missing'}],[{url:url('a'),title:'x'.repeat(201)}],
+    [{url:'https://evil.test/c/a',title:'External'}], [{url:url('a'),title:123}],Array(301).fill({url:url('a'),title:'Large'})]) {
+    assert.equal(snapshot({...value,chats}),null);
+  }
+});
+
 function readerFixture(t) {
   const before = globalThis.getComputedStyle;
   globalThis.getComputedStyle = () => ({visibility:'visible'});
   t.after(() => { globalThis.getComputedStyle = before; });
   const clicked = [];
-  const links = ['a','b','c'].map(id => ({href:url(id),target:'',isConnected:true,click:()=>clicked.push(id)}));
+  const links = ['a','b','c'].map(id => ({href:url(id),textContent:` Chat ${id} `,target:'',isConnected:true,click:()=>clicked.push(id)}));
   const editor = {value:'',isConnected:true,disabled:false,matches:()=>true,getClientRects:()=>[{}]};
   const state = {composerReady:true,hasDraft:false,busy:false,authState:'unknown'};
   const page = {href:url('a')};
@@ -62,4 +75,30 @@ test('changed conversation or reordered history cannot click an outdated target'
   fixture.page.href = url('a'); fixture.links.reverse();
   await fixture.reader.open(data,value=>replies.push(value));
   assert.equal(replies.at(-1).reason,'history-changed'); assert.deepEqual(fixture.clicked,[]);
+});
+
+test('search selection opens any current native history entry without candidate or adjacency filtering', async t => {
+  const fixture = readerFixture(t), replies = [];
+  await fixture.reader.open({currentUrl:url('a'),target:url('c'),selection:true},value=>replies.push(value));
+  assert.equal(replies.at(-1).dispatched,true); assert.deepEqual(fixture.clicked,['c']);
+  fixture.links.pop();
+  await fixture.reader.open({currentUrl:url('a'),target:url('c'),selection:true},value=>replies.push(value));
+  assert.equal(replies.at(-1).reason,'history-changed'); assert.deepEqual(fixture.clicked,['c']);
+});
+
+test('saved titles are read without modifying drafts; opening still refuses drafts, generation and stale routes', async t => {
+  const fixture = readerFixture(t), replies = [];
+  fixture.links[0].textContent='  Planning\n notes  ';
+  fixture.editor.value='Private unsent draft'; fixture.state.busy=true;
+  const state=await fixture.reader.inspect({readOnly:true});
+  assert.deepEqual(state.chats.map(chat=>chat.title),['Planning notes','Chat b','Chat c']);
+  assert.equal(fixture.editor.value,'Private unsent draft');
+  await fixture.reader.open({currentUrl:url('a'),target:url('c'),selection:true},value=>replies.push(value));
+  assert.equal(replies.at(-1).reason,'draft');
+  fixture.editor.value='';
+  await fixture.reader.open({currentUrl:url('a'),target:url('c'),selection:true},value=>replies.push(value));
+  assert.equal(replies.at(-1).reason,'generation');
+  fixture.state.busy=false; fixture.page.href=url('b');
+  await fixture.reader.open({currentUrl:url('a'),target:url('c'),selection:true},value=>replies.push(value));
+  assert.equal(replies.at(-1).reason,'conversation-changed'); assert.deepEqual(fixture.clicked,[]);
 });

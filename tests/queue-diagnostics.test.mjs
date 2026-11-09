@@ -17,6 +17,14 @@ test('diagnostic whitelisting drops content, account data, HTML, and unbounded i
   assert.equal(redactedDiagnostic({ phase: 'unknown' }), null);
 });
 
+test('completion timing is bounded and redacted without recording response or navigation contents', () => {
+  const diagnostic = redactedDiagnostic({ phase: 'collecting', timestamps: {
+    completionObservedAt: 100, capturedAt: 280, response: 'private', future: Infinity
+  }, raw: 'private response', editor: { type: 'missing' } });
+  assert.deepEqual(diagnostic.timestamps, { completionObservedAt: 100, capturedAt: 280 });
+  assert.ok(!JSON.stringify(diagnostic).includes('private'));
+});
+
 test('inspection separates unknown authentication, readiness, confirmation scope, and runtime identity', () => {
   const input = { authState: 'unknown', composerPresent: true, composerReady: false, buildId: BUILD.id };
   const unconfirmed = connectionReport(input, false, 'sidebar');

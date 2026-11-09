@@ -119,7 +119,7 @@
     }
     function matchingReply(deliveryId) {
       const nodes = authorNodes();
-      const index = nodes.findLastIndex(node => node.dataset.messageAuthorRole === 'user' && node.innerText.includes(`AI_AGENT_DELIVERY:${deliveryId}`));
+      const index = nodes.findLastIndex(node => node.dataset.messageAuthorRole === 'user' && node.textContent.includes(`AI_AGENT_DELIVERY:${deliveryId}`));
       if (index < 0) return {};
       let assistant;
       for (let cursor = index + 1; cursor < nodes.length; cursor++) {
@@ -132,36 +132,80 @@
       if (!node) return '';
       const content = [...node.querySelectorAll('.markdown, [data-message-content]')].at(-1) || node;
       const code = content.querySelectorAll('pre code');
-      return (code.length === 1 ? code[0].innerText : content.innerText).trim();
+      return (code.length === 1 ? code[0].textContent : editorText(content)).trim();
     }
     function wait(check, signal, timeout = 10000, timeoutError) {
       return new Promise((resolve, reject) => {
-        let timer, deadline, observer, complete = false;
+        let timer, deadline, wakeup, observer, complete = false;
         const finish = (failure, value) => {
           if (complete) return; complete = true;
-          clearInterval(timer); clearTimeout(deadline); observer?.disconnect();
+          clearInterval(timer); clearTimeout(deadline); clearTimeout(wakeup); observer?.disconnect();
           signal?.removeEventListener('abort', abort);
+          document.removeEventListener('input', inspect, true); document.removeEventListener('change', inspect, true);
+          window.removeEventListener('popstate', inspect);
           failure ? reject(failure) : resolve(value);
         };
         const abort = () => finish(error('interrupted', 'ChatGPT navigation or manual interaction interrupted this request. Inspect its conversation before retrying.'));
         const inspect = () => {
-          try { const result = check(); if (result) finish(null, result); }
+          if (complete) return;
+          clearTimeout(wakeup);
+          const wakeAfter = delay => { clearTimeout(wakeup); wakeup = setTimeout(inspect, Math.max(1, delay)); };
+          try { const result = check(wakeAfter); if (result) finish(null, result); }
           catch (failure) { finish(failure); }
         };
         if (signal?.aborted) { abort(); return; }
         signal?.addEventListener('abort', abort, { once: true });
         observer = new MutationObserver(inspect);
-        observer.observe(document.documentElement, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ['disabled', 'data-is-streaming'] });
+        observer.observe(document.documentElement, { childList: true, characterData: true, subtree: true, attributes: true,
+          attributeFilter: ['disabled', 'aria-disabled', 'contenteditable', 'data-is-streaming', 'aria-busy'] });
+        document.addEventListener('input', inspect, true); document.addEventListener('change', inspect, true);
+        window.addEventListener('popstate', inspect);
         timer = setInterval(inspect, 250);
         deadline = setTimeout(() => finish(timeoutError?.() || error('timeout', 'ChatGPT took too long. The request needs review; it will not be resent automatically.')), timeout);
         inspect();
       });
     }
+    async function freshConversation(data, id) {
+      if (active) throw error('busy', 'The ChatGPT connection is busy.');
+      const operation = { id, controller: new AbortController() };
+      active = operation;
+      const manualInput = event => { if (event.isTrusted) operation.controller.abort(); };
+      document.addEventListener('input', manualInput, true);
+      try {
+        preflight({ sessionConfirmed: data?.sessionConfirmed === true });
+        const fresh = () => location.pathname === '/' && !authorNodes().length;
+        if (fresh()) return { ...inspectConnection(), fresh: true, dispatched: false, method: 'empty-chat', url: location.origin + location.pathname };
+        const control = first('[data-testid="create-new-chat-button"], [data-testid="new-chat-button"], a[aria-label="New chat" i], button[aria-label="New chat" i]');
+        if (!control) return { ...inspectConnection(), fresh: false, dispatched: false };
+        const button = control.closest('a,button,[role="button"]');
+        const target = button?.matches('a') ? new URL(button.href, location.href) : null;
+        if (!button || !visible(button) || button.disabled || button.getAttribute('aria-disabled') === 'true' ||
+            target && (target.origin !== location.origin || target.username || target.password || target.pathname !== '/' || target.search || target.hash || button.target && button.target !== '_self')) {
+          return { ...inspectConnection(), fresh: false, dispatched: false };
+        }
+        preflight({ sessionConfirmed: data?.sessionConfirmed === true });
+        const originalPath = location.pathname;
+        button.click();
+        return await wait(() => {
+          if (location.pathname !== originalPath && location.pathname !== '/') throw error('navigation', 'ChatGPT opened an unexpected conversation. Nothing was inserted.');
+          const state = inspectConnection();
+          if (state.authState === 'signed-out') throw error('signed-out', 'ChatGPT signed out while opening a new chat.');
+          if (state.hasDraft) throw error('existing-draft', 'The new chat restored an unexpected draft. It was preserved.');
+          if (!fresh() || !state.composerReady || state.busy) return false;
+          preflight({ sessionConfirmed: data?.sessionConfirmed === true });
+          return { ...state, fresh: true, dispatched: true, method: 'native', url: location.origin + location.pathname };
+        }, operation.controller.signal, 10000, () => error('navigation-unconfirmed', 'New chat was clicked once, but a fresh conversation was not observed. Nothing was inserted.'));
+      } finally {
+        document.removeEventListener('input', manualInput, true);
+        if (active === operation) active = null;
+      }
+    }
     async function collect(data, operation, allowNewUrl) {
       operation.phase = 'collecting';
-      let currentPath = location.pathname, raw = '', changedAt = performance.now(), sawBusy = busy(), lastProgress = '', registeredUrl = '';
+      let currentPath = location.pathname, raw = '', changedAt = performance.now(), lastProgress = '', registeredUrl = '';
+      let completionAt = null, completionNode = null, parsedRaw = null, matchingJson = false;
       const acknowledgementDeadline = performance.now() + 15000;
-      return wait(() => {
+      return wait(wakeAfter => {
         if (location.pathname !== currentPath) {
           if (allowNewUrl && currentPath === '/' && /^\/c\/[\w-]+\/?$/.test(location.pathname)) { currentPath = location.pathname; allowNewUrl = false; }
           else throw error('navigation', 'The conversation changed. Open the recorded job chat before recovering this request.');
@@ -174,23 +218,48 @@
         }
         if (!operation.acknowledged) { operation.acknowledged = true; operation.timestamps.acknowledgedAt = Date.now(); }
         const url = location.origin + location.pathname;
+        let registered = false;
         if (/^\/(?:g\/[\w-]+\/)?c\/[\w-]+\/?$/.test(location.pathname) && registeredUrl !== url) {
           registeredUrl = url;
+          registered = true;
           emit({ type: 'queue.progress', operationId: operation.id, phase: 'registered', url, userMessageId: messageId(user), assistantMessageId: messageId(assistant), diagnostics: operation.diagnostic('acknowledged') });
         }
         const progress = { phase: assistant ? 'generating' : 'submitted', url, userMessageId: messageId(user), assistantMessageId: messageId(assistant) };
         const serialized = JSON.stringify(progress);
-        if (serialized !== lastProgress) { lastProgress = serialized; emit({ type: 'queue.progress', operationId: operation.id, ...progress, diagnostics: operation.diagnostic('collecting') }); }
+        if (serialized !== lastProgress) {
+          lastProgress = serialized;
+          if (!registered) emit({ type: 'queue.progress', operationId: operation.id, ...progress, diagnostics: operation.diagnostic('collecting') });
+        }
         const next = responseText(assistant);
         if (next.length > 500000) throw error('oversize', 'The ChatGPT response exceeds the local result size limit.');
-        if (next !== raw) { raw = next; changedAt = performance.now(); }
-        const generating = busy(); if (generating) sawBusy = true;
+        if (next !== raw) { raw = next; changedAt = performance.now(); completionAt = null; }
+        const generating = busy() || Boolean(assistant?.closest('[data-is-streaming="true"], [aria-busy="true"]') || assistant?.querySelector('[data-is-streaming="true"]'));
         const article = assistant?.closest('article') || assistant;
-        const finalActions = article?.querySelector('[data-testid="copy-turn-action-button"], [data-testid="good-response-turn-action-button"], button[aria-label="Copy"]');
-        if (!raw || generating || !finalActions || !visible(finalActions) || finalActions.disabled || performance.now() - changedAt < 1250) { blocked(); return false; }
+        const turnAction = article?.querySelector('[data-testid="copy-turn-action-button"], [data-testid="good-response-turn-action-button"]');
+        const finalActions = turnAction || article?.querySelector('button[aria-label="Copy"]');
+        if (!raw || generating || !finalActions || !visible(finalActions) || finalActions.disabled || finalActions.getAttribute('aria-disabled') === 'true') {
+          completionAt = null; completionNode = null; blocked(); return false;
+        }
+        if (completionAt === null || completionNode !== assistant) {
+          completionAt = performance.now(); completionNode = assistant;
+          operation.timestamps.completionObservedAt = Date.now();
+        }
+        if (raw !== parsedRaw) {
+          parsedRaw = raw; matchingJson = false;
+          try {
+            const json = JSON.parse(raw.replace(/^```(?:json)?\s*\n?([\s\S]*?)\n?```\s*$/i, '$1'));
+            matchingJson = json?.schemaVersion === 1 && json.requestId === data.requestId && json.resume && typeof json.resume === 'object' && !Array.isArray(json.resume);
+          } catch { /* Invalid or incomplete output keeps the conservative delay. */ }
+        }
+        // A matching complete JSON envelope plus enabled turn-level completion
+        // controls can settle quickly. Ambiguous controls/invalid text retain the
+        // original quiet period. No elapsed timer alone establishes completion.
+        const remaining = turnAction && matchingJson ? 180 - (performance.now() - Math.max(changedAt, completionAt)) : 1250 - (performance.now() - changedAt);
+        if (remaining > 0) { wakeAfter(remaining); blocked(); return false; }
         if (!/^\/(?:g\/[\w-]+\/)?c\/[\w-]+\/?$/.test(location.pathname)) throw error('conversation-url', 'The result has no saved conversation URL. Inspect ChatGPT before continuing.');
         const completedError = /^(?:i(?:'m| am) sorry|i (?:cannot|can't|won't) (?:help|assist|provide))/i.test(raw) ||
           Boolean(assistant?.querySelector('[data-testid="conversation-error"], [role="alert"]'));
+        operation.timestamps.capturedAt = Date.now();
         return { raw, url, deliveryId: data.deliveryId, userMessageId: messageId(user), assistantMessageId: messageId(assistant), buildId,
           completed: true, kind: completedError ? 'error' : 'response', diagnostics: operation.diagnostic('collecting') };
       }, operation.controller.signal, 600000);
@@ -203,7 +272,8 @@
         return { ...inspectConnection(), url: location.origin + location.pathname, existingDelivery: Boolean(match.user),
           preparedDraftMatches: sameDraft(editor(), data.prompt), userMessageId: messageId(match.user), assistantMessageId: messageId(match.assistant) };
       }
-      if (['preflight', 'submit'].includes(action) && data?.hostBuildId && data.hostBuildId !== buildId) throw error('revision-mismatch', 'The host and ChatGPT adapter build fingerprints differ. No prompt was submitted.');
+      if (['preflight', 'submit', 'fresh-conversation'].includes(action) && data?.hostBuildId && data.hostBuildId !== buildId) throw error('revision-mismatch', 'The host and ChatGPT adapter build fingerprints differ. No prompt was submitted.');
+      if (action === 'fresh-conversation') return freshConversation(data, id);
       if (action === 'preflight') return { ...preflight({ sessionConfirmed: data?.sessionConfirmed === true }), buildId };
       if (!['submit', 'recover'].includes(action) || active || typeof data?.deliveryId !== 'string' || !/^[\w-]{1,100}$/.test(data.deliveryId)) throw error('busy', 'The ChatGPT connection is busy or the request is invalid.');
       const operation = { id, controller: new AbortController(), authorizing: null, writing: false, phase: 'preflight',

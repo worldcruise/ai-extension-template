@@ -82,10 +82,12 @@ test('queue replies reject unbounded output and malformed success payloads', () 
 test('history replies retain only bounded public conversation references and require the current frame nonce', () => {
   const source = {};
   const data = {channel:FRAME_CHANNEL,nonce:'navigation-1',type:'history.reply',operationId:'history-1',ok:true,
-    value:{loaded:true,ready:true,hasDraft:false,busy:false,currentUrl:'https://chatgpt.com/',urls:['https://chatgpt.com/c/a'],title:'Not forwarded'}};
+    value:{loaded:true,ready:true,hasDraft:false,busy:false,currentUrl:'https://chatgpt.com/',urls:['https://chatgpt.com/c/a'],
+      chats:[{url:'https://chatgpt.com/c/a',title:'Planning',messages:'Not forwarded'}],title:'Not forwarded'}};
   const event = {source,origin:'https://chatgpt.com',data};
   const value = frameMessage(event,source,'navigation-1').value;
   assert.deepEqual(value.urls,['https://chatgpt.com/c/a']); assert.equal(value.title,undefined);
+  assert.deepEqual(value.chats,[{url:'https://chatgpt.com/c/a',title:'Planning'}]);
   assert.equal(frameMessage(event,source,'old-navigation'),null);
   assert.equal(frameMessage({...event,data:{...data,value:{...data.value,urls:['https://evil.test/c/a']}}},source,'navigation-1'),null);
 });

@@ -7,7 +7,7 @@ import { resumeTemplates } from '../src/resume-templates.mjs';
 export const root = fileURLToPath(new URL('../', import.meta.url));
 export const extensionFiles = [
   'src/build-info.js', 'src/runtime-info.mjs', 'src/queue-diagnostics.mjs', 'src/queue-outcomes.mjs', 'src/job-metadata.mjs',
-  'src/queue-mode.mjs', 'src/manual-prompt.mjs',
+  'src/queue-mode.mjs', 'src/manual-prompt.mjs', 'src/job-duplicates.mjs',
   'manifest.json', 'index.html',
   'src/sidebar.css', 'src/sidebar.mjs', 'src/sidebar-protocol.mjs',
   'src/workspace.mjs', 'src/studio.mjs', 'src/studio-examples.mjs', 'src/icons.mjs',

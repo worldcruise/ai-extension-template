@@ -5,7 +5,7 @@ export function redactedDiagnostic(value) {
   const number = (value, max) => Number.isSafeInteger(value) && value >= 0 && value <= max ? value : null;
   return { schemaVersion: 1, requestId: id(value.requestId), deliveryId: id(value.deliveryId), operationId: id(value.operationId),
     phase: value.phase, buildId: id(value.buildId),
-    timestamps: Object.fromEntries(['startedAt', 'insertedAt', 'retainedAt', 'preparedAt', 'dispatchedAt', 'acknowledgedAt', 'failedAt']
+    timestamps: Object.fromEntries(['startedAt', 'insertedAt', 'retainedAt', 'preparedAt', 'dispatchedAt', 'acknowledgedAt', 'completionObservedAt', 'capturedAt', 'failedAt']
       .filter(key => number(value.timestamps?.[key], Number.MAX_SAFE_INTEGER) !== null).map(key => [key, value.timestamps[key]])),
     editor: { type: ['textarea', 'contenteditable', 'missing', 'other'].includes(value.editor?.type) ? value.editor.type : 'other',
       connected: typeof value.editor?.connected === 'boolean' ? value.editor.connected : null, identityChanged: value.editor?.identityChanged === true,

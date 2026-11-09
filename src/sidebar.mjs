@@ -2,7 +2,7 @@ import { CHATGPT_HOME, CHATGPT_ORIGIN, FRAME_CHANNEL, frameMessage, frameShortcu
 import { createChatToolbar } from './chat-toolbar.mjs';
 import { BUILD, connectionReport, requireMatchingRevision } from './runtime-info.mjs';
 
-export function createChatSidebar({ onOpenChat = () => {}, getCompanyChats = () => [], onShortcut = () => {} } = {}) {
+export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {} } = {}) {
   const frame = document.getElementById('chatgpt-frame');
   const connection = document.getElementById('connection');
   const status = document.getElementById('status');
@@ -19,20 +19,23 @@ export function createChatSidebar({ onOpenChat = () => {}, getCompanyChats = () 
   let initialized = false;
   let starting = false;
   let awaitingFrameLoad = false;
+  let frameEpoch = 0, closed = false;
+  const readyWaiters = new Set();
+  const wakeReadyWaiters = () => { for (const check of [...readyWaiters]) check(); };
   let toolbar;
   let zoomPercent = 100;
   let navigationGuard = async () => {};
   let sessionConfirmed = false;
   const queueRequests = new Map();
   const historyRequests = new Map();
-  let historyState = {loaded:false,urls:[],ready:false,hasDraft:false,busy:false};
+  let historyState = {loaded:false,urls:[],chats:[],ready:false,hasDraft:false,busy:false};
   let historyEpoch = 0, historyAttempted = false, historyBusy = false, historyInspection = null;
   function renderHistory() {
-    toolbar?.updateHistory({...historyState, enabled:initialized && !awaitingFrameLoad && connection.dataset.state === 'ready', pending:historyBusy || Boolean(historyInspection)});
+    toolbar?.updateHistory({...historyState, enabled:initialized && !awaitingFrameLoad && connection.dataset.state === 'ready', pending:historyBusy || Boolean(historyInspection), navigating:historyBusy});
   }
   function resetHistory() {
     historyEpoch++; historyAttempted = false; historyBusy = false; historyInspection = null;
-    historyState = {loaded:false,urls:[],ready:false,hasDraft:false,busy:false};
+    historyState = {loaded:false,urls:[],chats:[],ready:false,hasDraft:false,busy:false};
     for (const request of historyRequests.values()) { clearTimeout(request.timer); request.reject(new Error('The ChatGPT page changed.')); }
     historyRequests.clear(); renderHistory();
   }
@@ -45,19 +48,25 @@ export function createChatSidebar({ onOpenChat = () => {}, getCompanyChats = () 
       frame.contentWindow.postMessage({channel:FRAME_CHANNEL,type:'history.command',nonce,operationId,action,data}, CHATGPT_ORIGIN);
     });
   }
-  async function refreshHistory() {
-    if (historyInspection || historyAttempted || historyState.loaded || !initialized || awaitingFrameLoad ||
-        document.getElementById('chat-view').hidden || historyState.hasDraft || historyState.busy || !historyState.ready) return;
+  async function refreshHistory(force = false) {
+    if (historyInspection) {
+      if (!force) return;
+      const epoch = historyEpoch;
+      try { await historyInspection; } catch { /* A fresh explicit read can retry inspection, never navigation. */ }
+      if (epoch !== historyEpoch) return;
+    }
+    if (historyBusy || !initialized || awaitingFrameLoad || document.getElementById('chat-view').hidden ||
+        !force && (historyAttempted || historyState.loaded || historyState.hasDraft || historyState.busy || !historyState.ready)) return;
     const epoch = historyEpoch;
     historyAttempted = true;
-    const operation = historyCommand('inspect');
+    const operation = historyCommand('inspect', {readOnly:force});
     historyInspection = operation; renderHistory();
     try { const value = await operation; if (epoch === historyEpoch) historyState = value; }
     catch { if (epoch === historyEpoch) historyState = {...historyState,reason:'unavailable'}; }
     finally { if (epoch === historyEpoch) { historyInspection = null; renderHistory(); } }
   }
-  async function moveHistory(direction) {
-    if (historyBusy || awaitingFrameLoad || ![-1,1].includes(direction)) return;
+  async function moveHistory(direction, selectedUrl = null) {
+    if (historyBusy || awaitingFrameLoad || selectedUrl === null && ![-1,1].includes(direction)) return;
     const epoch = historyEpoch, original = globalThis.AiAgentChatHistory.route(currentUrl);
     historyBusy = true; renderHistory();
     try {
@@ -68,9 +77,11 @@ export function createChatSidebar({ onOpenChat = () => {}, getCompanyChats = () 
       if (epoch !== historyEpoch) return;
       historyState = state;
       if (state.currentUrl !== original || state.hasDraft || state.busy || !state.ready) return;
-      const target = globalThis.AiAgentChatHistory.target(state.urls, state.currentUrl, direction);
-      if (!target) return;
-      const result = await historyCommand('open', {target,currentUrl:state.currentUrl,direction});
+      const target = selectedUrl === null ? globalThis.AiAgentChatHistory.target(state.urls, state.currentUrl, direction)
+        : globalThis.AiAgentChatHistory.conversation(selectedUrl);
+      if (!target || !state.urls.includes(target) || target === state.currentUrl) return;
+      const result = await historyCommand('open', {target,currentUrl:state.currentUrl,
+        ...(selectedUrl === null ? {direction} : {selection:true})});
       if (epoch !== historyEpoch) return;
       historyState = result;
       if (!result.dispatched) return;
@@ -99,33 +110,41 @@ export function createChatSidebar({ onOpenChat = () => {}, getCompanyChats = () 
     for (const request of queueRequests.values()) { clearTimeout(request.timer); request.reject(new Error(message)); }
     queueRequests.clear();
   }
-  async function waitForReady(inspectOnly = false) {
-    const deadline = Date.now() + 30000;
-    while (Date.now() < deadline) {
-      if (initialized && !awaitingFrameLoad && (inspectOnly || connection.dataset.state === 'ready')) return;
-      if (!inspectOnly && connection.dataset.state === 'guest') throw Object.assign(new Error('Sign in to ChatGPT, then reload the sidebar.'), { code: 'signed-out' });
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    throw new Error('ChatGPT is not ready. Open Chat and check its connection.');
+  function waitForReady(inspectOnly = false) {
+    let epoch = initialized || awaitingFrameLoad ? frameEpoch : null;
+    return new Promise((resolve, reject) => {
+      const finish = error => { clearTimeout(timer); readyWaiters.delete(check); error ? reject(error) : resolve(frameEpoch); };
+      const check = () => {
+        if (epoch === null && initialized) epoch = frameEpoch;
+        if (closed || epoch !== null && epoch !== frameEpoch) return finish(new Error('ChatGPT navigated before this operation was ready. Nothing was sent.'));
+        if (initialized && !awaitingFrameLoad && (inspectOnly || connection.dataset.state === 'ready')) return finish();
+        if (!inspectOnly && connection.dataset.state === 'guest') return finish(Object.assign(new Error('Sign in to ChatGPT, then reload the sidebar.'), { code: 'signed-out' }));
+        if (connection.dataset.state === 'error') finish(new Error(status.textContent || 'ChatGPT could not load.'));
+      };
+      const timer = setTimeout(() => finish(new Error('ChatGPT is not ready. Open Chat and check its connection.')), 30000);
+      readyWaiters.add(check); check();
+    });
   }
   async function queueCommand(action, data = {}, onProgress = async () => true) {
-    await waitForReady(['inspect', 'inspect-prepared'].includes(action));
+    const epoch = await waitForReady(['inspect', 'inspect-prepared'].includes(action));
+    if (closed || epoch !== frameEpoch || awaitingFrameLoad) throw new Error('ChatGPT navigated before command dispatch. Nothing was sent.');
     const operationId = crypto.randomUUID();
     return new Promise((resolve, reject) => {
       const request = { resolve, reject, onProgress, action, progress: Promise.resolve(),
-        timer: setTimeout(() => { queueRequests.delete(operationId); reject(new Error('ChatGPT did not respond. Inspect the source conversation before retrying.')); }, ['preflight', 'inspect', 'inspect-prepared'].includes(action) ? 12000 : 630000) };
+        timer: setTimeout(() => { queueRequests.delete(operationId); reject(new Error('ChatGPT did not respond. Inspect the source conversation before retrying.')); }, ['preflight', 'inspect', 'inspect-prepared', 'fresh-conversation'].includes(action) ? 12000 : 630000) };
       queueRequests.set(operationId, request);
       frame.contentWindow.postMessage({ channel: FRAME_CHANNEL, type: 'queue.command', nonce, operationId, action, data: { ...data, sessionConfirmed, hostBuildId: BUILD.id } }, CHATGPT_ORIGIN);
     });
   }
 
   function showState(state, text) {
-    if (connection.dataset.state === state && status.textContent === text) return;
+    if (connection.dataset.state === state && status.textContent === text) { wakeReadyWaiters(); return; }
     connection.dataset.state = state;
     connection.hidden = state === 'ready';
     status.textContent = text;
     recovery.hidden = !['guest', 'slow', 'error'].includes(state);
     signIn.textContent = state === 'guest' ? 'Sign in to ChatGPT' : 'Open ChatGPT';
+    wakeReadyWaiters();
   }
 
   function probe() {
@@ -150,6 +169,7 @@ export function createChatSidebar({ onOpenChat = () => {}, getCompanyChats = () 
     currentUrl = target;
     nonce = crypto.randomUUID();
     awaitingFrameLoad = true;
+    frameEpoch++;
     resetHistory();
     toolbar?.hide();
     toolbar?.updateCurrent();
@@ -229,7 +249,7 @@ export function createChatSidebar({ onOpenChat = () => {}, getCompanyChats = () 
               document.getElementById('runtime-adapter-build').textContent = message.value.buildId || 'Unknown';
             }
             try {
-              if (['preflight', 'submit'].includes(request.action)) requireMatchingRevision(message.value);
+              if (['preflight', 'submit', 'fresh-conversation'].includes(request.action)) requireMatchingRevision(message.value);
               request.resolve(connectionReport(message.value, sessionConfirmed, 'sidebar'));
             } catch (error) { request.reject(error); }
           } else request.reject(Object.assign(new Error(message.error.message), { code: message.error.code, diagnostics: message.error.diagnostics }));
@@ -258,6 +278,7 @@ export function createChatSidebar({ onOpenChat = () => {}, getCompanyChats = () 
   });
 
   frame.addEventListener('load', () => {
+    if (!awaitingFrameLoad) frameEpoch++;
     rejectQueue('The ChatGPT page reloaded. Start the queue to reconcile the interrupted request.');
     awaitingFrameLoad = false;
     nonce = crypto.randomUUID();
@@ -265,6 +286,7 @@ export function createChatSidebar({ onOpenChat = () => {}, getCompanyChats = () 
     resetHistory();
     toolbar?.hide();
     probe();
+    wakeReadyWaiters();
   });
   frame.addEventListener('error', () => {
     clearTimeout(watchdog);
@@ -280,7 +302,7 @@ export function createChatSidebar({ onOpenChat = () => {}, getCompanyChats = () 
     void openTab(connection.dataset.state === 'guest' ? `${CHATGPT_ORIGIN}/auth/login` : currentUrl);
   });
   document.getElementById('retry').addEventListener('click', () => initialized ? navigateManually(currentUrl) : void start());
-  window.addEventListener('pagehide', () => { rejectQueue('The sidebar closed. Recover this request after reopening it.'); resetHistory(); clearTimeout(watchdog); clearInterval(polling); chrome.runtime.onMessage.removeListener(onWorkspaceShortcut); });
+  window.addEventListener('pagehide', () => { closed = true; wakeReadyWaiters(); rejectQueue('The sidebar closed. Recover this request after reopening it.'); resetHistory(); clearTimeout(watchdog); clearInterval(polling); chrome.runtime.onMessage.removeListener(onWorkspaceShortcut); });
   async function openConversation(url) {
     const target = linkedConversationUrl(url);
     if (!target) return;
@@ -292,10 +314,10 @@ export function createChatSidebar({ onOpenChat = () => {}, getCompanyChats = () 
   }
   toolbar = createChatToolbar({
     currentUrl: () => currentUrl,
-    getCompanyChats,
     onHistoryNeeded: () => { void refreshHistory(); },
+    onChatsRefresh: () => { void refreshHistory(true); },
     moveHistory: direction => { void moveHistory(direction); },
-    selectConversation: chat => openConversation(chat.url)
+    selectConversation: chat => { void moveHistory(null, chat.url); }
   });
   void start();
   const queue = {
@@ -320,7 +342,14 @@ export function createChatSidebar({ onOpenChat = () => {}, getCompanyChats = () 
       }
     },
     async newConversation() {
-      await queueCommand('preflight');
+      resetHistory();
+      const report = await queueCommand('fresh-conversation');
+      if (report.fresh === true && report.url === CHATGPT_HOME) {
+        currentUrl = CHATGPT_HOME; toolbar.updateCurrent(); probe(); return;
+      }
+      // Only an unavailable native control permits the full-page fallback.
+      // An already dispatched navigation is never clicked or retried again.
+      if (report.dispatched !== false) throw new Error('ChatGPT navigation is unconfirmed. No prompt was inserted.');
       loadChat(CHATGPT_HOME);
       await waitForReady();
       await queueCommand('preflight');
@@ -333,6 +362,6 @@ export function createChatSidebar({ onOpenChat = () => {}, getCompanyChats = () 
   };
   return { probe, openConversation, getCurrentChat: () => linkedConversationUrl(currentUrl),
     queue, setNavigationGuard: callback => { navigationGuard = callback; },
-    refreshCompanies: toolbar.refreshCompanies, hideControls: toolbar.hide,
+    hideControls: toolbar.hide,
     signIn: () => openTab(`${CHATGPT_ORIGIN}/auth/login`) };
 }

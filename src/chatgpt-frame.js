@@ -7,6 +7,7 @@
   const channel = 'ai-agent-template.sidebar';
   let nonce;
   let timer;
+  let stateTimer, lastConnectionState;
   let lastState;
   let fontPercent = 100;
   let fontStyle;
@@ -90,12 +91,14 @@
 
   function sendState(force = false) {
     if (!nonce) return;
-    const editor = document.querySelector('#prompt-textarea, [data-composer-markdown][contenteditable="true"], textarea[data-mobile-composer-prompt]');
-    const ready = Boolean(editor?.isConnected && !editor.closest('[hidden], [inert]') &&
-      getComputedStyle(editor).display !== 'none' && getComputedStyle(editor).visibility !== 'hidden');
     const connection = queueAdapter?.inspectConnection();
+    const ready = connection?.composerPresent === true;
     const guest = connection?.authState === 'signed-out' || Boolean(document.querySelector('form[data-logged-out]'));
-    const state = { type: 'state', url: location.origin + location.pathname, ready, guest, authState: connection?.authState, buildId: connection?.buildId, history:historyReader.peek() };
+    const basic = { type: 'state', url: location.origin + location.pathname, ready, guest, authState: connection?.authState, buildId: connection?.buildId };
+    const signature = JSON.stringify([basic,connection?.hasDraft,connection?.busy]);
+    if (!force && signature === lastConnectionState) return;
+    lastConnectionState = signature;
+    const state = { ...basic, history:historyReader.peek(connection) };
     const serialized = JSON.stringify(state);
     if (force || serialized !== lastState) { lastState = serialized; post(state); }
   }
@@ -114,7 +117,7 @@
     if (typeof operationId !== 'string' || !/^[\w-]{1,100}$/.test(operationId)) return;
     if (event.data.type === 'history.command' && event.isTrusted) {
       const reply = value => post({type:'history.reply',operationId,ok:true,value});
-      if (event.data.action === 'inspect') void historyReader.inspect().then(reply).catch(() => post({type:'history.reply',operationId,ok:false}));
+      if (event.data.action === 'inspect') void historyReader.inspect({readOnly:event.data.data?.readOnly === true}).then(reply).catch(() => post({type:'history.reply',operationId,ok:false}));
       else if (event.data.action === 'open') void historyReader.open(event.data.data || {}, reply).catch(() => post({type:'history.reply',operationId,ok:false}));
       return;
     }
@@ -149,8 +152,10 @@
   }, true);
 
   function scheduleUpdate() {
-    if (timer) return;
-    timer = setTimeout(() => { timer = undefined; resizeText(); sendState(); }, 100);
+    // Connection changes wake the host promptly. Font measurement remains
+    // throttled and never delays readiness behind a full typography pass.
+    if (!stateTimer) stateTimer = setTimeout(() => { stateTimer = undefined; sendState(); }, 0);
+    if (fontPercent !== 100 && !timer) timer = setTimeout(() => { timer = undefined; resizeText(); }, 100);
   }
   const observer = new MutationObserver(records => {
     if (records.some(record => !fontStyle?.contains(record.target))) scheduleUpdate();
@@ -167,5 +172,5 @@
   window.addEventListener('popstate', () => sendState(true));
   window.addEventListener('resize', scheduleUpdate);
   document.addEventListener('input', scheduleUpdate, true);
-  window.addEventListener('pagehide', () => { queueAdapter?.dispose(); observer.disconnect(); clearTimeout(timer); });
+  window.addEventListener('pagehide', () => { queueAdapter?.dispose(); observer.disconnect(); clearTimeout(timer); clearTimeout(stateTimer); });
 })();

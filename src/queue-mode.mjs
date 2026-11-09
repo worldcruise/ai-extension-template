@@ -1,3 +1,4 @@
-// Temporary product mode: users copy, paste, and send each prompt themselves.
+// Bulk Start/Continue stays paused. Each explicit Add has a separate one-shot
+// permission to send only its newly saved request through Sidebar Chat.
 export const MANUAL_QUEUE_MODE = true;
-export const MANUAL_QUEUE_MESSAGE = 'Automatic sending is paused. Copy the prompt, then paste and send it in ChatGPT yourself.';
+export const MANUAL_QUEUE_MESSAGE = 'Add to queue copies and sends that new job in Sidebar Chat. Bulk Start/Continue is paused; older jobs are not sent automatically.';
