@@ -13,7 +13,8 @@
     "scripting"
   ],
   "host_permissions": [
-    "https://chatgpt.com/*"
+    "https://chatgpt.com/*",
+    "https://chat.deepseek.com/*"
   ],
   "optional_host_permissions": [
     "http://*/*",
@@ -59,10 +60,17 @@
   },
   "content_scripts": [
     {
+      "matches": ["https://chat.deepseek.com/*"],
+      "js": ["src/native-chat-search.js", "src/deepseek-frame.js"],
+      "all_frames": true,
+      "run_at": "document_start"
+    },
+    {
       "matches": [
         "https://chatgpt.com/*"
       ],
       "js": [
+        "src/native-chat-search.js",
         "src/build-info.js",
         "src/workspace-shortcut-keys.js",
         "src/chat-history.js",
@@ -75,6 +83,6 @@
     }
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'; frame-src https://chatgpt.com;"
+    "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'; frame-src https://chatgpt.com https://chat.deepseek.com;"
   }
 }

@@ -10,6 +10,8 @@ import { createQueueConnectionSettings } from './queue-connection-settings.mjs';
 import { createShortcutSettings } from './shortcut-settings.mjs';
 import { createWorkspaceShortcuts } from './workspace-shortcuts.mjs';
 import { BUILD } from './runtime-info.mjs';
+import { createChatProviders } from './chat-providers.mjs';
+import { createDeepseekToolbar } from './deepseek-toolbar.mjs';
 
 const q = selector => document.querySelector(selector);
 renderIcons();
@@ -47,6 +49,7 @@ function bindTabs(entries, onSelect, onBeforeSelect) {
 }
 
 let chat;
+let chatProviders;
 let workspaceShortcuts;
 const selectView = bindTabs([
   { id: 'studio', tab: q('#studio-tab'), panel: q('#studio-view') },
@@ -98,6 +101,8 @@ let connectionSettings;
 const selectedConnection = () => connectionSettings?.mode() === 'tab' ? tabChat : chat;
 const queue = createResumeQueue({ getChat: async ({ fromAdd = false } = {}) => {
   await connectionSettings.ready;
+  if (fromAdd) await chatProviders.ready;
+  if (fromAdd) await chatProviders.showChatGPT();
   return fromAdd ? chat : selectedConnection();
 } });
 connectionSettings = createQueueConnectionSettings({
@@ -123,6 +128,7 @@ const studio = createStudio({
   showChat: (url, { connection = connectionSettings.mode() } = {}) => {
     if (!url) { selectView('chat'); return; }
     void (async () => {
+      await chatProviders.showChatGPT();
       if (connection === 'tab') { await queue.pause(); await tabChat.queue.openConversation(url); await tabChat.open(); }
       else await chat?.openConversation(url);
     })().catch(error => studio.tabError(error.message));
@@ -168,6 +174,11 @@ chat = createChatSidebar({
   onShortcut: action => workspaceShortcuts?.run(action),
 });
 chat.setNavigationGuard(() => queue.pause());
+createDeepseekToolbar();
+chatProviders = createChatProviders({ beforeChange: async () => {
+  if (queue.snapshot().control.ownerId || queue.snapshot().starting) throw new Error('Wait for the current resume job to finish before switching providers.');
+  await queue.pause();
+} });
 workspaceShortcuts = createWorkspaceShortcuts({ selectView, selectJob: () => selectStudioTab('job') });
 window.addEventListener('pagehide', () => queue.dispose(), { once: true });
 
@@ -223,6 +234,7 @@ async function checkConnection() {
   } finally { q('#chat-check-again').disabled = false; }
 }
 q('#account-check').addEventListener('click', () => {
+  void chatProviders.showChatGPT();
   closeAccount(); selectView('chat'); openDialog('chat-connection-dialog'); void checkConnection();
 });
 q('#chat-check-again').addEventListener('click', () => { void checkConnection(); });
@@ -241,7 +253,11 @@ q('#chat-confirm-session').addEventListener('click', () => {
 });
 q('#chat-connection-sign-in').addEventListener('click', () => { void selectedConnection().signIn(); });
 q('#chat-connection-back').addEventListener('click', () => { q('#chat-connection-dialog').close(); selectView('studio'); selectStudioTab('results'); });
-q('#account-sign-in').addEventListener('click', () => { closeAccount(); void chat.signIn(); });
+q('#account-sign-in').addEventListener('click', () => {
+  closeAccount();
+  if (chatProviders.current() === 'deepseek') q('#deepseek-open').click();
+  else void chat.signIn();
+});
 q('#account-settings').addEventListener('click', () => {
   closeAccount(); selectView('settings'); q('.settings-tabs [aria-selected="true"]').focus();
 });

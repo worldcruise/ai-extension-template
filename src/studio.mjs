@@ -544,7 +544,7 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
       job: { company: tailor ? q('#job-company').value.trim() : 'Base resume',
         role: tailor ? q('#job-title').value.trim() || profile().role : profile().role, url, tabId: currentTabId, description, provenance }, tailor,
       resumeTemplate: q('#resume-template').value, promptTemplate, prompt: prompts[promptTemplate].text });
-    const id = await queue.add(input, { sendOnAdd: true, checkExisting: q('#check-existing-jobs').checked });
+    const id = await queue.add(input, { checkExisting: q('#check-existing-jobs').checked });
     const request = queue.snapshot().requests.find(item => item.id === id);
     clearPreview(); renderQueue();
     try { await copyRequestPrompt(request); }
@@ -557,8 +557,7 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     }
     copiedRequestId = id;
     showChat();
-    queue.sendAddedRequest(id);
-    status('Job saved and prompt copied. Opening a new Sidebar Chat to send this request. Earlier queued jobs are unchanged.');
+    status('Job saved and prompt copied. Paste it into your selected chat and send when ready.');
   }, 'add'); });
 
   for (const id of ['review-another', 'empty-prepare']) document.getElementById(id).addEventListener('click', () => showStudio('job'));

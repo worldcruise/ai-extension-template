@@ -117,7 +117,8 @@
     if (typeof operationId !== 'string' || !/^[\w-]{1,100}$/.test(operationId)) return;
     if (event.data.type === 'history.command' && event.isTrusted) {
       const reply = value => post({type:'history.reply',operationId,ok:true,value});
-      if (event.data.action === 'inspect') void historyReader.inspect({readOnly:event.data.data?.readOnly === true}).then(reply).catch(() => post({type:'history.reply',operationId,ok:false}));
+      if (event.data.action === 'search') void globalThis.AiAgentNativeSearch({ query: event.data.data?.query ?? '', provider: 'chatgpt' }).then(opened => reply({ ...historyReader.peek(), ...(!opened ? { reason: 'unavailable' } : {}) })).catch(() => post({type:'history.reply',operationId,ok:false}));
+      else if (event.data.action === 'inspect') void historyReader.inspect({readOnly:event.data.data?.readOnly === true}).then(reply).catch(() => post({type:'history.reply',operationId,ok:false}));
       else if (event.data.action === 'open') void historyReader.open(event.data.data || {}, reply).catch(() => post({type:'history.reply',operationId,ok:false}));
       return;
     }

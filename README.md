@@ -2,6 +2,20 @@
 
 A Chrome Manifest V3 extension with a combined **ChatGPT + Resume Studio** workspace.
 Current version: **0.5.0**. See [CHANGELOG.md](CHANGELOG.md) for the checkpoint details.
+Open the user-icon menu and choose **ChatGPT** or **DeepSeek** under Chat provider. The
+selection is saved on this device; both frames stay mounted to preserve drafts.
+DeepSeek loads on first selection and uses your separate DeepSeek browser session.
+Use **Open / sign in to DeepSeek** if sign-in or chat is blocked inside the panel,
+then reload after signing in. DeepSeek has the same hover toolbar as ChatGPT:
+New chat, reload, native chat search and loaded-history Up/Down navigation, text size, open
+the current conversation in a tab, and a separately saved pin preference.
+Drafts and active responses block navigation and reload. History uses only native
+loaded conversation links; no prompt insertion or sending is performed.
+Automatic sending is disabled. Add saves the job and copies its prompt, keeping
+your selected provider. Paste and send manually when ready. Saved result links
+and retained connection diagnostics still use ChatGPT.
+DeepSeek sending and resume response capture are not integrated yet. Live DeepSeek
+embedding and sign-in need verification with your account.
 The Chat view embeds ChatGPT using your browser's session. Resume Studio is based
 on `baseline/combined-chatgpt-resume-studio-code` and now has a persistent generation queue.
 
@@ -9,14 +23,12 @@ Studio includes JSON candidate-profile import, job-description extraction,
 template/prompt previews, request details, resume previews, and JSON copy.
 Profiles, immutable queued inputs, captured replies, results, and company chat
 links are saved locally in IndexedDB. **Add to queue** saves the job and its exact
-prompt, copies it, switches to Chat, opens a new Sidebar Chat, and submits it once.
-The extension records the originating conversation, monitors the matching response,
-and saves valid resume JSON before marking it Ready. Additional Adds wait their
-turn; older queued jobs are not included. Existing unrelated drafts and attachments
-are preserved and block sending. Clipboard failure leaves the job saved without
+prompt, copies it, and switches to your selected Chat provider. It never inserts
+or submits the prompt. Jobs remain queued for manual sending; existing drafts and
+attachments stay untouched. Clipboard failure leaves the job saved without
 sending and opens Details with the prompt selected.
 
-Fresh-chat preparation reuses an already empty Home or clicks ChatGPT's native
+The retained, inactive automation adapter's fresh-chat preparation reuses an already empty Home or clicks ChatGPT's native
 New chat control without reloading the app. A missing control uses the guarded
 full-load fallback; a clicked but unconfirmed navigation stops without retrying.
 Readiness and Send controls wake from events. Matching complete JSON with enabled
@@ -35,9 +47,8 @@ jobs, completed failures and base resumes are excluded. Turn the option off to
 intentionally add another job from the same company. There is no separate
 application-tracker store in the current runtime; saved results are checked here.
 
-Bulk Start/Continue/regeneration controls remain paused. Each Add grants permission
-only for its new request while this panel stays open. Pause, manual navigation,
-uncertain delivery, or persistence failure stops subsequent handoffs. Copy prompt
+Bulk Start/Continue/regeneration controls remain paused. Add creates no delivery
+attempt or send permission. Copy prompt
 on cards and in Details remains a clipboard-only action; it never resends a job.
 Saved results, Details, Review, preview, save retry, and cancellation remain
 available. PDF/DOCX export remains unavailable.
@@ -51,24 +62,24 @@ to keep it open in its own row above ChatGPT across chat reloads and view switch
 The iframe uses the remaining height, keeping its top content fully visible. This preference is saved
 on this device; unpin to restore hover behavior. A small downward chevron
 marks the hidden controls. Keyboard focus or a tap on the top edge also reveals
-them. The compact search field between the controls expands when focused and shows
-the current ChatGPT session's saved conversation titles in native history order,
-independent of the selected candidate. Type a chat title to filter; use Arrow keys
-and Enter to select, or Escape to collapse. Focus and Refresh read the latest
-rendered list. Selecting a chat rechecks the current route, draft and generation,
-then clicks its native conversation link once. Titles are held only in panel
-memory; chat message contents are not read for this list. The list covers the
-history ChatGPT has loaded, up to 300 chats, without private endpoints.
+them. Type in **Search chats** and press Enter or click its arrow. The query is
+passed directly to ChatGPT's or DeepSeek's native chat-history search input;
+results and selection stay in the provider's search UI. This searches through
+the provider rather than filtering only loaded sidebar titles. If necessary,
+the extension reveals the sidebar, recognizes attached shortcut labels, or uses
+ChatGPT's Ctrl/Cmd+K shortcut. Success requires a visible native search input
+that retains your query. An unavailable input keeps the query in the toolbar
+and shows an error; it never inserts a query into the message composer.
 
 Resume results still keep their originating conversation links in Details and
-Review. These saved request links are separate from the ChatGPT search list.
+Review. These saved request links are separate from the provider's native search.
 
 Stacked Up/Down controls immediately to the right of search browse ChatGPT's own
 loaded conversation history in its displayed order. Down from a new chat opens the
 most recent conversation; Up stops at the most recent conversation and is disabled
 on a new chat. The oldest loaded conversation disables Down. Navigation pauses
 while a draft or generation is active. Reading history restores the native sidebar's
-previous visibility. Drafts and active responses block search selection too.
+previous visibility. Native search uses the provider's own navigation behavior.
 
 Chat uses the full remaining panel height, with no Studio footer. Studio queue actions stay fixed
 below the scrolling content. Model and thinking settings are managed inside
@@ -214,7 +225,7 @@ also load the repository root directly during development.
 | `manifest.json` | Extension permissions, entry points and shortcut |
 | `index.html`, `src/sidebar.css`, `src/workspace.mjs` | Combined shell, themes, accessible tabs, and dialogs |
 | `src/sidebar.mjs` | Live ChatGPT frame loading/recovery and toolbar controls |
-| `src/chat-toolbar.mjs` | Hover toolbar and searchable native ChatGPT conversation list |
+| `src/chat-toolbar.mjs` | Shared hover toolbar and native provider search launcher |
 | `src/company-chats.mjs` | Saved company source links scoped to the selected candidate |
 | `src/resume-data.mjs` | Candidate format, prompt construction, and strict result/fact validation |
 | `src/manual-prompt.mjs`, `src/queue-mode.mjs` | Clipboard-only copy helpers and bulk sending policy; Add has a separate one-shot handoff |

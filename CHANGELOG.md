@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+- Restore direct query entry in the toolbar: Enter or the arrow fills the provider's native search input, preserving message drafts and keeping results native.
+- Recognize attached shortcut labels, add a verified ChatGPT Ctrl/Cmd+K fallback, and confirm the actual input accepts the query before reporting success.
+
+- Replace the saved-title search field with Search chats, opening each provider's original search UI without reading or filtering its results.
+
+- Add the matching hover/pin toolbar to DeepSeek with native loaded-history search/navigation, text sizing, guarded new chat/reload, and current-chat open-in-tab.
+- Authenticate DeepSeek frame messages by source, origin and nonce, bound history snapshots, and preserve manual-only sending.
+
+- Move Chat provider into the polished user-icon popup with provider-aware sign-in and full-height chat panes.
+- Disable Add/Ctrl+Enter automatic sending: save and copy only, preserve the selected provider, and create no delivery attempt.
+
+- Add a saved ChatGPT / DeepSeek chat selector with separate mounted frames, lazy DeepSeek loading, sign-in/tab fallback, and guarded reload.
+- Scope DeepSeek embed permissions to its chat host and this extension's subframes; retain ChatGPT for resume generation and connection checks.
+
 - Replace candidate/company search suggestions with the current ChatGPT session's saved chat titles and native links, with refresh, keyboard selection and candidate-independent results.
 - Keep chat titles in panel memory, validate bounded history messages, and preserve draft, generation and stale-navigation protections when choosing a conversation.
 - Reduce queue handoff latency with verified empty-chat reuse, native New chat navigation, event-driven readiness, and direct DOM response reads.

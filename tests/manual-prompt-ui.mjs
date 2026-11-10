@@ -29,7 +29,7 @@ export async function checkManualPromptUI({ cdp, dockSession, evaluate, until, s
     const field=document.getElementById('job-'+key);field.value=value;field.dispatchEvent(new Event('input',{bubbles:true}));}`);
   await dock('globalThis.manualClipboardWrites=[];Object.defineProperty(navigator,"clipboard",{configurable:true,value:{writeText:async value=>{manualClipboardWrites.push(value)}}})');
   await click('#add-request');
-  await until(async () => (await state()).requests.some(item => item.input.candidateId === candidateId && item.state === 'unsent') && !(await state()).control.ownerId, 'Add preserves the personal draft and records the unsent handoff');
+  await until(async () => (await state()).requests.some(item => item.input.candidateId === candidateId && item.state === 'queued') && !(await state()).control.ownerId, 'Add preserves the personal draft and keeps the job queued for manual sending');
   assert.equal(await dock('document.getElementById("chat-view").hidden'), false);
   const request = (await state()).requests.find(item => item.input.candidateId === candidateId);
   assert.ok(request);

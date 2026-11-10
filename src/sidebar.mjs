@@ -97,6 +97,7 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
   }
   const shortcutPresses = new Set();
   function onWorkspaceShortcut(message, sender) {
+    if (document.getElementById('chatgpt-pane')?.hidden) return false;
     if (!initialized || awaitingFrameLoad || document.getElementById('chat-view').hidden) return false;
     const shortcut = frameShortcutMessage(message, sender, chrome.runtime.id, nonce);
     if (!shortcut || shortcutPresses.has(shortcut.pressId)) return false;
@@ -314,6 +315,7 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
   }
   toolbar = createChatToolbar({
     currentUrl: () => currentUrl,
+    onNativeSearch: async query => (await historyCommand('search', { query })).reason !== 'unavailable',
     onHistoryNeeded: () => { void refreshHistory(); },
     onChatsRefresh: () => { void refreshHistory(true); },
     moveHistory: direction => { void moveHistory(direction); },

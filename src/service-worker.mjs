@@ -1,4 +1,4 @@
-import { EMBED_RULE_ID, embedRules } from './sidebar-protocol.mjs';
+import { EMBED_RULE_ID, DEEPSEEK_EMBED_RULE_ID, embedRules, deepseekEmbedRules } from './sidebar-protocol.mjs';
 import { createJobExtractionService } from './job-extraction-service.mjs';
 import { createReadPageCommands } from './read-page-commands.mjs';
 
@@ -15,8 +15,8 @@ function configureSidebar() {
       // the panel. The automatic side-panel action skips that permission grant.
       chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false }),
       chrome.declarativeNetRequest.updateDynamicRules({
-        removeRuleIds: [EMBED_RULE_ID],
-        addRules: embedRules(chrome.runtime.id)
+        removeRuleIds: [EMBED_RULE_ID, DEEPSEEK_EMBED_RULE_ID],
+        addRules: [...embedRules(chrome.runtime.id), ...deepseekEmbedRules(chrome.runtime.id)]
       })
     ]).catch(error => {
       configuring = null;

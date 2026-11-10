@@ -29,7 +29,7 @@ test('the unpacked build has every manifest resource and excludes the references
   const resources = [manifest.background.service_worker, manifest.side_panel.default_path,
     ...Object.values(manifest.icons), ...manifest.content_scripts.flatMap(script => script.js)];
   for (const resource of resources) assert.ok(extensionFiles.includes(resource), resource);
-  assert.deepEqual(manifest.host_permissions, ['https://chatgpt.com/*']);
+  assert.deepEqual(manifest.host_permissions, ['https://chatgpt.com/*', 'https://chat.deepseek.com/*']);
   assert.deepEqual(manifest.optional_host_permissions, ['http://*/*', 'https://*/*']);
   assert.ok(manifest.permissions.includes('storage'));
   assert.ok(manifest.permissions.includes('activeTab'));

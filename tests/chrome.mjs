@@ -80,6 +80,11 @@ let mode = 'ready';
 let requests = 0;
 const fixtureServer = await serveFixture((request, response) => {
   requests++;
+  if (request.headers.host?.startsWith('chat.deepseek.com')) {
+    response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'X-Frame-Options': 'DENY', 'Content-Security-Policy': "frame-ancestors 'none'" });
+    response.end(`<!doctype html><html><head><style>body{font:16px system-ui}nav{display:flex;gap:20px}textarea{width:90%;margin-top:80px}</style></head><body><button type="button" aria-label="Search chats" onclick="document.getElementById('native-search-dialog').showModal()">Search chats</button><dialog id="native-search-dialog"><input placeholder="Search chats"></dialog><nav><a href="/a/chat/recent">Recent DeepSeek chat</a><a href="/a/chat/older">Older DeepSeek chat</a></nav><h1>DeepSeek fixture</h1><textarea placeholder="Message DeepSeek"></textarea><script>document.querySelectorAll('a').forEach(link=>link.onclick=event=>{event.preventDefault();history.pushState({},'',link.getAttribute('href'));});</script></body></html>`);
+    return;
+  }
   const extractionPage=jobFixtureResponse(request.headers.host?.split(':')[0],request.url);
   if (extractionPage) {
     response.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store',
@@ -109,7 +114,7 @@ const profile = await mkdtemp(join(tmpdir(), 'sidebar-gpt-test-'));
 const browser = spawn(executable, [
   '--headless=new', '--no-first-run', '--no-default-browser-check',
   '--disable-background-networking', '--disable-component-update', '--disable-sync',
-  `--host-resolver-rules=${[...new Set(['chatgpt.com','jobs.example.test','blocked.jobs.example.test',...jobPageFixtures.map(item=>item.host)])].map(host=>`MAP ${host} 127.0.0.1:${fixtureServer.port}`).join(', ')}`,
+  `--host-resolver-rules=${[...new Set(['chatgpt.com','chat.deepseek.com','jobs.example.test','blocked.jobs.example.test',...jobPageFixtures.map(item=>item.host)])].map(host=>`MAP ${host} 127.0.0.1:${fixtureServer.port}`).join(', ')}`,
   '--no-proxy-server', '--ignore-certificate-errors',
   '--enable-unsafe-extension-debugging', '--remote-debugging-port=0',
   `--user-data-dir=${profile}`, 'about:blank'
@@ -129,7 +134,7 @@ const savedChats = [
 ];
 const fixture = guest => `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>body{margin:0;background:#fff;color:#202526;font:15px system-ui;display:flex;flex-direction:column;min-height:100vh}main{flex:1;display:grid;place-content:center;text-align:center;padding:24px}h1{font-size:25px;font-weight:550}p{color:#727b7b;font-size:13px}form{margin:18px;border:1px solid #dce3df;border-radius:22px;padding:16px;background:#f6f8f7}textarea{border:0;resize:none;background:transparent;width:100%;font:14px system-ui;outline:none}button{border:0;background:#147d66;color:white;padding:8px 14px;border-radius:20px}</style>
-</head><body><button id="sidebar-open" type="button" data-testid="open-sidebar-button" aria-label="Open sidebar" style="position:absolute;top:12px;left:12px">Chats</button><button id="sidebar-close" type="button" data-testid="close-sidebar-button" aria-label="Close sidebar" hidden style="position:absolute;top:12px;left:12px">Close chats</button><nav id="history" aria-label="Chat history" hidden style="position:absolute;top:50px;left:12px;max-width:250px;background:white;padding:12px;border:1px solid #ddd"></nav><main><h1>What can I help with?</h1><p>Local ChatGPT fixture · no live account</p></main><form ${guest ? 'data-logged-out' : ''}><textarea id="prompt-textarea" placeholder="Ask anything"></textarea>${guest ? '<button type="button" data-testid="login-button">Log in</button>' : ''}</form><script>
+</head><body><button type="button" aria-label="Search chats" onclick="document.getElementById('native-search-dialog').showModal()">Search chats</button><dialog id="native-search-dialog"><input placeholder="Search chats"></dialog><button id="sidebar-open" type="button" data-testid="open-sidebar-button" aria-label="Open sidebar" style="position:absolute;top:12px;left:12px">Chats</button><button id="sidebar-close" type="button" data-testid="close-sidebar-button" aria-label="Close sidebar" hidden style="position:absolute;top:12px;left:12px">Close chats</button><nav id="history" aria-label="Chat history" hidden style="position:absolute;top:50px;left:12px;max-width:250px;background:white;padding:12px;border:1px solid #ddd"></nav><main><h1>What can I help with?</h1><p>Local ChatGPT fixture · no live account</p></main><form ${guest ? 'data-logged-out' : ''}><textarea id="prompt-textarea" placeholder="Ask anything"></textarea>${guest ? '<button type="button" data-testid="login-button">Log in</button>' : ''}</form><script>
 const sidebarHistory=document.getElementById('history'), sidebarOpen=document.getElementById('sidebar-open'), sidebarClose=document.getElementById('sidebar-close');
 sidebarOpen.addEventListener('click',()=>{sidebarHistory.replaceChildren(...${JSON.stringify(savedChats)}.map(chat=>{const link=document.createElement('a');link.href=chat.url;link.textContent=chat.title;link.style.display='block';link.addEventListener('click',event=>{if(link.origin===location.origin && /^\\/c\\//.test(link.pathname)){event.preventDefault();window.history.pushState({},'',link.pathname);dispatchEvent(new PopStateEvent('popstate'));}});return link}));sidebarHistory.hidden=false;sidebarOpen.hidden=true;sidebarClose.hidden=false;});
 sidebarClose.addEventListener('click',()=>{sidebarHistory.hidden=true;sidebarOpen.hidden=false;sidebarClose.hidden=true;});
@@ -184,7 +189,7 @@ try {
     if (result.exceptionDetails) throw new Error(result.exceptionDetails.exception?.description || result.exceptionDetails.text);
     return result.result.value;
   }
-  await until(() => evaluate(workerSession, 'typeof chrome !== "undefined" && Boolean(chrome.declarativeNetRequest) && chrome.declarativeNetRequest.getDynamicRules().then(rules => rules.length === 1)'), 'embed rule');
+  await until(() => evaluate(workerSession, 'typeof chrome !== "undefined" && Boolean(chrome.declarativeNetRequest) && chrome.declarativeNetRequest.getDynamicRules().then(rules => rules.length === 2)'), 'embed rules');
   assert.equal(await evaluate(workerSession, '(async () => (await chrome.sidePanel.getPanelBehavior()).openPanelOnActionClick)()'), false);
   const rules = await evaluate(workerSession, 'chrome.declarativeNetRequest.getDynamicRules()');
   assert.deepEqual(rules[0].condition.initiatorDomains, [id]);
@@ -208,9 +213,67 @@ try {
   await click('#chat-tab');
   await until(async () => await state() === 'ready', 'embedded ChatGPT readiness');
   assert.equal(await read('document.getElementById("connection").hidden'), true);
+  assert.equal(await read('document.getElementById("deepseek-frame").hasAttribute("src")'), false, 'DeepSeek stays unloaded until selected');
+  await read('globalThis.originalChatFrame = document.getElementById("chatgpt-frame"); document.getElementById("chat-provider").value = "deepseek"; document.getElementById("chat-provider").dispatchEvent(new Event("change"))');
+  await until(() => read('!document.getElementById("deepseek-pane").hidden'), 'DeepSeek provider selection');
+  assert.equal(await read('document.getElementById("deepseek-frame").src'), 'https://chat.deepseek.com/');
+  assert.equal(await read('document.getElementById("chatgpt-pane").hidden'), true);
+  await until(() => read('!document.getElementById("deepseek-new-chat").disabled'), 'DeepSeek toolbar connected');
+  const deepseekTarget = await until(async () => (await targets()).find(target => target.type === 'iframe' && target.url.startsWith('https://chat.deepseek.com/')), 'DeepSeek fixture frame');
+  const deepseekSession = await session(deepseekTarget.targetId);
+  await click('#deepseek-chat-toolbar-reveal');
+  await click('#deepseek-chat-toolbar-pin');
+  assert.equal(await read('document.getElementById("deepseek-chat-toolbar-shell").dataset.pinned'), 'true');
+  assert.equal(await read('document.getElementById("chat-toolbar-shell").dataset.pinned'), 'false', 'provider pin preferences are independent');
+  await read('document.getElementById("deepseek-company-chat-search").value="budget notes";document.getElementById("deepseek-native-search-form").requestSubmit()');
+  await until(() => evaluate(deepseekSession, 'document.getElementById("native-search-dialog").open && document.querySelector("#native-search-dialog input").value === "budget notes"'), 'DeepSeek searches typed query in its native input');
+  await until(() => read('!document.getElementById("deepseek-native-search-submit").disabled'), 'DeepSeek search readback finishes');
+  assert.equal(await read('document.getElementById("deepseek-native-search-status").hidden'), true, 'DeepSeek query accepted without error');
+  assert.equal(await read('document.querySelectorAll("#deepseek-company-chat-list").length'), 0);
+  await evaluate(deepseekSession, 'document.getElementById("native-search-dialog").close()');
+  await click('#deepseek-chat-history-down');
+  await until(() => evaluate(deepseekSession, 'location.pathname === "/a/chat/recent"'), 'DeepSeek native history navigation');
+  await evaluate(deepseekSession, 'document.querySelector("textarea").value="Keep my draft";document.querySelector("textarea").dispatchEvent(new Event("input",{bubbles:true}))');
+  await until(() => read('document.getElementById("deepseek-new-chat").disabled && document.getElementById("deepseek-reload").disabled && document.getElementById("deepseek-chat-history-down").disabled'), 'DeepSeek draft guards');
+  await click('#deepseek-zoom-in');
+  await until(() => evaluate(deepseekSession, 'getComputedStyle(document.querySelector("h1")).fontSize === "35.2px"'), 'DeepSeek text sizing');
+  assert.equal(await evaluate(deepseekSession, 'document.querySelector("textarea").value'), 'Keep my draft');
+  await evaluate(deepseekSession, 'document.querySelector("textarea").value="";document.querySelector("textarea").dispatchEvent(new Event("input",{bubbles:true}))');
+  await until(() => read('!document.getElementById("deepseek-chat-history-down").disabled'), 'DeepSeek draft cleared');
+  await click('#deepseek-chat-history-down');
+  await until(() => evaluate(deepseekSession, 'location.pathname === "/a/chat/older"'), 'DeepSeek older history navigation');
+  await click('#deepseek-open-tab');
+  await until(async () => (await targets()).some(target => target.type === 'page' && target.url === 'https://chat.deepseek.com/a/chat/older'), 'DeepSeek current conversation opens in tab');
+  const beforeDeepseekReload = await evaluate(deepseekSession, 'performance.timeOrigin');
+  await click('#deepseek-reload');
+  await until(async () => await evaluate(deepseekSession, 'performance.timeOrigin') !== beforeDeepseekReload && await evaluate(deepseekSession, 'location.pathname === "/a/chat/older"'), 'DeepSeek reload document');
+  await until(() => read('!document.getElementById("deepseek-reload").disabled'), 'DeepSeek reload reconnects');
+  assert.equal(await evaluate(deepseekSession, 'location.pathname'), '/a/chat/older', 'reload keeps DeepSeek conversation');
+  await evaluate(deepseekSession, 'const stop=document.createElement("button");stop.dataset.testid="stop-button";stop.textContent="Stop";document.body.append(stop)');
+  await until(() => read('document.getElementById("deepseek-new-chat").disabled'), 'DeepSeek generation blocks new chat');
+  await evaluate(deepseekSession, 'document.querySelector("[data-testid=stop-button]").remove()');
+  await until(() => read('!document.getElementById("deepseek-new-chat").disabled'), 'DeepSeek generation ends');
+  await click('#deepseek-new-chat');
+  await until(() => evaluate(deepseekSession, 'location.pathname === "/"'), 'DeepSeek new chat opens home');
+  await until(() => read('!document.getElementById("deepseek-reload").disabled'), 'DeepSeek fresh chat reconnects');
+  for (const width of [280, 390]) {
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false }, panel);
+    assert.equal(await read('document.documentElement.scrollWidth <= innerWidth'), true, 'DeepSeek toolbar fits narrow panel');
+    assert.equal(await read('document.getElementById("deepseek-frame").getBoundingClientRect().top >= document.getElementById("deepseek-chat-toolbar").getBoundingClientRect().bottom'), true, 'DeepSeek pinned toolbar reserves space');
+  }
+  await cdp.send('Page.captureScreenshot', { format: 'png' }, panel).then(shot => writeFile(join(artifacts, 'deepseek-toolbar.png'), Buffer.from(shot.data, 'base64')));
+  await read('document.getElementById("chat-provider").value = "chatgpt"; document.getElementById("chat-provider").dispatchEvent(new Event("change"))');
+  await until(() => read('!document.getElementById("chatgpt-pane").hidden && !document.getElementById("chat-provider").disabled'), 'return to ChatGPT');
+  assert.equal(await read('globalThis.originalChatFrame === document.getElementById("chatgpt-frame")'), true, 'switching retains ChatGPT frame identity');
   const iframeTarget = await until(async () => (await targets()).find(target => target.type === 'iframe' && target.url.startsWith('https://chatgpt.com/')), 'ChatGPT frame');
   const frameSession = await session(iframeTarget.targetId);
   const workspace = await checkWorkspaceUI({ cdp, panel, read, click, frameSession, evaluate, artifacts, until });
+  if (process.argv.includes('--workspace-only')) {
+    assert.deepEqual(errors, []);
+    const report = { fixtureOnly: true, workspaceOnly: true, workspace };
+    await writeFile(join(artifacts, 'workspace-results.json'), JSON.stringify(report, null, 2));
+    console.log('Workspace browser checks passed.');
+  } else {
   await evaluate(frameSession, 'history.pushState({}, "", "/c/fixture-chat?secret=do-not-relay"); dispatchEvent(new PopStateEvent("popstate"))');
   await delay(200);
   await click('#open-tab');
@@ -380,6 +443,7 @@ try {
       'slow-loading recovery', 'retry', 'narrow layouts', 'no runtime errors'] };
   await writeFile(join(artifacts, 'chrome-results.json'), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report, null, 2));
+  }
 } catch (error) {
   await mkdir(artifacts, { recursive: true });
   const targetInfos = cdp ? (await cdp.send('Target.getTargets')).targetInfos : [];

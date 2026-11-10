@@ -2,6 +2,17 @@ export const CHATGPT_ORIGIN = 'https://chatgpt.com';
 export const CHATGPT_HOME = `${CHATGPT_ORIGIN}/`;
 export const FRAME_CHANNEL = 'ai-agent-template.sidebar';
 export const EMBED_RULE_ID = 1;
+export const DEEPSEEK_EMBED_RULE_ID = 2;
+
+export function deepseekEmbedRules(extensionId) {
+  return [{ id: DEEPSEEK_EMBED_RULE_ID, priority: 1,
+    action: { type: 'modifyHeaders', responseHeaders: [
+      { header: 'x-frame-options', operation: 'remove' },
+      { header: 'content-security-policy', operation: 'remove' }
+    ] },
+    condition: { regexFilter: '^https://chat\\.deepseek\\.com/', initiatorDomains: [extensionId], resourceTypes: ['sub_frame'] }
+  }];
+}
 
 export function frameShortcutMessage(message, sender, extensionId, nonce) {
   if (!nonce || sender?.id !== extensionId || message?.type !== 'workspace.shortcut' || message.nonce !== nonce ||
