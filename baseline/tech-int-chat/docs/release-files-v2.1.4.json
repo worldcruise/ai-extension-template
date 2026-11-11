@@ -1,0 +1,505 @@
+{
+  "release": "2.1.4",
+  "files": [
+    {
+      "path": ".gitignore",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "size": 9219,
+      "sha256": "11b921c7e05edcb27e6505328c776ebeecd8ddd295cd4a3ecd22faf4e00d9ef3"
+    },
+    {
+      "path": "README.md",
+      "size": 13849,
+      "sha256": "5d97e10a1398bb8c5d01b9e661b54ee71a18d7658b6b5cbbe3ef4afd235b8e16"
+    },
+    {
+      "path": "START-HERE.txt",
+      "size": 1877,
+      "sha256": "105f0caed960ebc0f871556513213f5135fc55bf841e9a262e3a76a3fcd2cbf2"
+    },
+    {
+      "path": "adapters/ChatGPTAdapter.js",
+      "size": 19267,
+      "sha256": "b92aefc16033f768117a6fd8bde7f42d7a5fa81e5c8c80873c983814fd8e2699"
+    },
+    {
+      "path": "background.js",
+      "size": 7099,
+      "sha256": "39a4d4a0275fe0709fd8cfc4bcd81762ff47ab6721479f7d3522105898f54830"
+    },
+    {
+      "path": "background.js.LICENSE.txt",
+      "size": 149,
+      "sha256": "cdf963ced7d25a0f98901a547647b4d6e2dbe0197fd78c87a059a87b0e542fe2"
+    },
+    {
+      "path": "chatGPT.js",
+      "size": 6117,
+      "sha256": "aba0695cf4524ebae7d79d0fa704c39040045499d1464d56764831bdd6dcffa7"
+    },
+    {
+      "path": "chatGPT.js.LICENSE.txt",
+      "size": 149,
+      "sha256": "cdf963ced7d25a0f98901a547647b4d6e2dbe0197fd78c87a059a87b0e542fe2"
+    },
+    {
+      "path": "core/Config.js",
+      "size": 412,
+      "sha256": "10ac35ddb444d2d10f10f089892db9c7df9df0492996d6448bc871d9e4ab0f98"
+    },
+    {
+      "path": "core/Logger.js",
+      "size": 177,
+      "sha256": "024f45e85fd6d89cb3fe15c47eb76158fe9c259fc214a86e672ebd33a7155d35"
+    },
+    {
+      "path": "core/MessageQueue.js",
+      "size": 289,
+      "sha256": "fb566f6383b500f4211cca6db8025276d03428df3f0252abde99344595e790c7"
+    },
+    {
+      "path": "core/RequestManager.js",
+      "size": 6759,
+      "sha256": "371713899beab73247d84a6f41ecc1f33e293093b3abc10e936beb9f4cfabb60"
+    },
+    {
+      "path": "core/SessionManager.js",
+      "size": 824,
+      "sha256": "63876b142d5e6da1196ecddea34e658d55bd36f2638267ab6f1a882a996e2cdc"
+    },
+    {
+      "path": "core/SubmissionDiagnostics.js",
+      "size": 2529,
+      "sha256": "7be51ac3dcfba865885ada6a97a785be53eed574fd1b551192787e3193ab0677"
+    },
+    {
+      "path": "core/TranscriptStore.js",
+      "size": 4938,
+      "sha256": "8e09adb18d737ed363dd462d381b11e72aaed1d813119728ae52bf8073f45257"
+    },
+    {
+      "path": "diagnostics/clipboard.html",
+      "size": 747,
+      "sha256": "e444a94abadfa53861980266287c80cc924bb12678d8a034835737b7bccedebe"
+    },
+    {
+      "path": "diagnostics/clipboard.js",
+      "size": 1559,
+      "sha256": "027ec932ad686b2a1747c3f3d1b0681da83148061f6d16abd37a2606789b7a73"
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "size": 6965,
+      "sha256": "87b3e5cb652a6efe59615280d458861d67863c73e78cedb86d085ef2d1054d87"
+    },
+    {
+      "path": "docs/BACKLOG.md",
+      "size": 2254,
+      "sha256": "b15e8568262dcb6ddfd4c098da276aa48268623df68a4f446ccd099bbf6e3145"
+    },
+    {
+      "path": "docs/CLIPBOARD-REVIEW.md",
+      "size": 5785,
+      "sha256": "eef212848cda1750e47942f877517abb95badab0aef7eab44b39ce0c9bee8d6e"
+    },
+    {
+      "path": "docs/CLIPBOARD.md",
+      "size": 4579,
+      "sha256": "57d786bba228e88535ceac035576999401ab30b8ea05ae5c64c2b933d86a19dd"
+    },
+    {
+      "path": "docs/FINAL-AUDIT-v2.1.4.md",
+      "size": 2787,
+      "sha256": "7381c31afb6d8701d9883e864c810ef46c65dab7f46a61e8e234a859305e91f2"
+    },
+    {
+      "path": "docs/SEND-DIAGNOSTICS.md",
+      "size": 4410,
+      "sha256": "f30781c4f54982a3d24cc3eae0a989e1b6ba5530cd8b30ada10e3a43f205ea0c"
+    },
+    {
+      "path": "docs/SEND-REVIEW.md",
+      "size": 7578,
+      "sha256": "ba07beec77548fdd67f55b22f2b1830398514b32f902ab6e3cf2bfe9048c2916"
+    },
+    {
+      "path": "docs/TEST-RESULTS.md",
+      "size": 1781,
+      "sha256": "27109eecde80156dacd7de49776c78119a57128c5be142e5874c0c166a40b2be"
+    },
+    {
+      "path": "docs/browser-dom-output.txt",
+      "size": 6216,
+      "sha256": "e500f7ba4cd0c51f07778ceaeacb30d3fefc2edc363983961c73835f59e7a503"
+    },
+    {
+      "path": "docs/browser-dom-results-v2.1.4.json",
+      "size": 3226,
+      "sha256": "71831c7cc062e71be00971b055ee62f18631aef5127e3fb80623cfed135e2987"
+    },
+    {
+      "path": "docs/browser-dom-results.json",
+      "size": 3258,
+      "sha256": "fb481d8c27869771f379df0f33d7ca954850dbbd4aa8e599edd89e2a1ff8009f"
+    },
+    {
+      "path": "docs/chatgpt-isolated-output.txt",
+      "size": 711,
+      "sha256": "fe23ba745a5a63fb8e5ee2d9c306b5e68197b7a48c166284aba3c7e531b44683"
+    },
+    {
+      "path": "docs/chatgpt-isolated-results-v2.1.4.json",
+      "size": 711,
+      "sha256": "3246334715d31ebf2e67c837635f4caab9605aec3987efb77f897be4ca4a644c"
+    },
+    {
+      "path": "docs/chatgpt-isolated-results.json",
+      "size": 711,
+      "sha256": "fe23ba745a5a63fb8e5ee2d9c306b5e68197b7a48c166284aba3c7e531b44683"
+    },
+    {
+      "path": "docs/chatgpt-regression-output.txt",
+      "size": 5580,
+      "sha256": "cfaa425f78c287547d24cf704168288bd50018efe1f3dfe599f86d11a040fd9a"
+    },
+    {
+      "path": "docs/chatgpt-regression-results.json",
+      "size": 3950,
+      "sha256": "23f49aa036a9c6f1c443286804b039c9b8a3fa7faddfeed06d498925a3484864"
+    },
+    {
+      "path": "docs/check-output-v2.1.4.txt",
+      "size": 312,
+      "sha256": "8b901a518042a095a71eaffc16cd2e7d5f28258b523125dcf73aad74d336d80c"
+    },
+    {
+      "path": "docs/check-output.txt",
+      "size": 252,
+      "sha256": "9da4cdbb2de515e3681c277489d2d2e7567673e287384b1df73ff8e4582e9060"
+    },
+    {
+      "path": "docs/clipboard-reproduction.json",
+      "size": 839,
+      "sha256": "dca29fac0d62693e79a56c5620c86b3b9279bb1c7c95862908caefe72240dc9a"
+    },
+    {
+      "path": "docs/extension-load-attempt.json",
+      "size": 573,
+      "sha256": "2d673a1dc174c118190e66d7edcc9b1641b26a201649c0e47d406579a53cc20e"
+    },
+    {
+      "path": "docs/history/v2.1.1/ARCHITECTURE.md",
+      "size": 6239,
+      "sha256": "0958641c286bac53005d0a215d05884ec3bcd221a89eac0b6a37aa0a6fc918d8"
+    },
+    {
+      "path": "docs/history/v2.1.1/CLIPBOARD-REVIEW.md",
+      "size": 2888,
+      "sha256": "de210a9f4cca285f603711ebced32336386e6f89a8a556fe7ef0e371cfc71f4b"
+    },
+    {
+      "path": "docs/history/v2.1.1/CLIPBOARD.md",
+      "size": 7689,
+      "sha256": "679bc0213e4cbe57b5da87559f5867e9c3bf0b26acf465061648e3cbd0f0c8e4"
+    },
+    {
+      "path": "docs/history/v2.1.1/TEST-RESULTS.md",
+      "size": 4462,
+      "sha256": "cd63522753c2d70cf7bd0a8127ff3954b14515e944023efe06e31053a27b4c60"
+    },
+    {
+      "path": "docs/history/v2.1.1/browser-dom-results.json",
+      "size": 2874,
+      "sha256": "5f146863ff3d4acb2b7ec04a19478d1f4d9d87a439116184d3b61b466e1d26a4"
+    },
+    {
+      "path": "docs/history/v2.1.1/check-output.txt",
+      "size": 245,
+      "sha256": "5f26359dee339113946b30b146ab0e9a5ef41883ac077a64c88021f00cc5bcaa"
+    },
+    {
+      "path": "docs/history/v2.1.1/clipboard-reproduction.json",
+      "size": 422,
+      "sha256": "6e623f4340fb239ca028bdddfb1215b18e61ecfdee3af978627973b2e58ce91d"
+    },
+    {
+      "path": "docs/history/v2.1.1/extension-load-attempt.json",
+      "size": 996,
+      "sha256": "a14741a954f6d2be55769231f9d3903a477db8f2ffc19c0afd5927a5cb05b49b"
+    },
+    {
+      "path": "docs/history/v2.1.1/unit-test-output.txt",
+      "size": 10745,
+      "sha256": "3544cc16a16df265cfa5f79dec53c80685802a38f8200b2f2247a17284b1402f"
+    },
+    {
+      "path": "docs/history/v2.1.2/CLIPBOARD.md",
+      "size": 4639,
+      "sha256": "cec7170df75e770782f88edade34fb596b6e68932cb0fe500cf430cf8d53cbc2"
+    },
+    {
+      "path": "docs/history/v2.1.2/README.md",
+      "size": 11573,
+      "sha256": "0514bff2b2bbb82a7387c77164939790627e4fd9b1ae73813d003fcac812e23d"
+    },
+    {
+      "path": "docs/history/v2.1.2/START-HERE.txt",
+      "size": 1510,
+      "sha256": "7742046eb49760878374ee29513a3dc53a66e09bbd4e646c00068677491f15d2"
+    },
+    {
+      "path": "docs/history/v2.1.2/TEST-RESULTS.md",
+      "size": 3507,
+      "sha256": "8060925012da4f4ba93f2428d07ff845c335e4394d417b1d5b23faee2180ef8b"
+    },
+    {
+      "path": "docs/history/v2.1.2/browser-dom-results.json",
+      "size": 3258,
+      "sha256": "794be0d71a737eeb6eca25bc85868bd38bd9c30edfed465931b1b38bccc05ef5"
+    },
+    {
+      "path": "docs/history/v2.1.2/check-output.txt",
+      "size": 252,
+      "sha256": "9b16c12f0a578945be41238d43362528c40d62d7580bb47ce445a9af84edddc4"
+    },
+    {
+      "path": "docs/history/v2.1.2/extension-load-attempt.json",
+      "size": 626,
+      "sha256": "55dba25d4aa236a688c7253bfe8e1856f6350432f106c9e90605033298bd2833"
+    },
+    {
+      "path": "docs/history/v2.1.2/release-files.json",
+      "size": 696,
+      "sha256": "8813438f8ce346f55ac53de41f02651ff300b496cadf7210cf3a9c6162991fe1"
+    },
+    {
+      "path": "docs/history/v2.1.2/unit-test-output.txt",
+      "size": 14589,
+      "sha256": "51ca5e3ddfff052ac0e5ba615ecc1b3445f56c78a5109d706ff20301ce704856"
+    },
+    {
+      "path": "docs/preservation.json",
+      "size": 1707,
+      "sha256": "5940597846b15fca2c87e972fbf5a36dfc389222d82bb13c1eb3f8b1b91765cd"
+    },
+    {
+      "path": "docs/release-files.json",
+      "size": 1028,
+      "sha256": "ba15c007d70a05c3f4a77f9140960497243a082c2eeef1b9c3cf9c10a36db3d8"
+    },
+    {
+      "path": "docs/submit-reproduction-v2.1.4.json",
+      "size": 2500,
+      "sha256": "5d1becedd52e9a61cb73d9c4f5557881ce487f9c2ff2ee78562ad52df9c33fd7"
+    },
+    {
+      "path": "docs/unit-test-output-v2.1.4.txt",
+      "size": 16901,
+      "sha256": "ca0533d787f97b1ea317dbd4ea177697943b2091014616d8264f87e88a4a248a"
+    },
+    {
+      "path": "docs/unit-test-output.txt",
+      "size": 16830,
+      "sha256": "225ba1e3f65cf425918bd6689898c660c9f5dc743133a74e55a781b75ba0fb62"
+    },
+    {
+      "path": "docs/v2.1.0-baseline-browser-dom.json",
+      "size": 2229,
+      "sha256": "a3fe77e4351e41ab24bc344151009a6db407d24c9a1f3e0e5a072f4b988655e4"
+    },
+    {
+      "path": "docs/v2.1.0-baseline-unit-output.txt",
+      "size": 7838,
+      "sha256": "409610045e05c82d580d176075bb2f33217a1b02638b8b8e5cbcd319dcc0b63d"
+    },
+    {
+      "path": "docs/v2.1.0-preservation.json",
+      "size": 2752,
+      "sha256": "479fd74b99293b70f99217eea874f96d6e988da79dbbdb6295f1fec359e35e71"
+    },
+    {
+      "path": "docs/v2.1.1-baseline-unit-output.txt",
+      "size": 10741,
+      "sha256": "f7122aa7e7d258e559e93e6406bdeac5ff6cc20fc2adf6f36a6df7e67358f133"
+    },
+    {
+      "path": "docs/v2.1.1-preservation.json",
+      "size": 7970,
+      "sha256": "9fd694f7be8d064245b849dd0642c3a002590ab8641f18737f179a510a31afa3"
+    },
+    {
+      "path": "docs/v2.1.2-preservation.json",
+      "size": 3437,
+      "sha256": "ab334c03fe15f5891775855bace366049c7268e9c6378a7c51b93588a9b1760e"
+    },
+    {
+      "path": "docs/v2.1.3-preservation.json",
+      "size": 2458,
+      "sha256": "dc422695fc778d3b9e3329367eb7e15c3fb4300598402e8402c20537c5ea3c0c"
+    },
+    {
+      "path": "gptPrompts.js",
+      "size": 2391,
+      "sha256": "87c4b2c50ea658261bab2a47c83cefbeebaa1ce420ea90922608af6a001c0faf"
+    },
+    {
+      "path": "images/extension-128.png",
+      "size": 3425,
+      "sha256": "09ad1655ec2923b8e6eb0babd678a79a485cf276a0ed2665c109ba1ddaa77ed5"
+    },
+    {
+      "path": "images/extension-32.png",
+      "size": 834,
+      "sha256": "b8361aa8b437cc3037914d89febed93446bbf76dfc5ce68c388b40735f81df96"
+    },
+    {
+      "path": "images/extension-48.png",
+      "size": 1189,
+      "sha256": "79b66130e4c96f0f434b1fb9e21edfd9d760e0eb2cfc7d690a900671b501161f"
+    },
+    {
+      "path": "index.html",
+      "size": 12743,
+      "sha256": "62e3937de38a67235f4d4aa729f597fec868c231ec8dafdab80e48cc2d7445f4"
+    },
+    {
+      "path": "manifest.json",
+      "size": 1432,
+      "sha256": "75efb32910954bb2ebd878fef2aca092353ee01be5423b9b4bd8d52d84bbf13c"
+    },
+    {
+      "path": "meeting.js",
+      "size": 26208,
+      "sha256": "72b4a331bebe6921246b1c721da61f31595ce52b7e61965107fa35b4c5900015"
+    },
+    {
+      "path": "offscreen/clipboard.html",
+      "size": 200,
+      "sha256": "f20a865aa377e59cbf79ad3f043e1ee32fb66f2328b2ca83c0b8066b1186c0ae"
+    },
+    {
+      "path": "offscreen/clipboard.js",
+      "size": 2566,
+      "sha256": "5d9dcf24910e7dc5d310d1920b004ee0fa40882e15622beeff44c2ec0d8b8ce0"
+    },
+    {
+      "path": "package.json",
+      "size": 315,
+      "sha256": "68fa012ed3dcfb49a10ed0a0cf37c1bb215f5aa2273eea0bfe23c7bebdf715bf"
+    },
+    {
+      "path": "popup.js",
+      "size": 29460,
+      "sha256": "eb77a7e1efee356cb649cba1ff63a50b4e24f048d837d9f1321b01a955de43b0"
+    },
+    {
+      "path": "popup.js.LICENSE.txt",
+      "size": 149,
+      "sha256": "cdf963ced7d25a0f98901a547647b4d6e2dbe0197fd78c87a059a87b0e542fe2"
+    },
+    {
+      "path": "scripts/check.mjs",
+      "size": 4925,
+      "sha256": "b7999ff17590025ec7ade6c5c20606f70a72640540e7bcd0f904ebffc3f75203"
+    },
+    {
+      "path": "scripts/reproduce-v211.mjs",
+      "size": 2638,
+      "sha256": "e5082279dd43f94e41b917c0f0b95ee963f2a0a5323193d8502e6c77a52b3f4a"
+    },
+    {
+      "path": "services/ChatGPTService.js",
+      "size": 4045,
+      "sha256": "762f9bd07436dde00a6fe714219540533bf3bc2ef0186226c031cd171eaf149e"
+    },
+    {
+      "path": "services/ClipboardService.js",
+      "size": 5463,
+      "sha256": "b9ad85381f36f3fec6d71c976b30a5a86ffc33a1ceb4aa8882060dc055a054cc"
+    },
+    {
+      "path": "services/StorageService.js",
+      "size": 7672,
+      "sha256": "0d0503641498f782a14857a19295a72b5dcc6bcd4cce7da7f015494795e83b97"
+    },
+    {
+      "path": "services/TranscriptService.js",
+      "size": 2937,
+      "sha256": "6aa9dea2f8d2a9e3454de124d0bdaee19a8b652497458da6cd8480f8b97bd3ed"
+    },
+    {
+      "path": "shared/ClipboardWriter.js",
+      "size": 6490,
+      "sha256": "a6381075c06cc6b43d81d489cf84508673c0dd52545b9343702954f1aeb3a7b6"
+    },
+    {
+      "path": "shared/PromptBuilder.js",
+      "size": 2071,
+      "sha256": "b1fc3e568e471a6819e9785528b7f7e1579ebbe843551288f586ad197edb57f2"
+    },
+    {
+      "path": "storage/migration.js",
+      "size": 1671,
+      "sha256": "f16fa44cbad6b9bf28a5396d16118145dbcb577de879ca4136c6a3e1f4532e23"
+    },
+    {
+      "path": "tests/browser_dom.py",
+      "size": 32328,
+      "sha256": "a74e202bb5c60a0a506f13da483835e563e70d803bdd559f2b53e583a1d116aa"
+    },
+    {
+      "path": "tests/browser_smoke.py",
+      "size": 13803,
+      "sha256": "f9bb13ce7d8b1a557f66b764a0f83eab9ed8306337b60399cd43a2776ac67a2b"
+    },
+    {
+      "path": "tests/chatgpt_isolated.py",
+      "size": 4133,
+      "sha256": "b7e81934ca53deb0794e060fd3c22dae1d6ad11dd2853deec164dd07ad47e7e8"
+    },
+    {
+      "path": "tests/chatgpt_regression.py",
+      "size": 14699,
+      "sha256": "bd41ed4a348086adc6c3621bb21c3e38af41acc0ec0a4723e91cd9204d9462b7"
+    },
+    {
+      "path": "tests/chrome-fixture.js",
+      "size": 6752,
+      "sha256": "199876bec217184e778ef1594ae39c2553e5539860219328b236ac9dcff969fb"
+    },
+    {
+      "path": "tests/clipboard-regression.test.js",
+      "size": 3146,
+      "sha256": "8f459460a49f153d3dbf42c47f0a4537d1ad9cb8a34d8a29e00a6c9ee5d5fff9"
+    },
+    {
+      "path": "tests/clipboard.test.js",
+      "size": 14685,
+      "sha256": "5bca09df3eb5b533c34c84ef354ee7e1bdebdcfeaa636c7ae38fcbeddd73791d"
+    },
+    {
+      "path": "tests/core.test.js",
+      "size": 10125,
+      "sha256": "c73e7cd48e5b79365fee610ef802396721220c8541b3c65fd5d9b6b2abb739fc"
+    },
+    {
+      "path": "tests/fixtures/ChatGPTAdapter.v2.1.2.js",
+      "size": 7107,
+      "sha256": "a601dfa04f0e2aac5116898d0e3c75596dbcbd438e4aee9871e22a79b23471ce"
+    },
+    {
+      "path": "tests/prompt-pipeline.test.js",
+      "size": 9675,
+      "sha256": "5d124aaa50ef914375ae62dbe69bea7f61434f593e2fef71e96b994fe56ff89e"
+    },
+    {
+      "path": "tests/submission-diagnostics.test.js",
+      "size": 4431,
+      "sha256": "b231be8d54b372e82d5ad0957ed8f01d617d9e84b18c6792419d2d44c6b3c626"
+    }
+  ]
+}

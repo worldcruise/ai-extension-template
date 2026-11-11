@@ -1,11 +1,16 @@
 {
   "name": "ai-agent-template",
-  "version": "0.5.0",
+  "version": "0.6.2",
   "private": true,
   "type": "module",
-  "description": "ChatGPT and Resume Studio in a shared Chrome side panel.",
+  "description": "A docked job workspace with ChatGPT and DeepSeek browser-tab document generation.",
   "scripts": {
     "build": "node scripts/build-extension.mjs",
+    "version:check": "node scripts/version.mjs check",
+    "version:major": "node scripts/version.mjs major && npm run build",
+    "version:minor": "node scripts/version.mjs minor && npm run build",
+    "version:misc": "node scripts/version.mjs misc && npm run build",
+    "version:patch": "node scripts/version.mjs patch && npm run build",
     "test": "node --test tests/*.test.mjs",
     "test:browser": "node tests/chrome.mjs"
   },

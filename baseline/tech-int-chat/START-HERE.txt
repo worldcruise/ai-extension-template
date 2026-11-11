@@ -1,0 +1,31 @@
+TECH-INT-CHAT — COMPLETE UPDATED EXTENSION v2.1.5
+
+1. Export any transcript you need before upgrading.
+2. Extract the ZIP and replace the files in your existing unpacked extension folder.
+3. Open chrome://extensions, click Reload, and confirm version 2.1.5.
+4. Close/reopen the extension panel and refresh BOTH Meet and ChatGPT tabs.
+5. Test one short normal selection, then F8/F9/F10 follow-up.
+
+Load the tech-int-chat folder that contains manifest.json. No build, npm install, API key,
+or server is required. Do not run two versions of the extension at the same time.
+
+v2.1.5 fixes the live failure reported from v2.1.4:
+- a verified Send click is now the terminal submit boundary; the adapter does not wait for
+  fragile ChatGPT conversation/generation DOM afterward;
+- ChatGPT navigation/loading after Send no longer cancels the request;
+- a second/auxiliary ProseMirror cannot beat the form-local composer;
+- zero-width empty-editor placeholders are not treated as an unsent draft;
+- clipboard behavior, UI, Meet selectors, transcript parsing and prompt strings are unchanged.
+
+No blocking runtime alert() calls are present. The Clear Transcript confirmation remains by design.
+
+Verification summary:
+- 76 Node unit tests: PASS
+- 36 Chromium DOM integration checks: PASS
+- 4 focused v2.1.5 submit regressions: PASS
+- 3 Chromium isolated-world checks: PASS
+- MV3/static/preservation checks: PASS
+- Native installed-extension smoke test: NOT AVAILABLE here (local browser policy blocks it)
+- Authenticated live ChatGPT/Meet: NOT available in this environment
+
+See docs/FINAL-AUDIT-v2.1.5.md and docs/TEST-RESULTS.md.

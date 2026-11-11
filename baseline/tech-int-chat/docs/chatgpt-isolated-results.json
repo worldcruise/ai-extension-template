@@ -1,0 +1,16 @@
+{
+  "release": "2.1.3",
+  "browser": "144.0.7559.96",
+  "passed": 3,
+  "checks": [
+    "application and adapter globals are isolated while the DOM is shared",
+    "isolated adapter invokes the page paste handler with the complete exact string, without transient activation",
+    "success is acknowledged from shared DOM without private framework state access or console errors"
+  ],
+  "scope": "Real Chromium CDP isolated world, native synthetic paste event crossing worlds; fixture page handler, not live ChatGPT",
+  "limitations": [
+    "No actual installed extension or native OS clipboard",
+    "No authenticated ChatGPT",
+    "No claim that focus or user activation caused the reported live failure"
+  ]
+}

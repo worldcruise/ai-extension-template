@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+## 0.6.2 — 2026-11-11
+
+- Request one fenced JSON code panel and three output checks. Capture ChatGPT's current turn/search layouts and CodeMirror code panels, exclude thinking and later turns, and wait for streaming to end plus ready Send or final-reply controls. Validate the complete code block, job/run IDs, schema and candidate facts before review. Preserve capture diagnostics alongside submission diagnostics and keep Resume observe-only after sending.
+
+## 0.6.1 — 2026-11-11
+
+- Verify ChatGPT prompt content using document structure, keep checks bound to the edited composer, and preserve matching content across editor replacement. Reuse an already-prepared prompt on Resume. Distinguish missing editors, mismatched text, and unstable content; retain bounded submission diagnostics in job Details, with a Copy diagnostics action and exact extension/build identity. Add real ProseMirror regression coverage, including blocked submission of changed text.
+
+## 0.6.0 — 2026-11-11
+
+- Add synchronized major/minor/misc (patch) version commands, dated release notes, and build-time consistency checks. Correct the stale lockfile version and derive source build metadata from the manifest.
+
+- Use an already-open ChatGPT tab for Generate, Resume, and Open selected AI. Prefer its active tab, otherwise its most recently used tab; never create or navigate ChatGPT tabs for generation. Replace unsent drafts with native plain text and press Enter once, removing the paste-event path that can create pasted.txt. Allow existing conversation history, serialize jobs sharing a tab, and keep automatic reply capture.
+
+- Replace the partial ChatGPT submission implementation with the full tech-int-chat v2.1.5 adapter, retaining its editor selection, paste/native-input pipeline, readiness checks, cancellation, and diagnostics. Add the job's persistent intent hook and retain explicit draft replacement. Separate verified submission from reply collection, allow bound ChatGPT replies without a conversation URL, and exclude draft previews from posted-message detection.
+
+- Replace unsent ChatGPT text drafts during document preparation. Use native textarea replacement or rich-editor deletion followed by paste handling and verified native insertion, following the tech-int-chat input approach. Wait for consumed asynchronous pastes to avoid duplicate prompts.
+
+- Fix ChatGPT preparation after editor replacement, recognize additional and form-associated Send controls, and allow Enter for a verified composer when Send is absent. Resume can recover a manually submitted job prompt after preparation failed. Capture the final assistant reply after thinking, bounded before the next user turn.
+
+- Add Generate documents as a separate per-job browser-tab workflow for ChatGPT and DeepSeek. Persist submission intent before sending, confirm the posted user message, collect its assistant reply automatically, and require document review before saving. Bind runs to their tab and browser session; recover by observing the original conversation without resending after a recorded attempt. Keep invalid replies for inspection.
+
+- Retire the old prompt delivery and queue runners, Send to AI / Capture result controls, and automation settings. Keep the dock, local job/profile storage, manual documents, and saved conversations. Adding a job only saves locally; legacy runner records never resume.
+
+- Recover a failed DeepSeek sidebar once the network returns without reloading the extension. Keep Reload available before composer readiness, add a Reconnect action for stalled loads, retire failed message channels, and preserve drafts, sign-in input, active responses, and healthy chats.
+
 - Preserve the loaded chat viewport off-screen while the dock is collapsed instead of removing it from layout. Restore it without replaying an opening animation, and keep the collapsed frame inert and out of keyboard focus.
 
 - Keep ChatGPT's loading notice hidden once the current page is connected, including when its composer is temporarily hidden during dock switches. Preserve input-readiness guards and show actual sign-out independently of composer visibility.
@@ -39,22 +65,16 @@
 - Authenticate DeepSeek frame messages by source, origin and nonce, bound history snapshots, and preserve manual-only sending.
 
 - Move Chat provider into the polished user-icon popup with provider-aware sign-in and full-height chat panes.
-- Disable Add/Ctrl+Enter automatic sending: save and copy only, preserve the selected provider, and create no delivery attempt.
+- Make Add/Ctrl+Enter save locally without copying or sending, preserving existing chat drafts.
 
 - Add a saved ChatGPT / DeepSeek chat selector with separate mounted frames, lazy DeepSeek loading, sign-in/tab fallback, and guarded reload.
-- Scope DeepSeek embed permissions to its chat host and this extension's subframes; retain ChatGPT for resume generation and connection checks.
+- Scope DeepSeek embed permissions to its chat host and this extension's subframes.
 
 - Replace candidate/company search suggestions with the current ChatGPT session's saved chat titles and native links, with refresh, keyboard selection and candidate-independent results.
 - Keep chat titles in panel memory, validate bounded history messages, and preserve draft, generation and stale-navigation protections when choosing a conversation.
-- Reduce queue handoff latency with verified empty-chat reuse, native New chat navigation, event-driven readiness, and direct DOM response reads.
-- Shorten settling for matching completed JSON to 180 ms while retaining conservative handling for ambiguous output, single-send guards, and validation before Ready.
-- Persist send authorization checks atomically, omit redundant acknowledgement writes, and capture redacted completion timing for latency checks.
 - Add a default-on, saved company/URL duplicate check for Add and Ctrl+Enter, with a visible Already applied status and transactional protection across panels.
-- Check the selected candidate's queued jobs and saved results before saving, copying or sending, preserving job URL identities and metadata provenance.
-- Make Add to queue save and copy the exact prompt, open Chat, and send that new request once in a fresh Sidebar Chat, with response monitoring and validated local results.
-- Serialize additional Adds without including older queued jobs; preserve drafts and stop on Pause, navigation, uncertain delivery, or persistence failure.
-- Keep Copy prompt clipboard-only and bulk Start/Continue paused; Review uses the originating delivery's connection.
-- Verify the handoff, duplicate guard, draft protection, cancellation, and single-send acknowledgement with unit tests and isolated browser fixtures.
+- Check the selected candidate's queued jobs and saved results before saving, preserving job URL identities and metadata provenance.
+- Verify local job saving, duplicate guards, draft protection, document editing, and cancellation with unit tests and isolated browser fixtures.
 
 ## 0.5.0 — 2026-11-08
 

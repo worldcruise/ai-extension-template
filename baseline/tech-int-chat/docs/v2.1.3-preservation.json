@@ -1,0 +1,31 @@
+{
+  "release": "2.1.3",
+  "source_archive": "tech-int-chat-updated-v2.1.2.zip",
+  "source_archive_sha256": "13fb3cce6ddb94255d7de636ace085dfc748e62f4881b4a8c7c0a9f87e88963f",
+  "original_reference_archive_sha256": "a02c5702c4451ac74c8ada6c77712615d0c8b35d8270cf8a7b136fbbc41d11c2",
+  "byte_identical_to_v2_1_2": {
+    "index.html": "62e3937de38a67235f4d4aa729f597fec868c231ec8dafdab80e48cc2d7445f4",
+    "meeting.js": "268eeea279c65e6fe54aa93e50fc0354c00f32fc9d66794cf45b11e1521d1b51",
+    "gptPrompts.js": "87c4b2c50ea658261bab2a47c83cefbeebaa1ce420ea90922608af6a001c0faf",
+    "shared/PromptBuilder.js": "b1fc3e568e471a6819e9785528b7f7e1579ebbe843551288f586ad197edb57f2",
+    "shared/ClipboardWriter.js": "a6381075c06cc6b43d81d489cf84508673c0dd52545b9343702954f1aeb3a7b6",
+    "services/ClipboardService.js": "b9ad85381f36f3fec6d71c976b30a5a86ffc33a1ceb4aa8882060dc055a054cc",
+    "offscreen/clipboard.html": "f20a865aa377e59cbf79ad3f043e1ee32fb66f2328b2ca83c0b8066b1186c0ae",
+    "offscreen/clipboard.js": "5d9dcf24910e7dc5d310d1920b004ee0fa40882e15622beeff44c2ec0d8b8ce0",
+    "background.js": "39a4d4a0275fe0709fd8cfc4bcd81762ff47ab6721479f7d3522105898f54830",
+    "services/StorageService.js": "0d0503641498f782a14857a19295a72b5dcc6bcd4cce7da7f015494795e83b97",
+    "services/TranscriptService.js": "6aa9dea2f8d2a9e3454de124d0bdaee19a8b652497458da6cd8480f8b97bd3ed",
+    "core/TranscriptStore.js": "8e09adb18d737ed363dd462d381b11e72aaed1d813119728ae52bf8073f45257",
+    "core/SessionManager.js": "63876b142d5e6da1196ecddea34e658d55bd36f2638267ab6f1a882a996e2cdc",
+    "core/MessageQueue.js": "fb566f6383b500f4211cca6db8025276d03428df3f0252abde99344595e790c7",
+    "core/Logger.js": "024f45e85fd6d89cb3fe15c47eb76158fe9c259fc214a86e672ebd33a7155d35",
+    "storage/migration.js": "f16fa44cbad6b9bf28a5396d16118145dbcb577de879ca4136c6a3e1f4532e23",
+    "images/extension-128.png": "09ad1655ec2923b8e6eb0babd678a79a485cf276a0ed2665c109ba1ddaa77ed5",
+    "images/extension-48.png": "79b66130e4c96f0f434b1fb9e21edfd9d760e0eb2cfc7d690a900671b501161f",
+    "images/extension-32.png": "b8361aa8b437cc3037914d89febed93446bbf76dfc5ce68c388b40735f81df96",
+    "docs/BACKLOG.md": "b15e8568262dcb6ddfd4c098da276aa48268623df68a4f446ccd099bbf6e3145"
+  },
+  "manifest_diff": "version only",
+  "panel_controller_diff": "failure diagnostic logging and error code only",
+  "original_UI_selectors_parsers_check": "scripts/check.mjs compares original preservation hashes"
+}

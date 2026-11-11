@@ -1,15 +1,14 @@
+import { createJobQueue } from './job-queue.mjs';
+import { createGenerationClient } from './generation-client.mjs';
+import { existingChatGPTTabs, focusChatGPTTab } from './chatgpt-tabs.mjs';
 import { createChatSidebar } from './sidebar.mjs';
 import { createStudio } from './studio.mjs';
 import { renderIcons } from './icons.mjs';
 import { createBrowserTabs } from './browser-tabs.mjs';
 import { createKeywordSettings } from './keyword-settings.mjs';
 import { createPageHighlights } from './page-highlights.mjs';
-import { createResumeQueue } from './resume-queue.mjs';
-import { createChatgptTabConnection } from './chatgpt-tab-connection.mjs';
-import { createQueueConnectionSettings } from './queue-connection-settings.mjs';
 import { createShortcutSettings } from './shortcut-settings.mjs';
 import { createWorkspaceShortcuts } from './workspace-shortcuts.mjs';
-import { BUILD } from './runtime-info.mjs';
 import { createChatProviders } from './chat-providers.mjs';
 import { createDeepseekToolbar } from './deepseek-toolbar.mjs';
 import { createWorkspaceDock } from './workspace-dock.mjs';
@@ -17,7 +16,6 @@ import { chatProviderForUrl } from './saved-chat.mjs';
 
 const q = selector => document.querySelector(selector);
 renderIcons();
-q('#runtime-host-build').textContent = `${BUILD.version} · ${BUILD.id}`;
 
 // Each panel remains mounted. Switching views never reloads the ChatGPT frame.
 function bindTabs(entries, onSelect, onBeforeSelect) {
@@ -122,22 +120,14 @@ for (const button of document.querySelectorAll('[data-close-dialog]')) {
 
 let browserTabs;
 let browserWindowId;
-const tabChat = createChatgptTabConnection({ getWindowId: async () => { await browserTabs.ready; return browserWindowId; },
-  onReport: report => { q('#runtime-selected-build').textContent = `${report.confirmationScope} · ${report.adapterBuild}`; } });
-let connectionSettings;
-const selectedConnection = () => connectionSettings?.mode() === 'tab' ? tabChat : chat;
-const queue = createResumeQueue({ getChat: async ({ fromAdd = false } = {}) => {
-  await connectionSettings.ready;
-  if (fromAdd) await chatProviders.ready;
-  if (fromAdd) await chatProviders.showChatGPT();
-  return fromAdd ? chat : selectedConnection();
-} });
-connectionSettings = createQueueConnectionSettings({
-  canChange: () => !queue.snapshot().control.ownerId && !queue.snapshot().starting,
-  openConnection: () => openSelectedChat()
-});
-function openSelectedChat() { return connectionSettings.mode() === 'tab' ? tabChat.open() : selectView('chat'); }
-queue.subscribe(() => connectionSettings.refresh());
+const queue = createJobQueue();
+const generations = createGenerationClient();
+async function openSelectedChat() {
+  await chatProviders.ready;
+  if (chatProviders.current() === 'chatgpt') return focusChatGPTTab((await existingChatGPTTabs())[0]);
+  return chrome.tabs.create({ url: 'https://chat.deepseek.com/', active: true });
+}
+q('#queue-connection-open').addEventListener('click', () => { void openSelectedChat().catch(error => studio.chatError(error.message)); });
 const shortcutSettings = createShortcutSettings();
 bindTabs([
   { id: 'keywords', tab: q('#keyword-settings-tab'), panel: q('#keyword-settings-panel') },
@@ -147,27 +137,21 @@ bindTabs([
   q('.settings-tabs [aria-selected="true"]').scrollIntoView({ block: 'nearest', inline: 'nearest' });
   if (id === 'shortcuts') void shortcutSettings.refresh();
 })('keywords');
-window.addEventListener('pagehide', () => tabChat.dispose());
 const studio = createStudio({
   queue,
+  generations,
+  getChatProvider: () => chatProviders?.current() || 'chatgpt',
   openDialog,
   showStudio: panel => { selectView('studio'); selectStudioTab(panel); },
-  showChat: (url, { connection = connectionSettings.mode() } = {}) => {
+  showChat: url => {
     if (!url) { selectView('chat'); return; }
     void (async () => {
-      if (chatProviderForUrl(url) === 'deepseek') {
-        await chatProviders.showProvider('deepseek');
-        if (chatProviders.current() !== 'deepseek') return;
-        selectView('chat');
-        await deepseekChat.openConversation(url);
-        return;
-      }
-      await chatProviders.showChatGPT();
-      if (connection === 'tab') { await queue.pause(); await tabChat.queue.openConversation(url); await tabChat.open(); }
-      else await chat?.openConversation(url);
+      const provider = chatProviderForUrl(url);
+      await chatProviders.showProvider(provider); selectView('chat');
+      await (provider === 'deepseek' ? deepseekChat : chat).openConversation(url);
     })().catch(error => studio.chatError(error.message));
   },
-  getCurrentChat: () => chatProviders?.current() === 'deepseek' ? deepseekChat?.getCurrentChat() : selectedConnection()?.getCurrentChat(),
+  getCurrentChat: () => chatProviders?.current() === 'deepseek' ? deepseekChat?.getCurrentChat() : chat?.getCurrentChat(),
   moveTab: direction => browserTabs?.move(direction)
 });
 const pageHighlights = createPageHighlights();
@@ -207,14 +191,10 @@ chat = createChatSidebar({
   onOpenChat: () => selectView('chat'),
   onShortcut: action => workspaceShortcuts?.run(action),
 });
-chat.setNavigationGuard(() => queue.pause());
 deepseekChat = createDeepseekToolbar();
-chatProviders = createChatProviders({ onSelect: () => { selectView('chat'); closeAccount(true); }, beforeChange: async () => {
-  if (queue.snapshot().control.ownerId || queue.snapshot().starting) throw new Error('Wait for the current resume job to finish before switching providers.');
-  await queue.pause();
-} });
+chatProviders = createChatProviders({ onSelect: () => { selectView('chat'); closeAccount(true); } });
 workspaceShortcuts = createWorkspaceShortcuts({ selectView, selectJob: () => selectStudioTab('job') });
-window.addEventListener('pagehide', () => queue.dispose(), { once: true });
+window.addEventListener('pagehide', () => { queue.dispose(); generations.dispose(); }, { once: true });
 
 const accountToggle = q('#account-toggle');
 function positionAccount() {
@@ -243,61 +223,6 @@ document.addEventListener('click', event => { if (!event.target.closest('.accoun
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && !q('#account-panel').hidden) { event.preventDefault(); closeAccount(true); }
 });
-async function checkConnection() {
-  q('#chat-connection-title').textContent = 'Checking connection…';
-  q('#chat-connection-message').textContent = 'Reading the ChatGPT page. No message will be sent.';
-  q('#chat-connection-details').replaceChildren();
-  q('#chat-confirm-session').hidden = q('#chat-session-note').hidden = q('#chat-connection-sign-in').hidden = true;
-  q('#chat-check-again').disabled = true;
-  try {
-    await connectionSettings.ready;
-    const report = await selectedConnection().queue.inspect();
-    const signedOut = report.authState === 'signed-out';
-    const known = report.authState === 'signed-in';
-    q('#chat-connection-title').textContent = signedOut ? 'Sign in required' : known ? 'Authentication evidence recognized' : report.sessionConfirmed ? 'Session confirmed; authentication evidence unknown' : 'Authentication evidence unknown';
-    q('#chat-connection-message').textContent = signedOut ? 'Sign in to ChatGPT in this browser profile, reload Chat, then check again.'
-      : known ? 'ChatGPT account signals were detected. Return to the queue and click Start queue when ready.'
-      : 'This ChatGPT layout does not expose the account controls we recognize. Open the selected ChatGPT connection, check your account, then confirm this session below.';
-    const details = [['Connection', connectionSettings.mode() === 'tab' ? 'ChatGPT tab' : 'Sidebar Chat'],
-      ['Composer presence', report.composerPresent ? 'Detected' : 'Not detected'], ['Composer readiness', report.composerReady ? 'Editable' : 'Not ready'],
-      ['Authentication evidence', signedOut ? 'Signed out' : known ? 'Recognized' : 'Unknown'],
-      ['Panel session', report.sessionConfirmed ? `Established for ${report.confirmationScope}` : 'Not confirmed'],
-      ['Generation activity', report.busy ? 'Detected' : 'Not detected'],
-      ['Unsent draft', report.hasDraft ? 'Present — finish or clear it before starting' : 'None'],
-      ['Account signals', report.evidence.length ? report.evidence.join(', ') : 'Not recognized'],
-      ['Host build', report.hostBuild], ['Adapter build', report.adapterBuild], ['Revision match', report.revisionMatches ? 'Yes' : 'No / unknown']];
-    q('#runtime-selected-build').textContent = `${report.confirmationScope} · ${report.adapterBuild}`;
-    q('#chat-connection-details').replaceChildren(...details.flatMap(([label, value]) => {
-      const name = document.createElement('dt'), text = document.createElement('dd'); name.textContent = label; text.textContent = value; return [name, text];
-    }));
-    q('#chat-connection-sign-in').hidden = !signedOut;
-    q('#chat-confirm-session').hidden = q('#chat-session-note').hidden = signedOut || known || report.sessionConfirmed || !report.composerPresent;
-    if (known) await queue.retryConnectionBlocked();
-  } catch (error) {
-    q('#chat-connection-title').textContent = 'ChatGPT is not ready';
-    q('#chat-connection-message').textContent = error.message;
-  } finally { q('#chat-check-again').disabled = false; }
-}
-q('#account-check').addEventListener('click', () => {
-  void chatProviders.showChatGPT();
-  closeAccount(); selectView('chat'); openDialog('chat-connection-dialog'); void checkConnection();
-});
-q('#chat-check-again').addEventListener('click', () => { void checkConnection(); });
-q('#chat-connection-open').addEventListener('click', () => { void Promise.resolve(openSelectedChat()).catch(error => { q('#chat-connection-message').textContent = error.message; }); });
-q('#chat-confirm-session').addEventListener('click', () => {
-  void (async () => {
-    q('#chat-confirm-session').disabled = true;
-    try {
-      await selectedConnection().queue.confirmSession(); await queue.retryConnectionBlocked();
-      q('#chat-connection-title').textContent = 'ChatGPT session confirmed';
-      q('#chat-connection-message').textContent = 'Return to the queue and click Start queue. Your unsent jobs have been restored; no message was sent by this check.';
-      q('#chat-confirm-session').hidden = q('#chat-session-note').hidden = true;
-    } catch (error) { q('#chat-connection-message').textContent = error.message; }
-    finally { q('#chat-confirm-session').disabled = false; }
-  })();
-});
-q('#chat-connection-sign-in').addEventListener('click', () => { void selectedConnection().signIn(); });
-q('#chat-connection-back').addEventListener('click', () => { q('#chat-connection-dialog').close(); selectView('studio'); selectStudioTab('results'); });
 q('#account-sign-in').addEventListener('click', () => {
   closeAccount();
   if (chatProviders.current() === 'deepseek') q('#deepseek-open').click();

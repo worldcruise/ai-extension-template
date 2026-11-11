@@ -8,5 +8,7 @@ export function parseManualResume(source, request) {
   let value;
   try { value = JSON.parse(raw); } catch { throw new Error('Paste one complete resume JSON object.'); }
   const envelope = value && Object.hasOwn(value, 'resume') ? value : { schemaVersion: 1, requestId: request.id, resume: value };
+  if (Object.hasOwn(envelope, 'coverLetter')) delete envelope.coverLetter;
+  if (Object.hasOwn(envelope, 'runId')) delete envelope.runId;
   return parseResume(JSON.stringify(envelope), request);
 }

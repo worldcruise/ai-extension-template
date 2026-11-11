@@ -1,0 +1,25 @@
+TECH-INT-CHAT — FULL UPDATED EXTENSION v2.1.2
+
+1. Export any transcript you need before an extension reload/update.
+2. Extract the ZIP. Replace the old unpacked extension folder's contents.
+3. Open chrome://extensions, click Reload, and confirm version 2.1.2.
+   For a new installation: disable the old copy, enable Developer mode,
+   click Load unpacked and select the folder containing manifest.json.
+4. Close/reopen the extension panel. Refresh Meet and ChatGPT tabs.
+5. Send a short selected transcript and paste into a text editor to check
+   the full outgoing prompt + transcript. Do not resubmit a sent prompt just to copy.
+
+No build, dependency installation, new permission or main-panel UI change is needed.
+Copy now starts locally in the click/key handler, before any ChatGPT request.
+The shared builder creates ONE final string that is copied and sent unchanged.
+
+69 unit tests + 36 Chromium DOM checks passed (OS writes/messages are mocked).
+Actual installed-extension/native system clipboard use was NOT verified here;
+the browser's administrator policy blocks the necessary extension testing.
+See docs/TEST-RESULTS.md for exact scope and docs/CLIPBOARD-REVIEW.md for reproduced defects.
+
+An optional native-only test page is included: diagnostics/clipboard.html.
+Open it using the extension URL described in docs/CLIPBOARD.md, not as a local file.
+It copies only a harmless marker, shows the real native error and sends nothing to ChatGPT.
+
+The optional improvements remain in docs/BACKLOG.md.

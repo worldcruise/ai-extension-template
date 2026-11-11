@@ -1,6 +1,5 @@
 export const QUEUE_DATABASE = 'ai-agent-resume-studio';
-export const QUEUE_LOCK = 'ai-agent-resume-runner';
-export const defaultControl = () => ({ paused: true, ownerId: null, candidateId: null, activeId: null });
+export const defaultControl = () => ({ selectedCandidateId: null });
 
 export function createQueueStore({ indexedDB = globalThis.indexedDB, name = QUEUE_DATABASE } = {}) {
   let opening;

@@ -1,0 +1,428 @@
+
+> tech-int-chat@2.1.2 test
+> node --test tests/*.test.js
+
+TAP version 13
+# Subtest: successful ChatGPT submission preserves a failed clipboard receipt for the panel
+ok 1 - successful ChatGPT submission preserves a failed clipboard receipt for the panel
+  ---
+  duration_ms: 1.571929
+  type: 'test'
+  ...
+# Subtest: successful clipboard receipt is durable but clipboard text is never persisted
+ok 2 - successful clipboard receipt is durable but clipboard text is never persisted
+  ---
+  duration_ms: 0.340293
+  type: 'test'
+  ...
+# Subtest: failed ChatGPT insertion still preserves the already completed clipboard outcome
+ok 3 - failed ChatGPT insertion still preserves the already completed clipboard outcome
+  ---
+  duration_ms: 0.297788
+  type: 'test'
+  ...
+# Subtest: missing or malformed clipboard receipts cannot masquerade as successful copying
+ok 4 - missing or malformed clipboard receipts cannot masquerade as successful copying
+  ---
+  duration_ms: 0.280854
+  type: 'test'
+  ...
+# Subtest: a pre-dispatch ChatGPT error retains the originating panel clipboard receipt
+ok 5 - a pre-dispatch ChatGPT error retains the originating panel clipboard receipt
+  ---
+  duration_ms: 0.562148
+  type: 'test'
+  ...
+# Subtest: native failure code is retained but arbitrary response data is never persisted
+ok 6 - native failure code is retained but arbitrary response data is never persisted
+  ---
+  duration_ms: 0.261274
+  type: 'test'
+  ...
+# Subtest: offscreen fallback copies exact text with no panel bounce and cleans up
+ok 7 - offscreen fallback copies exact text with no panel bounce and cleans up
+  ---
+  duration_ms: 2.064181
+  type: 'test'
+  ...
+# Subtest: fallback authorizes panel, extension-tab panel, and top-frame ChatGPT hotkey senders
+ok 8 - fallback authorizes panel, extension-tab panel, and top-frame ChatGPT hotkey senders
+  ---
+  duration_ms: 0.587165
+  type: 'test'
+  ...
+# Subtest: fallback rejects foreign, Meet, arbitrary extension and subframe senders
+ok 9 - fallback rejects foreign, Meet, arbitrary extension and subframe senders
+  ---
+  duration_ms: 0.371019
+  type: 'test'
+  ...
+# Subtest: invalid text, identity and deadlines are rejected before offscreen creation
+ok 10 - invalid text, identity and deadlines are rejected before offscreen creation
+  ---
+  duration_ms: 1.237295
+  type: 'test'
+  ...
+# Subtest: existing offscreen document is reused and then closed
+ok 11 - existing offscreen document is reused and then closed
+  ---
+  duration_ms: 0.230166
+  type: 'test'
+  ...
+# Subtest: offscreen writes are serialized and pending work is bounded
+ok 12 - offscreen writes are serialized and pending work is bounded
+  ---
+  duration_ms: 5.577536
+  type: 'test'
+  ...
+# Subtest: expired queued operations never start a stale clipboard write
+ok 13 - expired queued operations never start a stale clipboard write
+  ---
+  duration_ms: 1.21452
+  type: 'test'
+  ...
+# Subtest: expired offscreen startup is cleaned up without writing
+ok 14 - expired offscreen startup is cleaned up without writing
+  ---
+  duration_ms: 0.234814
+  type: 'test'
+  ...
+# Subtest: offscreen errors and mismatched receipts cannot masquerade as copied
+ok 15 - offscreen errors and mismatched receipts cannot masquerade as copied
+  ---
+  duration_ms: 0.627135
+  type: 'test'
+  ...
+# Subtest: offscreen timeout frees the queue and permission rejection does not poison next use
+ok 16 - offscreen timeout frees the queue and permission rejection does not poison next use
+  ---
+  duration_ms: 6.662891
+  type: 'test'
+  ...
+# Subtest: local native write is invoked synchronously before the caller's next statement
+ok 17 - local native write is invoked synchronously before the caller's next statement
+  ---
+  duration_ms: 3.37113
+  type: 'test'
+  ...
+# Subtest: native rejection tries the LOCAL legacy fallback before any runtime message
+ok 18 - native rejection tries the LOCAL legacy fallback before any runtime message
+  ---
+  duration_ms: 1.10793
+  type: 'test'
+  ...
+# Subtest: native synchronous exception and unavailable API use the same safe fallback
+ok 19 - native synchronous exception and unavailable API use the same safe fallback
+  ---
+  duration_ms: 1.695485
+  type: 'test'
+  ...
+# Subtest: offscreen is used only after both local methods fail, with the identical payload
+ok 20 - offscreen is used only after both local methods fail, with the identical payload
+  ---
+  duration_ms: 1.178907
+  type: 'test'
+  ...
+# Subtest: both native and fallback error codes reach the caller without private exception text
+ok 21 - both native and fallback error codes reach the caller without private exception text
+  ---
+  duration_ms: 0.719304
+  type: 'test'
+  ...
+# Subtest: native timeout never races a fallback and blocks another local write until settled
+ok 22 - native timeout never races a fallback and blocks another local write until settled
+  ---
+  duration_ms: 6.551283
+  type: 'test'
+  ...
+# Subtest: late native rejection never launches a stale fallback after timeout
+ok 23 - late native rejection never launches a stale fallback after timeout
+  ---
+  duration_ms: 6.308948
+  type: 'test'
+  ...
+# Subtest: invalid local text/identity never touches any clipboard method
+ok 24 - invalid local text/identity never touches any clipboard method
+  ---
+  duration_ms: 0.879846
+  type: 'test'
+  ...
+# Subtest: content hotkey receipt identifies content rather than falsely claiming panel use
+ok 25 - content hotkey receipt identifies content rather than falsely claiming panel use
+  ---
+  duration_ms: 0.655498
+  type: 'test'
+  ...
+# Subtest: worker clipboard route is independent of storage and ignores offscreen replies
+ok 26 - worker clipboard route is independent of storage and ignores offscreen replies
+  ---
+  duration_ms: 11.037549
+  type: 'test'
+  ...
+# Subtest: normalizes sender-scoped row identity, not a claimed tab ID
+ok 27 - normalizes sender-scoped row identity, not a claimed tab ID
+  ---
+  duration_ms: 1.605549
+  type: 'test'
+  ...
+# Subtest: new revisions replace rows; stale/out-of-order revisions cannot roll them back
+ok 28 - new revisions replace rows; stale/out-of-order revisions cannot roll them back
+  ---
+  duration_ms: 0.4978
+  type: 'test'
+  ...
+# Subtest: retrying a whole patch is idempotent
+ok 29 - retrying a whole patch is idempotent
+  ---
+  duration_ms: 0.287112
+  type: 'test'
+  ...
+# Subtest: caption resegmentation removes obsolete suffixes and rejects old suffix replay
+ok 30 - caption resegmentation removes obsolete suffixes and rejects old suffix replay
+  ---
+  duration_ms: 0.554907
+  type: 'test'
+  ...
+# Subtest: role-only revisions propagate
+ok 31 - role-only revisions propagate
+  ---
+  duration_ms: 1.48634
+  type: 'test'
+  ...
+# Subtest: clear generation rejects in-flight pre-clear captions
+ok 32 - clear generation rejects in-flight pre-clear captions
+  ---
+  duration_ms: 0.202535
+  type: 'test'
+  ...
+# Subtest: two source documents with the same raw ID do not overwrite each other
+ok 33 - two source documents with the same raw ID do not overwrite each other
+  ---
+  duration_ms: 0.320162
+  type: 'test'
+  ...
+# Subtest: malformed, oversized, missing-protocol and negative-revision patches fail
+ok 34 - malformed, oversized, missing-protocol and negative-revision patches fail
+  ---
+  duration_ms: 0.535376
+  type: 'test'
+  ...
+# Subtest: tab identity is derived from trusted sender metadata
+ok 35 - tab identity is derived from trusted sender metadata
+  ---
+  duration_ms: 0.40461
+  type: 'test'
+  ...
+# Subtest: serialized operations keep order and recover after a rejection
+ok 36 - serialized operations keep order and recover after a rejection
+  ---
+  duration_ms: 8.218596
+  type: 'test'
+  ...
+# Subtest: duplicate request ID returns the same running AND completed result
+ok 37 - duplicate request ID returns the same running AND completed result
+  ---
+  duration_ms: 17.182696
+  type: 'test'
+  ...
+# Subtest: different click IDs with the same in-flight payload are coalesced
+ok 38 - different click IDs with the same in-flight payload are coalesced
+  ---
+  duration_ms: 16.517464
+  type: 'test'
+  ...
+# Subtest: reusing a request ID for different content is rejected
+ok 39 - reusing a request ID for different content is rejected
+  ---
+  duration_ms: 11.219819
+  type: 'test'
+  ...
+# Subtest: transport failure after dispatch is uncertain, never auto-replayed
+ok 40 - transport failure after dispatch is uncertain, never auto-replayed
+  ---
+  duration_ms: 11.120936
+  type: 'test'
+  ...
+# Subtest: explicit pre-click failure from adapter is safe and actionable
+ok 41 - explicit pre-click failure from adapter is safe and actionable
+  ---
+  duration_ms: 12.668328
+  type: 'test'
+  ...
+# Subtest: worker recovery distinguishes pre-dispatch from ambiguous dispatch
+ok 42 - worker recovery distinguishes pre-dispatch from ambiguous dispatch
+  ---
+  duration_ms: 0.591552
+  type: 'test'
+  ...
+# Subtest: synchronous handler exceptions are recorded and release the busy lock
+ok 43 - synchronous handler exceptions are recorded and release the busy lock
+  ---
+  duration_ms: 4.83759
+  type: 'test'
+  ...
+# Subtest: coalesced request aliases survive a lost acknowledgment beyond the double-click window
+ok 44 - coalesced request aliases survive a lost acknowledgment beyond the double-click window
+  ---
+  duration_ms: 16.383347
+  type: 'test'
+  ...
+# Subtest: empty caption groups cannot create unbounded tombstone-only records
+ok 45 - empty caption groups cannot create unbounded tombstone-only records
+  ---
+  duration_ms: 0.316507
+  type: 'test'
+  ...
+# Subtest: shared builder preserves existing 1/conversation text exactly
+ok 46 - shared builder preserves existing 1/conversation text exactly
+  ---
+  duration_ms: 2.115619
+  type: 'test'
+  ...
+# Subtest: shared builder preserves existing 2/conversation text exactly
+ok 47 - shared builder preserves existing 2/conversation text exactly
+  ---
+  duration_ms: 0.687556
+  type: 'test'
+  ...
+# Subtest: shared builder preserves existing 3/conversation text exactly
+ok 48 - shared builder preserves existing 3/conversation text exactly
+  ---
+  duration_ms: 1.221722
+  type: 'test'
+  ...
+# Subtest: shared builder preserves existing 1/coding text exactly
+ok 49 - shared builder preserves existing 1/coding text exactly
+  ---
+  duration_ms: 0.594576
+  type: 'test'
+  ...
+# Subtest: shared builder preserves existing 2/coding text exactly
+ok 50 - shared builder preserves existing 2/coding text exactly
+  ---
+  duration_ms: 0.5908
+  type: 'test'
+  ...
+# Subtest: shared builder preserves existing 3/coding text exactly
+ok 51 - shared builder preserves existing 3/coding text exactly
+  ---
+  duration_ms: 0.598091
+  type: 'test'
+  ...
+# Subtest: shared builder preserves existing conversation/coding text exactly
+ok 52 - shared builder preserves existing conversation/coding text exactly
+  ---
+  duration_ms: 0.694927
+  type: 'test'
+  ...
+# Subtest: shared builder preserves existing coding/conversation text exactly
+ok 53 - shared builder preserves existing coding/conversation text exactly
+  ---
+  duration_ms: 0.785524
+  type: 'test'
+  ...
+# Subtest: shared builder preserves existing 5/coding text exactly
+ok 54 - shared builder preserves existing 5/coding text exactly
+  ---
+  duration_ms: 1.073118
+  type: 'test'
+  ...
+# Subtest: shared builder preserves existing followup-detail/conversation text exactly
+ok 55 - shared builder preserves existing followup-detail/conversation text exactly
+  ---
+  duration_ms: 1.204065
+  type: 'test'
+  ...
+# Subtest: shared builder preserves existing followup-technical/coding text exactly
+ok 56 - shared builder preserves existing followup-technical/coding text exactly
+  ---
+  duration_ms: 0.884353
+  type: 'test'
+  ...
+# Subtest: shared builder preserves existing followup-star/coding text exactly
+ok 57 - shared builder preserves existing followup-star/coding text exactly
+  ---
+  duration_ms: 0.549969
+  type: 'test'
+  ...
+# Subtest: builder rejects empty, oversized, non-string and unknown actions before copying
+ok 58 - builder rejects empty, oversized, non-string and unknown actions before copying
+  ---
+  duration_ms: 0.76954
+  type: 'test'
+  ...
+# Subtest: prepared payload is sent verbatim without a second clipboard call or prompt rebuild
+ok 59 - prepared payload is sent verbatim without a second clipboard call or prompt rebuild
+  ---
+  duration_ms: 2.960973
+  type: 'test'
+  ...
+# Subtest: prepared request replay returns the same result and does not send/copy twice
+ok 60 - prepared request replay returns the same result and does not send/copy twice
+  ---
+  duration_ms: 1.422424
+  type: 'test'
+  ...
+# Subtest: prepared clipboard failure still sends exactly once and preserves diagnostics
+ok 61 - prepared clipboard failure still sends exactly once and preserves diagnostics
+  ---
+  duration_ms: 0.988409
+  type: 'test'
+  ...
+# Subtest: unprepared/invalid incoming messages cannot silently rebuild a different prompt
+ok 62 - unprepared/invalid incoming messages cannot silently rebuild a different prompt
+  ---
+  duration_ms: 0.932936
+  type: 'test'
+  ...
+# Subtest: direct ChatGPT hotkey starts copying synchronously and awaits it before send
+ok 63 - direct ChatGPT hotkey starts copying synchronously and awaits it before send
+  ---
+  duration_ms: 15.373069
+  type: 'test'
+  ...
+# Subtest: cancelling while a hotkey copy is pending prevents insertion, even on late copy success
+ok 64 - cancelling while a hotkey copy is pending prevents insertion, even on late copy success
+  ---
+  duration_ms: 2.870947
+  type: 'test'
+  ...
+# Subtest: repeating a held function key cannot submit multiple follow-ups
+ok 65 - repeating a held function key cannot submit multiple follow-ups
+  ---
+  duration_ms: 0.826585
+  type: 'test'
+  ...
+# Subtest: handshake advertises v2.1.2 prepared-payload support
+ok 66 - handshake advertises v2.1.2 prepared-payload support
+  ---
+  duration_ms: 0.648917
+  type: 'test'
+  ...
+# Subtest: service forwards frozen text, not selected IDs or independently rebuilt prompts
+ok 67 - service forwards frozen text, not selected IDs or independently rebuilt prompts
+  ---
+  duration_ms: 2.827872
+  type: 'test'
+  ...
+# Subtest: stale ChatGPT controller is rejected before any external send
+ok 68 - stale ChatGPT controller is rejected before any external send
+  ---
+  duration_ms: 1.003182
+  type: 'test'
+  ...
+# Subtest: legacy panel protocol and oversized final payloads are rejected
+ok 69 - legacy panel protocol and oversized final payloads are rejected
+  ---
+  duration_ms: 0.310047
+  type: 'test'
+  ...
+1..69
+# tests 69
+# suites 0
+# pass 69
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 172.564563

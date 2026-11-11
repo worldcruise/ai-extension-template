@@ -10,16 +10,13 @@ import { fileURLToPath } from 'node:url';
 import { buildExtension } from '../scripts/build-extension.mjs';
 import { serveFixture } from './fixtures/https-server.mjs';
 import { checkWorkspaceUI } from './workspace-ui.mjs';
+import { checkDeepseekRecoveryUI } from './deepseek-recovery-ui.mjs';
 import { checkJobReader } from './job-reader-ui.mjs';
 import { checkReadPageShortcut } from './read-page-shortcut-ui.mjs';
 import { jobPageFixtures, jobFixtureResponse } from './fixtures/job-pages.mjs';
-import { queueFixtureScript } from './fixtures/queue-chatgpt.mjs';
-import { checkBulkQueue } from './bulk-queue-ui.mjs';
-import { checkTabQueue } from './tab-queue-ui.mjs';
-import { checkEditorBoundaries } from './editor-boundary-ui.mjs';
-import { checkManualPromptUI } from './manual-prompt-ui.mjs';
-import { checkAddChatUI } from './add-chat-ui.mjs';
-import { MANUAL_QUEUE_MODE } from '../src/queue-mode.mjs';
+import { chatFixtureScript } from './fixtures/chat-ui.mjs';
+import { generationFixture } from './fixtures/generation-chat.mjs';
+import { checkGenerationUI } from './generation-ui.mjs';
 
 const artifacts = fileURLToPath(new URL('../artifacts/', import.meta.url));
 const paths = [process.env.CHROME_PATH,
@@ -82,7 +79,7 @@ const fixtureServer = await serveFixture((request, response) => {
   requests++;
   if (request.headers.host?.startsWith('chat.deepseek.com')) {
     response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'X-Frame-Options': 'DENY', 'Content-Security-Policy': "frame-ancestors 'none'" });
-    response.end(`<!doctype html><html><head><style>body{font:16px system-ui}nav{display:flex;gap:20px}textarea{width:90%;margin-top:80px}</style></head><body><button type="button" aria-label="Search chats" onclick="document.getElementById('native-search-dialog').showModal()">Search chats</button><dialog id="native-search-dialog"><input placeholder="Search chats"></dialog><div id="history-open" role="button" tabindex="0" style="position:absolute;left:8px;top:8px;width:24px;height:24px"><svg width="20" height="20"><path d="M2 2h16v16H2z"/></svg></div><div id="history-close" role="button" tabindex="0" style="position:absolute;left:8px;top:8px;width:24px;height:24px" hidden><svg width="20" height="20"><path d="M2 2h16v16H2z"/></svg></div><nav id="history" hidden><div><h3>Pinned</h3><a href="/a/chat/s/pinned-old">Pinned older chat</a><h3>Recent</h3><a href="/a/chat/s/11111111-1111-4111-8111-111111111111">Recent DeepSeek chat</a><a href="/a/chat/s/22222222-2222-4222-8222-222222222222">Older DeepSeek chat</a></div></nav><section id="fixture-cookie-banner" role="dialog" style="position:fixed;top:110px;left:10px;right:10px;padding:20px;background:white;border:1px solid black;z-index:20"><p>We use cookies</p><button id="fixture-cookie-reject" onclick="document.getElementById('fixture-cookie-banner').hidden=true;document.body.dataset.cookieChoice='reject'">Reject all</button><button id="fixture-cookie-accept" onclick="document.getElementById('fixture-cookie-banner').hidden=true;document.body.dataset.cookieChoice='accept'">Accept all</button></section><h1>DeepSeek fixture</h1><textarea placeholder="Message DeepSeek"></textarea><script>const nav=document.getElementById('history'),saved=nav.innerHTML,open=document.getElementById('history-open'),close=document.getElementById('history-close');nav.replaceChildren();open.onclick=()=>{setTimeout(()=>{nav.innerHTML=saved;nav.hidden=false;open.hidden=true;close.hidden=false;nav.querySelectorAll('a').forEach(link=>link.onclick=event=>{event.preventDefault();setTimeout(()=>{history.pushState({},'',link.getAttribute('href'));nav.hidden=false;open.hidden=true;close.hidden=false;},150);});},250);};close.onclick=()=>{nav.hidden=true;nav.replaceChildren();open.hidden=false;close.hidden=true;};</script></body></html>`);
+    response.end(`<!doctype html><html><head><style>body{font:16px system-ui}nav{display:flex;gap:20px}textarea{width:90%;margin-top:80px}</style></head><body><button type="button" aria-label="Search chats" onclick="document.getElementById('native-search-dialog').showModal()">Search chats</button><dialog id="native-search-dialog"><input placeholder="Search chats"></dialog><div id="history-open" role="button" tabindex="0" style="position:absolute;left:8px;top:8px;width:24px;height:24px"><svg width="20" height="20"><path d="M2 2h16v16H2z"/></svg></div><div id="history-close" role="button" tabindex="0" style="position:absolute;left:8px;top:8px;width:24px;height:24px" hidden><svg width="20" height="20"><path d="M2 2h16v16H2z"/></svg></div><nav id="history" hidden><div><h3>Pinned</h3><a href="/a/chat/s/pinned-old">Pinned older chat</a><h3>Recent</h3><a href="/a/chat/s/11111111-1111-4111-8111-111111111111">Recent DeepSeek chat</a><a href="/a/chat/s/22222222-2222-4222-8222-222222222222">Older DeepSeek chat</a></div></nav><section id="fixture-cookie-banner" role="dialog" style="position:fixed;top:110px;left:10px;right:10px;padding:20px;background:white;border:1px solid black;z-index:20"><p>We use cookies</p><button id="fixture-cookie-reject" onclick="document.getElementById('fixture-cookie-banner').hidden=true;document.body.dataset.cookieChoice='reject'">Reject all</button><button id="fixture-cookie-accept" onclick="document.getElementById('fixture-cookie-banner').hidden=true;document.body.dataset.cookieChoice='accept'">Accept all</button></section><h1>DeepSeek fixture</h1><textarea placeholder="Message DeepSeek"></textarea><script>const nav=document.getElementById('history'),saved=nav.innerHTML,open=document.getElementById('history-open'),close=document.getElementById('history-close');nav.replaceChildren();open.onclick=()=>{setTimeout(()=>{nav.innerHTML=saved;nav.hidden=false;open.hidden=true;close.hidden=false;nav.querySelectorAll('a').forEach(link=>link.onclick=event=>{event.preventDefault();setTimeout(()=>{history.pushState({},'',link.getAttribute('href'));nav.hidden=false;open.hidden=true;close.hidden=false;},150);});},250);};close.onclick=()=>{nav.hidden=true;nav.replaceChildren();open.hidden=false;close.hidden=true;};</script><script>(${generationFixture.toString()})();</script></body></html>`);
     return;
   }
   const extractionPage=jobFixtureResponse(request.headers.host?.split(':')[0],request.url);
@@ -139,7 +136,7 @@ const fixture = guest => `<!doctype html><html><head><meta name="viewport" conte
 const sidebarHistory=document.getElementById('history'), sidebarOpen=document.getElementById('sidebar-open'), sidebarClose=document.getElementById('sidebar-close');
 sidebarOpen.addEventListener('click',()=>{sidebarHistory.replaceChildren(...${JSON.stringify(savedChats)}.map(chat=>{const link=document.createElement('a');link.href=chat.url;link.textContent=chat.title;if(chat.pinned)link.dataset.pinned='true';link.style.display='block';link.addEventListener('click',event=>{if(link.origin===location.origin && /^\\/c\\//.test(link.pathname)){event.preventDefault();window.history.pushState({},'',link.pathname);dispatchEvent(new PopStateEvent('popstate'));}});return link}));sidebarHistory.hidden=false;sidebarOpen.hidden=true;sidebarClose.hidden=false;});
 sidebarClose.addEventListener('click',()=>{sidebarHistory.hidden=true;sidebarHistory.replaceChildren();sidebarOpen.hidden=false;sidebarClose.hidden=true;});
-</script><script>(${queueFixtureScript.toString()})();</script></body></html>`;
+</script><script>(${chatFixtureScript.toString()})();(${generationFixture.toString()})();</script></body></html>`;
 
 try {
   const port = await until(async () => {
@@ -209,6 +206,12 @@ try {
   };
   const state = () => read('document.getElementById("connection").dataset.state');
   await until(() => read('document.documentElement.dataset.studioReady === "true"'), 'combined workspace startup');
+  if (process.argv.includes('--generation-only')) {
+    const checks = await checkGenerationUI({ cdp, panel, read, click, evaluate, until, targets, session, artifacts, workerSession });
+    assert.deepEqual(errors, []);
+    await writeFile(join(artifacts, 'generation-results.json'), JSON.stringify({ fixtureOnly: true, checks }, null, 2));
+    console.log('Document generation browser checks passed.');
+  } else {
   assert.equal(await read('document.querySelectorAll(".job-request").length'), 0, 'real queue starts empty');
   await click('#review-another'); await click('#account-toggle'); await click('#profile-details'); await click('#reset-examples');
   await read('if (document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
@@ -228,6 +231,9 @@ try {
   assert.equal(await evaluate(deepseekSession, 'document.getElementById("fixture-cookie-banner").hidden'), false, 'cookie choice is left to the user on first use');
   await cdp.send('Page.bringToFront', {}, panel);
   await read('Promise.all(document.getAnimations().filter(animation=>Number.isFinite(animation.effect.getComputedTiming().endTime)).map(animation=>animation.finished.catch(()=>{})))');
+  await until(() => evaluate(deepseekSession, '!document.documentElement.inert'), 'DeepSeek cookie controls are interactive');
+  await read('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');
+  await evaluate(deepseekSession, 'new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');
   const cookieButton = await evaluate(deepseekSession, '(()=>{const r=document.getElementById("fixture-cookie-reject").getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2}})()');
   const framePosition = await read('(()=>{const r=document.getElementById("deepseek-frame").getBoundingClientRect();return{x:r.x,y:r.y}})()');
   await cdp.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: framePosition.x + cookieButton.x, y: framePosition.y + cookieButton.y }, panel);
@@ -303,6 +309,8 @@ try {
   const frameSession = await session(iframeTarget.targetId);
   const workspace = await checkWorkspaceUI({ cdp, panel, read, click, frameSession, deepseekSession, evaluate, artifacts, until });
   if (process.argv.includes('--workspace-only')) {
+    workspace.checks.push(...await checkDeepseekRecoveryUI({ cdp, panel, read, click, evaluate, until, frameSession, targets, session }));
+    workspace.checks.push(...await checkGenerationUI({ cdp, panel, read, click, evaluate, until, targets, session, artifacts, workerSession }));
     assert.deepEqual(errors, []);
     const report = { fixtureOnly: true, workspaceOnly: true, workspace };
     await writeFile(join(artifacts, 'workspace-results.json'), JSON.stringify(report, null, 2));
@@ -441,21 +449,6 @@ try {
   const extraction=await checkJobReader({cdp,id,sourceSession,dockSession,evaluate,until});
   const shortcut = await checkReadPageShortcut({cdp,id,workerSession,sourceSession,dockSession,evaluate,until,session});
   dockSession = shortcut.dockSession;
-  let bulkQueue = { checks: [], fixtureOnly: true, liveAccount: false, submissions: 0, paused: true };
-  let tabQueue = { ...bulkQueue };
-  let editorBoundaries = { checks: [], fixtureOnly: true, liveAccount: false, paused: true };
-  let manualQueue;
-  let addChat;
-  if (MANUAL_QUEUE_MODE) {
-    manualQueue = await checkManualPromptUI({ cdp, dockSession, evaluate, until, session });
-    addChat = await checkAddChatUI({ cdp, dockSession, evaluate, until, session });
-  } else {
-    bulkQueue = await checkBulkQueue({cdp,id,workerSession,sourceSession,dockSession,panelSession:panel,evaluate,until,session});
-    dockSession = bulkQueue.dockSession;
-    tabQueue = await checkTabQueue({ cdp, id, workerSession, dockSession, evaluate, until, session });
-    dockSession = tabQueue.dockSession;
-  }
-  editorBoundaries = await checkEditorBoundaries({ cdp, id, evaluate, until, session, contexts });
   await evaluate(dockSession, 'if (document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
   await until(async () => await evaluate(dockSession, 'document.getElementById("connection")?.dataset.state') === 'ready', 'native dock ChatGPT readiness');
   const dockContexts = await evaluate(workerSession, 'chrome.runtime.getContexts({contextTypes:["SIDE_PANEL"]})');
@@ -465,11 +458,6 @@ try {
   assert.deepEqual(errors, []);
   const report = { browser: version.product, fixtureOnly: true, liveAuthentication: false, requests, layouts, workspace, extraction,
     shortcut: { assigned: shortcut.shortcut, warmDock: shortcut.warmDock, coldDock: shortcut.coldDock, physicalKeyboard: shortcut.physicalKeyboard },
-    bulkQueue: {checks:bulkQueue.checks,fixtureOnly:bulkQueue.fixtureOnly,liveAccount:bulkQueue.liveAccount,submissions:bulkQueue.submissions},
-    tabQueue: { checks: tabQueue.checks, fixtureOnly: tabQueue.fixtureOnly, liveAccount: tabQueue.liveAccount, submissions: tabQueue.submissions },
-    editorBoundaries,
-    ...(manualQueue ? { manualQueue } : {}),
-    ...(addChat ? { addChat } : {}),
     checks: ['unpacked extension loads', 'native dock opens from toolbar', 'dock survives tab navigation', 'installed header rule scope', 'embedding with restrictive response headers',
       'frame readiness', 'current conversation in new tab', 'reload keeps conversation', 'new chat', 'guest sign-in tab', 'embedded sign-in handoff',
       'job-page-only keyword highlighting with temporary page access', 'literal and cross-element phrases preserve page markup',
@@ -477,6 +465,7 @@ try {
       'slow-loading recovery', 'retry', 'narrow layouts', 'no runtime errors'] };
   await writeFile(join(artifacts, 'chrome-results.json'), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report, null, 2));
+  }
   }
 } catch (error) {
   await mkdir(artifacts, { recursive: true });

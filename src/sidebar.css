@@ -48,6 +48,9 @@ svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width:
 .provider-pane { display: flex; flex-direction: column; position: relative; flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
 .deepseek-controls { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px; }
 .provider-note { font-size: 11px; color: var(--muted); padding: 0 12px 8px; }
+.deepseek-connection { display: flex; align-items: center; gap: 8px; padding: 8px 12px; flex-shrink: 0; }
+.deepseek-connection .provider-note { flex: 1; padding: 0; }
+.deepseek-connection .button { flex-shrink: 0; }
 .chat-toolbar-shell { position: absolute; top: 0; left: 0; right: 0; height: 12px; z-index: 5; }
 .chat-toolbar-shell[data-pinned="true"] { position: relative; inset: auto; height: auto; flex-shrink: 0; }
 .chat-toolbar-shell[data-pinned="true"] .chat-toolbar-reveal { display: none; }
@@ -152,7 +155,6 @@ textarea.input { min-height: 100px; line-height: 1.7; font-size: 11px; resize: v
 .settings-scroll kbd { font: inherit; font-weight: 600; }
 .settings-tabs button[aria-selected="true"] { border-bottom-color: var(--accent); color: var(--accent); }
 .request-metadata dd { overflow-wrap: anywhere; }
-.state-pill[data-state="unsent"], .state-pill[data-state="uncertain"], .state-pill[data-state="invalid-output"], .state-pill[data-state="error-response"] { color: var(--muted); }
 .settings-scroll { overflow: auto; padding: 20px 16px; flex: 1; min-height: 0; }
 .settings-scroll h3 { font-size: 14px; }
 .settings-scroll h3.settings-subheading { margin-top: 24px; }
@@ -187,18 +189,15 @@ textarea.input { min-height: 100px; line-height: 1.7; font-size: 11px; resize: v
 .request-title p { color: var(--muted); font-size: 10px; margin-top: 1px; overflow-wrap: anywhere; }
 .state-pill { display: inline-flex; align-items: center; gap: 4px; background: var(--tint); color: var(--accent); padding: 3px 6px; font-size: 9px; border-radius: 5px; white-space: nowrap; }
 .state-pill svg { width: 10px; height: 10px; }
-.state-pill[data-state="saving"] { background: var(--amber-bg); color: var(--amber); }
 .state-pill[data-state="queued"] { background: var(--surface); color: var(--muted); }
 .request-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; color: var(--muted); font-size: 10px; margin: 10px 0 9px; }
 .example-saved { display: inline-flex; align-items: center; gap: 4px; color: var(--accent); margin-left: auto; }
 .example-saved svg { width: 11px; height: 11px; }
-.request-note { color: var(--amber); font-size: 10px; margin-bottom: 10px; }
 .request-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 .request-actions .button { font-size: 10px; padding: 6px 9px; min-height: 30px; }
+.generation-status { margin: 0 0 10px; font-size: 11px; line-height: 1.5; color: var(--muted); overflow-wrap: anywhere; }
 .review-another { flex: 1; min-width: 0; min-height: 38px; }
-#start-queue { flex: 0 0 auto; }
-.state-pill[data-state="attention"], .state-pill[data-state="interrupted"] { color: var(--amber); background: var(--amber-bg); }
-.request-error { overflow-wrap: anywhere; }
+.state-pill[data-state="attention"] { color: var(--amber); background: var(--amber-bg); }
 .empty-state { padding: 24px 12px 30px; text-align: center; }
 .empty-icon { display: grid; place-items: center; width: 43px; height: 43px; background: var(--tint); color: var(--accent); border-radius: 13px; margin: 0 auto 13px; }
 .empty-state h3 { font-size: 13px; margin-bottom: 5px; }
@@ -312,6 +311,8 @@ body:has(#capture-current-job:not([hidden])) { --dock-capture-height: 60px; }
 .request-actions { padding-top: 9px; margin-top: 9px; gap: 5px; }
 .request-actions .button { padding: 4px 7px; min-height: 28px; background: var(--surface); }
 .request-actions .button:hover { border-color: var(--accent); }
+.request-actions .generation-action { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.request-actions .generation-action:hover:enabled { background: color-mix(in srgb, var(--accent) 90%, var(--text)); }
 .request-updated { margin-left: auto; }
 .request-job-section { padding-bottom: 14px; }
 .request-job-section h3 { font-size: 13px; }

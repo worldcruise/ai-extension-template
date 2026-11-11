@@ -1,0 +1,320 @@
+
+> tech-int-chat@2.1.1 test
+> node --test tests/*.test.js
+
+TAP version 13
+# Subtest: focused-panel copy receives the exact final text and does not open offscreen
+ok 1 - focused-panel copy receives the exact final text and does not open offscreen
+  ---
+  duration_ms: 1.927252
+  type: 'test'
+  ...
+# Subtest: panel rejection uses offscreen with the same payload, not a rebuilt prompt
+ok 2 - panel rejection uses offscreen with the same payload, not a rebuilt prompt
+  ---
+  duration_ms: 0.422527
+  type: 'test'
+  ...
+# Subtest: panel copy remains usable even when offscreen APIs are unavailable
+ok 3 - panel copy remains usable even when offscreen APIs are unavailable
+  ---
+  duration_ms: 0.210487
+  type: 'test'
+  ...
+# Subtest: no panel and unavailable offscreen return a useful failure instead of success
+ok 4 - no panel and unavailable offscreen return a useful failure instead of success
+  ---
+  duration_ms: 0.251128
+  type: 'test'
+  ...
+# Subtest: an unresolved native panel write is not raced against an offscreen fallback
+ok 5 - an unresolved native panel write is not raced against an offscreen fallback
+  ---
+  duration_ms: 12.670661
+  type: 'test'
+  ...
+# Subtest: delayed negative panel receipt cannot start an already expired offscreen write
+ok 6 - delayed negative panel receipt cannot start an already expired offscreen write
+  ---
+  duration_ms: 0.343548
+  type: 'test'
+  ...
+# Subtest: offscreen failure codes survive the bridge without exposing arbitrary data
+ok 7 - offscreen failure codes survive the bridge without exposing arbitrary data
+  ---
+  duration_ms: 1.092746
+  type: 'test'
+  ...
+# Subtest: a mismatched panel acknowledgment is never accepted as clipboard success
+ok 8 - a mismatched panel acknowledgment is never accepted as clipboard success
+  ---
+  duration_ms: 0.235876
+  type: 'test'
+  ...
+# Subtest: successful ChatGPT submission preserves a failed clipboard receipt for the panel
+ok 9 - successful ChatGPT submission preserves a failed clipboard receipt for the panel
+  ---
+  duration_ms: 1.597075
+  type: 'test'
+  ...
+# Subtest: successful clipboard receipt is durable but clipboard text is never persisted
+ok 10 - successful clipboard receipt is durable but clipboard text is never persisted
+  ---
+  duration_ms: 0.900696
+  type: 'test'
+  ...
+# Subtest: failed ChatGPT insertion still preserves the already completed clipboard outcome
+ok 11 - failed ChatGPT insertion still preserves the already completed clipboard outcome
+  ---
+  duration_ms: 0.308374
+  type: 'test'
+  ...
+# Subtest: missing or malformed clipboard receipts cannot masquerade as successful copying
+ok 12 - missing or malformed clipboard receipts cannot masquerade as successful copying
+  ---
+  duration_ms: 0.11254
+  type: 'test'
+  ...
+# Subtest: clipboard bridge sends the exact full text, then closes the helper
+ok 13 - clipboard bridge sends the exact full text, then closes the helper
+  ---
+  duration_ms: 2.194245
+  type: 'test'
+  ...
+# Subtest: existing offscreen document is reused rather than double-created
+ok 14 - existing offscreen document is reused rather than double-created
+  ---
+  duration_ms: 0.271769
+  type: 'test'
+  ...
+# Subtest: clipboard rejects foreign extensions, Meet, iframes and lookalike origins
+ok 15 - clipboard rejects foreign extensions, Meet, iframes and lookalike origins
+  ---
+  duration_ms: 0.494525
+  type: 'test'
+  ...
+# Subtest: malformed or oversized clipboard requests never open a helper
+ok 16 - malformed or oversized clipboard requests never open a helper
+  ---
+  duration_ms: 0.395606
+  type: 'test'
+  ...
+# Subtest: concurrent copies serialize the complete create/write/close lifecycle
+ok 17 - concurrent copies serialize the complete create/write/close lifecycle
+  ---
+  duration_ms: 5.683469
+  type: 'test'
+  ...
+# Subtest: clipboard queue has a finite request bound
+ok 18 - clipboard queue has a finite request bound
+  ---
+  duration_ms: 1.903757
+  type: 'test'
+  ...
+# Subtest: expired queued work never overwrites the clipboard later
+ok 19 - expired queued work never overwrites the clipboard later
+  ---
+  duration_ms: 0.534655
+  type: 'test'
+  ...
+# Subtest: slow offscreen creation drops expired writes and cleans up
+ok 20 - slow offscreen creation drops expired writes and cleans up
+  ---
+  duration_ms: 0.25853
+  type: 'test'
+  ...
+# Subtest: permission failure does not poison the next clipboard operation
+ok 21 - permission failure does not poison the next clipboard operation
+  ---
+  duration_ms: 0.5844
+  type: 'test'
+  ...
+# Subtest: negative, mismatched and transport-error acknowledgments are not reported as copied
+ok 22 - negative, mismatched and transport-error acknowledgments are not reported as copied
+  ---
+  duration_ms: 0.668968
+  type: 'test'
+  ...
+# Subtest: offscreen response timeout releases the queue and closes the helper
+ok 23 - offscreen response timeout releases the queue and closes the helper
+  ---
+  duration_ms: 5.018547
+  type: 'test'
+  ...
+# Subtest: copy acknowledgment precedes Send and request replay copies/sends only once
+ok 24 - copy acknowledgment precedes Send and request replay copies/sends only once
+  ---
+  duration_ms: 4.619627
+  type: 'test'
+  ...
+# Subtest: normal/detail/STAR/coding/custom/follow-up paths copy exactly their final send string
+ok 25 - normal/detail/STAR/coding/custom/follow-up paths copy exactly their final send string
+  ---
+  duration_ms: 3.274241
+  type: 'test'
+  ...
+# Subtest: clipboard rejection or API exception does not block or change submission
+ok 26 - clipboard rejection or API exception does not block or change submission
+  ---
+  duration_ms: 1.678607
+  type: 'test'
+  ...
+# Subtest: clipboard timeout continues once; late success never sends a second prompt
+ok 27 - clipboard timeout continues once; late success never sends a second prompt
+  ---
+  duration_ms: 6.728382
+  type: 'test'
+  ...
+# Subtest: cancelling while clipboard is pending prevents subsequent ChatGPT insertion
+ok 28 - cancelling while clipboard is pending prevents subsequent ChatGPT insertion
+  ---
+  duration_ms: 2.021104
+  type: 'test'
+  ...
+# Subtest: invalid prompt/identity never invokes clipboard or Send
+ok 29 - invalid prompt/identity never invokes clipboard or Send
+  ---
+  duration_ms: 0.838703
+  type: 'test'
+  ...
+# Subtest: content handshake advertises v2.1.1 clipboard support
+ok 30 - content handshake advertises v2.1.1 clipboard support
+  ---
+  duration_ms: 0.603528
+  type: 'test'
+  ...
+# Subtest: real worker listener routes clipboard separately from storage and offscreen replies
+ok 31 - real worker listener routes clipboard separately from storage and offscreen replies
+  ---
+  duration_ms: 8.576055
+  type: 'test'
+  ...
+# Subtest: content controller keeps the exact clipboard error code for the durable job
+ok 32 - content controller keeps the exact clipboard error code for the durable job
+  ---
+  duration_ms: 1.316863
+  type: 'test'
+  ...
+# Subtest: normalizes sender-scoped row identity, not a claimed tab ID
+ok 33 - normalizes sender-scoped row identity, not a claimed tab ID
+  ---
+  duration_ms: 2.076967
+  type: 'test'
+  ...
+# Subtest: new revisions replace rows; stale/out-of-order revisions cannot roll them back
+ok 34 - new revisions replace rows; stale/out-of-order revisions cannot roll them back
+  ---
+  duration_ms: 0.897892
+  type: 'test'
+  ...
+# Subtest: retrying a whole patch is idempotent
+ok 35 - retrying a whole patch is idempotent
+  ---
+  duration_ms: 0.585422
+  type: 'test'
+  ...
+# Subtest: caption resegmentation removes obsolete suffixes and rejects old suffix replay
+ok 36 - caption resegmentation removes obsolete suffixes and rejects old suffix replay
+  ---
+  duration_ms: 0.706684
+  type: 'test'
+  ...
+# Subtest: role-only revisions propagate
+ok 37 - role-only revisions propagate
+  ---
+  duration_ms: 0.946846
+  type: 'test'
+  ...
+# Subtest: clear generation rejects in-flight pre-clear captions
+ok 38 - clear generation rejects in-flight pre-clear captions
+  ---
+  duration_ms: 0.244438
+  type: 'test'
+  ...
+# Subtest: two source documents with the same raw ID do not overwrite each other
+ok 39 - two source documents with the same raw ID do not overwrite each other
+  ---
+  duration_ms: 0.609558
+  type: 'test'
+  ...
+# Subtest: malformed, oversized, missing-protocol and negative-revision patches fail
+ok 40 - malformed, oversized, missing-protocol and negative-revision patches fail
+  ---
+  duration_ms: 0.436097
+  type: 'test'
+  ...
+# Subtest: tab identity is derived from trusted sender metadata
+ok 41 - tab identity is derived from trusted sender metadata
+  ---
+  duration_ms: 0.45796
+  type: 'test'
+  ...
+# Subtest: serialized operations keep order and recover after a rejection
+ok 42 - serialized operations keep order and recover after a rejection
+  ---
+  duration_ms: 11.447172
+  type: 'test'
+  ...
+# Subtest: duplicate request ID returns the same running AND completed result
+ok 43 - duplicate request ID returns the same running AND completed result
+  ---
+  duration_ms: 17.632894
+  type: 'test'
+  ...
+# Subtest: different click IDs with the same in-flight payload are coalesced
+ok 44 - different click IDs with the same in-flight payload are coalesced
+  ---
+  duration_ms: 15.664659
+  type: 'test'
+  ...
+# Subtest: reusing a request ID for different content is rejected
+ok 45 - reusing a request ID for different content is rejected
+  ---
+  duration_ms: 10.099739
+  type: 'test'
+  ...
+# Subtest: transport failure after dispatch is uncertain, never auto-replayed
+ok 46 - transport failure after dispatch is uncertain, never auto-replayed
+  ---
+  duration_ms: 11.314108
+  type: 'test'
+  ...
+# Subtest: explicit pre-click failure from adapter is safe and actionable
+ok 47 - explicit pre-click failure from adapter is safe and actionable
+  ---
+  duration_ms: 10.742307
+  type: 'test'
+  ...
+# Subtest: worker recovery distinguishes pre-dispatch from ambiguous dispatch
+ok 48 - worker recovery distinguishes pre-dispatch from ambiguous dispatch
+  ---
+  duration_ms: 0.404279
+  type: 'test'
+  ...
+# Subtest: synchronous handler exceptions are recorded and release the busy lock
+ok 49 - synchronous handler exceptions are recorded and release the busy lock
+  ---
+  duration_ms: 5.839524
+  type: 'test'
+  ...
+# Subtest: coalesced request aliases survive a lost acknowledgment beyond the double-click window
+ok 50 - coalesced request aliases survive a lost acknowledgment beyond the double-click window
+  ---
+  duration_ms: 16.163691
+  type: 'test'
+  ...
+# Subtest: empty caption groups cannot create unbounded tombstone-only records
+ok 51 - empty caption groups cannot create unbounded tombstone-only records
+  ---
+  duration_ms: 0.353061
+  type: 'test'
+  ...
+1..51
+# tests 51
+# suites 0
+# pass 51
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 163.921389

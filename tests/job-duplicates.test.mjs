@@ -39,11 +39,11 @@ test('URL normalization removes tracking noise and retains distinct job identifi
   for (const value of ['', 'not a URL', 'javascript:alert(1)', 'chrome://extensions', null]) assert.equal(duplicateJobUrl(value), '');
 });
 
-test('checks include recoverable and uncertain queue entries but exclude examples, cancelled and terminal failures', () => {
-  for (const state of ['queued', 'preparing', 'sending', 'generating', 'validating', 'saving', 'ready', 'unsent', 'interrupted', 'uncertain', 'attention']) {
+test('checks include existing jobs in any legacy state but exclude examples and cancelled jobs', () => {
+  for (const state of ['queued', 'preparing', 'sending', 'generating', 'validating', 'saving', 'ready', 'unsent', 'interrupted', 'uncertain', 'attention', 'invalid-output', 'error-response']) {
     assert.ok(findExistingJob(input(), [request({ state })]), state);
   }
-  for (const state of ['cancelled', 'invalid-output', 'error-response']) assert.equal(findExistingJob(input(), [request({ state })]), null);
+  for (const state of ['cancelled']) assert.equal(findExistingJob(input(), [request({ state })]), null);
   assert.equal(findExistingJob(input(), [request({ isExample: true })]), null);
   assert.equal(findExistingJob(input({}, 'other-candidate'), [request()]), null);
 });

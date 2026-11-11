@@ -93,15 +93,29 @@
   function post(data) {
     if (nonce) window.parent.postMessage({ channel, nonce, ...data }, extensionOrigin);
   }
-  const queueAdapter = globalThis.AiAgentChatQueue?.createPageAdapter(post);
-  const historyReader = globalThis.AiAgentChatHistory.createReader({ getConnection: () => queueAdapter?.inspectConnection() || {} });
+  // Read-only UI state: never insert text, submit, or read conversation replies.
+  const visible = node => Boolean(node?.getClientRects().length && getComputedStyle(node).visibility !== 'hidden');
+  function inspectView() {
+    const candidates = [...document.querySelectorAll('#prompt-textarea, [data-testid="prompt-textarea"], form textarea, form [contenteditable="true"]')];
+    const editor = candidates.map(node => node.matches('textarea,[contenteditable="true"]') ? node : node.querySelector('textarea,[contenteditable="true"]')).find(visible);
+    const signedOut = [...document.querySelectorAll('form[data-logged-out], [data-testid="login-button"], [data-testid="signup-button"], [data-testid="sign-in-button"], [data-testid="logged-out"], a[href*="/auth/login"], a[href*="/auth/signup"]')].some(visible) ||
+      [...document.querySelectorAll('button, a, [role="button"]')].some(node => visible(node) && /^(?:log in|sign in|sign up|create account)$/i.test((node.getAttribute('aria-label') || node.textContent).trim()));
+    const signedIn = Boolean(document.querySelector('[data-testid="accounts-profile-button"], [data-testid="profile-button"], [data-testid="user-menu-button"], [data-testid="profile-menu-button"], [data-testid="account-menu-trigger"]')) ||
+      [...document.querySelectorAll('button[aria-label*="profile" i], button[aria-label*="account" i], [role="button"][aria-label*="profile" i]')].some(visible);
+    const attachment = editor?.closest('form')?.querySelector('[data-testid="file-thumbnail"], [data-testid="attachment-preview"], [data-file-id]');
+    return { composerPresent: Boolean(editor), composerReady: Boolean(editor && !editor.disabled && !editor.readOnly),
+      hasDraft: Boolean((editor?.value || editor?.textContent || '').replace(/[\u200b\ufeff]/g, '').trim() || attachment),
+      busy: [...document.querySelectorAll('[data-is-streaming="true"], [data-testid="stop-button"], button[aria-label*="stop generating" i], button[aria-label*="stop streaming" i]')].some(visible),
+      authState: signedOut ? 'signed-out' : signedIn ? 'signed-in' : 'unknown' };
+  }
+  const historyReader = globalThis.AiAgentChatHistory.createReader({ getConnection: inspectView });
 
   function sendState(force = false) {
     if (!nonce) return;
-    const connection = queueAdapter?.inspectConnection();
+    const connection = inspectView();
     const ready = connection?.composerPresent === true;
     const guest = connection?.authState === 'signed-out' || Boolean(document.querySelector('form[data-logged-out]'));
-    const basic = { type: 'state', url: location.origin + location.pathname, ready, guest, authState: connection?.authState, buildId: connection?.buildId };
+    const basic = { type: 'state', url: location.origin + location.pathname, ready, guest, authState: connection?.authState };
     const signature = JSON.stringify([basic,connection?.hasDraft,connection?.busy]);
     if (!force && signature === lastConnectionState) return;
     lastConnectionState = signature;
@@ -129,13 +143,6 @@
       else if (event.data.action === 'inspect') void historyReader.inspect({readOnly:event.data.data?.readOnly === true}).then(reply).catch(() => post({type:'history.reply',operationId,ok:false}));
       else if (event.data.action === 'open') void historyReader.open(event.data.data || {}, reply).catch(() => post({type:'history.reply',operationId,ok:false}));
       return;
-    }
-    if (event.data.type === 'queue.authorize') queueAdapter?.authorize(operationId, event.data.allowed);
-    if (event.data.type === 'queue.command' && queueAdapter) {
-      queueAdapter.execute(event.data.action, event.data.data, operationId).then(
-        value => post({ type: 'queue.reply', operationId, ok: true, value }),
-        error => post({ type: 'queue.reply', operationId, ok: false, error: { code: error.code || 'chat-error', message: error.message.slice(0, 2000), diagnostics: error.diagnostics } })
-      );
     }
   });
 
@@ -181,5 +188,5 @@
   window.addEventListener('popstate', () => sendState(true));
   window.addEventListener('resize', scheduleUpdate);
   document.addEventListener('input', scheduleUpdate, true);
-  window.addEventListener('pagehide', () => { queueAdapter?.dispose(); observer.disconnect(); clearTimeout(timer); clearTimeout(stateTimer); });
+  window.addEventListener('pagehide', () => { observer.disconnect(); clearTimeout(timer); clearTimeout(stateTimer); });
 })();

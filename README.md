@@ -1,333 +1,246 @@
 # AI Agent Template
 
-A Chrome Manifest V3 extension with an **Application Tracker dock** and ChatGPT / DeepSeek chat.
-Current version: **0.5.0**. See [CHANGELOG.md](CHANGELOG.md) for the checkpoint details.
-Click the bottom status bar to lift it and reveal chat beneath it. Click the same
-raised bar to return to the job workspace. Only one accordion is expanded at a
-time: opening chat hides all job content, and selecting Job form or Queue closes
-chat. Collapsing keeps the loaded chat at the same viewport size off-screen,
-with input and focus disabled until expansion. Both headers share the same height and background. The former
-Resume Studio / Chat tabs have been removed. Collapse chat to use the full dock.
-The padded Job form / Queue row is also an accordion header. Its chevron or empty
-area switches between job content and chat while preserving drafts. Candidate
-selection and profile import are available under **User menu → Candidate profile**.
-Open the user-icon menu in the bottom status bar and choose **ChatGPT** or **DeepSeek** under Chat provider. The
-selection is saved on this device; both frames stay mounted to preserve drafts.
-DeepSeek loads on first selection and uses your separate DeepSeek browser session.
-Use **Open / sign in to DeepSeek** if sign-in or chat is blocked inside the panel,
-then reload after signing in. DeepSeek has the same hover toolbar as ChatGPT:
-New chat, reload, native chat search and loaded-history Up/Down navigation, text size, open
-the current conversation in a tab, and a separately saved pin preference.
-Drafts and active responses block navigation and reload. History uses only native
-loaded conversation links; no prompt insertion or sending is performed.
-Automatic sending is disabled. Add saves the job and copies its prompt, keeping
-your selected provider. Paste and send manually when ready. A saved job can be
-connected to the current conversation in either provider from Details. Open chat
-on the job reopens that link, preserving draft and active-response guards.
-DeepSeek sending and resume response capture are not integrated yet. Live DeepSeek
-embedding and sign-in need verification with your account.
-The chat pane uses your browser sessions. The queue adapts
-`baseline/application-tracker-queue-demo.html` and the sibling
-`ApplicationTracker_v2.1` project's compact job cards, labelled actions,
-job-description-first details, and grouped forms. Search by company or role and
-filter by status; the selected candidate scopes the list. Go to apply opens the
-saved listing, and View resume opens its local preview. Existing job capture,
-profile import, templates, and manual prompt copying remain connected to storage.
-The **Documents** form accepts pasted or imported resume JSON plus an optional
-cover letter. It validates the resume against the saved candidate and job, then
-marks the job Ready. Cancel leaves the stored documents unchanged; a stale editor
-cannot overwrite a newer job update. Saved delivery history is retained.
-The sibling project's autofill engine and document export pipeline are not part
-of this UI adaptation.
+A Chrome Manifest V3 extension with a docked job form, application queue, and
+expandable ChatGPT / DeepSeek chat. Current version: **0.6.2**.
 
-Studio includes JSON candidate-profile import, job-description extraction,
-template/prompt previews, request details, resume previews, and JSON copy.
-Profiles, immutable queued inputs, captured replies, results, and company chat
-links are saved locally in IndexedDB. **Add to queue** saves the job and its exact
-prompt, copies it, and switches to your selected Chat provider. It never inserts
-or submits the prompt. Jobs remain queued for manual sending; existing drafts and
-attachments stay untouched. Clipboard failure leaves the job saved without
-sending and opens Details with the prompt selected.
+Save jobs locally, then choose **Generate documents** to submit a prompt and
+collect the reply for review. ChatGPT uses a tab you already opened; DeepSeek
+opens a dedicated tab. Generation runs independently of the dock. **Add to queue** only saves
+the job; it does not change the clipboard or send anything.
 
-The retained, inactive automation adapter's fresh-chat preparation reuses an already empty Home or clicks ChatGPT's native
-New chat control without reloading the app. A missing control uses the guarded
-full-load fallback; a clicked but unconfirmed navigation stops without retrying.
-Readiness and Send controls wake from events. Matching complete JSON with enabled
-turn-level completion controls settles for 180 ms; ambiguous/non-JSON output
-keeps the 1.25 s quiet check. Streaming must stop, the delivery must match, and
-the result must still pass local validation and saving. ChatGPT's generation time
-is outside the extension's control.
+## Install and develop
 
-**Check existing company or URL** is on by default in Job form and is saved on
-this device. Add to queue and Ctrl+Enter check the selected candidate's existing
-queue entries and saved results. A matching company name or job URL shows
-**Already applied** with the matching list and stops before saving, copying, or
-sending. Company names ignore case and extra spaces; URLs ignore tracking
-parameters but keep distinct job IDs and hash routes. Example results, cancelled
-jobs, completed failures and base resumes are excluded. Turn the option off to
-intentionally add another job from the same company. There is no separate
-application-tracker store in the current runtime; saved results are checked here.
-
-Bulk Start/Continue/regeneration controls remain paused. Add creates no delivery
-attempt or send permission. Copy prompt
-on cards and in Details remains a clipboard-only action; it never resends a job.
-Saved results, Details, Review, preview, save retry, and cancellation remain
-available. PDF/DOCX export remains unavailable.
-
-ChatGPT stays mounted when switching views, preserving its conversation and composer.
-The bottom status bar holds chat, queue, and account controls. New chat, reload, and
-open-in-tab actions sit in a toolbar hidden by default. Hover over the top edge
-of Chat to slide it down; moving away hides it again. New chat (+) and reload sit
-on the left; text-size, open-in-tab, and pin controls sit on the right. Pin the toolbar
-to keep it open in its own row above ChatGPT across chat reloads and view switches.
-The iframe uses the remaining height, keeping its top content fully visible. This preference is saved
-on this device; unpin to restore hover behavior. A small downward chevron
-marks the hidden controls. Keyboard focus or a tap on the top edge also reveals
-them. Type in **Search chats** and press Enter or click its arrow. The query is
-passed directly to ChatGPT's or DeepSeek's native chat-history search input;
-results and selection stay in the provider's search UI. This searches through
-the provider rather than filtering only loaded sidebar titles. If necessary,
-the extension reveals the sidebar, recognizes attached shortcut labels, or uses
-ChatGPT's Ctrl/Cmd+K shortcut. Success requires a visible native search input
-that retains your query. An unavailable input keeps the query in the toolbar
-and shows an error; it never inserts a query into the message composer.
-
-Resume results still keep their originating conversation links in Details and
-Review. These saved request links are separate from the provider's native search.
-
-Stacked Up/Down controls immediately to the right of search browse each provider's
-loaded conversation history, skipping entries marked as pinned or grouped under
-Pinned. Down from a new or pinned chat opens the most recent regular conversation;
-Up stops at the most recent regular conversation and is disabled on new or pinned
-chats. The oldest loaded regular conversation disables Down. Navigation pauses
-while a draft or generation is active. Reading history restores the native sidebar's
-previous visibility. Both providers' arrows work with the native sidebar closed:
-history is briefly revealed when needed, read in native order, and restored to
-its previous visibility. DeepSeek retains the loaded list in panel memory when
-the sidebar removes its links. Each arrow rechecks fresh links, the current
-conversation, drafts, and generation. DeepSeek also recognizes its unlabeled
-top-left sidebar icon and waits for delayed history. Its arrows use native in-page
-navigation without reloading the iframe, preserving the current session and sidebar
-visibility. Mounted hidden links are reused without opening the sidebar. There is
-no automatic full-reload fallback; failures show a message in the toolbar. Native search uses
-the provider's own navigation behavior.
-
-DeepSeek cookie consent is remembered only after you make a choice in its cookie
-banner. On later loads, the same recognized button is selected automatically;
-the extension does not choose Accept or Reject for you. Choices stay in local
-extension storage. Custom checkbox preferences remain managed by DeepSeek and
-clear any earlier remembered generic action. Authentication cookies are untouched.
-
-Chat uses the full remaining panel height, with no Studio footer. Studio queue actions stay fixed
-below the scrolling content. Model and thinking settings are managed inside
-ChatGPT. Account controls open the real ChatGPT sign-in page; the Studio examples
-do not represent a connected account.
-
-Chat zoom icons on the right change the font size inside Chat from
-50% to 150% in 10% steps, preserving the iframe dimensions and viewport. New
-messages and the composer follow the selected text size. Resume template selection
-uses all eight original images from `baseline/thumbnails`, bundled locally in
-`assets/resume-templates`.
-Turning tailoring off keeps the job extraction fields and controls open, hides
-the prompt-template dropdown, and uses base-resume instructions. Turning it back
-on restores the prompt selection. The description field is labeled Job Description.
-Resume options & instructions starts collapsed; click its heading to expand it.
-
-Keyword highlighting applies only to job web pages. Use the Highlight switch
-beside the compact tab controls; Read page sits at the far right. Open the user
-menu → Settings → Keyword highlights to save keywords (one per line), color,
-case matching, and whole-word matching. Select Yellow, Green, Blue, Red, Purple,
-Orange, or Custom to edit a separate keyword list for that color. Switching colors
-keeps unsaved edits; **Save keywords** saves every list together (up to 200 keywords
-per color). The first color shown wins when the same keyword is in multiple lists;
-longer phrases at the same position take priority. Existing single-color settings
-keep their keywords in the matching group, with the previous Pink preset moving to
-Red and other custom colors preserved in Custom. These preferences stay on this device.
-Read page can request optional website access; the extension icon and shortcut
-also support Chrome's temporary access to the selected job page.
-Highlights use CSS text ranges, preserving page markup and editable fields,
-and update as job content changes. The dock and ChatGPT are never highlighted.
-
-Previous/Next switches the actual open tabs in the sidebar's associated browser
-window, wrapping at either end. The counter updates when tabs open, close, move,
-or become active. Company, job title, URL, and JD drafts are retained per tab while
-the panel is open. URLs fill from permitted page metadata; manually entered URLs
-are retained and included in queued request snapshots. Navigation uses tab IDs and
-positions. Read page fills Company, Job title, URL, and Job Description from the
-selected tab, including with tailoring off. On first use, its button requests
-optional HTTP/HTTPS website access through Chrome. Once approved, it continues
-the same read and works across job sites without another extension-icon click.
-Declining keeps the fields unchanged. Navigation while consent is pending cancels
-that read. Press
-**Ctrl+Shift+F** (**Command+Shift+F** on macOS) for the same action from the job
-page; it opens the sidebar and selects Job form automatically.
-The shortcut uses temporary active-tab access without requesting persistent website
-permission. Reading progress stays in the button; results fill the editable fields
-and actual errors open a dialog. There is no inline Read page status row.
-Open **User menu → Settings → Keyboard shortcuts** to see the current assignment
-and choose **Change shortcut** to customize it in Chrome. Existing Chrome assignments
-can keep the previous shortcut; Settings and the Read page tooltip show the actual binding.
-
-The **Queue** tab contains queued jobs and saved results. While the tracker
-or the embedded ChatGPT has focus, these sidebar shortcuts are available:
-
-| Shortcut | Action |
-| --- | --- |
-| Ctrl+Up | Collapse chat and focus the tracker |
-| Ctrl+Down | Expand chat |
-| Ctrl+Left | Previous browser tab (the `<` action) |
-| Ctrl+Right | Next browser tab (the `>` action) |
-| Ctrl+Enter | Save the prepared job, copy its prompt, and expand chat |
-
-Settings → Keyboard shortcuts lists these bindings. Ctrl+Enter uses the same job
-validation and Add action as the button, preserves the ChatGPT draft, and adds one
-request per key press. Dialogs keep their own keyboard controls. These bindings
-apply inside the sidebar; Read page remains Chrome’s browser shortcut.
-
-Page extraction combines JobPosting metadata, ATS/board selectors, embedded job JSON, and generic
-content-region ranking. Fields stay editable, and edits made during a read are
-preserved. See the [repository review and extraction notes](docs/job-extraction-review.md)
-for source pins, coverage, validation, and limits.
-
-For generation, open **Profile → Download example format**, fill the JSON with
-your own facts, and use **Import profile JSON**. Add jobs to copy and send each new
-request in Sidebar Chat. Bulk Start and recovery sending remain paused.
-Pause finishes the current response before stopping. Closing the sidebar preserves
-the queue and marks unresolved deliveries for reconciliation. Continue sending or
-Reconcile delivery handles one request only: it verifies the original prepared
-draft or reads the existing marked conversation. It never invents a new attempt
-or silently starts other jobs. Add remains available during collection.
-
-Completed invalid JSON and confirmed completed error responses are archived under
-**Completed failures** with raw captures and delivery history. They are not resent
-automatically. Timeouts, lost connections, and unacknowledged clicks remain
-uncertain and block more generation until reconciled. **Generate again** opens a
-deliberate regeneration dialog, preserves previous attempts, and queues a new
-attempt only after confirmation; sending still requires Start queue. **Retry save**
-only persists captured output. Review on a completed valid result opens its recorded
-conversation; Details is separate. A missing conversation reference never opens
-an unrelated chat. See [queue implementation notes](docs/chatgpt-queue.md).
-
-For the normal-tab workflow inspired by Multi-AI-Prompt, open **Settings → ChatGPT
-queue** and choose **ChatGPT tab** for connection inspection and the retained
-normal-tab recovery workflow. Add to queue always uses Sidebar Chat.
-The extension creates its own ChatGPT tab in this window and activates it to send;
-your personal ChatGPT tabs are preserved. Keep the sidebar open while it runs.
-**Sidebar Chat** remains available and is the default. The selected connection is
-saved locally and locked while a job runs; recovery uses the original connection.
-See the [reference review](baseline/multi-ai-prompt/README.md).
-
-If Chat works but the queue cannot recognize the signed-in account, open the user
-menu → **Check connection**. The check recognizes account controls, saved-chat
-links, and loaded conversations. For an unrecognized layout, **Use this signed-in
-session** confirms the current panel session after you check your account in Chat.
-Explicit sign-in prompts still block sending. A successful check restores jobs
-that were blocked before any send, without sending or retrying them automatically.
-The check runs inside this extension; no desktop app or browser-control extension
-is required. Install this extension and sign in separately in each browser profile
-where you use it; no other extension files or login data belong in the project.
-
-Highlight feedback appears in the toggle's hover hint. The fixed footer uses a
-compact queue row with icon controls; action messages remain available to screen
-readers and as a queue-row hover hint without taking up a separate status row.
-
-## Start
-
-Requires Node.js 24+ to run the checks and build. There are no package dependencies.
+Use Node.js 24 or newer. There are no package dependencies to install.
 
 ```powershell
 npm run build
 ```
 
-1. Open `chrome://extensions` and enable **Developer mode**.
-2. Choose **Load unpacked** and select this project's `dist/extension` folder.
-3. Pin **AI Agent Template**, then click its icon. The shortcut is **Alt+Shift+G**
-   on Windows/Linux or **Command+Shift+G** on macOS; customize it at
-   `chrome://extensions/shortcuts`.
-4. If needed, sign in to ChatGPT in a normal tab, return to the sidebar, and reload.
+Open `chrome://extensions`, enable Developer mode, select **Load unpacked**, and
+choose `dist/extension`. Pin the extension and click its icon to open the dock.
+After source changes, rebuild and reload the extension. Close and reopen an
+existing dock so it uses the updated scripts.
 
-The toolbar starts a new chat, reloads the current chat, or opens it in a normal
-tab. ChatGPT provides its own conversation history, model picker and composer.
-Queued generation submits prompts through the visible ChatGPT interface using
-your browser session. It stores the job inputs, captured result, and conversation
-link locally; the conversation itself is managed by ChatGPT.
+## Versioning
 
-Run `npm run build` and reload the extension after changing its source. You can
-also load the repository root directly during development.
+Use **MAJOR.MINOR.PATCH**; **misc** is an alias for patch, not a fourth number.
+The numbering follows [Semantic Versioning](https://semver.org/) with numeric
+components compatible with [Chrome's manifest rules](https://developer.chrome.com/docs/extensions/reference/manifest/version).
+
+| Change | Command | Increment |
+| --- | --- | --- |
+| Breaking compatibility with supported workflows, stored data, or import/export formats | `npm run version:major` | `X.Y.Z` → `(X+1).0.0` |
+| Add features while retaining supported behavior and data | `npm run version:minor` | `X.Y.Z` → `X.(Y+1).0` |
+| Miscellaneous fixes, UI polish, documentation, or internal maintenance | `npm run version:misc` | `X.Y.Z` → `X.Y.(Z+1)` |
+
+`npm run version:patch` is equivalent to `version:misc`. Before `1.0.0`, minor
+versions mark development milestones, including evolving workflows. The current
+milestone collects the dock, DeepSeek support, and per-job document generation;
+it does not imply live-provider compatibility has been verified.
+
+Write the pending changes under **Unreleased** in `CHANGELOG.md`, then run one
+version command for the highest-impact change in that release. It uses
+`package.json` as the source of truth, updates the manifest, both lockfile
+versions and this README, dates the changelog section in UTC, and rebuilds
+`dist/extension`. Major increments reset minor and patch; minor increments reset
+patch. Existing release entries remain unchanged. No commit, tag, or publication
+is performed. If the build fails, fix the error and run `npm run build` again;
+the version has already been updated.
+
+Use `npm run version:check` to check consistency. Builds reject mismatched
+versions; ordinary builds and local edits do not increment them. Source build
+metadata reads the manifest version, while each build records that version and
+a content fingerprint. These release numbers are separate from stored-data
+schema versions and the upstream `tech-int-chat` adapter version.
+
+## Workspace
+
+Click the bottom status bar to expand chat. Click it again to return to the job
+workspace. Job form and Queue share an accordion header; expanding one workspace
+collapses the other. The user icon in the status bar opens provider selection,
+candidate profiles, sign-in, and settings.
+
+Both provider frames stay mounted when switching views, preserving conversation
+and composer state. Collapsed chat keeps its viewport off-screen, with input and
+focus disabled until expansion. The frames use your existing browser sessions.
+
+Both chats have a toolbar with New chat, Reload, native chat search, Up/Down
+history navigation, text size, Open in tab, and a saved pin preference. Hover or
+focus the top edge to reveal it; pin it to keep it visible. History navigation
+uses native conversation links, skips pinned chats, and starts at the newest
+regular chat. Search forwards your query to the provider's own search UI.
+Drafts and active responses block navigation that would discard them.
+
+Choose ChatGPT or DeepSeek under **Settings → Chat settings** or in the user
+menu. **Open selected AI** focuses an existing ChatGPT tab or opens DeepSeek's
+home page. This selection also determines the provider for new document-generation
+runs. Existing runs stay with their original provider and conversation.
+
+DeepSeek remembers the cookie-banner choice you explicitly make. After an
+offline/online transition, it probes the embedded page and can retry a stuck
+load once. Recovery preserves healthy pages, drafts, unfinished sign-in input,
+active responses, and the current conversation. Reload and Reconnect remain
+available when the message box has not loaded.
+
+## Local jobs and documents
+
+Import a candidate JSON file from **User menu → Candidate profile**. The example
+download shows the supported fields. Profiles, job snapshots, documents, and
+connected chat URLs stay in IndexedDB on this device. Generation records retain
+their job/profile snapshot, prompt, progress, conversation link, and captured
+reply locally. Clicking Generate documents sends that snapshot to the selected
+provider through its website using your signed-in session.
+
+**Read page** extracts a job's company, title, URL, and description from the
+selected browser tab. Review or edit those fields, select the desired template
+preferences, and choose **Add to queue**. Writing preferences are included when
+you subsequently generate documents; the resume template controls preview style.
+
+**Add This Job in One Click** appears for HTTP/HTTPS pages absent from the
+selected candidate's list. It reads the page and saves the job, and remains
+available when chat is expanded. Website access may require Chrome's permission
+dialog. Extension shortcuts can use temporary active-tab access.
+
+**Check existing company or URL** is enabled by default. It checks the selected
+candidate's saved jobs before adding a duplicate. Company matching ignores case
+and extra spaces; URLs ignore tracking parameters while retaining job IDs and
+hash routes. Examples, cancelled jobs, and base resumes are excluded from the
+company check. Queue search and status filters do not change stored jobs.
+
+Saved job cards offer Details, Go to apply, Documents, resume preview, and
+cancellation where applicable. Details can connect the current ChatGPT or
+DeepSeek conversation, which can later be reopened from the job.
+
+For ChatGPT, open and sign in to a normal browser tab first. **Generate documents**
+uses the active ChatGPT tab, or the most recently used one if another site is
+active. It can append the job prompt to the conversation already open there.
+It does not create, reload, or navigate a ChatGPT tab. Only one job at a time
+can use a given tab. DeepSeek continues to open a dedicated tab.
+
+The ChatGPT adapter is based on `tech-int-chat` v2.1.5, retaining editor selection,
+readiness checks, cancellation, and bounded diagnostics. It replaces unsent
+draft text, inserts the prompt through native text input, verifies it, and
+presses Enter once. It never dispatches a paste event, avoiding ChatGPT's
+large-paste conversion to a text attachment. Existing attached files must be
+removed before submission. Already-posted prompts are observed rather than
+sent again. A disabled Send control is never bypassed with Enter.
+
+The matching assistant reply is collected automatically after generation ends.
+New prompts request one fenced JSON code panel containing both documents and
+ask the provider to check JSON/identifiers, candidate facts, and completeness
+in three passes. The extension independently validates the result before review.
+For new ChatGPT runs, capture reads the response's code block, including the
+current CodeMirror panel layout. It waits for streaming to stop, the block to
+settle, and the Send control to become ready. A final reply toolbar also signals
+completion when an empty composer keeps Send disabled. Thinking blocks, user
+prompts, and later turns are excluded. Multiple JSON blocks or invalid output
+remain available for review instead of being silently repaired.
+ChatGPT replies can be captured while its page has no saved conversation URL.
+The result must match the job and run in the extension's bound tab. Draft
+previews and editor mirrors do not count as posted user messages. If the provider
+does supply a conversation link, it is retained for reopening that chat.
+**Review documents** opens the captured resume and cover letter in Documents.
+Saving is required before they replace approved job documents. Invalid replies
+remain available for correction. **Stop tracking** stops extension monitoring;
+it does not stop an already-running response on the provider website.
+
+**Resume** continues a run after sign-in, connection, or page problems. Once a
+submission attempt is recorded, recovery only checks the same conversation and
+never resends. If the ChatGPT tab was closed, open that conversation yourself
+before resuming. Without a saved link, the unique run marker must still be
+visible in an open tab; otherwise import the documents manually. If preparation
+failed and you sent its prompt yourself in the opened
+tab, Resume recognizes that run's posted message and collects the reply without
+another submission. There is one run per job, with no bulk runner or automatic
+retries. Browser checks use local fixtures; live compatibility depends on each
+provider's markup and signed-in session.
+
+**Documents** accepts pasted or imported resume JSON and an optional cover
+letter. Validation checks the job and fixed candidate facts before marking the
+job Ready. Cancelling leaves saved documents unchanged, and stale edits cannot
+overwrite newer updates. Resume preview and JSON copy remain available;
+PDF/DOCX export is not implemented.
+
+Existing jobs, profiles, and documents are preserved. Old in-progress records
+without a saved resume appear as Needs attention; old records with saved resumes
+appear as Ready. No old runner, delivery, or recovery work resumes.
+
+## Shortcuts and highlights
+
+Ctrl+Up/Down switches between the job workspace and chat. Ctrl+Left/Right moves
+between browser tabs. Ctrl+Enter saves the job to the queue. Dialogs retain their
+own keyboard controls. The Read page shortcut defaults to Ctrl+Shift+F
+(Command+Shift+F on macOS); change it in Chrome's extension shortcut settings.
+
+Keyword highlights are configurable in Settings and apply only to job pages
+with granted access. They use literal matching and preserve page markup.
 
 ## Project map
 
 | Path | Purpose |
 | --- | --- |
-| `manifest.json` | Extension permissions, entry points and shortcut |
-| `index.html`, `src/sidebar.css`, `src/workspace.mjs` | Combined shell, themes, accessible tabs, and dialogs |
-| `src/sidebar.mjs` | Live ChatGPT frame loading/recovery and toolbar controls |
-| `src/chat-toolbar.mjs` | Shared hover toolbar and native provider search launcher |
-| `src/company-chats.mjs` | Saved company source links scoped to the selected candidate |
-| `src/resume-data.mjs` | Candidate format, prompt construction, and strict result/fact validation |
-| `src/manual-prompt.mjs`, `src/queue-mode.mjs` | Clipboard-only copy helpers and bulk sending policy; Add has a separate one-shot handoff |
-| `src/queue-store.mjs`, `src/resume-queue.mjs` | Transactional local queue, shared runner lock, capture recovery, terminal outcomes, and explicit regeneration |
-| `src/chatgpt-queue.js` | Isolated ChatGPT composer submission and matching response collection |
-| `src/chatgpt-tab-connection.mjs`, `src/chatgpt-tab.js` | Dedicated ChatGPT tab, content-script messaging, and reconnectable result collection |
-| `src/queue-connection-settings.mjs` | Saved Sidebar Chat / ChatGPT tab selection |
-| `src/browser-tabs.mjs` | Window-scoped open-tab navigation and live tab counts |
-| `src/job-page-evidence.mjs`, `src/job-site-adapters.mjs` | Read-only page evidence and ATS/board selector configurations |
-| `src/job-extraction-core.mjs`, `src/job-extraction-service.mjs` | Posting selection, normalization, and background read coordination |
-| `src/keyword-settings.mjs`, `src/keyword-matcher.js` | Local keyword preferences and literal matching |
-| `src/page-highlights.mjs`, `src/job-page-highlighter.js` | Opt-in job-page highlighting with temporary page access |
-| `src/studio.mjs`, `src/studio-examples.mjs` | Studio interactions and explicitly labeled example data |
-| `src/icons.mjs` | Locally bundled SVG icons; no remote script dependencies |
-| `src/service-worker.mjs` | Side-panel setup and frame rule registration |
-| `src/sidebar-protocol.mjs` | Frame message checks, conversation URLs and embed rule |
-| `src/chatgpt-frame.js` | Readiness/navigation signals and sign-in link handoff |
-| `scripts/build-extension.mjs` | Packages only runtime files into `dist/extension` |
-| `baseline/` | Original reference extensions; excluded from the build |
+| `manifest.json`, `index.html`, `src/sidebar.css` | Extension resources and dock UI |
+| `src/workspace.mjs`, `src/workspace-dock.mjs`, `src/studio.mjs` | Workspace navigation, forms, and local job actions |
+| `src/job-queue.mjs`, `src/queue-store.mjs` | Local job/profile/document persistence |
+| `src/generation-service.mjs`, `src/generation-store.mjs`, `src/generation-client.mjs` | Persistent per-job runs, tab ownership, and UI progress |
+| `src/generation-tab.js`, `src/generation-dom.js`, `src/generation-chatgpt.js`, `src/generation-deepseek.js` | Browser-tab input, submission receipt, and reply observation |
+| `src/chatgpt-submit-adapter.js`, `src/chatgpt-tabs.mjs` | Native plain-text input and Enter, plus selection of an already-open ChatGPT tab |
+| `src/generation-data.mjs` | Prompt envelopes, conversation URLs, and reply validation |
+| `src/manual-documents.mjs`, `src/queue-documents.mjs`, `src/resume-data.mjs` | Manual document import, editing, and validation |
+| `src/chatgpt-frame.js`, `src/sidebar.mjs`, `src/sidebar-protocol.mjs` | Embedded ChatGPT UI state and manual navigation |
+| `src/deepseek-frame.js`, `src/deepseek-toolbar.mjs`, `src/deepseek-recovery.mjs` | Embedded DeepSeek UI and connection recovery |
+| `src/chat-providers.mjs`, `src/native-chat-search.js`, `src/sidebar-history.js` | Provider selection, search, and native history |
+| `src/job-page-evidence.mjs`, `src/job-site-adapters.mjs`, `src/job-extraction-core.mjs` | Read-only job extraction |
+| `src/service-worker.mjs` | Side-panel setup, scoped frame rules, job-page commands, and run messaging |
+| `scripts/build-extension.mjs` | Runtime-only build in `dist/extension` |
+| `baseline/` | Reference projects, excluded from the extension build |
 
-The frame integration is adapted from the reference sidebar's architecture. Its
-header rule removes `X-Frame-Options` and `Content-Security-Policy` for ChatGPT
-subframe requests initiated by **this extension only**. Ordinary tabs and frames
-on other websites do not match. Keyword preferences use local extension storage.
-The tabs permission supplies the current page URL so **Add This Job in One Click**
-appears only for HTTP/HTTPS pages absent from the selected candidate’s job list.
-The button stays available above the chat accordion, reads the page, saves the job,
-and copies its prompt for manual sending. Tracking parameters do not create duplicates.
-Job reading and highlighting use scripting on the selected job page. Read page
-and one-click capture request optional HTTP/HTTPS website access only when clicked; Chrome's permission
-dialog controls approval. The extension icon and shortcut can instead use
-[temporary active-tab access](https://developer.chrome.com/docs/extensions/develop/concepts/activeTab).
-No backend service, API key, or OAuth setup is required.
+Embedding rules apply only to provider subframes initiated by this extension.
+No backend service, API key, or OAuth configuration is required. Provider
+embedding and sign-in still depend on each website's browser/session behavior.
 
-Embedding depends on the ChatGPT website and its current browser/session behavior.
-The frame stays visible during slow loading; **Open ChatGPT** and **Try again**
-provide recovery without treating a timeout as proof of logout.
-
-## Check
+## Checks
 
 ```powershell
 npm test
+node tests/chrome.mjs --workspace-only
 npm run test:browser
 ```
 
-The browser smoke test checks the combined workspace, candidate isolation, request
-snapshots, preview/copy actions, keyboard navigation, narrow layouts, themes, and
-preservation of the ChatGPT frame and composer across view changes. It also verifies
-the native side panel, connection recovery, JSON profile import, explicit bulk
-submission, draft preservation, contenteditable editing, terminal failures, durable
-company links, and recovery after closing a running sidebar without duplicate
-submission. The tab connection checks also cover a dedicated normal tab, early
-chat registration, personal-tab isolation, protected worker drafts, saved connection
-selection, and recovery using the same tab and delivery. It uses an isolated Chrome profile and local fixture pages,
-not your real ChatGPT account. Set `CHROME_PATH` if Chrome is not at a standard
-installation path. Screenshots and the smoke-test report go to `artifacts/`.
+Unit tests cover local storage behavior, preserved legacy data, document
+validation, duplicate checks, extraction, provider protocols, and build contents.
+Generation tests cover concurrent starts, persisted submission intent, sender
+binding, stale tab IDs, and validation failures.
+Chrome checks use an isolated profile and local fixture pages to verify dock
+layouts, keyboard controls, saved documents, chat navigation, draft preservation,
+DeepSeek recovery, and document generation with textarea/rich editors, delayed
+readiness, disappearing Send controls, reloads, and dock closure. They do not use
+a live account. Set `CHROME_PATH` if Chrome
+is not in a standard installation location. Reports and screenshots go to
+`artifacts/`.
 
-Runtime fingerprints are visible in **Settings > ChatGPT queue > Runtime diagnostics**
-and the connection dialog. The normal build writes a content fingerprint into
-`dist/extension/src/build-info.js`; other bundled runtime files are copied unchanged.
-A source checkout reports `source-unbuilt` and cannot authorize generation until
-built. Host and adapter fingerprints must match. This identifies reporting runtime
-revisions; source/build parity alone cannot identify Chrome's loaded revision.
+### Real editor checks
 
-Company/title snapshots carry provenance for user input, structured data, page
-extraction, profile fallback, or missing values. Historical records without evidence
-retain their labels and show an unknown historical source. No origin is inferred
-from a filename, a label such as ja_mageia, or generated resume fields.
+The optional editor suite runs the current ChatGPT adapter against actual
+ProseMirror in an isolated Chrome profile, using synthetic prompts on a local
+page. Install its test-only packages outside the extension, then run it:
+
+```powershell
+npm install --prefix artifacts/chatgpt-retention-research --ignore-scripts --no-package-lock --no-audit --no-fund prosemirror-view@1.42.9 prosemirror-model@1.25.13 prosemirror-state@1.4.4
+node tests/chatgpt-editor.mjs
+```
+
+It checks long/multiline text, Unicode, layout-dependent text readings, composer
+replacement, competing editors, reuse of matching drafts, and rejection of
+altered text before submission. It does not contact ChatGPT or use your account.
+Results are saved in `artifacts/chatgpt-retention-research/verification-results.json`.
+
+If a live ChatGPT submission fails, open the job's **Details → AI generation &
+diagnostics → Copy diagnostics**. The last check records the extension version,
+build fingerprint, comparison counts, first mismatch position/type, editor
+replacement count, and Send readiness. Capture diagnostics also record reply
+and code-block counts, job/run matching, streaming, and completion signals.
+It excludes the prompt, response text, page HTML and
+conversation URL. These diagnostics survive closing the dock and are retained
+while Resume checks an already-prepared prompt. A matching draft is verified and
+submitted without reinsertion; a recorded submission attempt is never resent.

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AI Agent Template",
   "short_name": "Sidebar GPT",
-  "version": "0.5.0",
+  "version": "0.6.2",
   "description": "A docked job queue and job form with expandable ChatGPT and DeepSeek conversations.",
   "minimum_chrome_version": "116",
   "permissions": [
@@ -76,8 +76,6 @@
         "src/workspace-shortcut-keys.js",
         "src/sidebar-history.js",
         "src/chat-history.js",
-        "src/chatgpt-queue.js",
-        "src/chatgpt-tab.js",
         "src/chatgpt-frame.js"
       ],
       "all_frames": true,

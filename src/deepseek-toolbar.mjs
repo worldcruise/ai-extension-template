@@ -1,5 +1,6 @@
 import { createChatToolbar } from './chat-toolbar.mjs';
 import { DEEPSEEK_ORIGIN, DEEPSEEK_CHANNEL, deepseekRoutes, deepseekState, deepseekRoute, createDeepseekTransport } from './deepseek-protocol.mjs';
+import { createDeepseekRecovery } from './deepseek-recovery.mjs';
 
 export function createDeepseekToolbar() {
   const pane = document.getElementById('deepseek-pane'), frame = document.getElementById('deepseek-frame');
@@ -17,7 +18,9 @@ export function createDeepseekToolbar() {
   const q = id => document.getElementById('deepseek-' + id);
   let nonce = crypto.randomUUID(), currentUrl = DEEPSEEK_ORIGIN + '/', scale = 100, connected = false, navigating = false;
   let state = { loaded: false, ready: false, hasDraft: false, busy: false, urls: [], chats: [] };
+  let lastStateAt = 0, loadStartedAt = Date.now();
   const status = document.getElementById('deepseek-status');
+  const connection = document.getElementById('deepseek-connection'), retry = document.getElementById('deepseek-retry');
   const searchRequests = new Map();
   const historyRequests = new Map();
   const transport = createDeepseekTransport({ frame,
@@ -72,21 +75,35 @@ export function createDeepseekToolbar() {
       if (!command('search', { operationId, query })) { clearTimeout(timer); searchRequests.delete(operationId); resolve(false); }
     }),
     currentUrl: () => currentUrl, onHistoryNeeded: () => { void refreshHistory(); }, moveHistory: direction => { void moveHistory(direction); } });
+  const freshState = () => connected && Date.now() - lastStateAt < 6000;
+  const protectedInput = () => state.hasDraft || state.busy || state.hasFormInput;
+  const recovery = createDeepseekRecovery({
+    online: navigator.onLine !== false,
+    getState: () => ({ mounted: frame.hasAttribute('src'), ready: freshState() && state.ready,
+      protected: protectedInput() || navigating || historyPending }),
+    probe: () => command('probe'), reconnect: () => reconnect({ automatic: true }), onChange: render
+  });
   function render() {
     toolbar.updateHistory({ ...state, enabled: connected, navigating, pending: historyPending });
-    q('new-chat').disabled = q('reload').disabled = !connected || !state.ready || state.hasDraft || state.busy || navigating;
+    q('new-chat').disabled = recovery.offline || !connected || !state.ready || protectedInput() || navigating;
+    q('reload').disabled = retry.disabled = recovery.offline || !frame.hasAttribute('src') || protectedInput() || navigating || historyPending;
     q('zoom-in').disabled = !connected || scale === 150;
     q('zoom-out').disabled = !connected || scale === 50;
     q('chat-zoom-status').textContent = `Chat text size ${scale}%`;
     q('zoom-in').title = `Increase text size (${scale}%)`; q('zoom-out').title = `Decrease text size (${scale}%)`;
-    status.hidden = connected && state.ready;
+    status.hidden = connection.hidden = !recovery.offline && connected && state.ready;
+    retry.hidden = recovery.offline || Date.now() - loadStartedAt < 6000;
     // A hidden or loading composer is not evidence that the session signed out.
-    status.textContent = connected ? 'Waiting for DeepSeek’s message box… If it does not appear, use Open in tab.' : 'Connecting to DeepSeek… If chat does not load, use Open in tab.';
+    status.textContent = recovery.offline ? 'You’re offline. DeepSeek will retry when your connection returns.'
+      : protectedInput() ? 'Waiting for DeepSeek’s message box… Finish or clear the current input or response before reconnecting.'
+        : connected ? 'Waiting for DeepSeek’s message box… Use Reload if the page is stuck.'
+          : 'Connecting to DeepSeek… Use Reload if the page is stuck.';
   }
   let navigationTimer;
   let pendingNavigation;
   function requestNavigation(action, url, resolve) {
-    if (!connected || !state.ready || state.hasDraft || state.busy || navigating) return;
+    if (recovery.offline || !connected || (!state.ready && action !== 'reload') || protectedInput() || navigating) return;
+    recovery.stop();
     const operationId = crypto.randomUUID();
     pendingNavigation = { action, operationId, url, resolve }; navigating = true; render();
     if (!command(action, { operationId, ...(url ? { url } : {}) })) { pendingNavigation = null; navigating = false; render(); resolve?.(false); return; }
@@ -115,7 +132,7 @@ export function createDeepseekToolbar() {
         deepseekRoute(data.url) === data.url && (data.action === 'new' ? data.url === DEEPSEEK_ORIGIN + '/' : data.action === 'open' ? data.url === pendingNavigation.url : data.url === currentUrl)) {
       // The extension initiates full loads so its scoped embed rule still applies.
       const resolve = pendingNavigation.resolve;
-      pendingNavigation = null; clearTimeout(navigationTimer); connected = false; render(); frame.src = data.url; resolve?.(true);
+      pendingNavigation = null; clearTimeout(navigationTimer); loadFrame(data.url); resolve?.(true);
       return;
     }
     const next = deepseekState(event, frame.contentWindow, nonce);
@@ -124,7 +141,7 @@ export function createDeepseekToolbar() {
       pendingNavigation?.resolve?.(false); pendingNavigation = null;
       navigating = false; clearTimeout(navigationTimer); q('native-search-status').hidden = true;
     }
-    currentUrl = next.currentUrl; state = next; connected = true; render(); toolbar.updateCurrent();
+    currentUrl = next.currentUrl; state = next; connected = true; lastStateAt = Date.now(); render(); toolbar.updateCurrent();
     if (shell.dataset.open === 'true') void refreshHistory();
   }
   function clearRequests() {
@@ -133,19 +150,52 @@ export function createDeepseekToolbar() {
       requests.clear();
     }
   }
-  function onLoad() { clearRequests(); historyAttempted = false; historyPending = false; connected = false; navigating = false; pendingNavigation?.resolve?.(false); pendingNavigation = null; clearTimeout(navigationTimer); render(); command('probe'); }
+  function onLoad() {
+    clearRequests(); historyAttempted = false; historyPending = false; connected = false; navigating = false;
+    state = { ...state, ready: false }; lastStateAt = 0; loadStartedAt = Date.now();
+    pendingNavigation?.resolve?.(false); pendingNavigation = null; clearTimeout(navigationTimer); render(); command('probe');
+  }
+  function loadFrame(url) {
+    // Retire the old channel before navigation. A browser network-error page
+    // cannot answer probes; the replacement document must offer a fresh port.
+    transport.close(); nonce = crypto.randomUUID(); currentUrl = url;
+    state = { loaded: false, ready: false, hasDraft: false, busy: false, hasFormInput: false, urls: [], chats: [] };
+    onLoad(); frame.src = url;
+  }
+  function reconnect({ automatic = false } = {}) {
+    if (recovery.offline || !frame.hasAttribute('src') || protectedInput() || navigating || historyPending) return;
+    if (!automatic) recovery.stop();
+    if (freshState()) { requestNavigation('reload'); return; }
+    // A previously ready page with a silent channel may still hold unseen input.
+    // Only an explicit Reload may replace that page without a fresh guard reply.
+    if (automatic && state.ready) return;
+    loadFrame(deepseekRoute(currentUrl) || deepseekRoute(frame.src) || DEEPSEEK_ORIGIN + '/');
+  }
   const onWindowMessage = event => { transport.accept(event); };
   window.addEventListener('message', onWindowMessage); frame.addEventListener('load', onLoad);
   q('new-chat').addEventListener('click', () => requestNavigation('new'));
-  q('reload').addEventListener('click', () => requestNavigation('reload'));
+  q('reload').addEventListener('click', () => reconnect());
+  retry.addEventListener('click', () => reconnect());
   q('open-tab').addEventListener('click', () => {
-    void chrome.tabs.create({ url: currentUrl }).catch(() => { status.hidden = false; status.textContent = 'Could not open DeepSeek in a tab.'; });
+    void chrome.tabs.create({ url: currentUrl }).catch(() => { status.hidden = connection.hidden = false; status.textContent = 'Could not open DeepSeek in a tab.'; });
   });
   for (const [id, delta] of [['zoom-in', 10], ['zoom-out', -10]]) q(id).addEventListener('click', () => {
     scale = Math.max(50, Math.min(150, scale + delta)); command('probe'); render();
   });
-  const poll = setInterval(() => { if (!pane.hidden && frame.hasAttribute('src')) command('probe'); }, 1500);
-  window.addEventListener('pagehide', () => { transport.close(); clearRequests(); clearInterval(poll); clearTimeout(navigationTimer); window.removeEventListener('message', onWindowMessage); frame.removeEventListener('load', onLoad); }, { once: true });
+  const onOnline = () => recovery.setOnline(true), onOffline = () => recovery.setOnline(false);
+  window.addEventListener('online', onOnline); window.addEventListener('offline', onOffline);
+  const poll = setInterval(() => {
+    recovery.setOnline(navigator.onLine !== false);
+    if (!pane.hidden && frame.hasAttribute('src')) {
+      if (lastStateAt && Date.now() - lastStateAt >= 6000) connected = false;
+      command('probe'); render();
+    }
+  }, 1500);
+  window.addEventListener('pagehide', () => {
+    recovery.dispose(); transport.close(); clearRequests(); clearInterval(poll); clearTimeout(navigationTimer);
+    window.removeEventListener('online', onOnline); window.removeEventListener('offline', onOffline);
+    window.removeEventListener('message', onWindowMessage); frame.removeEventListener('load', onLoad);
+  }, { once: true });
   render();
   return {
     probe: () => command('probe'),

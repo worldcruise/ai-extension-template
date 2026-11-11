@@ -1,0 +1,39 @@
+{
+  "release": "2.1.3",
+  "runtime_files_changed": [
+    "adapters/ChatGPTAdapter.js",
+    "chatGPT.js",
+    "core/Config.js",
+    "core/RequestManager.js",
+    "diagnostics/clipboard.js",
+    "manifest.json",
+    "popup.js",
+    "services/ChatGPTService.js"
+  ],
+  "runtime_files_added": [
+    "core/SubmissionDiagnostics.js"
+  ],
+  "protected_runtime_files_unchanged": [
+    "index.html",
+    "meeting.js",
+    "gptPrompts.js",
+    "shared/PromptBuilder.js",
+    "shared/ClipboardWriter.js",
+    "services/ClipboardService.js",
+    "offscreen/clipboard.html",
+    "offscreen/clipboard.js",
+    "background.js",
+    "services/StorageService.js",
+    "services/TranscriptService.js",
+    "core/TranscriptStore.js",
+    "core/SessionManager.js",
+    "core/MessageQueue.js",
+    "core/Logger.js",
+    "storage/migration.js",
+    "images/extension-128.png",
+    "images/extension-48.png",
+    "images/extension-32.png",
+    "docs/BACKLOG.md"
+  ],
+  "development_docs_and_tests": "Included; not loaded by the extension manifest."
+}

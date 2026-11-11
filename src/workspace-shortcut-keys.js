@@ -6,7 +6,7 @@
     { key: 'ArrowDown', shortcut: 'Ctrl+Down', action: 'view.chat', label: 'Open Chat', target: 'chat-dock-toggle' },
     { key: 'ArrowLeft', shortcut: 'Ctrl+Left', action: 'tab.previous', label: 'Previous browser tab', target: 'previous-job' },
     { key: 'ArrowRight', shortcut: 'Ctrl+Right', action: 'tab.next', label: 'Next browser tab', target: 'next-job' },
-    { key: 'Enter', shortcut: 'Ctrl+Enter', action: 'queue.add', label: 'Save job and copy prompt', target: 'add-request' }
+    { key: 'Enter', shortcut: 'Ctrl+Enter', action: 'queue.add', label: 'Save job to queue', target: 'add-request' }
   ].map(Object.freeze));
   const isAction = action => bindings.some(binding => binding.action === action);
   function action(event) {

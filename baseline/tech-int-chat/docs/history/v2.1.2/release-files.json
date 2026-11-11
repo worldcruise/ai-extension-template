@@ -1,0 +1,28 @@
+{
+  "version": "2.1.2",
+  "modified_code_and_config": [
+    "background.js",
+    "chatGPT.js",
+    "core/RequestManager.js",
+    "index.html",
+    "manifest.json",
+    "package.json",
+    "popup.js",
+    "scripts/check.mjs",
+    "services/ChatGPTService.js",
+    "services/ClipboardService.js",
+    "tests/browser_dom.py",
+    "tests/browser_smoke.py",
+    "tests/chrome-fixture.js",
+    "tests/clipboard-regression.test.js",
+    "tests/clipboard.test.js"
+  ],
+  "added_code_and_config": [
+    "diagnostics/clipboard.html",
+    "diagnostics/clipboard.js",
+    "scripts/reproduce-v211.mjs",
+    "shared/ClipboardWriter.js",
+    "shared/PromptBuilder.js",
+    "tests/prompt-pipeline.test.js"
+  ]
+}

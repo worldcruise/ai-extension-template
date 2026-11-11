@@ -1,0 +1,19 @@
+{
+  "release": "2.1.3",
+  "scope": "Unpacked extension load attempt with existing administrator policy; no policy changes",
+  "extensions_page": "Page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at chrome://extensions/",
+  "observed_service_workers": [],
+  "browser": "144.0.7559.96",
+  "relevant_managed_policies": {
+    "ExtensionInstallBlocklist": [
+      "*"
+    ],
+    "URLBlocklist": [
+      "*"
+    ],
+    "DefaultClipboardSetting": 2
+  },
+  "installed_extension_verified": false,
+  "authenticated_chatgpt_verified": false,
+  "native_system_clipboard_verified": false
+}

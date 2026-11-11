@@ -1,0 +1,18 @@
+{
+  "release": "2.1.2",
+  "scope": "Actual extension load attempt; no administrator policies changed",
+  "native_clipboard_verified": false,
+  "browser": "144.0.7559.96",
+  "extensions_page": "Page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at chrome://extensions/",
+  "observed_service_workers": [],
+  "relevant_managed_policies": {
+    "ExtensionInstallBlocklist": [
+      "*"
+    ],
+    "URLBlocklist": [
+      "*"
+    ],
+    "DefaultClipboardSetting": 2
+  },
+  "conclusion": "This environment does not establish native OS clipboard behavior of the installed extension. DOM/messaging tests are separate and mock OS writes."
+}

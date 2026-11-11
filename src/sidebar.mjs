@@ -1,6 +1,5 @@
 import { CHATGPT_HOME, CHATGPT_ORIGIN, FRAME_CHANNEL, frameMessage, frameShortcutMessage, conversationUrl, linkedConversationUrl } from './sidebar-protocol.mjs';
 import { createChatToolbar } from './chat-toolbar.mjs';
-import { BUILD, connectionReport, requireMatchingRevision } from './runtime-info.mjs';
 
 export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {} } = {}) {
   const frame = document.getElementById('chatgpt-frame');
@@ -20,14 +19,13 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
   let starting = false;
   let awaitingFrameLoad = false;
   let chatEstablished = false;
-  let frameEpoch = 0, closed = false;
-  const readyWaiters = new Set();
-  const wakeReadyWaiters = () => { for (const check of [...readyWaiters]) check(); };
   let toolbar;
   let zoomPercent = 100;
-  let navigationGuard = async () => {};
-  let sessionConfirmed = false;
-  const queueRequests = new Map();
+  async function navigationGuard() {
+    if (!initialized || awaitingFrameLoad) return;
+    const current = await historyCommand('inspect', { readOnly: true });
+    if (current.hasDraft || current.busy) throw new Error('Finish or clear the current draft or response before navigating.');
+  }
   const historyRequests = new Map();
   let historyState = {loaded:false,urls:[],chats:[],ready:false,hasDraft:false,busy:false};
   let historyEpoch = 0, historyAttempted = false, historyBusy = false, historyInspection = null;
@@ -108,45 +106,14 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
     return false;
   }
   chrome.runtime.onMessage.addListener(onWorkspaceShortcut);
-  function rejectQueue(message) {
-    for (const request of queueRequests.values()) { clearTimeout(request.timer); request.reject(new Error(message)); }
-    queueRequests.clear();
-  }
-  function waitForReady(inspectOnly = false) {
-    let epoch = initialized || awaitingFrameLoad ? frameEpoch : null;
-    return new Promise((resolve, reject) => {
-      const finish = error => { clearTimeout(timer); readyWaiters.delete(check); error ? reject(error) : resolve(frameEpoch); };
-      const check = () => {
-        if (epoch === null && initialized) epoch = frameEpoch;
-        if (closed || epoch !== null && epoch !== frameEpoch) return finish(new Error('ChatGPT navigated before this operation was ready. Nothing was sent.'));
-        if (initialized && !awaitingFrameLoad && (inspectOnly || connection.dataset.state === 'ready')) return finish();
-        if (!inspectOnly && connection.dataset.state === 'guest') return finish(Object.assign(new Error('Sign in to ChatGPT, then reload the sidebar.'), { code: 'signed-out' }));
-        if (connection.dataset.state === 'error') finish(new Error(status.textContent || 'ChatGPT could not load.'));
-      };
-      const timer = setTimeout(() => finish(new Error('ChatGPT is not ready. Open Chat and check its connection.')), 30000);
-      readyWaiters.add(check); check();
-    });
-  }
-  async function queueCommand(action, data = {}, onProgress = async () => true) {
-    const epoch = await waitForReady(['inspect', 'inspect-prepared'].includes(action));
-    if (closed || epoch !== frameEpoch || awaitingFrameLoad) throw new Error('ChatGPT navigated before command dispatch. Nothing was sent.');
-    const operationId = crypto.randomUUID();
-    return new Promise((resolve, reject) => {
-      const request = { resolve, reject, onProgress, action, progress: Promise.resolve(),
-        timer: setTimeout(() => { queueRequests.delete(operationId); reject(new Error('ChatGPT did not respond. Inspect the source conversation before retrying.')); }, ['preflight', 'inspect', 'inspect-prepared', 'fresh-conversation'].includes(action) ? 12000 : 630000) };
-      queueRequests.set(operationId, request);
-      frame.contentWindow.postMessage({ channel: FRAME_CHANNEL, type: 'queue.command', nonce, operationId, action, data: { ...data, sessionConfirmed, hostBuildId: BUILD.id } }, CHATGPT_ORIGIN);
-    });
-  }
-
   function showState(state, text) {
     connection.hidden = state === 'ready' || state === 'connected';
-    if (connection.dataset.state === state && status.textContent === text) { wakeReadyWaiters(); return; }
+    if (connection.dataset.state === state && status.textContent === text) return;
     connection.dataset.state = state;
     status.textContent = text;
     recovery.hidden = !['guest', 'slow', 'error'].includes(state);
     signIn.textContent = state === 'guest' ? 'Sign in to ChatGPT' : 'Open ChatGPT';
-    wakeReadyWaiters();
+
   }
 
   function probe() {
@@ -168,12 +135,12 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
   function loadChat(url = currentUrl) {
     const target = conversationUrl(url);
     if (!target) return;
-    rejectQueue('The ChatGPT frame navigated. Recover the recorded request before sending it again.');
+
     currentUrl = target;
     chatEstablished = false;
     nonce = crypto.randomUUID();
     awaitingFrameLoad = true;
-    frameEpoch++;
+
     resetHistory();
     toolbar?.hide();
     toolbar?.updateCurrent();
@@ -220,60 +187,13 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
       else request.reject(new Error('ChatGPT history is unavailable.'));
       return;
     }
-    if (message.type === 'queue.progress' || message.type === 'queue.reply') {
-      const request = queueRequests.get(message.operationId);
-      if (!request) return;
-      if (message.type === 'queue.progress') {
-        request.progress = request.progress.then(async () => {
-          const allowed = await request.onProgress(message);
-          if (message.phase === 'prepared') frame.contentWindow.postMessage({ channel: FRAME_CHANNEL,
-            type: 'queue.authorize', nonce, operationId: message.operationId, allowed: allowed !== false }, CHATGPT_ORIGIN);
-        }).catch(error => {
-          if (message.phase === 'prepared') {
-            frame.contentWindow.postMessage({ channel: FRAME_CHANNEL, type: 'queue.authorize', nonce,
-              operationId: message.operationId, allowed: false }, CHATGPT_ORIGIN);
-            clearTimeout(request.timer); queueRequests.delete(message.operationId); request.reject(error);
-          }
-          // After a send, continue collecting even if a progress write fails.
-          // The completed reply can still be journaled and saved or recovered.
-        });
-      } else {
-        clearTimeout(request.timer); queueRequests.delete(message.operationId);
-        void request.progress.then(() => {
-          if (message.ok) {
-            if (message.value.authState === 'signed-in') sessionConfirmed = true;
-            if (message.value.authState === 'signed-out') {
-              chatEstablished = false;
-              sessionConfirmed = false;
-              clearTimeout(watchdog);
-              showState('guest', 'Sign in to ChatGPT in a tab, then reload the sidebar.');
-            } else if (message.value.authState && (message.value.composerPresent || message.value.authenticated || message.value.authState === 'signed-in')) {
-              chatEstablished = true;
-              clearTimeout(watchdog);
-              showState(message.value.composerPresent ? 'ready' : 'connected', message.value.composerPresent ? 'ChatGPT is ready.' : 'ChatGPT is connected.');
-            }
-            if (['inspect', 'preflight'].includes(request.action)) {
-              document.getElementById('runtime-adapter-build').textContent = message.value.buildId || 'Unknown';
-            }
-            try {
-              if (['preflight', 'submit', 'fresh-conversation'].includes(request.action)) requireMatchingRevision(message.value);
-              request.resolve(connectionReport(message.value, sessionConfirmed, 'sidebar'));
-            } catch (error) { request.reject(error); }
-          } else request.reject(Object.assign(new Error(message.error.message), { code: message.error.code, diagnostics: message.error.diagnostics }));
-        });
-      }
-      return;
-    }
     if (message.type === 'sign-in') {
-      sessionConfirmed = false;
+
       void openTab(`${CHATGPT_ORIGIN}/auth/login`);
       return;
     }
     currentUrl = message.url;
     if (message.history) historyState = message.history;
-    if (message.buildId) document.getElementById('runtime-adapter-build').textContent = message.buildId;
-    if (message.guest || message.authState === 'signed-out') sessionConfirmed = false;
-    else if (message.authState === 'signed-in') sessionConfirmed = true;
     toolbar.updateCurrent();
     if (message.guest || message.authState === 'signed-out') {
       chatEstablished = false;
@@ -297,15 +217,15 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
   });
 
   frame.addEventListener('load', () => {
-    if (!awaitingFrameLoad) { frameEpoch++; chatEstablished = false; }
-    rejectQueue('The ChatGPT page reloaded. Start the queue to reconcile the interrupted request.');
+    if (!awaitingFrameLoad) chatEstablished = false;
+
     awaitingFrameLoad = false;
     nonce = crypto.randomUUID();
     shortcutPresses.clear();
     resetHistory();
     toolbar?.hide();
     probe();
-    wakeReadyWaiters();
+
   });
   frame.addEventListener('error', () => {
     clearTimeout(watchdog);
@@ -321,11 +241,11 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
     void openTab(connection.dataset.state === 'guest' ? `${CHATGPT_ORIGIN}/auth/login` : currentUrl);
   });
   document.getElementById('retry').addEventListener('click', () => initialized ? navigateManually(currentUrl) : void start());
-  window.addEventListener('pagehide', () => { closed = true; wakeReadyWaiters(); rejectQueue('The sidebar closed. Recover this request after reopening it.'); resetHistory(); clearTimeout(watchdog); clearInterval(polling); chrome.runtime.onMessage.removeListener(onWorkspaceShortcut); });
+  window.addEventListener('pagehide', () => { resetHistory(); clearTimeout(watchdog); clearInterval(polling); chrome.runtime.onMessage.removeListener(onWorkspaceShortcut); });
   async function openConversation(url) {
     const target = linkedConversationUrl(url);
     if (!target) return;
-    await navigationGuard();
+    if (target !== currentUrl) await navigationGuard();
     onOpenChat();
     if (target !== currentUrl) loadChat(target);
     toolbar.hide();
@@ -340,48 +260,7 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
     selectConversation: chat => { void moveHistory(null, chat.url); }
   });
   void start();
-  const queue = {
-    kind: 'sidebar',
-    inspect: () => queueCommand('inspect'),
-    inspectPrepared: data => queueCommand('inspect-prepared', data),
-    monitor: (data, progress) => queueCommand('recover', data, progress),
-    async confirmSession() {
-      const state = await queueCommand('inspect');
-      if (state.authState === 'signed-out' || !state.composerPresent) throw new Error('Sign in to ChatGPT and wait for the composer before confirming this session.');
-      sessionConfirmed = true;
-      return { ...state, sessionConfirmed: true };
-    },
-    async openConversation(value) {
-      const url = linkedConversationUrl(value);
-      if (!url) throw new Error('This request has no source conversation.');
-      if (url !== currentUrl) {
-        const state = await queueCommand('inspect');
-        if (state.authState === 'signed-out') throw Object.assign(new Error('Sign in to ChatGPT, then reload the sidebar.'), { code: 'signed-out' });
-        if (state.hasDraft || state.busy) throw new Error('Finish or clear the current Chat draft or generation before opening the recorded conversation.');
-        loadChat(url); await waitForReady();
-      }
-    },
-    async newConversation() {
-      resetHistory();
-      const report = await queueCommand('fresh-conversation');
-      if (report.fresh === true && report.url === CHATGPT_HOME) {
-        currentUrl = CHATGPT_HOME; toolbar.updateCurrent(); probe(); return;
-      }
-      // Only an unavailable native control permits the full-page fallback.
-      // An already dispatched navigation is never clicked or retried again.
-      if (report.dispatched !== false) throw new Error('ChatGPT navigation is unconfirmed. No prompt was inserted.');
-      loadChat(CHATGPT_HOME);
-      await waitForReady();
-      await queueCommand('preflight');
-    },
-    submit(data, progress) { onOpenChat(); return queueCommand('submit', data, progress); },
-    async recover(data) {
-      await queue.openConversation(data.url);
-      return queueCommand('recover', data);
-    }
-  };
   return { probe, openConversation, getCurrentChat: () => linkedConversationUrl(currentUrl),
-    queue, setNavigationGuard: callback => { navigationGuard = callback; },
     hideControls: toolbar.hide,
     signIn: () => openTab(`${CHATGPT_ORIGIN}/auth/login`) };
 }

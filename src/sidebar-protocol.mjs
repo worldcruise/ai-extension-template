@@ -72,7 +72,6 @@ export function frameMessage(event, frameWindow, nonce) {
     const value = globalThis.AiAgentChatHistory.snapshot(data.value);
     return value ? {type:data.type,operationId:data.operationId,ok:true,value} : null;
   }
-  if (['queue.reply', 'queue.progress'].includes(data.type)) return queueMessage(data);
   if (data.type !== 'state') return null;
   const url = conversationUrl(data.url);
   if (!url) return null;
@@ -82,29 +81,5 @@ export function frameMessage(event, frameWindow, nonce) {
     ...(globalThis.AiAgentChatHistory.snapshot(data.history) ? {history:globalThis.AiAgentChatHistory.snapshot(data.history)} : {}) };
 }
 
-export function queueMessage(data) {
-  if (data && ['queue.reply', 'queue.progress'].includes(data.type)) {
-    if (typeof data.operationId !== 'string' || !/^[\w-]{1,100}$/.test(data.operationId)) return null;
-    if (data.type === 'queue.progress') {
-      const url = conversationUrl(data.url);
-      if (!url || !['prepared', 'dispatched', 'registered', 'submitted', 'generating'].includes(data.phase)) return null;
-      return { type: data.type, operationId: data.operationId, phase: data.phase, url,
-        userMessageId: typeof data.userMessageId === 'string' ? data.userMessageId.slice(0, 300) : '',
-        assistantMessageId: typeof data.assistantMessageId === 'string' ? data.assistantMessageId.slice(0, 300) : '',
-        ...(redactedDiagnostic(data.diagnostics) ? { diagnostics: redactedDiagnostic(data.diagnostics) } : {}) };
-    }
-    if (typeof data.ok !== 'boolean') return null;
-    if (!data.ok) return { type: data.type, operationId: data.operationId, ok: false,
-      error: { code: String(data.error?.code || 'chat-error').slice(0, 100), message: String(data.error?.message || 'ChatGPT could not complete this request.').slice(0, 2000),
-        ...(redactedDiagnostic(data.error?.diagnostics) ? { diagnostics: redactedDiagnostic(data.error.diagnostics) } : {}) } };
-    if (!data.value || typeof data.value !== 'object' || Array.isArray(data.value)) return null;
-    if (data.value.raw !== undefined && (typeof data.value.raw !== 'string' || data.value.raw.length > 500000)) return null;
-    const value = { ...data.value };
-    if ('diagnostics' in value) value.diagnostics = redactedDiagnostic(value.diagnostics);
-    return { type: data.type, operationId: data.operationId, ok: true, value };
-  }
-  return null;
-}
-import { redactedDiagnostic } from './queue-diagnostics.mjs';
 import './workspace-shortcut-keys.js';
 import './chat-history.js';

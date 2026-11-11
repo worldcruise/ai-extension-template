@@ -1,0 +1,11 @@
+{
+  "release": "2.1.5",
+  "passed": 4,
+  "checks": [
+    "post-click success does not wait for user-message/Stop-button acknowledgment DOM",
+    "synchronous post-submit DOM teardown does not invalidate a verified Send click",
+    "form-local composer is chosen over a second visible 927-character ProseMirror",
+    "zero-width placeholder is treated as empty, not an existing draft"
+  ],
+  "scope": "Focused real-Chromium DOM regression; extension messaging and authenticated ChatGPT are mocked."
+}

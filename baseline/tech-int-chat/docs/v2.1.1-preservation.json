@@ -1,0 +1,141 @@
+{
+  "release": "2.1.1",
+  "source_archive": "tech-int-chat-updated-v2.1.0.zip",
+  "source_archive_sha256": "50a2685b374fa4fbd596dba4ec624be88806e12b1db4ad1aa3571cd8afe8ecdd",
+  "comparison": "Against the actual uploaded complete v2.1.0 ZIP, not a hypothetical scaffold.",
+  "protected_files": {
+    "index.html": "2b7c7f228d956d244842adea96a860363dfcc62f7da02389f5ecfcc55b846fc2",
+    "meeting.js": "268eeea279c65e6fe54aa93e50fc0354c00f32fc9d66794cf45b11e1521d1b51",
+    "gptPrompts.js": "87c4b2c50ea658261bab2a47c83cefbeebaa1ce420ea90922608af6a001c0faf",
+    "adapters/ChatGPTAdapter.js": "a601dfa04f0e2aac5116898d0e3c75596dbcbd438e4aee9871e22a79b23471ce",
+    "images/extension-128.png": "09ad1655ec2923b8e6eb0babd678a79a485cf276a0ed2665c109ba1ddaa77ed5",
+    "images/extension-32.png": "b8361aa8b437cc3037914d89febed93446bbf76dfc5ce68c388b40735f81df96",
+    "images/extension-48.png": "79b66130e4c96f0f434b1fb9e21edfd9d760e0eb2cfc7d690a900671b501161f",
+    "core/TranscriptStore.js": "8e09adb18d737ed363dd462d381b11e72aaed1d813119728ae52bf8073f45257",
+    "core/SessionManager.js": "63876b142d5e6da1196ecddea34e658d55bd36f2638267ab6f1a882a996e2cdc",
+    "core/Config.js": "1689fe9c19853816c6a0d5048b6229443862f7c2be64c2603406b39bec19d522",
+    "core/MessageQueue.js": "fb566f6383b500f4211cca6db8025276d03428df3f0252abde99344595e790c7",
+    "core/Logger.js": "024f45e85fd6d89cb3fe15c47eb76158fe9c259fc214a86e672ebd33a7155d35",
+    "services/StorageService.js": "0d0503641498f782a14857a19295a72b5dcc6bcd4cce7da7f015494795e83b97",
+    "services/TranscriptService.js": "6aa9dea2f8d2a9e3454de124d0bdaee19a8b652497458da6cd8480f8b97bd3ed",
+    "storage/migration.js": "f16fa44cbad6b9bf28a5396d16118145dbcb577de879ca4136c6a3e1f4532e23",
+    "docs/BACKLOG.md": "b15e8568262dcb6ddfd4c098da276aa48268623df68a4f446ccd099bbf6e3145",
+    "offscreen/clipboard.html": "f20a865aa377e59cbf79ad3f043e1ee32fb66f2328b2ca83c0b8066b1186c0ae",
+    "tests/core.test.js": "c73e7cd48e5b79365fee610ef802396721220c8541b3c65fd5d9b6b2abb739fc",
+    "tests/browser_smoke.py": "5fe0d2e2e79033dacf3aebb05bee70dae5c931c348e6e03c24b62aaa15f55235"
+  },
+  "permissions_unchanged": true,
+  "host_permissions_unchanged": true,
+  "original_layout_and_transcript_extraction_preserved": true,
+  "changed_files": {
+    "CHANGELOG.md": {
+      "before": "f6b36d1672dc19f535285f951d0787738fa27df02810df14156d0021d136c34a",
+      "after": "a6a7a90d743ef18443bb221cd59acfc1c625d5668d1535b75a7c72be98f2362a"
+    },
+    "README.md": {
+      "before": "7fab985e6eed776a8c9ae51b2432c68f3211d99a5e58e823da2d64a0e52deae6",
+      "after": "5cd64e3dc691380b31e4d110246dc6c71f0d3cad2601d7240e7707bcebca1d38"
+    },
+    "START-HERE.txt": {
+      "before": "ed6a2a30a5ed1703f75dd57afc6415ec3b88ab7ebe36d79e80298e77093749b5",
+      "after": "d85a6aad26dad67244ad1d7b49eeb1f76f94d990bbd5872379ecb8cca3d827cb"
+    },
+    "background.js": {
+      "before": "39a4d4a0275fe0709fd8cfc4bcd81762ff47ab6721479f7d3522105898f54830",
+      "after": "fde815c40b2a5fe3881b16b26244d4f0ca5acd0a98d9bcc96d98d8456d2457e3"
+    },
+    "chatGPT.js": {
+      "before": "26abe22f5181bd0be1f5bc9e69fd3099383615ac619320b87685dca5d4ed885b",
+      "after": "776b8faed13876853d21aa3d719b7ac58c1567883f53faacf464b57d2213a373"
+    },
+    "core/RequestManager.js": {
+      "before": "d4e630187d8f8cc9b6470c3d2e7a04fea6e3afc542d2e1b24794f96a965b0429",
+      "after": "2e0635eb593f0a7cccde4f0840c3241b08e6399b53619cf609c99fc368dd48f0"
+    },
+    "docs/ARCHITECTURE.md": {
+      "before": "6e470b33bd04e892283e648e1160efaf3e3ee5118784f360f7e7f1eaf5c4bf8b",
+      "after": "0958641c286bac53005d0a215d05884ec3bcd221a89eac0b6a37aa0a6fc918d8"
+    },
+    "docs/CLIPBOARD.md": {
+      "before": "9cbce8ca209d12d2f76e9c51d8e69839b76ddd37e5e2bf49c886a26be36bc223",
+      "after": "679bc0213e4cbe57b5da87559f5867e9c3bf0b26acf465061648e3cbd0f0c8e4"
+    },
+    "docs/TEST-RESULTS.md": {
+      "before": "87f745c76be3d4f817269f771bb44fed028101e4e38c3916e316e319427fd380",
+      "after": "cd63522753c2d70cf7bd0a8127ff3954b14515e944023efe06e31053a27b4c60"
+    },
+    "docs/browser-dom-results.json": {
+      "before": "a3fe77e4351e41ab24bc344151009a6db407d24c9a1f3e0e5a072f4b988655e4",
+      "after": "5f146863ff3d4acb2b7ec04a19478d1f4d9d87a439116184d3b61b466e1d26a4"
+    },
+    "docs/check-output.txt": {
+      "before": "e9b081e1c29385fc061091261e993c3330d765f2f73faa0766b4b06fd81a53b1",
+      "after": "5f26359dee339113946b30b146ab0e9a5ef41883ac077a64c88021f00cc5bcaa"
+    },
+    "docs/extension-load-attempt.json": {
+      "before": "2a254da373d8cc68db71d455b73bfb637010c54ccc41537ec72365100f25669e",
+      "after": "a14741a954f6d2be55769231f9d3903a477db8f2ffc19c0afd5927a5cb05b49b"
+    },
+    "docs/unit-test-output.txt": {
+      "before": "03546c2018ac568eb78e9ee22535adc9ffd9537d8daac225a5b23bbcbe6cfb1f",
+      "after": "3544cc16a16df265cfa5f79dec53c80685802a38f8200b2f2247a17284b1402f"
+    },
+    "manifest.json": {
+      "before": "90c3f7e47d0827ee4ea79cbac8ae33c43c72d26ef62bf85e92801f4db8be9e8e",
+      "after": "ad8aaaa0aa7da22873bec7f0ce8f6f56d8081ecafa9628212ccf8008c153be99"
+    },
+    "offscreen/clipboard.js": {
+      "before": "16ff678d53d33f085ab62f1bc906ef9a73845bf64f8b8a73ce9edba56793a92b",
+      "after": "5d9dcf24910e7dc5d310d1920b004ee0fa40882e15622beeff44c2ec0d8b8ce0"
+    },
+    "package.json": {
+      "before": "f5826d9664e896313c88690bb3247f88beac841c0e6c48fb686bac4ce827a591",
+      "after": "e2efa1b487dec2f9336cb4af04d22f10c42b430b2e0dbaa326b5db77446d0c57"
+    },
+    "popup.js": {
+      "before": "c0aedf19feb7260a89ceaba3397a8f687668cc181687ca3a86031de553c64ab8",
+      "after": "a285e10be6b10f23b0750b8f113e44f845c638a6bef1338a0f7dbbf9727ea1f9"
+    },
+    "scripts/check.mjs": {
+      "before": "a71b926931b801a55e1ef85add859ab487e82a8a6ba06895f16fcfbd274bf70d",
+      "after": "e3e761b29aa1287a4c4a3189ec4a302a9ddbcecb2f15c4304fdedd086ea643f4"
+    },
+    "services/ChatGPTService.js": {
+      "before": "7af45cfb5beadb1f4c43d00f216ade7bfedd9f8c10115d0c86f9c0a06e53b830",
+      "after": "fae62cc77639d609d84c003a917c52245818ccf9a0499e9cc855b2c7be160fda"
+    },
+    "services/ClipboardService.js": {
+      "before": "02fef6f4c9925c10b01da1c88e52912afe77deb662c1f320dfae12d557007e8a",
+      "after": "a93200085ab516b253dc94ade70e66d55ef83dd3321c64d392ea773f07896371"
+    },
+    "tests/browser_dom.py": {
+      "before": "4d8bc5e783c2e03db1d89a7ed8498419e39a585dac0f7a9fcb4a7a1325de6182",
+      "after": "d05a03bae122aac0c3332d431b070f54f01313e7750c244eea81432d3c555c59"
+    },
+    "tests/chrome-fixture.js": {
+      "before": "58ad880b7b7461c21fe3bbea682b3749e7ee73fe9830981ca350fa12fe3506c0",
+      "after": "06f614fdd63fbc8139c973ffa421e0c8562189c429fee441eec645a303ca556b"
+    },
+    "tests/clipboard.test.js": {
+      "before": "fac0d4c9ecc3b18954ba7d20d0c84a4a8b56a3d5204599e4cc8b4474fd9b23df",
+      "after": "370dc0a200fe82ef7c7f03b86b93e5905e2052b3f3a9ef575cc6d224c69f7e1b"
+    }
+  },
+  "added_files": {
+    "docs/CLIPBOARD-REVIEW.md": "de210a9f4cca285f603711ebced32336386e6f89a8a556fe7ef0e371cfc71f4b",
+    "docs/clipboard-reproduction.json": "6e623f4340fb239ca028bdddfb1215b18e61ecfdee3af978627973b2e58ce91d",
+    "docs/v2.1.0-baseline-browser-dom.json": "a3fe77e4351e41ab24bc344151009a6db407d24c9a1f3e0e5a072f4b988655e4",
+    "docs/v2.1.0-baseline-unit-output.txt": "409610045e05c82d580d176075bb2f33217a1b02638b8b8e5cbcd319dcc0b63d",
+    "tests/clipboard-regression.test.js": "6ab897e3fb8c59a12f2a86a95e256b27246b5daf49af0be2aa5f751243ce54df"
+  },
+  "deleted_files": [],
+  "inventory_exclusions": [
+    "SHA256SUMS.txt",
+    "docs/v2.1.1-preservation.json"
+  ],
+  "notes": [
+    "popup.js changes clipboard handling and failure alerts, not HTML/CSS/layout or existing selection/rendering logic.",
+    "This inventory and regenerated SHA256SUMS.txt are excluded from recursive content hashing here.",
+    "Runtime unit/browser evidence uses mocks for Chrome APIs and OS clipboard writes; native clipboard is not certified."
+  ]
+}

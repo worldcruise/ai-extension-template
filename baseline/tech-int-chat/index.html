@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="canonical" href="https://chat.chatvn.org" />
+    <title>Chat GPT - chatvn.org</title>
+    <meta name="description"
+        content="ChatGPT Vietnamese khÃ´ng cáº§n tÃ i khoáº£n, ChatGPT Vietnamese sáº½ giÃºp báº¡n tráº£i nghiá»‡m ChatGPT.">
+    <link rel="shortcut icon" href="images/extension-32.png">
+    <meta name="theme-color" content="#3063A0">
+    <style type="text/css">
+        /* Reset margin and padding */
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .tools-header {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #191c20;
+            border-bottom: 1px solid #ddd;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .title {
+            flex-grow: 1;
+            font-size: 14px;
+            font-weight: bold;
+            margin-right: 12px;
+            padding-left: 5px;
+            color: white;
+        }
+
+        .chatMenuView {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            top: 12px;
+            font-size: 20px;
+        }
+
+        #chatList {
+            font-size: 17px;
+            display: flex;
+            flex-direction: column;
+            overflow: auto;
+            height: 100%;
+            resize: vertical;
+            overflow: auto;
+            min-height: 250px;
+        }
+
+        .radioView {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .radioView input[type="radio"] {
+            display: none;
+        }
+
+        .radioView label {
+            padding: 5px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            border: 1px solid #555;
+        }
+
+        .radioView input[type="radio"]:checked+label {
+            background-color: #6200ea;
+            color: white;
+            border-color: #6200ea;
+        }
+
+        .radioView input[type="radio"]:not(:checked)+label:hover {
+            background-color: #333;
+            border-color: #777;
+        }
+
+        .state-divider {
+            width: 1px;
+            height: 20px;
+            background-color: #555;
+            margin: 0 5px;
+        }
+
+        .ai-mode-section,
+        .prompt-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ai-mode-section label {
+            background-color: #2d3748;
+            border-color: #4a5568;
+        }
+
+        .ai-mode-section input[type="radio"]:checked+label {
+            background-color: #3182ce;
+            border-color: #3182ce;
+        }
+
+        .chatButtons {
+            display: flex;
+            align-items: center;
+        }
+
+        .status-bar {
+            color: #cbd5e1;
+            font-size: 11px;
+            padding: 4px 12px;
+            background: #111827;
+            border-bottom: 1px solid #2d3748;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .action-button {
+            width: 35px;
+            padding: 7px;
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            margin-left: 5px;
+        }
+
+        .action-button:hover {
+            background-color: #3700b3;
+        }
+
+        #clearTranscript{
+            height: 35px;
+            justify-content: center;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        pre {
+            overflow: auto;
+            border: 1px solid #999;
+            page-break-inside: avoid;
+        }
+
+        .form-control {
+            display: block;
+            width: 100%;
+            height: 34px;
+            padding: 6px 12px;
+            font-size: 14px;
+            color: #555;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .btn-success {
+            color: #fff;
+            background-color: #5cb85c;
+            border-color: #4cae4c;
+        }
+
+        .btn-warning {
+            color: #fff;
+            background-color: #f0ad4e;
+            border-color: #eea236;
+            margin-right: 10px;
+        }
+
+        .btn-lg {
+            padding: 7px 10px;
+            font-size: 16px;
+            border-radius: 6px;
+        }
+
+        #serialNumber {
+            user-select: text;
+        }
+
+        pre {
+            display: block;
+            padding: 9.5px;
+            margin: 0 0 10px;
+            font-size: 13px;
+            color: #333;
+            word-break: break-all;
+            word-wrap: break-word;
+            background-color: #f5f5f5;
+            border: 1px solid #ccc;
+            border-radius: 4px
+        }
+
+        pre code {
+            padding: 0;
+            font-size: inherit;
+            color: inherit;
+            white-space: pre-wrap;
+            background-color: transparent;
+            border-radius: 0
+        }
+
+        #chatContainer {
+            display: flex;
+            flex-direction: column;
+            background-color: #3c4043;
+            padding: 12px;
+            height: 100%;
+            overflow: auto;
+        }
+
+        .chatMessage {
+            display: flex;
+            flex-direction: column;
+            max-width: 94%;
+            margin-bottom: 5px;
+        }
+
+        .chatMessage.currentUser {
+            align-self: flex-end;
+            align-items: flex-end;
+        }
+
+        .chatMessage.otherUser {
+            align-self: flex-start;
+            align-items: flex-start;
+        }
+
+        .speakerName {
+            font-size: 10px;
+            font-weight: bold;
+            margin-bottom: 2px;
+            opacity: 0.9;
+            color: #e0e0e0;
+            display: none;
+        }
+
+        .currentUser .speakerName {
+            color: #b0c4de;
+        }
+
+        .otherUser .speakerName {
+            color: #e0e0e0;
+        }
+
+        .chatBubble {
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            opacity: 0.8;
+            word-wrap: break-word;
+            position: relative;
+            font-size: 16px;
+        }
+
+        .chatBubble:hover {
+            opacity: 1;
+        }
+
+        .currentUser .chatBubble {
+            background-color: #395163;
+            border-bottom-right-radius: 4px;
+        }
+
+        .otherUser .chatBubble {
+            border-bottom-left-radius: 4px;
+        }
+
+        /* Speaker colors - will be dynamically assigned */
+        .speaker-0 .chatBubble {
+            background-color: #4c5256;
+        }
+
+        .speaker-1 .chatBubble {
+            background-color: #7c3aed;
+        }
+
+        .speaker-2 .chatBubble {
+            background-color: #dc2626;
+        }
+
+        .speaker-3 .chatBubble {
+            background-color: #059669;
+        }
+
+        .speaker-4 .chatBubble {
+            background-color: #d97706;
+        }
+
+        .speaker-5 .chatBubble {
+            background-color: #dc2626;
+        }
+
+        .speaker-6 .chatBubble {
+            background-color: #7c2d12;
+        }
+
+        .speaker-7 .chatBubble {
+            background-color: #1e40af;
+        }
+
+        .speaker-8 .chatBubble {
+            background-color: #be185d;
+        }
+
+        .speaker-9 .chatBubble {
+            background-color: #065f46;
+        }
+
+        .selectedChatStart .chatBubble {
+            border-top: 5px solid #09ff00;
+        }
+
+        .selectedChatEnd .chatBubble {
+            border-bottom: 5px solid #09ff00;
+        }
+
+        /* Legacy classes for compatibility */
+        .youChatInstance,
+        .interviewerChatInstance {
+            display: none;
+            /* Hide old style messages */
+        }
+
+        #gernerateResponse {
+            margin-bottom: 10px;
+        }
+
+        #responseContainer {
+            background-color: #b2cbdd;
+            padding: 10px;
+            white-space: pre-wrap;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            max-height: 300px;
+            overflow: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="tools-header" id="tools-header">
+        <div class="chatMenuView" id="chatHeader">
+            <div class="radioView">
+                <div class="ai-mode-section" style="display: none;">
+                    <input type="radio" name="aiMode" value="conversation" id="conversationAccount" checked>
+                    <label class="title" for="conversationAccount">Conversation AI</label>
+                    <input type="radio" name="aiMode" value="coding" id="codingAccount">
+                    <label class="title" for="codingAccount">Live Coding AI</label>
+                </div>
+                <div class="state-divider" style="display: none;"></div>
+                <div class="prompt-section">
+                    <input type="radio" name="accountType" value="1" id="normalAccount" checked>
+                    <label class="title" for="normalAccount">Normal</label>
+                    <input type="radio" name="accountType" value="2" id="detailAccount">
+                    <label class="title" for="detailAccount">Detail</label>
+                    <input type="radio" name="accountType" value="3" id="starAccount">
+                    <label class="title" for="starAccount">Star</label>
+                </div>
+            </div>
+            <div class="chatButtons">
+                <button id="train" class="action-button" title="Analyze full transcript">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
+                        <path
+                            d="M4.5 6.75A.75.75 0 0 1 5.25 6h13.5a.75.75 0 0 1 0 1.5H5.25a.75.75 0 0 1-.75-.75Zm0 4.5A.75.75 0 0 1 5.25 10.5h13.5a.75.75 0 0 1 0 1.5H5.25a.75.75 0 0 1-.75-.75Zm0 4.5A.75.75 0 0 1 5.25 15h7.5a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1-.75-.75Z" />
+                        <path fillRule="evenodd" clipRule="evenodd"
+                            d="M16.28 14.22a.75.75 0 0 1 1.06 0l1.72 1.72 3.22-3.22a.75.75 0 1 1 1.06 1.06l-3.75 3.75a.75.75 0 0 1-1.06 0l-2.25-2.25a.75.75 0 0 1 0-1.06Z" />
+                    </svg>
+                </button>
+
+                <!-- 2/27/2026 Customize -->
+                <button id="download" class="action-button" title="Download transcript">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
+                        <path fillRule="evenodd" d="M12 2a1 1 0 0 1 1 1v9.59l2.95-2.95a1 1 0 1 1 1.41 1.41l-4.66 4.66a1 1 0 0 1-1.41 
+                            0L6.63 11.05a1 1 0 1 1 1.41-1.41L11 12.59V3a1 1 0 0 1 1-1Z" clipRule="evenodd" />
+                        <path d="M4 18a2 2 0 0 1 2-2h2.5a1 1 0 1 1 0 2H6v1h12v-1h-2.5a1 1 0 1 1 0-2H18a2 2 0 0 1 2 
+                            2v1a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-1Z" />
+                    </svg>
+                </button>
+                <button id="clearTranscript" class="action-button" title="Clear transcript">
+                    <span style="font-weight:bold;font-size:16px;line-height:1;">×</span>
+                </button>
+                <!-- 2/27/2026 Customize -->
+
+            </div>
+        </div>
+    </div>
+    <div class="status-bar" id="statusText" style="display: none;">Ready</div>
+    <div id="chatContainer">
+        <div id="chatList"></div>
+    </div>
+    <script src="./gptPrompts.js"></script>
+    <script src="./shared/PromptBuilder.js"></script>
+    <script src="./shared/ClipboardWriter.js"></script>
+    <script src="./popup.js"></script>
+</body>
+
+</html>

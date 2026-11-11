@@ -4,7 +4,7 @@ export function createQueueDocuments({ queue, getRequest, openDialog, onSaved })
   const q = selector => document.querySelector(selector), dialog = q('#documents-dialog');
   const resume = q('#documents-resume'), letter = q('#documents-cover-letter'), enabled = q('#documents-cover-enabled');
   const status = q('#documents-status'), save = q('#documents-save');
-  let current, epoch = 0, busy = false;
+  let current, generation = null, epoch = 0, busy = false;
   function validate() {
     letter.disabled = !enabled.checked || busy;
     save.disabled = true;
@@ -40,7 +40,8 @@ export function createQueueDocuments({ queue, getRequest, openDialog, onSaved })
     busy = true;
     for (const control of dialog.querySelectorAll('button,input,textarea')) control.disabled = true;
     try {
-      await queue.saveDocuments(request.id, { resume: resume.value, coverLetter: letter.value, coverLetterEnabled: enabled.checked, expectedUpdatedAt: request.updatedAt });
+      await queue.saveDocuments(request.id, { resume: resume.value, coverLetter: letter.value, coverLetterEnabled: enabled.checked, expectedUpdatedAt: request.updatedAt,
+        generationId: generation?.id, sourceUrl: generation?.url });
       if (ticket === epoch) { dialog.close(); onSaved(request.id); }
     } catch (error) {
       if (ticket === epoch) { status.textContent = error.message; status.dataset.state = 'invalid'; }
@@ -50,14 +51,19 @@ export function createQueueDocuments({ queue, getRequest, openDialog, onSaved })
       letter.disabled = !enabled.checked;
     }
   });
-  return { open(id) {
+  return { open(id, { generated = null } = {}) {
     if (busy) return;
     const request = getRequest(id);
     if (!request) return;
     current = structuredClone(request); epoch++;
+    generation = generated;
     q('#documents-context').textContent = `${request.input.job.company || 'Base resume'} · ${request.input.profile.name}`;
     resume.value = request.resume ? JSON.stringify(request.resume, null, 2) : '';
     letter.value = request.coverLetter || ''; enabled.checked = request.coverLetterEnabled === true;
+    if (generated) {
+      resume.value = generated.result ? JSON.stringify(generated.result.resume, null, 2) : generated.raw || '';
+      letter.value = generated.result?.coverLetter || ''; enabled.checked = true;
+    }
     validate(); openDialog('documents-dialog');
     resume.focus();
   } };

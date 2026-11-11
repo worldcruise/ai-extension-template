@@ -1,0 +1,111 @@
+{
+  "release": "2.1.3",
+  "browser": "144.0.7559.96",
+  "passed": 18,
+  "checks": [
+    "v2.1.2 failure reproduced and v2.1.3 passes: native insertion refused; controlled editor reverts direct DOM mutation",
+    "v2.1.2 failure reproduced and v2.1.3 passes: prompt ID belongs to a noneditable wrapper",
+    "v2.1.2 failure reproduced and v2.1.3 passes: focus handler replaces the initial composer",
+    "native editing emits input once in v2.1.3, rather than native plus duplicate synthetic input",
+    "Normal/Detail/STAR in both modes send full long Unicode payloads without rebuilding or recopying",
+    "diagnostic history is bounded and contains counts/stages, not transcript/prompt content",
+    "working F8/F9/F10 still use the same adapter and copy their own final text",
+    "asynchronous handled paste and composer replacement are not mistaken for insertion failure or replayed",
+    "unsupported native insertion gets an insertion-stage error, not fabricated DOM text or a send click",
+    "accepted text with disabled Send is distinguished from rejected insertion",
+    "missing editor is distinguished from insertion/send readiness failures",
+    "post-click timeout remains uncertain and replay of the request ID cannot click again",
+    "existing draft is preserved exactly and never replaced or submitted",
+    "trusted user edit while waiting for Send cancels without overwriting the user",
+    "explicit composer-submit Send control is supported without generic form-submit guessing",
+    "voice control reusing composer-submit ID is never clicked as Send",
+    "cancellation during delayed editor processing cannot later submit the prompt",
+    "no uncaught JavaScript exceptions in adapter regression fixtures"
+  ],
+  "comparisons": [
+    {
+      "case": "native insertion refused; controlled editor reverts direct DOM mutation",
+      "result": {
+        "old": {
+          "status": "Error",
+          "error": "Timed out waiting for ChatGPT to become ready",
+          "clicks": 0,
+          "code": null,
+          "pasteCalls": 0
+        },
+        "new": {
+          "status": "Content sent",
+          "error": null,
+          "clicks": 1,
+          "code": null,
+          "pasteCalls": 1
+        }
+      }
+    },
+    {
+      "case": "prompt ID belongs to a noneditable wrapper",
+      "result": {
+        "old": {
+          "status": "Error",
+          "error": "Timed out waiting for ChatGPT to become ready",
+          "clicks": 0,
+          "code": null,
+          "pasteCalls": 0
+        },
+        "new": {
+          "status": "Content sent",
+          "error": null,
+          "clicks": 1,
+          "code": null,
+          "pasteCalls": 1
+        }
+      }
+    },
+    {
+      "case": "focus handler replaces the initial composer",
+      "result": {
+        "old": {
+          "status": "Error",
+          "error": "ChatGPT changed pages before submission",
+          "clicks": 0,
+          "code": null,
+          "pasteCalls": 0
+        },
+        "new": {
+          "status": "Content sent",
+          "error": null,
+          "clicks": 1,
+          "code": null,
+          "pasteCalls": 1
+        }
+      }
+    },
+    {
+      "case": "native input event duplication",
+      "result": {
+        "old": [
+          {
+            "trusted": true,
+            "type": "insertText"
+          },
+          {
+            "trusted": false,
+            "type": "insertText"
+          }
+        ],
+        "new": [
+          {
+            "trusted": true,
+            "type": "insertText"
+          }
+        ]
+      }
+    }
+  ],
+  "scope": "Real Chromium DOM + native edit events; mocked Chrome messages and OS clipboard. Controlled-editor model is a fixture, not ChatGPT internals.",
+  "limitations": [
+    "No authenticated ChatGPT or Google Meet",
+    "No native extension load or system clipboard validation",
+    "No proof that the simulated native-insertion rejection is the exact cause on the user machine"
+  ]
+}

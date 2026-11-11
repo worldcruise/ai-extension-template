@@ -18,11 +18,17 @@ test('the unpacked build has every manifest resource and excludes the references
     return files;
   }
   assert.deepEqual((await filesAt(output)).sort(), [...extensionFiles].sort());
+  for (const file of extensionFiles) assert.doesNotMatch(file, /(?:chatgpt-(?:queue|tab(?:-connection)?)\.(?:js|mjs)|web-chat|manual-chat|chat-page-actions|manual-prompt|resume-queue|queue-(?:mode|outcomes|diagnostics|connection))/);
+  const html = await readFile(join(output, 'index.html'), 'utf8');
+  assert.doesNotMatch(html, /Send to AI|Capture result|Copy prompt|id="(?:start-queue|pause-queue|queue-connection|regenerate-dialog|chat-connection-dialog)"/);
   const manifest = JSON.parse(await readFile(join(output, 'manifest.json'), 'utf8'));
   const context = vm.createContext({});
   vm.runInContext(await readFile(join(output, 'src/build-info.js'), 'utf8'), context);
   assert.equal(context.AiAgentBuild.id, await runtimeFingerprint());
   assert.equal(context.AiAgentBuild.version, manifest.version);
+  const sourceContext = vm.createContext({ chrome: { runtime: { getManifest: () => manifest } } });
+  vm.runInContext(await readFile(join(root, 'src/build-info.js'), 'utf8'), sourceContext);
+  assert.equal(sourceContext.AiAgentBuild.version, manifest.version);
   for (const file of extensionFiles.filter(file => file !== 'src/build-info.js')) {
     assert.ok((await readFile(join(root, file))).equals(await readFile(join(output, file))), `${file} matches its runtime input`);
   }

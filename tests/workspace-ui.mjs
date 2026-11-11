@@ -252,6 +252,7 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await read('if (document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
   await read('document.getElementById("chat-toolbar-reveal").focus()');
   await until(() => read('!document.getElementById("company-chat-search").disabled'), 'expanded ChatGPT restores search readiness');
+  await cdp.send('Page.bringToFront', {}, panel);
   await read('document.getElementById("company-chat-search").value="resume planning";document.getElementById("company-chat-search").focus()');
   await cdp.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 }, panel);
   await cdp.send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 }, panel);
@@ -280,16 +281,14 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await setValue('#queue-filter', 'all');
   assert.equal(await read('document.querySelectorAll("#resume-queue .job-request").length'), 3, 'filters leave saved jobs intact');
 
-  await click('[data-request-id="3"] [data-action="retry-save"]');
   assert.equal(await read('document.querySelectorAll(".state-pill[data-state=ready]").length'), 3);
-  assert.match(await text('#workspace-status'), /No generation was started/);
   await click('[data-request-id="1"] [data-action="details"]');
   assert.equal(await read('document.getElementById("request-dialog").open'), true);
   assert.match(await text('#request-metadata'), /Morgan Taylor/);
   assert.equal(Object.keys(JSON.parse(await text('#request-output'))).length, 6);
   await screenshot('workspace-request.png');
   await click('#request-open-chat');
-  await until(() => read('!document.getElementById("chat-view").hidden'), 'connected chat opens after queue pause');
+  await until(() => read('!document.getElementById("chat-view").hidden'), 'connected chat opens without changing its draft');
   assert.equal(await evaluate(frameSession, 'document.getElementById("prompt-textarea").value'), 'Keep this ChatGPT draft');
   await read('if (!document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
   await click('[data-request-id="1"] [data-action="details"]');
@@ -379,21 +378,22 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await evaluate(frameSession, `globalThis.nativeCtrlEnterForTest = 0;
     document.addEventListener('keydown', event => { if (event.ctrlKey && event.key === 'Enter') nativeCtrlEnterForTest++; });`);
   await shortcut('Enter', {inChat:true,repeat:true});
-  await until(() => read('document.documentElement.dataset.studioBusy !== "true" && !document.getElementById("chat-view").hidden'), 'Ctrl+Enter adds once and opens Chat');
+  await until(() => read('document.documentElement.dataset.studioBusy !== "true" && document.getElementById("chat-view").hidden'), 'Ctrl+Enter saves once and shows the queue');
   await until(() => read('Boolean(document.querySelector(".state-pill[data-state=queued]"))'), 'manual Add stays queued and preserves the Chat draft');
   assert.equal(await read('document.querySelectorAll(".job-request").length'), 1);
   assert.equal(await evaluate(frameSession, 'nativeCtrlEnterForTest'), 0);
   assert.equal(await evaluate(frameSession, 'document.getElementById("prompt-textarea").value'), 'Keep this ChatGPT draft');
   assert.match(await text('#resume-queue .job-request'), /Queued/);
-  assert.equal(await read('addClipboardWrites.length'), 1);
-  assert.equal(await read('import(chrome.runtime.getURL("src/queue-store.mjs")).then(module => module.createQueueStore().read()).then(state => state.requests.filter(job => !job.isExample).every(job => !job.deliveryId && job.attempts.length === 0))'), true, 'manual Add creates no delivery attempt or send permission');
+  assert.equal(await read('document.querySelectorAll("[data-action=prepare-chat], [data-action=capture-chat], [data-action=copy-prompt], #start-queue, #pause-queue, #queue-connection").length'), 0, 'AI automation controls are removed');
+  assert.equal(await read('addClipboardWrites.length'), 0);
+  assert.equal(await read('import(chrome.runtime.getURL("src/queue-store.mjs")).then(module => module.createQueueStore().read()).then(state => state.requests.filter(job => !job.isExample).every(job => !job.deliveryId && !job.attempts))'), true, 'manual Add creates no delivery attempt or send permission');
   assert.equal(await read('document.getElementById("check-existing-jobs").checked'), true);
-  await shortcut('Enter', { inChat: true, repeat: true });
+  await shortcut('Enter', { repeat: true });
   await until(() => read('document.documentElement.dataset.studioBusy!=="true" && !document.getElementById("queue-notice").hidden'), 'Ctrl+Enter reports a duplicate already in the queue');
   assert.equal(await text('#queue-notice-title'), 'Already applied');
   assert.match(await text('#queue-notice-message'), /candidate.*queue/);
   assert.equal(await read('document.querySelectorAll(".job-request").length'), 1);
-  assert.equal(await read('addClipboardWrites.length'), 1, 'duplicate shortcut never copies another prompt');
+  assert.equal(await read('addClipboardWrites.length'), 0, 'saving jobs never changes the clipboard');
   assert.equal(await evaluate(frameSession, 'document.getElementById("prompt-textarea").value'), 'Keep this ChatGPT draft');
   assert.equal(await evaluate(frameSession, 'nativeCtrlEnterForTest'), 0);
   assert.equal(await read('(() => {const rect=document.getElementById("queue-notice").getBoundingClientRect();return rect.width>0&&rect.left>=0&&rect.right<=innerWidth;})()'), true);
@@ -402,7 +402,7 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   assert.equal(await read('document.getElementById("queue-notice").hidden'), true);
   await read('if (!document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()'); await click('#view-queue');
   await click('#resume-queue .job-request [data-action="details"]');
-  await read('document.getElementById("request-full-prompt").focus()');
+  await read('document.querySelector("#request-dialog [data-close-dialog]").focus()');
   await shortcut('Enter');
   assert.equal(await read('document.querySelectorAll(".job-request").length'), 1, 'modal shortcuts cannot add jobs');
   assert.equal(await read('document.getElementById("request-dialog").open'), true);
@@ -421,9 +421,6 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await closeDialog('request-dialog');
   await click('#resume-queue .job-request [data-action="cancel"]');
   assert.equal(await read('document.querySelectorAll(".job-request").length'), 0);
-  await click('#pause-queue');
-  assert.equal(await read('document.getElementById("pause-queue").getAttribute("aria-pressed")'), 'true');
-  await click('#pause-queue');
   await click('#review-another');
   await click('#tailor');
   assert.equal(await read('document.getElementById("job-context").hidden'), false);
@@ -439,7 +436,7 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await click('#tailor');
   await setValue('#job-description', '', 'input');
   await click('#add-request');
-  await until(() => read('Boolean(document.querySelector(".state-pill[data-state=queued]")) && !document.getElementById("chat-view").hidden'), 'base resume stays queued for manual sending');
+  await until(() => read('Boolean(document.querySelector(".state-pill[data-state=queued]")) && document.getElementById("chat-view").hidden'), 'base resume stays saved in the queue');
   await read('if (!document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()'); await click('#view-queue');
   await click('#resume-queue .job-request [data-action="details"]');
   assert.match(await text('#request-metadata'), /Base resume/);
@@ -551,7 +548,7 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   assert.equal(await read('document.getElementById("account-panel").hidden'), false);
   assert.equal(await read('document.getElementById("account-panel").contains(document.getElementById("chat-provider"))'), true);
   assert.equal(await read('document.getElementById("chat-view").contains(document.getElementById("chat-provider"))'), false);
-  assert.equal(await read('document.getElementById("account-check").hidden'), true);
+  assert.equal(await read('document.getElementById("account-check")'), null);
   await screenshot('workspace-chat-settings.png');
   assert.equal(await read('document.getElementById("account-chat") === null'), true, 'redundant Open chat button removed');
   await setValue('#chat-provider', 'deepseek');
@@ -759,6 +756,6 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
     'saved company source links remain available in Details', 'Search chats opens the provider native dialog', 'custom saved-title search removed',
     'Chat has no Studio footer', 'fixed Studio action buttons',
     'candidate isolation and empty state', 'template and prompt previews', 'immutable request snapshots', 'queued example cancellation',
-    'save-retry example without generation', 'base resume example', 'resume preview and JSON copy', 'export availability',
+    'local saved documents', 'base resume example', 'resume preview and JSON copy', 'export availability',
     'literal job text rendering', 'account panel', 'dialog Escape and keyboard tabs', 'fixed controls and narrow layouts', 'light and dark themes'] };
 }

@@ -1,5 +1,3 @@
-import { terminalStates } from './queue-outcomes.mjs';
-
 export const duplicateCheckStorageKey = 'checkExistingJobs';
 
 const trustedCompany = ['user', 'structured', 'page'];
@@ -40,7 +38,7 @@ export function findExistingJob(input, requests = []) {
   if (!company && !url) return null;
   for (const request of requests) {
     if (request.isExample || request.input?.candidateId !== input.candidateId || !request.input?.tailor ||
-        request.state === 'cancelled' || terminalStates.includes(request.state)) continue;
+        request.state === 'cancelled') continue;
     const matchedBy = [];
     if (company && company === companyKey(request.input.job)) matchedBy.push('company');
     if (url && url === duplicateJobUrl(request.input.job?.url)) matchedBy.push('url');

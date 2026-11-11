@@ -39,9 +39,10 @@ export function deepseekState(event, source, nonce) {
       data.chats.some(chat => !deepseekConversation(chat?.url) || typeof chat.title !== 'string' || chat.title.length > 200)) return null;
   const chats = [...new Map(data.chats.map(chat => [deepseekConversation(chat.url), { url: deepseekConversation(chat.url), title: chat.title }])).values()];
   if (data.loaded !== undefined && typeof data.loaded !== 'boolean') return null;
+  if (data.hasFormInput !== undefined && typeof data.hasFormInput !== 'boolean') return null;
   if (data.pinnedUrls !== undefined && (!Array.isArray(data.pinnedUrls) || data.pinnedUrls.length > 300 || data.pinnedUrls.some(url => !deepseekConversation(url)))) return null;
   const pinnedUrls = [...new Set((data.pinnedUrls || []).map(deepseekConversation))];
   const regular = chats.filter(chat => !pinnedUrls.includes(chat.url));
   return { currentUrl: deepseekRoute(data.url), chats: regular, urls: regular.map(chat => chat.url), pinnedUrls, loaded: data.loaded !== false, ready: data.ready,
-    hasDraft: data.hasDraft, busy: data.busy };
+    hasDraft: data.hasDraft, busy: data.busy, hasFormInput: data.hasFormInput === true };
 }

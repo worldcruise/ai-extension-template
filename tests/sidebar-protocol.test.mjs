@@ -58,24 +58,11 @@ test('frame shortcuts require an authenticated extension sender, current nonce, 
   for (const extra of [{type:'state'},{action:'send'},{pressId:'x'.repeat(101)},{pressId:'invalid id'}]) assert.equal(read({...message,...extra}),null);
 });
 
-test('queue progress keeps a bounded operation identity and only supported phases and conversation URLs', () => {
+test('retired automation messages are rejected', () => {
   const source = {};
-  const data = {channel:FRAME_CHANNEL,nonce:'navigation-1',type:'queue.progress',operationId:'operation-1',phase:'prepared',url:'https://chatgpt.com/'};
-  const event = {source,origin:'https://chatgpt.com',data};
-  assert.equal(frameMessage(event,source,'navigation-1').phase,'prepared');
-  assert.equal(frameMessage(event,source,'wrong-navigation'),null);
-  for (const extra of [{operationId:'bad request'}, {phase:'execute'}, {url:'https://evil.test/'}, {url:'https://chatgpt.com/auth/login'}]) {
-    assert.equal(frameMessage({...event,data:{...data,...extra}},source,'navigation-1'),null);
-  }
-});
-
-test('queue replies reject unbounded output and malformed success payloads', () => {
-  const source = {};
-  const data = {channel:FRAME_CHANNEL,nonce:'navigation-1',type:'queue.reply',operationId:'operation-1',ok:true,value:{raw:'{}'}};
-  const event = {source,origin:'https://chatgpt.com',data};
-  assert.equal(frameMessage(event,source,'navigation-1').value.raw,'{}');
-  for (const extra of [{ok:'yes'}, {value:[]}, {value:null}, {value:{raw:'x'.repeat(500001)}}]) {
-    assert.equal(frameMessage({...event,data:{...data,...extra}},source,'navigation-1'),null);
+  for (const type of ['queue.reply', 'queue.progress', 'queue.command', 'queue.authorize']) {
+    const event = { source, origin: 'https://chatgpt.com', data: { channel: FRAME_CHANNEL, nonce: 'n', type, operationId: 'op', ok: true, value: { raw: '{}' } } };
+    assert.equal(frameMessage(event, source, 'n'), null);
   }
 });
 

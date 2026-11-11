@@ -1,0 +1,21 @@
+{
+  "scenario": "ChatGPT acknowledged submission while clipboard copying explicitly failed",
+  "input": {
+    "status": "Content sent",
+    "clipboard": {
+      "ok": false,
+      "code": "copy_command_failed"
+    }
+  },
+  "v2.1.0": {
+    "jobStatus": "succeeded",
+    "clipboard": null
+  },
+  "v2.1.1": {
+    "jobStatus": "succeeded",
+    "clipboard": {
+      "ok": false,
+      "code": "copy_command_failed"
+    }
+  }
+}

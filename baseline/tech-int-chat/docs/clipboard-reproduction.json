@@ -1,0 +1,33 @@
+{
+  "source": "actual v2.1.1 archive",
+  "scope": "Static control-flow reproductions with mocked browser boundaries; not proof of the user machine failure",
+  "results": [
+    {
+      "case": "No ChatGPT tab",
+      "error": "No ChatGPT tab found. Open chatgpt.com first.",
+      "clipboard_attempts": 0,
+      "path": [
+        "find-tab"
+      ]
+    },
+    {
+      "case": "Native API rejects (controlled reproduction)",
+      "result": {
+        "ok": false,
+        "code": "clipboard_write_denied",
+        "requestId": "repro_request_2"
+      },
+      "focused_local_legacy_attempts": 0
+    },
+    {
+      "case": "Panel response consumes shared deadline (controlled reproduction)",
+      "result": {
+        "ok": false,
+        "code": "expired"
+      },
+      "path": [
+        "tech-int-chat-panel-clipboard"
+      ]
+    }
+  ]
+}

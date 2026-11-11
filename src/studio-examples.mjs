@@ -31,7 +31,7 @@ export const prompts = {
 
 export function createExamples() {
   return jobs.map((job, index) => ({
-    id: index + 1, state: index === 2 ? 'saving' : 'ready',
+    id: index + 1, state: 'ready',
     input: structuredClone({ candidateId: 'morgan', profile: profiles.morgan, job, tailor: true,
       resumeTemplate: index === 1 ? 'harvard' : 'kakuna', promptTemplate: 'focused', prompt: prompts.focused.text }),
     resume: structuredClone({ company: job.company, title: profiles.morgan.role, summary: profiles.morgan.summary,

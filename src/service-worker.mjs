@@ -1,6 +1,28 @@
 import { EMBED_RULE_ID, DEEPSEEK_EMBED_RULE_ID, embedRules, deepseekEmbedRules } from './sidebar-protocol.mjs';
 import { createJobExtractionService } from './job-extraction-service.mjs';
 import { createReadPageCommands } from './read-page-commands.mjs';
+import { createGenerationService } from './generation-service.mjs';
+
+const generations = createGenerationService();
+chrome.runtime.onMessage.addListener((message, sender, respond) => {
+  if (sender.id !== chrome.runtime.id || !message?.type?.startsWith('generation.')) return false;
+  const ui = sender.url === chrome.runtime.getURL('index.html');
+  let task;
+  if (ui && message.type === 'generation.start') task = () => generations.start(message.jobId, message.provider);
+  if (ui && message.type === 'generation.list') task = async () => {
+    const runs = await generations.list();
+    if (message.reconnect) void generations.reconnect().catch(() => {});
+    return runs;
+  };
+  if (ui && message.type === 'generation.read') task = () => generations.read(message.id);
+  if (ui && message.type === 'generation.open') task = () => generations.open(message.id, message.resume === true);
+  if (ui && message.type === 'generation.stop') task = () => generations.stop(message.id);
+  if (!ui && message.type === 'generation.attach') task = () => generations.attach(message.id, message.actorId, sender);
+  if (!ui && message.type === 'generation.event') task = () => generations.event(message.id, message.actorId, message.data || {}, sender);
+  if (!task) return false;
+  Promise.resolve().then(task).then(value => respond({ ok: true, value }), error => respond({ ok: false, error: error.message || 'The generation could not continue.' }));
+  return true;
+});
 
 const extractJob = createJobExtractionService();
 const readPageCommands = createReadPageCommands();

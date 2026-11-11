@@ -3,17 +3,22 @@ import { createHash } from 'node:crypto';
 import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { resumeTemplates } from '../src/resume-templates.mjs';
+import { checkVersion } from './version.mjs';
 
 export const root = fileURLToPath(new URL('../', import.meta.url));
 export const extensionFiles = [
-  'src/build-info.js', 'src/runtime-info.mjs', 'src/queue-diagnostics.mjs', 'src/queue-outcomes.mjs', 'src/job-metadata.mjs',
-  'src/queue-mode.mjs', 'src/manual-prompt.mjs', 'src/job-duplicates.mjs',
+  'src/build-info.js', 'src/job-metadata.mjs', 'src/job-duplicates.mjs',
   'manifest.json', 'index.html',
   'src/sidebar.css', 'src/sidebar.mjs', 'src/sidebar-protocol.mjs',
   'src/workspace.mjs', 'src/studio.mjs', 'src/studio-examples.mjs', 'src/icons.mjs',
   'src/workspace-dock.mjs',
   'src/saved-chat.mjs',
   'src/manual-documents.mjs', 'src/queue-documents.mjs',
+  'src/generation-data.mjs', 'src/generation-store.mjs', 'src/generation-service.mjs', 'src/generation-client.mjs',
+  'src/generation-diagnostics.mjs',
+  'src/generation-dom.js', 'src/generation-chatgpt.js', 'src/generation-deepseek.js', 'src/generation-tab.js',
+  'src/chatgpt-submit-adapter.js',
+  'src/chatgpt-tabs.mjs',
   'src/browser-tabs.mjs', 'src/read-page-commands.mjs', 'src/shortcut-settings.mjs', 'src/job-page-access.mjs',
   'src/workspace-shortcut-keys.js', 'src/workspace-shortcuts.mjs',
   'src/chat-toolbar.mjs',
@@ -21,13 +26,12 @@ export const extensionFiles = [
   'src/native-chat-search.js',
   'src/sidebar-history.js',
   'src/deepseek-toolbar.mjs', 'src/deepseek-protocol.mjs', 'src/deepseek-frame.js',
+  'src/deepseek-recovery.mjs',
   'src/deepseek-routes.js',
   'src/deepseek-consent.js',
   'src/chat-history.js',
-  'src/company-chats.mjs',
   'src/resume-templates.mjs',
-  'src/resume-data.mjs', 'src/queue-store.mjs', 'src/resume-queue.mjs', 'src/chatgpt-queue.js',
-  'src/chatgpt-tab.js', 'src/chatgpt-tab-connection.mjs', 'src/queue-connection-settings.mjs',
+  'src/resume-data.mjs', 'src/queue-store.mjs', 'src/job-queue.mjs',
   'src/keyword-matcher.js', 'src/job-page-highlighter.js', 'src/page-highlights.mjs', 'src/keyword-settings.mjs',
   'src/job-highlights.css',
   'src/job-site-adapters.mjs', 'src/job-page-evidence.mjs', 'src/job-extraction-core.mjs', 'src/job-extraction-service.mjs',
@@ -45,6 +49,7 @@ export async function runtimeFingerprint() {
 }
 
 export async function buildExtension() {
+  await checkVersion(root);
   const outputRoot = join(root, 'dist');
   const output = join(outputRoot, 'extension');
   await mkdir(outputRoot, { recursive: true });

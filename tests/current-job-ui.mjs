@@ -74,7 +74,7 @@ export async function checkCurrentJobUI({ cdp, panel, read, click, until, screen
     assert.notEqual(added[0].input.job.company, 'Wrong draft company');
     assert.notEqual(added[0].input.job.description, 'Wrong draft description');
     assert.equal(added[0].state, 'queued');
-    assert.deepEqual(added[0].attempts, []);
+    assert.equal(added[0].attempts, undefined);
     assert.equal(await visible(), false, 'saved URL hides capture immediately');
     assert.equal(await read('document.getElementById("chat-view").hidden'), false);
     assert.equal(await evaluate(frameSession, 'document.getElementById("prompt-textarea").value'), 'Keep my unsent draft');

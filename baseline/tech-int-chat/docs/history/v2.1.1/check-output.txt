@@ -1,0 +1,5 @@
+
+> tech-int-chat@2.1.1 check
+> node scripts/check.mjs
+
+PASS: MV3 manifest, 12 manifest references, 23 JavaScript syntax checks, local imports, clipboard-only additional permissions, 5 original assets, selector block and 11 extraction functions.

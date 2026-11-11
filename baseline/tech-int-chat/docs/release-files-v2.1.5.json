@@ -1,0 +1,480 @@
+{
+  "release": "2.1.5",
+  "files": [
+    {
+      "path": ".gitignore",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "bytes": 10650,
+      "sha256": "f48ce117e501b23cbaf9b7e6eadfa571f4dce6e403b16bc17fe26df50f50ebac"
+    },
+    {
+      "path": "README.md",
+      "bytes": 5001,
+      "sha256": "40108ff19327118c0115abfb60b27a36b401e83c283c8a63b38f3d7cbb06cc85"
+    },
+    {
+      "path": "START-HERE.txt",
+      "bytes": 1622,
+      "sha256": "4390af0b864fc68ef5940b695da927224e57b30af56f96f7a54eb07204b60bdb"
+    },
+    {
+      "path": "adapters/ChatGPTAdapter.js",
+      "bytes": 20487,
+      "sha256": "0532d3e49b3e725af734cd72644c53291eb35212fe2646ee297a687df2e9c734"
+    },
+    {
+      "path": "background.js",
+      "bytes": 6976,
+      "sha256": "e1554b1a9099afc35fa07686a0c300b7eb4c4c0bc78fd8ddedfe0659bf3c1784"
+    },
+    {
+      "path": "background.js.LICENSE.txt",
+      "bytes": 149,
+      "sha256": "cdf963ced7d25a0f98901a547647b4d6e2dbe0197fd78c87a059a87b0e542fe2"
+    },
+    {
+      "path": "chatGPT.js",
+      "bytes": 5982,
+      "sha256": "93c01b86056eeee14b769eb2b4a8ea4ca84666ad5772cb78a5ce6b6f9359740d"
+    },
+    {
+      "path": "chatGPT.js.LICENSE.txt",
+      "bytes": 149,
+      "sha256": "cdf963ced7d25a0f98901a547647b4d6e2dbe0197fd78c87a059a87b0e542fe2"
+    },
+    {
+      "path": "core/Config.js",
+      "bytes": 412,
+      "sha256": "06ba099e831111a0d539f9f00219f46032c7b0c045b04ba264372d0ff5e56e21"
+    },
+    {
+      "path": "core/Logger.js",
+      "bytes": 177,
+      "sha256": "024f45e85fd6d89cb3fe15c47eb76158fe9c259fc214a86e672ebd33a7155d35"
+    },
+    {
+      "path": "core/MessageQueue.js",
+      "bytes": 289,
+      "sha256": "fb566f6383b500f4211cca6db8025276d03428df3f0252abde99344595e790c7"
+    },
+    {
+      "path": "core/RequestManager.js",
+      "bytes": 6759,
+      "sha256": "1f5143fd3eaa85a9a71af78fe0174b25a83d29df1f5debd756204bd57d7afaa3"
+    },
+    {
+      "path": "core/SessionManager.js",
+      "bytes": 824,
+      "sha256": "63876b142d5e6da1196ecddea34e658d55bd36f2638267ab6f1a882a996e2cdc"
+    },
+    {
+      "path": "core/SubmissionDiagnostics.js",
+      "bytes": 2556,
+      "sha256": "74db93c57001a74190944d5207b85774ae25a5efea0f4bc50e36fd15a1e236e6"
+    },
+    {
+      "path": "core/TranscriptStore.js",
+      "bytes": 4938,
+      "sha256": "8e09adb18d737ed363dd462d381b11e72aaed1d813119728ae52bf8073f45257"
+    },
+    {
+      "path": "diagnostics/clipboard.html",
+      "bytes": 747,
+      "sha256": "e444a94abadfa53861980266287c80cc924bb12678d8a034835737b7bccedebe"
+    },
+    {
+      "path": "diagnostics/clipboard.js",
+      "bytes": 1559,
+      "sha256": "dd78d4304f5cac9810797d5779fbbb5595264ce3aed0baca846d9e75bc76f1df"
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "bytes": 7573,
+      "sha256": "a5c1a6e415c96c766c8de439e46085f6eb8ba622d0d72a6128249e1c26870978"
+    },
+    {
+      "path": "docs/BACKLOG.md",
+      "bytes": 2254,
+      "sha256": "b15e8568262dcb6ddfd4c098da276aa48268623df68a4f446ccd099bbf6e3145"
+    },
+    {
+      "path": "docs/CLIPBOARD-REVIEW.md",
+      "bytes": 5785,
+      "sha256": "eef212848cda1750e47942f877517abb95badab0aef7eab44b39ce0c9bee8d6e"
+    },
+    {
+      "path": "docs/CLIPBOARD.md",
+      "bytes": 4579,
+      "sha256": "a61d2b63c1f80c0009a0c549edeb98cc0ec02196b619a42a42a6d65a7ac2c4a7"
+    },
+    {
+      "path": "docs/FINAL-AUDIT-v2.1.5.md",
+      "bytes": 3730,
+      "sha256": "ec8aaee9a8e23da2db80be05b5ff9f25576ad3e9656a9de96817012aefa2bd80"
+    },
+    {
+      "path": "docs/SEND-DIAGNOSTICS.md",
+      "bytes": 1176,
+      "sha256": "179f75f5ecd6f533ba42c92f92a1ca5fc663c3dbbf7a9ff394c742bda9f00b16"
+    },
+    {
+      "path": "docs/SEND-REVIEW.md",
+      "bytes": 7578,
+      "sha256": "ba07beec77548fdd67f55b22f2b1830398514b32f902ab6e3cf2bfe9048c2916"
+    },
+    {
+      "path": "docs/TEST-RESULTS.md",
+      "bytes": 2129,
+      "sha256": "2776d0db36d0bbd0f7ba356a6e76ac36659e5b1d606225ac51b39f7c7c54df9b"
+    },
+    {
+      "path": "docs/browser-dom-output-v2.1.5.txt",
+      "bytes": 6206,
+      "sha256": "c182b4c4fd9ea1439534e4d600e9da272ee64baadefd1314f5e350e1c26ffed8"
+    },
+    {
+      "path": "docs/browser-dom-results-v2.1.5.json",
+      "bytes": 3253,
+      "sha256": "554b8500c004aaef57738bc9bbbe740d59a19ddf36eb38544cd7d36bd7b7a1a9"
+    },
+    {
+      "path": "docs/chatgpt-isolated-output-v2.1.5.txt",
+      "bytes": 711,
+      "sha256": "dd38cb5bceedb7ad30a772d5315ff89b53ea97b7bc8eda8785f2c08896871a00"
+    },
+    {
+      "path": "docs/chatgpt-isolated-results-v2.1.5.json",
+      "bytes": 711,
+      "sha256": "dd38cb5bceedb7ad30a772d5315ff89b53ea97b7bc8eda8785f2c08896871a00"
+    },
+    {
+      "path": "docs/check-output-v2.1.5.txt",
+      "bytes": 412,
+      "sha256": "1777c6d8c63544eeb7dcc49c4f293d2e9dff74e8ec68d68084a0fb117c6b2d9d"
+    },
+    {
+      "path": "docs/clipboard-reproduction.json",
+      "bytes": 839,
+      "sha256": "dca29fac0d62693e79a56c5620c86b3b9279bb1c7c95862908caefe72240dc9a"
+    },
+    {
+      "path": "docs/extension-load-attempt.json",
+      "bytes": 573,
+      "sha256": "2d673a1dc174c118190e66d7edcc9b1641b26a201649c0e47d406579a53cc20e"
+    },
+    {
+      "path": "docs/history/v2.1.1/ARCHITECTURE.md",
+      "bytes": 6239,
+      "sha256": "0958641c286bac53005d0a215d05884ec3bcd221a89eac0b6a37aa0a6fc918d8"
+    },
+    {
+      "path": "docs/history/v2.1.1/CLIPBOARD-REVIEW.md",
+      "bytes": 2888,
+      "sha256": "de210a9f4cca285f603711ebced32336386e6f89a8a556fe7ef0e371cfc71f4b"
+    },
+    {
+      "path": "docs/history/v2.1.1/CLIPBOARD.md",
+      "bytes": 7689,
+      "sha256": "679bc0213e4cbe57b5da87559f5867e9c3bf0b26acf465061648e3cbd0f0c8e4"
+    },
+    {
+      "path": "docs/history/v2.1.1/TEST-RESULTS.md",
+      "bytes": 4462,
+      "sha256": "cd63522753c2d70cf7bd0a8127ff3954b14515e944023efe06e31053a27b4c60"
+    },
+    {
+      "path": "docs/history/v2.1.1/browser-dom-results.json",
+      "bytes": 2874,
+      "sha256": "5f146863ff3d4acb2b7ec04a19478d1f4d9d87a439116184d3b61b466e1d26a4"
+    },
+    {
+      "path": "docs/history/v2.1.1/check-output.txt",
+      "bytes": 245,
+      "sha256": "5f26359dee339113946b30b146ab0e9a5ef41883ac077a64c88021f00cc5bcaa"
+    },
+    {
+      "path": "docs/history/v2.1.1/clipboard-reproduction.json",
+      "bytes": 422,
+      "sha256": "6e623f4340fb239ca028bdddfb1215b18e61ecfdee3af978627973b2e58ce91d"
+    },
+    {
+      "path": "docs/history/v2.1.1/extension-load-attempt.json",
+      "bytes": 996,
+      "sha256": "a14741a954f6d2be55769231f9d3903a477db8f2ffc19c0afd5927a5cb05b49b"
+    },
+    {
+      "path": "docs/history/v2.1.1/unit-test-output.txt",
+      "bytes": 10745,
+      "sha256": "3544cc16a16df265cfa5f79dec53c80685802a38f8200b2f2247a17284b1402f"
+    },
+    {
+      "path": "docs/history/v2.1.2/CLIPBOARD.md",
+      "bytes": 4639,
+      "sha256": "cec7170df75e770782f88edade34fb596b6e68932cb0fe500cf430cf8d53cbc2"
+    },
+    {
+      "path": "docs/history/v2.1.2/README.md",
+      "bytes": 11573,
+      "sha256": "0514bff2b2bbb82a7387c77164939790627e4fd9b1ae73813d003fcac812e23d"
+    },
+    {
+      "path": "docs/history/v2.1.2/START-HERE.txt",
+      "bytes": 1510,
+      "sha256": "7742046eb49760878374ee29513a3dc53a66e09bbd4e646c00068677491f15d2"
+    },
+    {
+      "path": "docs/history/v2.1.2/TEST-RESULTS.md",
+      "bytes": 3507,
+      "sha256": "8060925012da4f4ba93f2428d07ff845c335e4394d417b1d5b23faee2180ef8b"
+    },
+    {
+      "path": "docs/history/v2.1.2/browser-dom-results.json",
+      "bytes": 3258,
+      "sha256": "794be0d71a737eeb6eca25bc85868bd38bd9c30edfed465931b1b38bccc05ef5"
+    },
+    {
+      "path": "docs/history/v2.1.2/check-output.txt",
+      "bytes": 252,
+      "sha256": "9b16c12f0a578945be41238d43362528c40d62d7580bb47ce445a9af84edddc4"
+    },
+    {
+      "path": "docs/history/v2.1.2/extension-load-attempt.json",
+      "bytes": 626,
+      "sha256": "55dba25d4aa236a688c7253bfe8e1856f6350432f106c9e90605033298bd2833"
+    },
+    {
+      "path": "docs/history/v2.1.2/release-files.json",
+      "bytes": 696,
+      "sha256": "8813438f8ce346f55ac53de41f02651ff300b496cadf7210cf3a9c6162991fe1"
+    },
+    {
+      "path": "docs/history/v2.1.2/unit-test-output.txt",
+      "bytes": 14589,
+      "sha256": "51ca5e3ddfff052ac0e5ba615ecc1b3445f56c78a5109d706ff20301ce704856"
+    },
+    {
+      "path": "docs/preservation.json",
+      "bytes": 1707,
+      "sha256": "5940597846b15fca2c87e972fbf5a36dfc389222d82bb13c1eb3f8b1b91765cd"
+    },
+    {
+      "path": "docs/unit-test-output-v2.1.5.txt",
+      "bytes": 16903,
+      "sha256": "1739960772f4660c2813d1d7da1e3d964431bd9222052682319a92229b752f64"
+    },
+    {
+      "path": "docs/v2.1.0-baseline-browser-dom.json",
+      "bytes": 2229,
+      "sha256": "a3fe77e4351e41ab24bc344151009a6db407d24c9a1f3e0e5a072f4b988655e4"
+    },
+    {
+      "path": "docs/v2.1.0-baseline-unit-output.txt",
+      "bytes": 7838,
+      "sha256": "409610045e05c82d580d176075bb2f33217a1b02638b8b8e5cbcd319dcc0b63d"
+    },
+    {
+      "path": "docs/v2.1.0-preservation.json",
+      "bytes": 2752,
+      "sha256": "479fd74b99293b70f99217eea874f96d6e988da79dbbdb6295f1fec359e35e71"
+    },
+    {
+      "path": "docs/v2.1.1-baseline-unit-output.txt",
+      "bytes": 10741,
+      "sha256": "f7122aa7e7d258e559e93e6406bdeac5ff6cc20fc2adf6f36a6df7e67358f133"
+    },
+    {
+      "path": "docs/v2.1.1-preservation.json",
+      "bytes": 7970,
+      "sha256": "9fd694f7be8d064245b849dd0642c3a002590ab8641f18737f179a510a31afa3"
+    },
+    {
+      "path": "docs/v2.1.2-preservation.json",
+      "bytes": 3437,
+      "sha256": "ab334c03fe15f5891775855bace366049c7268e9c6378a7c51b93588a9b1760e"
+    },
+    {
+      "path": "docs/v2.1.3-preservation.json",
+      "bytes": 2458,
+      "sha256": "dc422695fc778d3b9e3329367eb7e15c3fb4300598402e8402c20537c5ea3c0c"
+    },
+    {
+      "path": "docs/v2.1.5-submit-regression-output.txt",
+      "bytes": 500,
+      "sha256": "9f84ec2024d6145232f1b7ef74fe5f6927d7629c084bd27bba10f102e0eecae7"
+    },
+    {
+      "path": "docs/v2.1.5-submit-regression.json",
+      "bytes": 500,
+      "sha256": "9f84ec2024d6145232f1b7ef74fe5f6927d7629c084bd27bba10f102e0eecae7"
+    },
+    {
+      "path": "gptPrompts.js",
+      "bytes": 2391,
+      "sha256": "87c4b2c50ea658261bab2a47c83cefbeebaa1ce420ea90922608af6a001c0faf"
+    },
+    {
+      "path": "images/extension-128.png",
+      "bytes": 3425,
+      "sha256": "09ad1655ec2923b8e6eb0babd678a79a485cf276a0ed2665c109ba1ddaa77ed5"
+    },
+    {
+      "path": "images/extension-32.png",
+      "bytes": 834,
+      "sha256": "b8361aa8b437cc3037914d89febed93446bbf76dfc5ce68c388b40735f81df96"
+    },
+    {
+      "path": "images/extension-48.png",
+      "bytes": 1189,
+      "sha256": "79b66130e4c96f0f434b1fb9e21edfd9d760e0eb2cfc7d690a900671b501161f"
+    },
+    {
+      "path": "index.html",
+      "bytes": 12743,
+      "sha256": "62e3937de38a67235f4d4aa729f597fec868c231ec8dafdab80e48cc2d7445f4"
+    },
+    {
+      "path": "manifest.json",
+      "bytes": 1432,
+      "sha256": "b4b82719cc2444ac3355692a03c95af935d61b926b85a68b41f55bc882c3f5a6"
+    },
+    {
+      "path": "meeting.js",
+      "bytes": 26208,
+      "sha256": "72b4a331bebe6921246b1c721da61f31595ce52b7e61965107fa35b4c5900015"
+    },
+    {
+      "path": "offscreen/clipboard.html",
+      "bytes": 200,
+      "sha256": "f20a865aa377e59cbf79ad3f043e1ee32fb66f2328b2ca83c0b8066b1186c0ae"
+    },
+    {
+      "path": "offscreen/clipboard.js",
+      "bytes": 2566,
+      "sha256": "5d9dcf24910e7dc5d310d1920b004ee0fa40882e15622beeff44c2ec0d8b8ce0"
+    },
+    {
+      "path": "package.json",
+      "bytes": 315,
+      "sha256": "7f4466bb57caa2b29b805899ccd69605e31d84da8a53f7db75faf76e1da7468f"
+    },
+    {
+      "path": "popup.js",
+      "bytes": 29460,
+      "sha256": "c9cc62c4075a801493ee91ab9a4a17467332815fd787f80b2fb9072fe4ecedab"
+    },
+    {
+      "path": "popup.js.LICENSE.txt",
+      "bytes": 149,
+      "sha256": "cdf963ced7d25a0f98901a547647b4d6e2dbe0197fd78c87a059a87b0e542fe2"
+    },
+    {
+      "path": "scripts/check.mjs",
+      "bytes": 6057,
+      "sha256": "829bd5a7a89a3ec594bc8e144bd97f934eada1fe978bf86a4549af3ee27c4e10"
+    },
+    {
+      "path": "scripts/reproduce-v211.mjs",
+      "bytes": 2638,
+      "sha256": "e5082279dd43f94e41b917c0f0b95ee963f2a0a5323193d8502e6c77a52b3f4a"
+    },
+    {
+      "path": "services/ChatGPTService.js",
+      "bytes": 4045,
+      "sha256": "762f9bd07436dde00a6fe714219540533bf3bc2ef0186226c031cd171eaf149e"
+    },
+    {
+      "path": "services/ClipboardService.js",
+      "bytes": 5463,
+      "sha256": "b9ad85381f36f3fec6d71c976b30a5a86ffc33a1ceb4aa8882060dc055a054cc"
+    },
+    {
+      "path": "services/StorageService.js",
+      "bytes": 7672,
+      "sha256": "0d0503641498f782a14857a19295a72b5dcc6bcd4cce7da7f015494795e83b97"
+    },
+    {
+      "path": "services/TranscriptService.js",
+      "bytes": 2937,
+      "sha256": "6aa9dea2f8d2a9e3454de124d0bdaee19a8b652497458da6cd8480f8b97bd3ed"
+    },
+    {
+      "path": "shared/ClipboardWriter.js",
+      "bytes": 6490,
+      "sha256": "a6381075c06cc6b43d81d489cf84508673c0dd52545b9343702954f1aeb3a7b6"
+    },
+    {
+      "path": "shared/PromptBuilder.js",
+      "bytes": 2071,
+      "sha256": "b1fc3e568e471a6819e9785528b7f7e1579ebbe843551288f586ad197edb57f2"
+    },
+    {
+      "path": "storage/migration.js",
+      "bytes": 1671,
+      "sha256": "f16fa44cbad6b9bf28a5396d16118145dbcb577de879ca4136c6a3e1f4532e23"
+    },
+    {
+      "path": "tests/browser_dom.py",
+      "bytes": 32353,
+      "sha256": "b7927f2258eacd5bbbbce2bb23418a1a2a2b3301bafc73713b9c2a703615838d"
+    },
+    {
+      "path": "tests/browser_smoke.py",
+      "bytes": 13803,
+      "sha256": "f9bb13ce7d8b1a557f66b764a0f83eab9ed8306337b60399cd43a2776ac67a2b"
+    },
+    {
+      "path": "tests/chatgpt_isolated.py",
+      "bytes": 4133,
+      "sha256": "1613ae2f508dc9c587a86ac3fe8cbe38f0a12b80f2262ef5a743cf50bd5dc911"
+    },
+    {
+      "path": "tests/chatgpt_regression.py",
+      "bytes": 16094,
+      "sha256": "90cb18d2004ff3134d799599ae153f23f4c7772b5266f003a33afa102b05a10c"
+    },
+    {
+      "path": "tests/chrome-fixture.js",
+      "bytes": 6752,
+      "sha256": "199876bec217184e778ef1594ae39c2553e5539860219328b236ac9dcff969fb"
+    },
+    {
+      "path": "tests/clipboard-regression.test.js",
+      "bytes": 3146,
+      "sha256": "8f459460a49f153d3dbf42c47f0a4537d1ad9cb8a34d8a29e00a6c9ee5d5fff9"
+    },
+    {
+      "path": "tests/clipboard.test.js",
+      "bytes": 14685,
+      "sha256": "5bca09df3eb5b533c34c84ef354ee7e1bdebdcfeaa636c7ae38fcbeddd73791d"
+    },
+    {
+      "path": "tests/core.test.js",
+      "bytes": 10125,
+      "sha256": "c73e7cd48e5b79365fee610ef802396721220c8541b3c65fd5d9b6b2abb739fc"
+    },
+    {
+      "path": "tests/fixtures/ChatGPTAdapter.v2.1.2.js",
+      "bytes": 7107,
+      "sha256": "a601dfa04f0e2aac5116898d0e3c75596dbcbd438e4aee9871e22a79b23471ce"
+    },
+    {
+      "path": "tests/prompt-pipeline.test.js",
+      "bytes": 9675,
+      "sha256": "9ecc3efd0831f96897264a576af0cef1b7cf750918926581c0595140745c11bf"
+    },
+    {
+      "path": "tests/submission-diagnostics.test.js",
+      "bytes": 4430,
+      "sha256": "d9c57d0e4110e8ac24c1c15f8e789226d92ef774c76a676b45c55e50973cf512"
+    },
+    {
+      "path": "tests/v215_submit_regression.py",
+      "bytes": 4756,
+      "sha256": "97be23ca88bf81dce44f7dd0ea211f3ef77a1148543e16cec449216cc1883007"
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "case": "composer exposes only form-local button[type=submit]",
+  "results": {
+    "v2.1.3": {
+      "result": {
+        "status": "Error",
+        "error": "The prompt is in the composer, but ChatGPT did not enable its Send button. Nothing was sent.",
+        "code": "send_button_not_ready",
+        "stage": "send_button",
+        "diagnostics": {
+          "version": "2.1.3",
+          "requestId": "submit_repro_123",
+          "source": "panel",
+          "action": "normal",
+          "stage": "send_button",
+          "code": "send_button_not_ready",
+          "elapsedMs": 8386,
+          "expectedChars": 11,
+          "actualChars": 11,
+          "documentFocused": true,
+          "transientActivation": false,
+          "visibility": "visible",
+          "editorKind": "contenteditable",
+          "knownEditorCandidates": 1,
+          "editorFound": true,
+          "editorTag": "DIV",
+          "activeInEditor": true,
+          "textMatches": true,
+          "sendFound": false,
+          "sendEnabled": false,
+          "generationActive": false,
+          "insertionMethod": "paste_event",
+          "pasteHandled": true,
+          "nativeReturned": false,
+          "inputEvents": 0,
+          "trustedInputs": 0,
+          "replacements": 0,
+          "clicked": false
+        }
+      },
+      "submits": 0,
+      "remainingText": "hello world"
+    },
+    "v2.1.4": {
+      "result": {
+        "status": "Content sent",
+        "diagnostics": {
+          "version": "2.1.4",
+          "requestId": "submit_repro_123",
+          "source": "panel",
+          "action": "normal",
+          "stage": "complete",
+          "code": "acknowledged",
+          "elapsedMs": 388,
+          "expectedChars": 11,
+          "actualChars": 0,
+          "documentFocused": true,
+          "transientActivation": true,
+          "visibility": "visible",
+          "editorKind": "contenteditable",
+          "knownEditorCandidates": 1,
+          "editorFound": true,
+          "editorTag": "DIV",
+          "activeInEditor": true,
+          "textMatches": false,
+          "sendFound": true,
+          "sendEnabled": false,
+          "generationActive": false,
+          "insertionMethod": "paste_event",
+          "pasteHandled": true,
+          "nativeReturned": false,
+          "inputEvents": 0,
+          "trustedInputs": 0,
+          "replacements": 0,
+          "clicked": true
+        }
+      },
+      "submits": 1,
+      "remainingText": ""
+    }
+  },
+  "browser": "144.0.7559.96"
+}

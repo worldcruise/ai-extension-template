@@ -1,4 +1,4 @@
-// Only user-requested toolbar navigation and text sizing; never insert or send.
+// Toolbar navigation, guarded network recovery and text sizing; never insert or send.
 (() => {
   if (window === window.top || location.ancestorOrigins[0] !== chrome.runtime.getURL('').replace(/\/$/, '')) return;
   const parentOrigin = location.ancestorOrigins[0], channel = 'ai-agent-template.deepseek';
@@ -38,11 +38,15 @@
   function state() {
     const editors = [...document.querySelectorAll('textarea, [contenteditable="true"]')].filter(node => node.isConnected);
     const hasDraft = editors.some(node => (node.value || node.textContent || '').replace(/[\u200b\ufeff]/g, '').trim()) || Boolean(document.querySelector('[data-testid="attachment"], [data-testid="file-preview"], [data-state="uploading"]'));
+    // Send only a boolean, never sign-in details. Recovery must not clear a
+    // password, verification code, file selection, or other unfinished input.
+    const hasFormInput = [...document.querySelectorAll('input')].some(node => visible(node) &&
+      !['hidden', 'button', 'submit', 'reset', 'checkbox', 'radio', 'range', 'color'].includes(node.type) && Boolean(node.value));
     const busy = [...document.querySelectorAll('[data-is-streaming="true"], [data-testid="stop-button"], button[aria-label*="stop" i], button[title*="stop" i], [role="button"][aria-label*="stop" i]')].some(visible);
     const found = historyLinks();
     if (found.length) remember(found);
     else if (emptyHistory()) remember([]);
-    return { url: route(location.href) || location.origin + '/', ready: editors.some(node => visible(node) && !node.disabled), hasDraft, busy, chats: cachedChats, pinnedUrls, loaded: historyLoaded };
+    return { url: route(location.href) || location.origin + '/', ready: editors.some(node => visible(node) && !node.disabled), hasDraft, busy, hasFormInput, chats: cachedChats, pinnedUrls, loaded: historyLoaded };
   }
   function resize() {
     if (!document.body || scale === 100 && !style) return;
@@ -110,7 +114,7 @@
       return;
     }
     const current = state();
-    if (current.hasDraft || current.busy || !current.ready) { post(); return; }
+    if (current.hasDraft || current.busy || current.hasFormInput || (!current.ready && data.action !== 'reload')) { post(); return; }
     if (['reload', 'new', 'open'].includes(data.action) && typeof data.operationId === 'string' && /^[\w-]{1,100}$/.test(data.operationId)) {
       if (data.action === 'open' && routes.conversation(data.url) !== data.url) return;
       sendToHost({ channel, nonce, type: 'navigate', operationId: data.operationId,

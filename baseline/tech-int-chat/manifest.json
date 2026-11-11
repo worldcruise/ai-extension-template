@@ -1,0 +1,65 @@
+{
+  "name": "tech-int-chat",
+  "version": "2.1.5",
+  "description": "Revamp your meetings with an AI-powered response.",
+  "manifest_version": 3,
+  "action": {
+    "default_icon": "images/extension-48.png",
+    "default_popup": "index.html"
+  },
+  "icons": {
+    "32": "images/extension-32.png",
+    "48": "images/extension-48.png",
+    "128": "images/extension-128.png"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "permissions": [
+    "tabs",
+    "sidePanel",
+    "scripting",
+    "storage",
+    "clipboardWrite",
+    "offscreen"
+  ],
+  "host_permissions": [
+    "https://meet.google.com/*",
+    "https://chatgpt.com/*",
+    "https://chat.openai.com/*"
+  ],
+  "side_panel": {
+    "default_path": "index.html"
+  },
+  "content_scripts": [
+    {
+      "js": [
+        "meeting.js"
+      ],
+      "matches": [
+        "https://meet.google.com/",
+        "https://meet.google.com/*"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "js": [
+        "gptPrompts.js",
+        "shared/PromptBuilder.js",
+        "shared/ClipboardWriter.js",
+        "adapters/ChatGPTAdapter.js",
+        "chatGPT.js"
+      ],
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "minimum_chrome_version": "116"
+}

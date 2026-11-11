@@ -61,6 +61,9 @@ test('DeepSeek state requires its frame, origin and nonce and bounds history pay
     url: 'https://chat.deepseek.com/', ready: true, hasDraft: false, busy: false,
     chats: [{ url: 'https://chat.deepseek.com/a/chat/s/abc', title: 'Literal title' }] } };
   assert.equal(deepseekState(event, source, nonce).chats[0].title, 'Literal title');
+  assert.equal(deepseekState(event, source, nonce).hasFormInput, false);
+  assert.equal(deepseekState({ ...event, data: { ...event.data, hasFormInput: true } }, source, nonce).hasFormInput, true);
+  assert.equal(deepseekState({ ...event, data: { ...event.data, hasFormInput: 'private input' } }, source, nonce), null);
   assert.equal(deepseekState({ ...event, data: { ...event.data, loaded: false, chats: [] } }, source, nonce).loaded, false);
   assert.equal(deepseekState({ ...event, data: { ...event.data, loaded: 'yes' } }, source, nonce), null);
   assert.equal(deepseekState({ ...event, data: { ...event.data, pinnedUrls: ['https://evil.test/a/chat/s/pin'] } }, source, nonce), null);

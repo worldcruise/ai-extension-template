@@ -3,18 +3,15 @@ import { profiles as exampleProfiles, prompts } from './studio-examples.mjs';
 import { exampleProfile } from './resume-data.mjs';
 import { savedChatUrl, requestChatUrl } from './saved-chat.mjs';
 import { resumeTemplates, resumeTemplate } from './resume-templates.mjs';
-import { terminalStates, recoverableStates, deliveryEvidence } from './queue-outcomes.mjs';
 import { metadataProvenance, provenanceLabel } from './job-metadata.mjs';
-import { redactedDiagnostic } from './queue-diagnostics.mjs';
-import { MANUAL_QUEUE_MODE, MANUAL_QUEUE_MESSAGE } from './queue-mode.mjs';
-import { copyRequestPrompt, promptForManualCopy } from './manual-prompt.mjs';
 import { updateReadPageHint } from './shortcut-settings.mjs';
 import { requestJobPageAccess } from './job-page-access.mjs';
 import { duplicateCheckStorageKey, duplicateJobUrl, jobUrlInList } from './job-duplicates.mjs';
 import { createQueueDocuments } from './queue-documents.mjs';
+import { phaseLabel, runningPhases } from './generation-data.mjs';
 
 export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
-  getCurrentChat = () => null }) {
+  generations, getChatProvider = () => 'chatgpt', getCurrentChat = () => null }) {
   const q = selector => document.querySelector(selector);
   let requests = [];
   const documents = createQueueDocuments({ queue, openDialog,
@@ -22,12 +19,9 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     onSaved: () => { clearPreview(); showStudio('results'); status('Resume and cover letter saved on this job.'); }
   });
   let profiles = { ...exampleProfiles };
-  let queueState = { control: { paused: true }, requests: [] };
   let initialized = false;
   const pendingActions = new Set();
-  let regenerationTarget = null;
-  let copiedRequestId = null;
-  let copyFeedbackTimer;
+  const awaitingReview = new Set();
   let noticeTimer, duplicateOptionSaving = false;
   function showNotice(title, message) {
     clearTimeout(noticeTimer);
@@ -54,13 +48,11 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     if (area === 'local' && changes[duplicateCheckStorageKey] && !duplicateOptionSaving) q('#check-existing-jobs').checked = changes[duplicateCheckStorageKey].newValue !== false;
   };
   chrome.storage.onChanged.addListener(duplicateOptionChanged);
-  const manualOnly = () => queueState.manualOnly ?? MANUAL_QUEUE_MODE;
   let selectionLoaded = false;
   let currentTabId = null;
   let currentTabUrl = '', currentTabBusy = false;
   let previewId = null;
   let detailRequestId = null;
-  let paused = true;
   let queueSearch = '', queueFilter = 'all';
   let reading = null;
   const readFeedback = new Map();
@@ -78,13 +70,13 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
   const profile = () => profiles[candidateId()];
   async function perform(task, key = 'general') {
     if (pendingActions.has(key)) return;
-    const reflectPending = () => { document.documentElement.dataset.studioBusy = String([...pendingActions].some(key => !key.startsWith('continue-send:') && !key.startsWith('recover:'))); };
+    const reflectPending = () => { document.documentElement.dataset.studioBusy = String(pendingActions.size > 0); };
     pendingActions.add(key); reflectPending(); renderQueue();
     try { return await task(); }
     catch (error) {
       if (error.code === 'already-applied') {
         const field = error.duplicate.matchedBy.includes('company') ? 'Company' : 'Job URL';
-        showNotice('Already applied', `${field} already exists in this candidate’s ${error.duplicate.location}. Nothing was added or sent.`);
+        showNotice('Already applied', `${field} already exists in this candidate’s ${error.duplicate.location}. Nothing was added.`);
       } else { status(error.message); q('#profile-import-status').textContent = error.message; }
     }
     finally { pendingActions.delete(key); reflectPending(); renderQueue(); }
@@ -99,7 +91,7 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     q('#profile-kind').textContent = current.isExample !== false ? 'Example profile' : 'Imported profile';
   }
   function updateQueue(value) {
-    queueState = value; requests = value.requests; paused = value.control.paused;
+    requests = value.requests;
     const selected = selectionLoaded ? candidateId() : value.control.selectedCandidateId || candidateId();
     selectionLoaded = true;
     const options = queue.profileOptions();
@@ -133,8 +125,7 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     button.dataset.request = String(id);
     if (glyph) button.append(icon(glyph));
     button.append(document.createTextNode(text));
-    button.disabled = pendingActions.has(`${name}:${id}`) ||
-      (['continue-send', 'recover', 'regenerate'].includes(name) && (queueState.starting || Boolean(queueState.control.ownerId)));
+    button.disabled = pendingActions.has(`${name}:${id}`);
     return button;
   }
   function clearPreview() {
@@ -144,16 +135,15 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     q('#resume-paper').replaceChildren();
   }
   function renderQueue() {
+    q('#studio-dock-toggle .preview-label').textContent = 'Saved jobs';
     const all = requests.filter(request => request.input.candidateId === candidateId() && request.state !== 'cancelled');
-    const own = all.filter(request => !terminalStates.includes(request.state));
-    const failures = all.filter(request => terminalStates.includes(request.state));
+    const own = all;
     const matches = request => {
       const text = `${request.input.job.company} ${request.input.job.role}`.toLocaleLowerCase();
-      return text.includes(queueSearch) && (queueFilter === 'all' || request.state === queueFilter ||
-        queueFilter === 'attention' && [...recoverableStates, ...terminalStates, 'saving'].includes(request.state));
+      return text.includes(queueSearch) && (queueFilter === 'all' || request.state === queueFilter);
     };
-    const visible = own.filter(matches), visibleFailures = failures.filter(matches);
-    q('#queue-no-matches').hidden = !all.length || visible.length + visibleFailures.length > 0;
+    const visible = own.filter(matches);
+    q('#queue-no-matches').hidden = !all.length || visible.length > 0;
     q('#add-request').disabled = !initialized || pendingActions.has('add');
     q('#review-count').textContent = own.length;
     q('#queue-owner').textContent = profile().name;
@@ -172,7 +162,7 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
       title.append(heading);
       const pill = element('span', 'state-pill');
       pill.dataset.state = request.state;
-      const labels = { ready: request.isExample ? 'Ready' : 'Ready for review', saving: 'Save pending', queued: 'Queued', preparing: 'Preparing', sending: 'Sending', generating: 'Generating', validating: 'Validating', attention: 'Needs attention', interrupted: 'Interrupted', unsent: 'Not sent', uncertain: 'Reconcile delivery', 'invalid-output': 'Invalid completed output', 'error-response': 'Completed error response' };
+      const labels = { ready: request.isExample ? 'Ready' : 'Ready for review', queued: 'Queued', attention: 'Needs attention' };
       pill.append(icon(request.state === 'ready' ? 'check' : 'clock'), document.createTextNode(labels[request.state] || request.state));
       top.append(element('span', 'company-mark', company[0]), title, pill);
       const number = typeof request.id === 'number' ? String(request.id).padStart(3, '0') : request.id.slice(0, 8);
@@ -190,11 +180,23 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
         meta.append(saved);
       }
       card.append(top, meta);
-      if (request.state === 'saving') card.append(element('p', 'request-note', request.isExample ? 'Example result retained · Try the save-retry interaction.' : 'Result retained. Retry saving before closing the panel.'));
-      if (request.error) card.append(element('p', 'request-note request-error', request.error));
-      if (request.isExample) card.append(element('p', 'field-hint', 'Example result · Not sent to ChatGPT'));
+      if (request.isExample) card.append(element('p', 'field-hint', 'Example result'));
       const actions = element('div', 'request-actions');
-      actions.append(action(pendingActions.has(`copy-prompt:${request.id}`) ? 'Copying…' : copiedRequestId === request.id ? 'Copied' : 'Copy prompt', 'copy', 'copy-prompt', request.id));
+      if (!request.isExample) {
+        const run = generations.forJob(request.id);
+        const complete = run && ['complete', 'invalid'].includes(run.phase);
+        const stopped = run && ['attention', 'stopped'].includes(run.phase);
+        const name = !run ? 'generate' : complete ? 'review-generation' : stopped ? 'resume-generation' : 'open-generation';
+        const label = !run ? 'Generate documents' : complete ? 'Review documents' : stopped ? 'Resume' : 'Open AI tab';
+        const primary = action(label, 'sparkles', name, request.id); primary.classList.add('generation-action');
+        actions.append(primary);
+        if (run) {
+          const note = element('p', 'generation-status', `${run.provider === 'deepseek' ? 'DeepSeek' : 'ChatGPT'} · ${phaseLabel(run)}${run.error ? '. ' + run.error : ''}`);
+          note.setAttribute('role', 'status'); card.append(note);
+          if (complete || stopped) actions.append(action('Open AI tab', 'external', 'open-generation', request.id));
+          if (runningPhases.includes(run.phase)) actions.append(action('Stop tracking', 'close', 'stop-generation', request.id));
+        }
+      }
       actions.append(action('Details', 'file', 'details', request.id));
       const jobUrl = safeJobUrl(input.job.url);
       if (jobUrl) {
@@ -209,53 +211,18 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
       }
       if (request.state === 'ready') actions.append(action('View resume', 'file', 'preview', request.id));
       const editDocuments = action('Documents', 'file-pen', 'documents', request.id);
-      editDocuments.disabled = ['preparing', 'sending', 'generating', 'validating', 'saving'].includes(request.state);
       actions.append(editDocuments);
-      if (request.state === 'saving') actions.append(action('Retry save', 'refresh', 'retry-save', request.id));
-      if (recoverableStates.includes(request.state)) {
-        const attempt = request.attempts?.at(-1);
-        if (!manualOnly() && attempt && !attempt.sendIntent && !attempt.submitted && !attempt.dispatchedAt) {
-          actions.append(action('Continue sending', 'chat', 'continue-send', request.id));
-        }
-        if (['login-unverified', 'signed-out', 'composer-unavailable'].includes(request.errorCode) || /Could not verify a signed-in ChatGPT account/.test(request.error || '')) {
-          actions.append(action('Check connection', 'scan', 'connection', request.id));
-        }
-        if (!manualOnly() && (request.state === 'uncertain' || request.sourceChatUrl || request.rawOutput)) actions.append(action('Reconcile delivery', 'refresh', 'recover', request.id));
-      }
-      if (!manualOnly() && !request.isExample && [...recoverableStates, ...terminalStates, 'ready'].includes(request.state)) actions.append(action('Generate again', 'plus', 'regenerate', request.id));
-      if (['queued', ...recoverableStates].includes(request.state)) actions.append(action('Cancel', 'close', 'cancel', request.id));
-      if (recoverableStates.includes(request.state) && !manualOnly()) card.append(element('p', 'field-hint', 'Continue/reconcile handles only this request. It does not resume other jobs.'));
+      if (['queued', 'attention'].includes(request.state)) actions.append(action('Cancel', 'close', 'cancel', request.id));
       card.append(actions);
       return card;
     };
     q('#resume-queue').replaceChildren(...visible.map(renderCard));
-    q('#failed-queue').replaceChildren(...visibleFailures.map(renderCard));
-    const detailCopyPending = Boolean(detailRequestId && pendingActions.has(`copy-prompt:${detailRequestId}`));
-    q('#request-copy-prompt').disabled = detailCopyPending;
-    q('#request-copy-prompt').textContent = detailCopyPending ? 'Copying…' : detailRequestId && copiedRequestId === detailRequestId ? 'Copied' : 'Copy prompt';
-    q('#failed-results').hidden = visibleFailures.length === 0; q('#failed-count').textContent = visibleFailures.length;
-    if (queueFilter === 'attention' || queueSearch) q('#failed-results').open = true;
     const counts = own.reduce((total, request) => { total[request.state] = (total[request.state] || 0) + 1; return total; }, {});
     const parts = [];
     if (counts.ready) parts.push(`${counts.ready} ready`);
-    if (counts.saving) parts.push(`${counts.saving} save pending`);
     if (counts.queued) parts.push(`${counts.queued} queued`);
-    const working = ['preparing', 'sending', 'generating', 'validating'].reduce((count, key) => count + (counts[key] || 0), 0);
-    if (working) parts.unshift(`${working} working`);
-    const needsAttention = recoverableStates.reduce((total, key) => total + (counts[key] || 0), 0);
-    if (needsAttention) parts.push(`${needsAttention} need attention`);
-    q('#queue-summary').textContent = (paused && queueState.control.ownerId ? 'Pausing · ' : '') + (parts.join(' · ') || 'Queue empty');
-    const pause = q('#pause-queue');
-    pause.setAttribute('aria-pressed', String(paused));
-    pause.title = paused ? 'Start queue' : 'Pause after the current response';
-    pause.setAttribute('aria-label', pause.title);
-    pause.replaceChildren(icon(paused ? 'play' : 'pause'));
-    const eligible = !requests.some(request => !request.isExample && request.state === 'uncertain') && own.some(request => !request.isExample && ['queued', 'interrupted'].includes(request.state));
-    pause.disabled = !initialized || (paused && (manualOnly() || !eligible || Boolean(queueState.control.ownerId)));
-    if (manualOnly() && paused) { pause.title = MANUAL_QUEUE_MESSAGE; pause.setAttribute('aria-label', 'Bulk sending paused'); }
-    q('#start-queue').disabled = manualOnly() || !initialized || !eligible || Boolean(queueState.control.ownerId) || queueState.starting;
-    q('#start-queue').hidden = manualOnly();
-    q('#start-queue').textContent = queueState.control.ownerId ? 'Queue running' : 'Start queue';
+    if (counts.attention) parts.push(`${counts.attention} need attention`);
+    q('#queue-summary').textContent = parts.join(' · ') || 'Queue empty';
     renderCurrentJob();
   }
 
@@ -442,10 +409,10 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
   function renderSource(request) {
     const source = requestChatUrl(request);
     const current = savedChatUrl(getCurrentChat());
-    const savedCompany = request.input.tailor && (manualOnly() || (request.state === 'ready' && Boolean(request.resume)) || recoverableStates.includes(request.state) || terminalStates.includes(request.state));
+    const savedCompany = request.input.tailor;
     q('#request-source-note').textContent = source ? `Connected chat · ${request.input.job.company}`
       : savedCompany ? 'Open this job’s conversation in Chat, then connect it here to reopen it from the queue.'
-      : 'A company’s chat can be connected once its resume is saved.';
+      : 'Connect conversations from a job with a company attached.';
     q('#request-open-chat').disabled = !source;
     const connect = q('#request-connect-chat');
     connect.disabled = !savedCompany || !current || source === current;
@@ -462,29 +429,39 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
       ['Prompt template', prompts[input.promptTemplate].name], ['Mode', input.tailor ? 'Tailored resume' : 'Base resume']
     ];
     const provenance = metadataProvenance(input.job);
-    metadata.push(['Company source', provenanceLabel(provenance.company)], ['Job title source', provenanceLabel(provenance.role)], ['Delivery evidence', deliveryEvidence(request).description]);
+    metadata.push(['Company source', provenanceLabel(provenance.company)], ['Job title source', provenanceLabel(provenance.role)]);
     if (input.tailor && input.job.url) metadata.push(['Source URL', input.job.url]);
     q('#request-metadata').replaceChildren(...metadata.flatMap(([label, value]) => [element('dt', '', label), element('dd', '', value)]));
     q('#request-prompt').textContent = input.prompt;
-    q('#request-full-prompt').value = promptForManualCopy(request);
-    q('#request-copy-prompt').textContent = copiedRequestId === request.id ? 'Copied' : 'Copy prompt';
-    q('#request-copy-status').textContent = '';
     q('#request-job').textContent = input.tailor ? input.job.description : 'No job description attached to this base resume.';
     const listing = q('#request-job-link'), listingUrl = safeJobUrl(input.job.url);
     listing.hidden = !listingUrl;
     if (listingUrl) listing.href = listingUrl; else listing.removeAttribute('href');
     q('#request-output-section').hidden = !request.resume && !request.rawOutput;
     q('#request-output').textContent = request.resume ? JSON.stringify(request.resume, null, 2) : request.rawOutput || '';
-    q('#request-diagnostics').textContent = JSON.stringify((request.attempts || []).map(attempt => ({ deliveryId: attempt.deliveryId,
-      connection: attempt.connection || 'sidebar', startedAt: attempt.startedAt, preparedAt: attempt.preparedAt, dispatchedAt: attempt.dispatchedAt,
-      acknowledgedAt: attempt.acknowledgedAt, sendIntent: attempt.sendIntent === true, submitted: attempt.submitted === true,
-      diagnostics: (Array.isArray(attempt.diagnostics) ? attempt.diagnostics : []).map(redactedDiagnostic).filter(Boolean) })), null, 2);
-    q('#request-capture-history').replaceChildren(...(request.attempts || []).filter(attempt => attempt.raw).map(attempt => {
-      const details = element('details', 'request-section'); details.append(element('summary', '', `Captured delivery ${attempt.deliveryId}`), element('pre', '', attempt.raw)); return details;
-    }));
     renderSource(request);
+    renderGenerationDetails();
     openDialog('request-dialog');
   }
+  function renderGenerationDetails() {
+    const run = generations.forJob(detailRequestId);
+    q('#request-generation-section').hidden = !run;
+    q('#request-generation-status').textContent = run ? `${phaseLabel(run)}${run.error ? '. ' + run.error : ''}` : '';
+    q('#request-generation-diagnostics').textContent = run?.diagnostics || run?.captureDiagnostics ? JSON.stringify({
+      ...(run.diagnostics ? { submission: { checkedAt: new Date(run.diagnosticAt).toISOString(), ...run.diagnostics } } : {}),
+      ...(run.captureDiagnostics ? { capture: { checkedAt: new Date(run.captureDiagnosticAt).toISOString(), ...run.captureDiagnostics } } : {})
+    }, null, 2) : 'No AI diagnostics have been recorded for this run yet.';
+    q('#copy-generation-diagnostics').hidden = !run?.diagnostics && !run?.captureDiagnostics;
+  }
+  q('#copy-generation-diagnostics').addEventListener('click', async () => {
+    const text = q('#request-generation-diagnostics').textContent;
+    try { await navigator.clipboard.writeText(text); status('Submission diagnostics copied.'); }
+    catch {
+      const range = document.createRange(); range.selectNodeContents(q('#request-generation-diagnostics'));
+      const selection = window.getSelection(); selection.removeAllRanges(); selection.addRange(range);
+      status('Diagnostics selected. Press Ctrl+C or Command+C to copy.');
+    }
+  });
   function preview(request) {
     if (request.state !== 'ready' || !request.resume) return;
     previewId = request.id;
@@ -515,71 +492,42 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     status(`Previewing the ${resumeTemplate(request.input.resumeTemplate).name} resume · ${data.company}`);
   }
 
-  function copyPrompt(request) {
-    void perform(async () => {
-      try { await copyRequestPrompt(request); }
-      catch {
-        copiedRequestId = null; clearTimeout(copyFeedbackTimer);
-        requestDetails(request);
-        q('#request-full-prompt').focus(); q('#request-full-prompt').select();
-        q('#request-copy-status').textContent = 'Clipboard access failed. The full prompt is selected below; copy it manually.';
-        status('Clipboard access failed. Copy the selected full prompt from Details.');
-        return;
-      }
-      copiedRequestId = request.id;
-      q('#request-copy-prompt').textContent = detailRequestId === request.id ? 'Copied' : 'Copy prompt';
-      q('#request-copy-status').textContent = detailRequestId === request.id ? 'Prompt copied. Paste and send it in ChatGPT yourself.' : '';
-      status('Prompt copied. Paste and send it in ChatGPT yourself. Delivery status was not changed.');
-      clearTimeout(copyFeedbackTimer);
-      copyFeedbackTimer = setTimeout(() => { if (copiedRequestId === request.id) { copiedRequestId = null; q('#request-copy-prompt').textContent = 'Copy prompt'; renderQueue(); } }, 2000);
-    }, `copy-prompt:${request.id}`);
-  }
   function requestAction(event) {
     const button = event.target.closest('button[data-action]');
     if (!button) return;
     const request = requests.find(item => String(item.id) === button.dataset.request && item.input.candidateId === candidateId());
     if (!request) return;
-    if (button.dataset.action === 'copy-prompt') { copyPrompt(request); return; }
-    if (manualOnly() && ['continue-send', 'recover', 'regenerate'].includes(button.dataset.action)) { status(MANUAL_QUEUE_MESSAGE); return; }
+    if (['generate', 'review-generation', 'resume-generation', 'open-generation', 'stop-generation'].includes(button.dataset.action)) {
+      const name = button.dataset.action;
+      void perform(async () => {
+        const run = generations.forJob(request.id);
+        if (name === 'generate') {
+          awaitingReview.add(request.id);
+          try { await generations.start(request.id, getChatProvider()); status('Document generation connected to the AI tab. Progress is saved while the dock is closed.'); }
+          catch (error) { awaitingReview.delete(request.id); throw error; }
+        } else if (name === 'review-generation') await reviewGeneration(request.id, run.id);
+        else if (name === 'stop-generation') { awaitingReview.delete(request.id); await generations.stop(run.id); status('Tracking stopped. Any response already generating stays in the AI tab.'); }
+        else { if (name === 'resume-generation') awaitingReview.add(request.id); await generations.open(run.id, name === 'resume-generation'); }
+      }, `${name}:${request.id}`);
+      return;
+    }
     if (button.dataset.action === 'details') requestDetails(request);
     if (button.dataset.action === 'review') {
       const url = requestChatUrl(request);
-      if (url) showChat(url, { connection: request.attempts?.at(-1)?.connection });
+      if (url) showChat(url);
     }
-    if (button.dataset.action === 'connection') q('#account-check').click();
     if (button.dataset.action === 'preview') preview(request);
     if (button.dataset.action === 'documents') documents.open(request.id);
-    if (button.dataset.action === 'retry-save') {
-      void perform(async () => { await queue.retrySave(request.id); status(`Save completed · ${request.input.job.company}. No generation was started.`); }, `retry-save:${request.id}`);
-    }
     if (button.dataset.action === 'cancel') {
-      void perform(async () => { await queue.cancel(request.id); if (previewId === request.id) clearPreview(); status(`Request cancelled · ${request.input.job.company}`); }, `cancel:${request.id}`);
+      void perform(async () => {
+        const run = generations.forJob(request.id);
+        if (run) await generations.stop(run.id);
+        awaitingReview.delete(request.id);
+        await queue.cancel(request.id); if (previewId === request.id) clearPreview(); status(`Request cancelled · ${request.input.job.company}`);
+      }, `cancel:${request.id}`);
     }
-    if (button.dataset.action === 'regenerate') {
-      regenerationTarget = { id: request.id, deliveryId: request.deliveryId || null, updatedAt: request.updatedAt };
-      q('#regenerate-evidence').textContent = `Previous state: ${request.state}. ${deliveryEvidence(request).description}.`;
-      openDialog('regenerate-dialog');
-    }
-    if (['continue-send', 'recover'].includes(button.dataset.action)) void perform(async () => {
-      await queue.continueRequest(request.id); status('Reconciliation finished for this request only. Other jobs were not started.');
-    }, `${button.dataset.action}:${request.id}`);
   }
   q('#resume-queue').addEventListener('click', requestAction);
-  q('#failed-queue').addEventListener('click', requestAction);
-  q('#request-copy-prompt').addEventListener('click', () => {
-    const request = requests.find(item => item.id === detailRequestId && item.input.candidateId === candidateId());
-    if (request) copyPrompt(request);
-  });
-  q('#regenerate-confirm').addEventListener('click', () => {
-    if (manualOnly()) { status(MANUAL_QUEUE_MESSAGE); return; }
-    if (!regenerationTarget) return;
-    const target = regenerationTarget; q('#regenerate-confirm').disabled = true;
-    void perform(async () => {
-      await queue.generateAgain(target.id, { confirmed: true, expectedDeliveryId: target.deliveryId, expectedUpdatedAt: target.updatedAt });
-      regenerationTarget = null; q('#regenerate-dialog').close(); status('A new generation attempt is queued. Choose Start queue to send it.');
-    }, `regenerate:${target.id}`).finally(() => { q('#regenerate-confirm').disabled = false; });
-  });
-
   q('#candidate').addEventListener('change', () => {
     renderCandidate();
     void queue.selectCandidate(candidateId()).catch(error => status(error.message));
@@ -648,37 +596,19 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
 
   async function saveRequest(input, options) {
     q('#queue-notice').hidden = true; clearTimeout(noticeTimer);
-    const id = await queue.add(input, options);
-    const request = queue.snapshot().requests.find(item => item.id === id);
+    await queue.add(input, options);
     clearPreview(); renderQueue();
     if (q('#chat-view').hidden) showStudio('results');
-    try { await copyRequestPrompt(request); }
-    catch {
-      showChat(); requestDetails(request);
-      q('#request-full-prompt').focus(); q('#request-full-prompt').select();
-      q('#request-copy-status').textContent = 'The job was saved, but clipboard access failed. Nothing was sent. Copy this prompt manually.';
-      status('Job saved. Clipboard access failed; nothing was sent.');
-      return;
-    }
-    copiedRequestId = id;
-    showChat();
-    status('Job saved and prompt copied. Paste it into your selected chat and send when ready.');
+    status('Job saved to the queue.');
   }
 
   for (const id of ['review-another', 'empty-prepare']) document.getElementById(id).addEventListener('click', () => showStudio('job'));
   for (const id of ['view-queue', 'open-queue']) document.getElementById(id).addEventListener('click', () => showStudio('results'));
-  const startQueue = () => { if (manualOnly()) { status(MANUAL_QUEUE_MESSAGE); return; } void queue.start(candidateId()).catch(error => status(error.message)); };
-  q('#start-queue').addEventListener('click', startQueue);
-  q('#pause-queue').addEventListener('click', () => {
-    if (manualOnly() && paused) { status(MANUAL_QUEUE_MESSAGE); return; }
-    if (paused) startQueue();
-    else void perform(async () => { await queue.pause(); status('Queue will pause after the current response.'); }, 'pause');
-  });
   q('#request-open-chat').addEventListener('click', () => {
     const request = requests.find(item => item.id === detailRequestId && item.input.candidateId === candidateId());
     const url = requestChatUrl(request);
     if (!url) return;
-    q('#request-dialog').close(); showChat(url, { connection: request.attempts?.at(-1)?.connection });
+    q('#request-dialog').close(); showChat(url);
   });
   q('#request-connect-chat').addEventListener('click', () => {
     const request = requests.find(item => item.id === detailRequestId && item.input.candidateId === candidateId());
@@ -696,7 +626,7 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
   q('#reset-examples').addEventListener('click', () => { void perform(async () => {
     await queue.loadExamples(); q('#profile-dialog').close(); q('#candidate').value = 'morgan';
     renderCandidate(); clearPreview(); renderQueue(); showStudio('results');
-    status('Example results loaded. Examples are never sent by the runner.');
+    status('Example results loaded.');
   }); });
   function downloadProfile() {
     const url = URL.createObjectURL(new Blob([JSON.stringify(exampleProfile, null, 2) + '\n'], { type: 'application/json' }));
@@ -716,12 +646,28 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     event.target.value = '';
   });
   const unsubscribe = queue.subscribe(updateQueue);
+  async function reviewGeneration(jobId, runId) {
+    const generated = await generations.read(runId);
+    const request = requests.find(item => item.id === jobId && item.state !== 'cancelled' && item.input.candidateId === candidateId());
+    if (!request || generated.jobId !== jobId) return;
+    if (q('dialog[open]')) { showNotice('Documents are ready', 'Close the current dialog, then choose Review documents on this job.'); return; }
+    documents.open(jobId, { generated });
+  }
+  const unsubscribeRuns = generations.subscribe(runs => {
+    renderQueue();
+    if (q('#request-dialog').open) renderGenerationDetails();
+    for (const run of runs) if (awaitingReview.has(run.jobId) && ['complete', 'invalid'].includes(run.phase)) {
+      awaitingReview.delete(run.jobId);
+      void reviewGeneration(run.jobId, run.id).catch(error => status(error.message));
+    }
+  });
+  void generations.ready.catch(error => status(error.message));
   const ready = Promise.all([queue.ready, duplicateOptionReady]).then(() => {
     initialized = true; updateQueue(queue.snapshot());
     document.documentElement.dataset.studioReady = 'true';
   }).catch(error => { status(error.message); q('#empty-queue p').textContent = error.message; });
   window.addEventListener('pagehide', unsubscribe, { once: true });
-  window.addEventListener('pagehide', () => clearTimeout(copyFeedbackTimer), { once: true });
+  window.addEventListener('pagehide', unsubscribeRuns, { once: true });
   window.addEventListener('pagehide', () => { clearTimeout(noticeTimer); chrome.storage.onChanged.removeListener(duplicateOptionChanged); }, { once: true });
   renderQueue(); renderTemplate();
   return { ready, updateTabs, tabError, readPage,

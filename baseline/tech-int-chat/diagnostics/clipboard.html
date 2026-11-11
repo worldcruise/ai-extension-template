@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Tech Interview Chat — native clipboard check</title>
+</head>
+<body>
+  <h1>Native clipboard check</h1>
+  <p>This optional test writes a harmless marker, not a meeting transcript. It never sends anything to ChatGPT and never reads your clipboard.</p>
+  <p>Keep this tab focused. Click the button, then paste into a plain-text editor. The test replaces your current clipboard contents.</p>
+  <button id="testClipboard" type="button">Test native clipboard</button>
+  <pre id="result" aria-live="polite">Ready. No clipboard operation has run.</pre>
+  <script src="./clipboard.js"></script>
+</body>
+</html>

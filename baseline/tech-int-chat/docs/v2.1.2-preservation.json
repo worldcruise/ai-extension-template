@@ -1,0 +1,77 @@
+{
+  "release": "2.1.2",
+  "source_zip_sha256": "e25719f2969ad54d2df54be8c70c2a44b0dfb3a71fb475264906293d71cd7cab",
+  "unchanged": {
+    "meeting.js": {
+      "before": "268eeea279c65e6fe54aa93e50fc0354c00f32fc9d66794cf45b11e1521d1b51",
+      "after": "268eeea279c65e6fe54aa93e50fc0354c00f32fc9d66794cf45b11e1521d1b51",
+      "equal": true
+    },
+    "gptPrompts.js": {
+      "before": "87c4b2c50ea658261bab2a47c83cefbeebaa1ce420ea90922608af6a001c0faf",
+      "after": "87c4b2c50ea658261bab2a47c83cefbeebaa1ce420ea90922608af6a001c0faf",
+      "equal": true
+    },
+    "adapters/ChatGPTAdapter.js": {
+      "before": "a601dfa04f0e2aac5116898d0e3c75596dbcbd438e4aee9871e22a79b23471ce",
+      "after": "a601dfa04f0e2aac5116898d0e3c75596dbcbd438e4aee9871e22a79b23471ce",
+      "equal": true
+    },
+    "core/Config.js": {
+      "before": "1689fe9c19853816c6a0d5048b6229443862f7c2be64c2603406b39bec19d522",
+      "after": "1689fe9c19853816c6a0d5048b6229443862f7c2be64c2603406b39bec19d522",
+      "equal": true
+    },
+    "core/Logger.js": {
+      "before": "024f45e85fd6d89cb3fe15c47eb76158fe9c259fc214a86e672ebd33a7155d35",
+      "after": "024f45e85fd6d89cb3fe15c47eb76158fe9c259fc214a86e672ebd33a7155d35",
+      "equal": true
+    },
+    "core/MessageQueue.js": {
+      "before": "fb566f6383b500f4211cca6db8025276d03428df3f0252abde99344595e790c7",
+      "after": "fb566f6383b500f4211cca6db8025276d03428df3f0252abde99344595e790c7",
+      "equal": true
+    },
+    "core/SessionManager.js": {
+      "before": "63876b142d5e6da1196ecddea34e658d55bd36f2638267ab6f1a882a996e2cdc",
+      "after": "63876b142d5e6da1196ecddea34e658d55bd36f2638267ab6f1a882a996e2cdc",
+      "equal": true
+    },
+    "core/TranscriptStore.js": {
+      "before": "8e09adb18d737ed363dd462d381b11e72aaed1d813119728ae52bf8073f45257",
+      "after": "8e09adb18d737ed363dd462d381b11e72aaed1d813119728ae52bf8073f45257",
+      "equal": true
+    },
+    "services/StorageService.js": {
+      "before": "0d0503641498f782a14857a19295a72b5dcc6bcd4cce7da7f015494795e83b97",
+      "after": "0d0503641498f782a14857a19295a72b5dcc6bcd4cce7da7f015494795e83b97",
+      "equal": true
+    },
+    "services/TranscriptService.js": {
+      "before": "6aa9dea2f8d2a9e3454de124d0bdaee19a8b652497458da6cd8480f8b97bd3ed",
+      "after": "6aa9dea2f8d2a9e3454de124d0bdaee19a8b652497458da6cd8480f8b97bd3ed",
+      "equal": true
+    },
+    "storage/migration.js": {
+      "before": "f16fa44cbad6b9bf28a5396d16118145dbcb577de879ca4136c6a3e1f4532e23",
+      "after": "f16fa44cbad6b9bf28a5396d16118145dbcb577de879ca4136c6a3e1f4532e23",
+      "equal": true
+    },
+    "offscreen/clipboard.html": {
+      "before": "f20a865aa377e59cbf79ad3f043e1ee32fb66f2328b2ca83c0b8066b1186c0ae",
+      "after": "f20a865aa377e59cbf79ad3f043e1ee32fb66f2328b2ca83c0b8066b1186c0ae",
+      "equal": true
+    },
+    "offscreen/clipboard.js": {
+      "before": "5d9dcf24910e7dc5d310d1920b004ee0fa40882e15622beeff44c2ec0d8b8ce0",
+      "after": "5d9dcf24910e7dc5d310d1920b004ee0fa40882e15622beeff44c2ec0d8b8ce0",
+      "equal": true
+    },
+    "docs/BACKLOG.md": {
+      "before": "b15e8568262dcb6ddfd4c098da276aa48268623df68a4f446ccd099bbf6e3145",
+      "after": "b15e8568262dcb6ddfd4c098da276aa48268623df68a4f446ccd099bbf6e3145",
+      "equal": true
+    }
+  },
+  "index_html_change": "Three bundled script tags added before popup.js; removing only those tags restores the exact prior bytes. All visible markup/CSS unchanged."
+}

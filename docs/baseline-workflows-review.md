@@ -171,7 +171,7 @@ Current [job metadata provenance](../src/job-metadata.mjs) covers company and ro
 
 The current [candidate schema and resume validation](../src/resume-data.mjs) preserve fixed profile facts, but do not define a full application-answer profile. Work authorization, compensation preferences, availability, and sensitive or consent-related answers need explicit user data/policy rather than inference from resume prose.
 
-The current [manual prompt flow](../src/manual-prompt.mjs) and [manual queue policy](../src/queue-mode.mjs) should remain the default. There is no implemented general ATS autofill pipeline, dedicated cover-letter workflow, or connected PDF/DOCX exporter in the current UI. Reference study does not make those capabilities available automatically.
+The extension now keeps local job storage and manual document editing only; its prompt-copy and AI automation modules have been removed. This reference study describes the baseline projects, not active extension features. There is no general ATS autofill pipeline or connected PDF/DOCX exporter in the current UI.
 
 ### Suggested implementation order
 

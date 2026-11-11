@@ -1,0 +1,16 @@
+{
+  "release": "2.1.1",
+  "date": "2026-09-25",
+  "attempted": "Launch Chromium with an unpacked extension in an isolated profile; wait for a service worker; inspect chrome://extensions/",
+  "browser": "144.0.7559.96",
+  "observations": [
+    "No extension service-worker event within the 5-second observation window.",
+    "Navigation to chrome://extensions/ failed with net::ERR_BLOCKED_BY_ADMINISTRATOR.",
+    "Managed browser policy contains ExtensionInstallBlocklist=[\"*\"], URLBlocklist=[\"*\"], and DefaultClipboardSetting=2.",
+    "No browser administrator policy was modified."
+  ],
+  "conclusion": "Actual installed-extension and native OS clipboard behavior was not verified; the worker timeout alone does not establish a code defect or its cause.",
+  "dom_suite_scope": "Real Chromium DOM; mocked Chrome messages, Clipboard API implementation and OS writes.",
+  "attempted_source_version": "2.1.0 (input package during the recheck)",
+  "candidate_native_clipboard_verified": false
+}
