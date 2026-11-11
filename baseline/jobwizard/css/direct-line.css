@@ -1,0 +1,1242 @@
+/* =============================================================
+   [Pro design v5 · 2026-06-03] Direct line — Pro concierge panel.
+
+   Mounted inside the JobWizard shadow root by js/directLine.js.
+   Pure gold + neutral palette. No Aurora, no purple — this surface
+   lives in the Pro identity zone with the upgraded quota card.
+
+   Layout: full-overlay backdrop + centered panel with 360px width
+   when sidebar shape allows; falls back to 92vw on narrow viewports.
+   Top strip carries the metal navy gradient + gold "DIRECT LINE"
+   chip; everything else is white / paper for legibility.
+   ============================================================= */
+
+/* The backdrop uses .jw-bv1-modal-backdrop (from billing-v1.css) for the
+   shared modal-layer scaffold — fixed inset 0, flex-center, blur, scoped
+   z-index. We only add direct-line-specific entry-transition tuning here. */
+#autofill_detail .jw-dl-backdrop {
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+#autofill_detail .jw-dl-backdrop.jw-dl-show {
+  opacity: 1;
+}
+
+/* Panel is a flex-centered child of the backdrop — no position: fixed.
+   This is the key fix vs. the original implementation: the panel lives
+   inside the shared modal layer rather than floating on the host page.
+   Per feedback_extension_modal_in_shadow_dom.md, no position: fixed
+   overlay sitting on top of the host page. */
+#autofill_detail .jw-dl-panel {
+  position: relative;
+  width: 380px;
+  max-width: 92vw;
+  max-height: 88vh;
+  background: #ffffff;
+  border-radius: 14px;
+  /* No rim — Chen 2026-06-04: the previous faint gold border + rounded
+     corners + shadow combination read as an off-white seam around the
+     panel. Shadow alone carries the depth now; the dark navy strip on top
+     gives the panel its top boundary without needing any side rim. */
+  border: 0;
+  /* Tighter, cooler shadow — still lifts the card cleanly off the backdrop
+     but no longer projects a halo that competes with the strip. */
+  box-shadow:
+    0 24px 56px -20px rgba(2, 6, 23, 0.42),
+    0 10px 20px -10px rgba(2, 6, 23, 0.22);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--jobwizard-font-family, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif);
+  color: #0f172a;
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+#autofill_detail .jw-dl-panel.jw-dl-show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Top strip — metal navy gradient + gold "DIRECT LINE" chip
+   ───────────────────────────────────────────────────────────── */
+#autofill_detail .jw-dl-strip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* Taller strip → more visual weight, more room for the metal to breathe. */
+  padding: 18px 18px 16px;
+  min-height: 64px;
+  box-sizing: border-box;
+  /* Multi-layer metal:
+     1) thin top-edge highlight band (light grazes the upper rim)
+     2) top-left sheen (existing brushed-metal cue, slightly warmer)
+     3) base diagonal gradient with extra stops for tonal variation */
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, transparent 14%, transparent 100%),
+    radial-gradient(ellipse 60% 80% at 18% 0%, rgba(255, 255, 255, 0.06), transparent 55%),
+    linear-gradient(135deg, #1e3a5f 0%, #16213c 25%, #0f172a 55%, #050b1a 80%, #020617 100%);
+  color: #ffffff;
+  flex-shrink: 0;
+  /* Gold hairline + inner highlight + inner bottom shadow — defines the
+     metal as a real surface that catches light at the top and grounds on
+     the white body below. */
+  border-top: 1px solid rgba(212, 176, 106, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+#autofill_detail .jw-dl-strip::before {
+  /* Faint top-left gold sheen — brushed metal cue layered on top of the
+     base radial in the background stack for extra warmth. */
+  content: "";
+  position: absolute;
+  top: -40%;
+  left: -20%;
+  width: 80%;
+  height: 80%;
+  background: radial-gradient(ellipse at top left,
+    rgba(212, 176, 106, 0.12) 0%,
+    rgba(212, 176, 106, 0.04) 40%,
+    transparent 70%);
+  pointer-events: none;
+}
+#autofill_detail .jw-dl-strip::after {
+  /* Gold hairline along the BOTTOM edge — defines the strip-to-body
+     boundary and ties the gold language across the metal/white seam. */
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(212, 176, 106, 0.35) 20%,
+    rgba(212, 176, 106, 0.5) 50%,
+    rgba(212, 176, 106, 0.35) 80%,
+    transparent 100%);
+  pointer-events: none;
+}
+
+#autofill_detail .jw-dl-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: #2a2218;
+  color: #d4b06a;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 176, 106, 0.25);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+}
+#autofill_detail .jw-dl-chip-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #d4b06a;
+  box-shadow: 0 0 6px rgba(212, 176, 106, 0.55);
+  animation: jw-dl-breathe 2.4s ease-in-out infinite;
+  flex: 0 0 5px;
+}
+@keyframes jw-dl-breathe {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(0.85); }
+}
+
+/* Plan badge — small gold pill to the right of the DIRECT LINE chip.
+   Renders dynamically from the user's effective plan ("PRO" / "ULTRA").
+   Tier-name only, no marketing tag — keeps copy future-tier-compatible. */
+#autofill_detail .jw-dl-chip-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+  /* Allow wrap to a second line when the strip is cramped (long plan names
+     on narrow viewports). The chip + badge stay grouped either way. */
+  flex-wrap: wrap;
+}
+/* Plan badge — upgraded v6 (2026-06-04, Chen feedback Image #76).
+   Goal: feels like a high-end service tag, not a plain pill. Bigger
+   padding, gold gradient bg, deeper gold border, sparkle glyph + tighter
+   text — restraint over flash. NO animation on the badge itself per the
+   v5 surface-isolation rule (Aurora is gated to non-Pro upgrade CTAs). */
+#autofill_detail .jw-dl-plan-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px 5px 10px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  color: #d4b06a;
+  /* Subtle two-stop gold gradient — feels like brushed metal rather than
+     a flat tint. Top-left catches a hint more light. */
+  background: linear-gradient(135deg, rgba(212, 176, 106, 0.18) 0%, rgba(184, 146, 61, 0.12) 100%);
+  border: 1px solid rgba(212, 176, 106, 0.55);
+  border-radius: 999px;
+  text-transform: uppercase;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  /* Inner highlight + outer warm shadow → micro raise without lifting too
+     much. Pairs with the sparkle for the "premium accent" read. */
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 1px 4px rgba(212, 176, 106, 0.15);
+  text-shadow: 0 0 6px rgba(212, 176, 106, 0.25);
+}
+#autofill_detail .jw-dl-plan-badge-sparkle {
+  flex: 0 0 9px;
+  color: #d4b06a;
+  /* Faint glow on the sparkle so it reads as a gem chip, not flat clip-art. */
+  filter: drop-shadow(0 0 3px rgba(212, 176, 106, 0.5));
+  /* Extremely subtle 3s pulse — slower than the panel-level chip-dot
+     breathing (2.4s) so the two animations don't sync into a flicker.
+     Reinforces "alive, on standby for you" for Pro users. Restrained
+     opacity range (0.7 → 1.0) — no scale change, no glow flicker. */
+  animation: jw-dl-plan-badge-pulse 3s ease-in-out infinite;
+}
+@keyframes jw-dl-plan-badge-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.7; }
+}
+#autofill_detail .jw-dl-plan-badge-text {
+  line-height: 1;
+}
+
+#autofill_detail .jw-dl-close {
+  background: transparent;
+  border: 0;
+  color: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
+  position: relative;
+  z-index: 1;
+}
+#autofill_detail .jw-dl-close:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Greeting + textarea + footnote + CTA
+   ───────────────────────────────────────────────────────────── */
+#autofill_detail .jw-dl-greet {
+  padding: 22px 20px 6px;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: #0a0a0a;
+  line-height: 1.35;
+  background: #ffffff;
+}
+
+#autofill_detail .jw-dl-form {
+  padding: 12px 20px 16px;
+  background: #ffffff;
+  flex-shrink: 0;
+}
+
+#autofill_detail .jw-dl-textarea {
+  width: 100%;
+  min-height: 110px;
+  box-sizing: border-box;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 11px 13px;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #1f2937;
+  resize: vertical;
+  outline: none;
+  background: #ffffff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+#autofill_detail .jw-dl-textarea::placeholder {
+  color: #94a3b8;
+}
+#autofill_detail .jw-dl-textarea:focus {
+  border-color: #d4b06a;
+  box-shadow: 0 0 0 3px rgba(212, 176, 106, 0.12);
+}
+
+/* Context line — sits directly under the textarea. Functional reassurance:
+   tells the user what metadata rides along so they never retype. Paperclip
+   glyph = "attached". One quiet line, never wraps awkwardly. (2026-06-09,
+   Chen: split the old 2-sentence footnote — the SLA promise became its own
+   element below the CTA; this line keeps only the "what we attach" half.) */
+#autofill_detail .jw-dl-context {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #64748b;
+  letter-spacing: 0.002em;
+}
+#autofill_detail .jw-dl-context svg {
+  flex: 0 0 13px;
+  width: 13px;
+  height: 13px;
+  margin-top: 1px;
+  color: #9ca3af;
+}
+#autofill_detail .jw-dl-context-k {
+  color: #475569;
+  font-weight: 500;
+}
+
+/* SLA promise — standalone element, centered directly UNDER the Send CTA.
+   "Guarantee-under-the-action" pattern: this is what the user most wants to
+   know after clicking Send, so it's tied to the button rather than buried in
+   the compose copy. Quiet + confident: tiny gold dot + gold "24 hours" /
+   "always" echo the gold-zone vocabulary without a heavy box. */
+#autofill_detail .jw-dl-sla {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 11px;
+  font-size: 10.5px;
+  color: #94a3b8;
+  letter-spacing: 0.01em;
+}
+#autofill_detail .jw-dl-sla-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #d4b06a;
+  box-shadow: 0 0 5px rgba(212, 176, 106, 0.5);
+  flex: 0 0 5px;
+}
+#autofill_detail .jw-dl-sla b {
+  color: #8a6b22;
+  font-weight: 600;
+}
+
+/* Gold sparkle that briefly fades in near the greeting after the first send
+   of the session — "we noticed you" moment. Single 1200ms life cycle:
+   fade up + slight scale, hold, fade out. Removed from DOM by JS after.
+   Inline-block so it sits inline with the greeting text. */
+#autofill_detail .jw-dl-greet-sparkle {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  color: #d4b06a;
+  filter: drop-shadow(0 0 4px rgba(212, 176, 106, 0.55));
+  animation: jw-dl-sparkle 1200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  vertical-align: middle;
+}
+@keyframes jw-dl-sparkle {
+  0%   { opacity: 0; transform: translateY(2px) scale(0.85) rotate(-8deg); }
+  20%  { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+  70%  { opacity: 1; transform: scale(1) rotate(6deg); }
+  100% { opacity: 0; transform: scale(1.05) rotate(8deg); }
+}
+
+#autofill_detail .jw-dl-actions {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 12px;
+}
+/* CTA flex-grows so the attach button sits as a fixed square to its left,
+   keeping the primary Send action visually dominant. */
+#autofill_detail .jw-dl-actions .jw-dl-cta {
+  flex: 1 1 auto;
+  width: auto;
+}
+
+/* 主黑副金 — dark navy gradient bg + gold text + subtle gold flow band.
+   v7 (2026-06-04, Chen Image #78/#79): the previous white+gold-outline CTA
+   read too light against the white body, didn't carry primary-action weight.
+   New treatment matches the canonical gold-zone-on-dark vocabulary used by
+   the panel's top strip — dark navy → near-black diagonal gradient + 1px
+   gold top edge + faint white inner highlight + bottom inner shadow + a
+   slow horizontal gold shimmer band that loops every 6s. Same treatment
+   below on .jw-dl-reply-send and .jw-dl-intro-cta for cross-surface parity. */
+#autofill_detail .jw-dl-cta {
+  width: 100%;
+  background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 50%, #020617 100%);
+  color: #d4b06a;
+  border: 0;
+  border-radius: 10px;
+  padding: 13px 22px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-family: inherit;
+  cursor: pointer;
+  transition: box-shadow 200ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 180ms ease;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow:
+    /* Gold top edge — the metal's catch-light rim */
+    inset 0 1px 0 rgba(212, 176, 106, 0.55),
+    /* Faint inner highlight */
+    inset 0 2px 6px rgba(255, 255, 255, 0.04),
+    /* Bottom inner shadow — grounds the button */
+    inset 0 -2px 4px rgba(0, 0, 0, 0.35),
+    /* Outer drop */
+    0 4px 12px rgba(2, 6, 23, 0.28);
+}
+#autofill_detail .jw-dl-cta::before {
+  /* Slow gold shimmer band — left → right, looping. Restrained opacity so
+     it reads as a "flow" hint, not a glare. Uses background-position to
+     animate cheaply (compositor-friendly). */
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(212, 176, 106, 0.10) 50%,
+    transparent 100%);
+  background-size: 200% 100%;
+  background-position: -100% 0;
+  animation: jw-dl-cta-flow 6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+#autofill_detail .jw-dl-cta > * {
+  position: relative;
+  z-index: 1;
+}
+@keyframes jw-dl-cta-flow {
+  0%   { background-position: -100% 0; }
+  50%  { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+#autofill_detail .jw-dl-cta:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 176, 106, 0.65),
+    inset 0 2px 6px rgba(255, 255, 255, 0.06),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.4),
+    0 8px 16px rgba(2, 6, 23, 0.32),
+    0 0 0 1px rgba(212, 176, 106, 0.32);
+}
+#autofill_detail .jw-dl-cta:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 176, 106, 0.55),
+    inset 0 2px 8px rgba(0, 0, 0, 0.35),
+    0 2px 6px rgba(2, 6, 23, 0.28);
+}
+#autofill_detail .jw-dl-cta:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  /* No flow animation when disabled — keeps the dimmed state quiet. */
+}
+#autofill_detail .jw-dl-cta:disabled::before {
+  animation: none;
+  opacity: 0;
+}
+#autofill_detail .jw-dl-cta.jw-dl-cta-sending {
+  opacity: 0.85;
+  cursor: progress;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Recent section
+   ───────────────────────────────────────────────────────────── */
+#autofill_detail .jw-dl-recent {
+  background: #f8fafc;
+  padding: 14px 20px 18px;
+  border-top: 1px solid #f1f5f9;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+#autofill_detail .jw-dl-recent-title {
+  /* Lighter section header — was 10.5px / 700; reduced to 10px / 500 so it
+     reads as a quiet wayfinder, not a heavy label. Letter-spacing retained
+     so it still feels tracked/intentional. */
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+/* Gold dot next to "RECENT" — hidden by default, activated when the latest
+   ticket is 'replied'. One-shot pulse on activation draws the eye to the
+   unread reply without nagging. */
+#autofill_detail .jw-dl-recent-title-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: transparent;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+#autofill_detail .jw-dl-recent-title-dot-active {
+  background: #d4b06a;
+  box-shadow: 0 0 6px rgba(212, 176, 106, 0.55);
+  opacity: 1;
+  animation: jw-dl-recent-dot-pulse 1.2s cubic-bezier(0.22, 1, 0.36, 1) 1;
+}
+@keyframes jw-dl-recent-dot-pulse {
+  0%   { transform: scale(0.6); opacity: 0; }
+  40%  { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+#autofill_detail .jw-dl-recent-loading,
+#autofill_detail .jw-dl-recent-empty {
+  font-size: 12.5px;
+  color: #94a3b8;
+  padding: 10px 0;
+  font-style: italic;
+}
+
+/* 12px gap between Recent items (rows + expanded cards) — replaces the
+   per-row bottom hairline removed above. Single source for inter-item
+   spacing, easier to retune later. */
+#autofill_detail .jw-dl-recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#autofill_detail .jw-dl-thread {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  /* Lighter row: was 10px vertical; now 8px so rows feel airier. Recent
+     surface (f8fafc) IS the visual frame — rows shouldn't draw borders. */
+  padding: 8px 8px 8px 4px;
+  /* Removed bottom hairline between rows — the 12px gap (set on the list
+     itself, below) provides separation. Less ink on the page. */
+  border-bottom: 0;
+  cursor: pointer;
+  position: relative;
+  border-radius: 8px;
+  margin: 0 -8px 0 -4px;
+  transition: background 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+#autofill_detail .jw-dl-thread:last-child {
+  border-bottom: 0;
+}
+#autofill_detail .jw-dl-thread:hover:not(.jw-dl-expanded) {
+  background: #fafafa;
+}
+#autofill_detail .jw-dl-thread:hover:not(.jw-dl-expanded) .jw-dl-thread-chevron {
+  color: #475569;
+  transform: translateX(2px);
+}
+#autofill_detail .jw-dl-thread.jw-dl-thread-loading {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+#autofill_detail .jw-dl-thread-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-top: 7px;
+  flex-shrink: 0;
+  background: #cbd5e1;
+  transition: background 180ms ease, box-shadow 180ms ease;
+}
+/* Status tone ladder — the gold warmth scales with how "alive" the ticket
+   is from the user's POV:
+     neutral  → just_sent (team hasn't seen)
+     gold-soft→ received  (we've got it)
+     gold-deep→ investigating
+     gold-full→ replied   (Pro value-delivered)
+     muted    → closed */
+#autofill_detail .jw-dl-thread-dot-neutral {
+  background: #cbd5e1;
+}
+#autofill_detail .jw-dl-thread-dot-gold-soft {
+  background: #e4cf9b;
+  box-shadow: 0 0 4px rgba(212, 176, 106, 0.25);
+}
+#autofill_detail .jw-dl-thread-dot-gold-deep {
+  background: #d4b06a;
+  box-shadow: 0 0 5px rgba(212, 176, 106, 0.35);
+}
+#autofill_detail .jw-dl-thread-dot-gold-full {
+  background: #d4b06a;
+  box-shadow: 0 0 6px rgba(212, 176, 106, 0.5);
+}
+#autofill_detail .jw-dl-thread-dot-muted {
+  background: #cbd5e1;
+}
+
+#autofill_detail .jw-dl-thread-body {
+  flex: 1;
+  min-width: 0;
+}
+#autofill_detail .jw-dl-thread-meta {
+  font-size: 10.5px;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+#autofill_detail .jw-dl-thread-title {
+  font-size: 12.5px;
+  color: #1e293b;
+  font-weight: 500;
+  line-height: 1.45;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* No hairline under the title — the row + chevron + status already give
+     enough affordance. Less ink, lighter feel. */
+  margin-bottom: 3px;
+}
+#autofill_detail .jw-dl-thread.jw-dl-expanded .jw-dl-thread-title {
+  margin-bottom: 0;
+}
+#autofill_detail .jw-dl-thread-status {
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 2px;
+  transition: color 150ms ease;
+}
+#autofill_detail .jw-dl-thread-status-neutral {
+  color: #64748b;
+  font-weight: 500;
+}
+#autofill_detail .jw-dl-thread-status-gold-soft {
+  color: #a08246;
+}
+#autofill_detail .jw-dl-thread-status-gold-deep {
+  color: #8a6b22;
+}
+#autofill_detail .jw-dl-thread-status-gold-full {
+  color: #8a6b22;
+  font-weight: 700;
+}
+#autofill_detail .jw-dl-thread-status-muted {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* Chevron affordance — neutral grey by default, rotates 90° when row is
+   expanded so it points down. Sits at the right edge of the row, opt-out
+   when expanded (the card chrome carries the affordance instead). */
+#autofill_detail .jw-dl-thread-chevron {
+  flex: 0 0 14px;
+  align-self: center;
+  color: #9ca3af;
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), color 180ms ease;
+}
+#autofill_detail .jw-dl-thread.jw-dl-expanded .jw-dl-thread-chevron {
+  transform: rotate(90deg);
+  color: #64748b;
+}
+
+/* Expanded thread — inline card.
+   v7 visual diet (2026-06-04, Chen feedback "ui 太厚了"): dropped the box-
+   shadow entirely, faded the border to a near-invisible hairline. The outer
+   Recent surface (#f8fafc) provides the visual frame; the inner card just
+   marks "this row is open" with a 1px whisper of structure. */
+#autofill_detail .jw-dl-thread.jw-dl-expanded {
+  display: block;
+  padding: 12px 14px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.04);
+  border-radius: 10px;
+  margin: 0;
+  cursor: default;
+}
+#autofill_detail .jw-dl-thread.jw-dl-expanded:hover {
+  background: #ffffff;
+}
+#autofill_detail .jw-dl-thread.jw-dl-expanded .jw-dl-thread-body {
+  margin-bottom: 8px;
+}
+#autofill_detail .jw-dl-thread.jw-dl-expanded .jw-dl-thread-title {
+  white-space: normal;
+}
+/* In expanded card, the chevron sits at top-right to keep the read order
+   clean (meta/title/status flow vertically, chevron is a small affordance
+   marker that the row is open). */
+#autofill_detail .jw-dl-thread.jw-dl-expanded .jw-dl-thread-chevron {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+}
+
+#autofill_detail .jw-dl-thread-expanded {
+  margin-top: 8px;
+}
+
+/* Thread bubbles (v7 visual diet · 2026-06-04, Chen "ui 太厚了 / 私密优质服务"):
+   Both bubbles share the same airy structure — 3px gold left bar, NO
+   background tint, NO box-shadow, NO heavy border. The bar carries the
+   speaker identity (soft gold = you, deeper gold = team) and the body
+   text floats in the white card. Linear/Things 3 vibe rather than chat-app
+   bubble blocks. */
+#autofill_detail .jw-dl-bubble {
+  padding: 4px 0 4px 12px;
+  border-radius: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-top: 8px;
+  border-left: 3px solid transparent;
+  background: transparent;
+  /* No border, no shadow — restraint per the visual diet pass. */
+}
+#autofill_detail .jw-dl-bubble-you {
+  color: #1f2937;
+  border-left-color: rgba(212, 176, 106, 0.32);
+}
+#autofill_detail .jw-dl-bubble-team {
+  color: #1f2937;
+  border-left-color: rgba(212, 176, 106, 0.7);
+  /* "Just delivered" cue retained — gentle 250ms scale-fade so a team reply
+     lands with a subtle motion accent. Restrained: opacity + 0.04 scale,
+     no bounce. */
+  animation: jw-dl-bubble-deliver 250ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes jw-dl-bubble-deliver {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+/* Label sits on the SAME row visual rhythm as the body — was its own line
+   with margin-bottom: 4px; now inline-block, mr-8px, slightly smaller +
+   lighter weight so it reads as a quiet attribution glyph. */
+#autofill_detail .jw-dl-bubble-from {
+  display: inline-block;
+  font-size: 10px;
+  color: #9ca3af;
+  font-weight: 500;
+  margin-right: 8px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  vertical-align: baseline;
+}
+#autofill_detail .jw-dl-bubble-body {
+  display: block;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-top: 2px;
+}
+
+/* Fresh-bubble entry — applied to the just-posted reply so the user sees
+   the message land. 200ms fade-up, no bounce (the panel is a calm surface,
+   bouncy easing would feel cheap here). */
+#autofill_detail .jw-dl-bubble-fresh {
+  animation: jw-dl-bubble-in 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes jw-dl-bubble-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Inline reply composer (v7 visual diet · 2026-06-04):
+   Always-visible compact compose row at the bottom of an expanded, non-
+   closed thread. Single textarea with an embedded gold arrow icon at the
+   right edge — NO separate heavy navy Send button. Auto-grows up to 3
+   rows. Send on Enter, newline on Shift+Enter (wired in JS). The 16px
+   margin-top separates the input zone from the conversation above. */
+#autofill_detail .jw-dl-reply-form {
+  margin-top: 16px;
+  position: relative;
+  display: block;
+}
+#autofill_detail .jw-dl-reply-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ececec;
+  border-radius: 8px;
+  /* Right padding leaves room for the embedded send-icon button. */
+  padding: 8px 36px 8px 12px;
+  font-family: inherit;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #1f2937;
+  resize: none;
+  outline: none;
+  background: #ffffff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  overflow-y: auto;
+  /* Single-row default; auto-grow logic in JS extends up to 3 rows. */
+  min-height: 34px;
+  max-height: 88px;
+  display: block;
+}
+#autofill_detail .jw-dl-reply-textarea::placeholder {
+  color: #b0b8c4;
+  font-weight: 400;
+}
+#autofill_detail .jw-dl-reply-textarea:focus {
+  border-color: rgba(212, 176, 106, 0.5);
+  box-shadow: 0 0 0 2px rgba(212, 176, 106, 0.08);
+}
+
+/* Embedded send icon — sits inside the textarea at the right edge.
+   Default: neutral grey, disabled (textarea empty). On content: gold,
+   cursor:pointer, hover/active micro-lift. NO background, NO border —
+   minimal weight per the visual diet pass. */
+#autofill_detail .jw-dl-reply-send {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: #cbd5e1;
+  cursor: not-allowed;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  transition: color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+#autofill_detail .jw-dl-reply-send:not(:disabled) {
+  color: #d4b06a;
+  cursor: pointer;
+}
+#autofill_detail .jw-dl-reply-send:not(:disabled):hover {
+  background: rgba(212, 176, 106, 0.10);
+  transform: translateX(1px);
+}
+#autofill_detail .jw-dl-reply-send:not(:disabled):active {
+  transform: translateX(0) scale(0.94);
+  background: rgba(212, 176, 106, 0.16);
+}
+#autofill_detail .jw-dl-reply-send[aria-busy="true"] {
+  color: #d4b06a;
+  cursor: progress;
+  opacity: 0.7;
+}
+#autofill_detail .jw-dl-reply-send svg {
+  display: block;
+}
+
+/* =============================================================
+   Direct line — Free intro modal (paywall pre-roll)
+
+   Sits inside the shared .jw-bv1-modal-backdrop modal layer (so it
+   uses the same blurred backdrop / centered flex / z-index as the
+   upgrade + wall modals). Card visual is the neutral white + gold
+   accent dot vocabulary from the Pro panel — kept consistent with
+   the Direct line surface, NOT the Aurora pricing look.
+   ============================================================= */
+#autofill_detail .jw-dl-intro-card {
+  position: relative;
+  width: min(92vw, 360px);
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 24px 64px -24px rgba(15, 23, 42, 0.45),
+              0 12px 32px -16px rgba(15, 23, 42, 0.25);
+  padding: 22px 22px 20px;
+  font-family: var(--jobwizard-font-family, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif);
+  color: #0f172a;
+  animation: jw-dl-intro-in 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes jw-dl-intro-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+#autofill_detail .jw-dl-intro-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.05);
+  color: rgba(15, 23, 42, 0.55);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+  padding: 0;
+}
+#autofill_detail .jw-dl-intro-close:hover {
+  background: rgba(15, 23, 42, 0.10);
+  color: rgba(15, 23, 42, 0.8);
+}
+
+#autofill_detail .jw-dl-intro-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: #2a2218;
+  color: #d4b06a;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 176, 106, 0.25);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+#autofill_detail .jw-dl-intro-chip-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #d4b06a;
+  box-shadow: 0 0 6px rgba(212, 176, 106, 0.55);
+  animation: jw-dl-breathe 2.4s ease-in-out infinite;
+  flex: 0 0 5px;
+}
+
+#autofill_detail .jw-dl-intro-title {
+  margin: 14px 0 4px;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: #0a0a0a;
+}
+
+#autofill_detail .jw-dl-intro-bullets {
+  list-style: none;
+  margin: 12px 0 18px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+#autofill_detail .jw-dl-intro-bullets li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #334155;
+}
+#autofill_detail .jw-dl-intro-bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #d4b06a;
+  box-shadow: 0 0 6px rgba(212, 176, 106, 0.4);
+}
+
+#autofill_detail .jw-dl-intro-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* Intro "See plans →" — same 主黑副金 vocabulary as the panel's Send CTA.
+   Keeps the three gold-zone primary actions visually aligned across the
+   intro modal + panel surfaces. Gold flow band loops slowly. */
+#autofill_detail .jw-dl-intro-cta {
+  width: 100%;
+  background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 50%, #020617 100%);
+  color: #d4b06a;
+  border: 0;
+  border-radius: 10px;
+  padding: 13px 22px;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-family: inherit;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition: box-shadow 200ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 176, 106, 0.55),
+    inset 0 2px 6px rgba(255, 255, 255, 0.04),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.35),
+    0 4px 12px rgba(2, 6, 23, 0.28);
+}
+#autofill_detail .jw-dl-intro-cta::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(212, 176, 106, 0.10) 50%,
+    transparent 100%);
+  background-size: 200% 100%;
+  background-position: -100% 0;
+  animation: jw-dl-cta-flow 6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+#autofill_detail .jw-dl-intro-cta > * {
+  position: relative;
+  z-index: 1;
+}
+#autofill_detail .jw-dl-intro-cta:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 176, 106, 0.65),
+    inset 0 2px 6px rgba(255, 255, 255, 0.06),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.4),
+    0 8px 16px rgba(2, 6, 23, 0.32),
+    0 0 0 1px rgba(212, 176, 106, 0.32);
+}
+#autofill_detail .jw-dl-intro-cta:active {
+  transform: translateY(0);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 176, 106, 0.55),
+    inset 0 2px 8px rgba(0, 0, 0, 0.35),
+    0 2px 6px rgba(2, 6, 23, 0.28);
+}
+
+#autofill_detail .jw-dl-intro-secondary {
+  width: 100%;
+  background: transparent;
+  color: #64748b;
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 12.5px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+#autofill_detail .jw-dl-intro-secondary:hover {
+  color: #1f2937;
+  background: rgba(15, 23, 42, 0.04);
+}
+
+/* =============================================================
+   Image attachments (Direct line · 2026-06-11)
+
+   Two composers share these styles:
+   - New-ticket composer: attach button sits left of the Send CTA;
+     thumbnail strip (.jw-dl-thumbs) appears above the context line.
+   - Reply composer: inline 📎 button + thumbnail strip above the form.
+
+   Visual language matches the panel — quiet gold accents, white cards,
+   soft rounded thumbs, micro-feedback on hover/active. Images only.
+   ============================================================= */
+
+/* New-ticket attach button — fixed square, gold-on-white, mirrors the
+   restrained weight of the inline reply icons. */
+#autofill_detail .jw-dl-attach-row {
+  display: flex;
+  align-items: stretch;
+  flex: 0 0 auto;
+}
+#autofill_detail .jw-dl-attach-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  /* Borderless at rest (a resting frame reads too heavy next to the CTA);
+     the 1px transparent border is kept only so the hover tint doesn't shift layout. */
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: #b08a3e;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 160ms ease, background 160ms ease,
+              border-color 160ms ease, transform 160ms ease;
+}
+#autofill_detail .jw-dl-attach-btn:hover:not(:disabled) {
+  color: #d4b06a;
+  border-color: rgba(212, 176, 106, 0.55);
+  background: rgba(212, 176, 106, 0.06);
+}
+#autofill_detail .jw-dl-attach-btn:active:not(:disabled) {
+  transform: scale(0.94);
+  background: rgba(212, 176, 106, 0.12);
+}
+#autofill_detail .jw-dl-attach-btn:disabled {
+  color: #cbd5e1;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+#autofill_detail .jw-dl-attach-btn svg { display: block; }
+
+/* Reply-composer attach button — sits inside the reply form at the left
+   edge, same minimal weight as the embedded send icon. */
+#autofill_detail .jw-dl-reply-attach {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: #b08a3e;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  transition: color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+#autofill_detail .jw-dl-reply-attach:hover:not(:disabled) {
+  color: #d4b06a;
+  background: rgba(212, 176, 106, 0.10);
+}
+#autofill_detail .jw-dl-reply-attach:active:not(:disabled) {
+  transform: scale(0.92);
+  background: rgba(212, 176, 106, 0.16);
+}
+#autofill_detail .jw-dl-reply-attach:disabled {
+  color: #cbd5e1;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+#autofill_detail .jw-dl-reply-attach svg { display: block; }
+/* Reply textarea grows its left padding to clear the embedded 📎 icon. */
+#autofill_detail .jw-dl-reply-form .jw-dl-reply-textarea {
+  padding-left: 36px;
+}
+
+/* Composing-state thumbnail strip — wraps, small soft-rounded thumbs with
+   a × remove badge. Shared by both composers (.jw-dl-thumbs /
+   .jw-dl-reply-thumbs). */
+#autofill_detail .jw-dl-thumbs,
+#autofill_detail .jw-dl-reply-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+#autofill_detail .jw-dl-reply-thumbs { margin-top: 8px; margin-bottom: 2px; }
+#autofill_detail .jw-dl-thumb {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #ececec;
+  background: #f8fafc;
+  flex: 0 0 auto;
+  animation: jw-dl-thumb-in 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes jw-dl-thumb-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+#autofill_detail .jw-dl-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+#autofill_detail .jw-dl-thumb-remove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.72);
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 140ms ease, transform 140ms ease;
+}
+#autofill_detail .jw-dl-thumb-remove:hover {
+  background: rgba(15, 23, 42, 0.92);
+  transform: scale(1.08);
+}
+#autofill_detail .jw-dl-thumb-remove:active { transform: scale(0.9); }
+#autofill_detail .jw-dl-thumb-remove svg { display: block; }
+
+/* Uploading placeholder thumb — gold spinner on the soft card. */
+#autofill_detail .jw-dl-thumb-uploading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+#autofill_detail .jw-dl-thumb-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(212, 176, 106, 0.25);
+  border-top-color: #d4b06a;
+  border-radius: 50%;
+  animation: jw-dl-spin 0.7s linear infinite;
+}
+@keyframes jw-dl-spin { to { transform: rotate(360deg); } }
+
+/* Read-only attachment strip inside a rendered message bubble — clickable
+   thumbnails open the full image in a new tab. Sits under the bubble body,
+   offset to align with the bubble's text indent. */
+#autofill_detail .jw-dl-bubble-atts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+#autofill_detail .jw-dl-att-thumb {
+  display: block;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #ececec;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 160ms ease, border-color 160ms ease;
+}
+#autofill_detail .jw-dl-att-thumb:hover {
+  transform: translateY(-1px);
+  border-color: rgba(212, 176, 106, 0.55);
+  box-shadow: 0 4px 12px -4px rgba(15, 23, 42, 0.25);
+}
+#autofill_detail .jw-dl-att-thumb:active { transform: translateY(0) scale(0.97); }
+#autofill_detail .jw-dl-att-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Commercial support is separate from the account's feature plan. */
+.jw-dl-access-notice { margin: 18px 0; padding: 16px; border-radius: 12px; background: #f6f7f9; color: #485260; font-size: 13px; line-height: 1.6; }
+.jw-dl-access-notice p { margin: 0 0 12px; }
+.jw-dl-access-action { border: 1px solid #d5d9e0; border-radius: 8px; background: #fff; padding: 8px 12px; color: #26364c; font: inherit; cursor: pointer; }
+
+.jw-dl-form[hidden], .jw-dl-reply-form[hidden], .jw-dl-reply-thumbs[hidden] { display: none !important; }

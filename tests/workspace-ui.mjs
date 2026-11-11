@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { checkCurrentJobUI } from './current-job-ui.mjs';
 
-export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, evaluate, artifacts, until }) {
+export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, deepseekSession, evaluate, artifacts, until }) {
   const text = selector => read(`document.querySelector(${JSON.stringify(selector)}).textContent`);
   const value = selector => read(`document.querySelector(${JSON.stringify(selector)}).value`);
   const setValue = (selector, value, event = 'change') => read(`(() => {
@@ -11,6 +12,32 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
     field.dispatchEvent(new Event(${JSON.stringify(event)}, { bubbles: true }));
   })()`);
   const closeDialog = id => click(`#${id} [data-close-dialog]`);
+  async function checkChatViewportAcrossCollapse(session, editor) {
+    const settleLayout = () => read('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');
+    await settleLayout();
+    const dimensions = () => evaluate(session, '({width:innerWidth,height:innerHeight,document:performance.timeOrigin,url:location.href})');
+    const before = await dimensions();
+    await evaluate(session, 'globalThis.dockResizeEvents=[];globalThis.dockResizeListener=()=>dockResizeEvents.push([innerWidth,innerHeight]);addEventListener("resize",dockResizeListener)');
+    for (let i = 0; i < 2; i++) {
+      await until(() => evaluate(session, '!document.documentElement.inert'), 'chat input is restored before focusing');
+      await evaluate(session, `document.querySelector(${JSON.stringify(editor)}).focus()`);
+      await click('#chat-dock-toggle');
+      await settleLayout();
+      assert.deepEqual(await dimensions(), before, 'collapsed chat retains its document and full viewport');
+      await until(() => evaluate(session, 'document.documentElement.inert'), 'parked frame disables its own input and focus');
+      assert.equal(await read('(()=>{const pane=document.getElementById("chat-view");return pane.hidden && pane.inert && pane.getAttribute("aria-hidden")==="true" && pane.getBoundingClientRect().right<=0})()'), true, 'collapsed chat is off-screen and excluded from interaction');
+      await evaluate(session, `document.querySelector(${JSON.stringify(editor)}).focus()`);
+      await settleLayout();
+      assert.equal(await read('document.activeElement.id'), 'chat-dock-toggle', 'collapsed iframe cannot retain focus');
+      await click('#chat-dock-toggle');
+      await settleLayout();
+      assert.deepEqual(await dimensions(), before, 'expansion does not resize or reload the page');
+      await until(() => evaluate(session, '!document.documentElement.inert'), 'expanded frame restores its input and focus');
+      assert.equal(await read('!document.getElementById("chat-view").inert && document.getElementById("chat-view").getAttribute("aria-hidden")==="false"'), true);
+    }
+    assert.deepEqual(await evaluate(session, 'dockResizeEvents'), [], 'collapse and expand do not trigger native viewport rebuilds');
+    await evaluate(session, 'removeEventListener("resize",dockResizeListener);delete globalThis.dockResizeListener;delete globalThis.dockResizeEvents');
+  }
   async function shortcut(key, { inChat = false, repeat = false } = {}) {
     await cdp.send('Page.bringToFront', {}, panel);
     if (inChat) await evaluate(frameSession, 'document.getElementById("prompt-textarea").focus()');
@@ -24,6 +51,7 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   async function screenshot(name) {
     await cdp.send('Page.bringToFront', {}, panel);
     // Let the browser paint after scrolling, view switches, or media changes.
+    await read('Promise.all(document.getAnimations().filter(animation => animation.effect.getTiming().iterations !== Infinity).map(animation => animation.finished.catch(() => {})))');
     await read('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
     const shot = await cdp.send('Page.captureScreenshot', { format: 'png' }, panel);
     await writeFile(join(artifacts, name), Buffer.from(shot.data, 'base64'));
@@ -31,17 +59,17 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await cdp.send('Emulation.setDeviceMetricsOverride', { width: 390, height: 900, deviceScaleFactor: 1, mobile: false }, panel);
   await cdp.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'light' }] }, panel);
   assert.equal(await read('document.getElementById("chat-toolbar-shell").dataset.open'), 'false');
-  assert.equal(await read('document.querySelector(".studio-footer").getClientRects().length'), 0);
+  assert.equal(await read('document.querySelector(".studio-footer").getClientRects().length'), 0, 'job content and actions stay collapsed while chat is open');
   assert.equal(await read('getComputedStyle(document.querySelector(".chat-toolbar-handle")).visibility'), 'visible');
   assert.equal(await read('document.querySelectorAll("#chatgpt-pane .chat-toolbar-handle svg").length'), 1);
   await screenshot('workspace-chat-collapsed.png');
-  assert.match(await text('#results-tab'), /^Job Queues/);
+  assert.match(await text('#results-tab'), /^Queue/);
   await evaluate(frameSession, `globalThis.nativeCtrlEnterForTest = 0;
     document.getElementById('prompt-textarea').value = 'Keep my shortcut draft';
     document.getElementById('prompt-textarea').dispatchEvent(new Event('input',{bubbles:true}));
     document.addEventListener('keydown', event => { if (event.ctrlKey && event.key === 'Enter') nativeCtrlEnterForTest++; });`);
   await shortcut('ArrowUp', {inChat:true});
-  await until(() => read('!document.getElementById("studio-view").hidden'), 'Ctrl+Up from Chat opens Resume Studio');
+  await until(() => read('!document.getElementById("studio-view").hidden && document.getElementById("chat-view").hidden'), 'Ctrl+Up collapses chat and reveals the tracker');
   await shortcut('ArrowDown');
   await until(() => read('!document.getElementById("chat-view").hidden'), 'Ctrl+Down opens Chat');
   await shortcut('Enter', {inChat:true,repeat:true});
@@ -76,6 +104,11 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   assert.equal(await read('document.getElementById("chat-history-up").disabled'), true, 'most recent chat disables Up');
   await click('#chat-history-up');
   assert.equal(await path(), '/c/saved-resume', 'Up never wraps to a new chat');
+  await historyStep('#chat-history-down','/c/saved-interview');
+  await until(() => read('!document.getElementById("chat-history-up").disabled'), 'older ChatGPT chat enables Up before opening a pin');
+  await evaluate(frameSession, 'history.pushState({},"","/c/pinned-old");dispatchEvent(new PopStateEvent("popstate"))');
+  await until(() => read('document.getElementById("chat-history-up").disabled && !document.getElementById("chat-history-down").disabled'), 'pinned ChatGPT chat starts navigation at newest regular chat');
+  await historyStep('#chat-history-down','/c/saved-resume');
   await historyStep('#chat-history-down','/c/saved-interview');
   await historyStep('#chat-history-up','/c/saved-resume');
   await historyStep('#chat-history-down','/c/saved-interview');
@@ -131,8 +164,8 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await cdp.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 }, panel);
   await cdp.send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 }, panel);
   assert.equal(await read('document.getElementById("chat-toolbar-shell").dataset.open'), 'true', 'Escape does not undo the pin');
-  await click('#studio-tab');
-  await click('#chat-tab');
+  await read('if (!document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
+  await read('if (document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
   assert.equal(await read('document.getElementById("chat-toolbar-shell").dataset.open'), 'true', 'pin survives view switches');
   assert.equal(await read('Math.abs(document.getElementById("chatgpt-frame").getBoundingClientRect().top-document.getElementById("chat-toolbar").getBoundingClientRect().bottom)<1'), true, 'pinned toolbar does not cover the iframe after switching views');
   await screenshot('workspace-chat-pinned.png');
@@ -200,7 +233,7 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   assert.equal(await read('document.getElementById("chatgpt-frame").getBoundingClientRect().height'), iframeHeight);
   await screenshot('workspace-chat-expanded.png');
   await evaluate(frameSession, 'document.getElementById("prompt-textarea").value="";document.getElementById("prompt-textarea").dispatchEvent(new Event("input",{bubbles:true}))');
-  await click('#studio-tab');
+  await read('if (!document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
   assert.equal(await read('document.querySelector(\'[data-request-id="1"] [data-action="review"]\').disabled'), true, 'a result without a source cannot open an unrelated chat');
   await click('[data-request-id="1"] [data-action="details"]');
   assert.equal(await read('document.getElementById("request-connect-chat").disabled'), true);
@@ -216,8 +249,9 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await click('[data-request-id="2"] [data-action="details"]');
   await click('#request-connect-chat');
   await closeDialog('request-dialog');
-  await click('#chat-tab');
+  await read('if (document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
   await read('document.getElementById("chat-toolbar-reveal").focus()');
+  await until(() => read('!document.getElementById("company-chat-search").disabled'), 'expanded ChatGPT restores search readiness');
   await read('document.getElementById("company-chat-search").value="resume planning";document.getElementById("company-chat-search").focus()');
   await cdp.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 }, panel);
   await cdp.send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 }, panel);
@@ -235,9 +269,16 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await until(async () => Number((await text('#job-position')).split('/')[1]) === (await sourceTabs()).length, 'open-tab count');
   await read('globalThis.originalChatFrame = document.getElementById("chatgpt-frame")');
   await evaluate(frameSession, 'document.getElementById("prompt-textarea").value = "Keep this ChatGPT draft"');
-  await click('#studio-tab');
+  await read('if (!document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
   assert.equal(await read('document.querySelectorAll(".job-request").length'), 3);
   await screenshot('workspace-queue.png');
+  await setValue('#queue-search', 'northstar', 'input');
+  assert.equal(await read('document.querySelectorAll("#resume-queue .job-request").length'), 1, 'queue search matches a saved company');
+  await setValue('#queue-filter', 'queued');
+  assert.equal(await read('document.getElementById("queue-no-matches").hidden'), false, 'combined filters show an honest empty result');
+  await setValue('#queue-search', '', 'input');
+  await setValue('#queue-filter', 'all');
+  assert.equal(await read('document.querySelectorAll("#resume-queue .job-request").length'), 3, 'filters leave saved jobs intact');
 
   await click('[data-request-id="3"] [data-action="retry-save"]');
   assert.equal(await read('document.querySelectorAll(".state-pill[data-state=ready]").length'), 3);
@@ -250,7 +291,7 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await click('#request-open-chat');
   await until(() => read('!document.getElementById("chat-view").hidden'), 'connected chat opens after queue pause');
   assert.equal(await evaluate(frameSession, 'document.getElementById("prompt-textarea").value'), 'Keep this ChatGPT draft');
-  await click('#studio-tab');
+  await read('if (!document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
   await click('[data-request-id="1"] [data-action="details"]');
   await cdp.send('Page.bringToFront', {}, panel);
   await read('document.querySelector("#request-dialog [data-close-dialog]").focus()');
@@ -314,18 +355,18 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   assert.equal(await value('#job-company'), 'Cedar Forge');
   assert.equal(await value('#job-title'), 'Platform Engineer');
   assert.equal(await value('#job-url'), jobUrl);
-  await click('#chat-tab');
+  await read('if (document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
   assert.equal(await read('document.getElementById("chatgpt-frame") === globalThis.originalChatFrame'), true);
   assert.equal(await evaluate(frameSession, 'document.getElementById("prompt-textarea").value'), 'Keep this ChatGPT draft');
-  await click('#studio-tab');
+  await read('if (!document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
   assert.equal(await value('#job-description'), literalJob);
   assert.equal(await value('#prompt-template'), 'technical');
 
   await setValue('#candidate', 'jordan');
-  await click('#chat-tab');
+  await read('if (document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
   await read('document.getElementById("chat-toolbar-reveal").focus()');
-  await click('#studio-tab');
-  await click('#profile-details');
+  await read('if (!document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
+  await click('#account-toggle'); await click('#profile-details');
   assert.equal(await text('#profile-name'), 'Jordan Lee');
   assert.equal(await read('document.getElementById("import-profile").disabled'), false);
   await closeDialog('profile-dialog');
@@ -359,7 +400,7 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await screenshot('workspace-already-applied.png');
   await click('#queue-notice-dismiss');
   assert.equal(await read('document.getElementById("queue-notice").hidden'), true);
-  await click('#studio-tab'); await click('#view-queue');
+  await read('if (!document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()'); await click('#view-queue');
   await click('#resume-queue .job-request [data-action="details"]');
   await read('document.getElementById("request-full-prompt").focus()');
   await shortcut('Enter');
@@ -399,14 +440,14 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await setValue('#job-description', '', 'input');
   await click('#add-request');
   await until(() => read('Boolean(document.querySelector(".state-pill[data-state=queued]")) && !document.getElementById("chat-view").hidden'), 'base resume stays queued for manual sending');
-  await click('#studio-tab'); await click('#view-queue');
+  await read('if (!document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()'); await click('#view-queue');
   await click('#resume-queue .job-request [data-action="details"]');
   assert.match(await text('#request-metadata'), /Base resume/);
   assert.match(await text('#request-prompt'), /without tailoring to a job/);
   await closeDialog('request-dialog');
 
   await click('#review-another');
-  await click('#profile-details');
+  await click('#account-toggle'); await click('#profile-details');
   await click('#reset-examples');
   assert.equal(await read('document.querySelectorAll(".job-request").length'), 3);
   await click('#account-toggle');
@@ -512,14 +553,81 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   assert.equal(await read('document.getElementById("chat-view").contains(document.getElementById("chat-provider"))'), false);
   assert.equal(await read('document.getElementById("account-check").hidden'), true);
   await screenshot('workspace-chat-settings.png');
-  await click('#account-chat');
-  assert.equal(await read('document.getElementById("account-panel").hidden'), true);
+  assert.equal(await read('document.getElementById("account-chat") === null'), true, 'redundant Open chat button removed');
+  await setValue('#chat-provider', 'deepseek');
+  await until(() => read('document.getElementById("account-panel").hidden && !document.getElementById("deepseek-pane").hidden && !document.getElementById("chat-provider").disabled'), 'provider selection opens chat and closes popup');
+  assert.equal(await read('document.getElementById("account-toggle").getAttribute("aria-expanded")'), 'false');
+  assert.equal(await read('document.activeElement.id'), 'account-toggle', 'closing the popup restores focus');
+  const retainedDeepseekDocument = await evaluate(deepseekSession, 'performance.timeOrigin');
+  const retainedDeepseekUrl = await evaluate(deepseekSession, 'location.href');
+  await evaluate(deepseekSession, 'document.querySelector("textarea").value="Keep this DeepSeek draft across collapse";document.querySelector("textarea").dispatchEvent(new Event("input",{bubbles:true}))');
+  await until(() => read('document.getElementById("deepseek-new-chat").disabled && document.getElementById("deepseek-status").hidden'), 'DeepSeek draft is ready before collapse');
+  await checkChatViewportAcrossCollapse(deepseekSession, 'textarea');
+  await click('#chat-dock-toggle');
+  await evaluate(deepseekSession, 'document.querySelector("textarea").hidden=true;document.querySelector("textarea").dispatchEvent(new Event("input",{bubbles:true}))');
+  await until(() => read('!document.getElementById("deepseek-status").hidden'), 'DeepSeek reports an unavailable composer while collapsed');
+  await click('#chat-dock-toggle');
+  assert.doesNotMatch(await text('#deepseek-status'), /sign[ -]?in|log[ -]?in/i, 'expanding an unavailable composer does not invent a sign-in requirement');
+  assert.match(await text('#deepseek-status'), /message box/i);
+  assert.equal(await read('document.getElementById("deepseek-new-chat").disabled'), true, 'loading does not bypass navigation guards');
+  await evaluate(deepseekSession, 'document.querySelector("textarea").hidden=false');
+  // No frame input event: expanding the selected provider must probe it.
+  await click('#chat-dock-toggle');
+  await click('#chat-dock-toggle');
+  await until(() => read('document.getElementById("deepseek-status").hidden'), 'expanded DeepSeek refreshes its readiness');
+  assert.equal(await evaluate(deepseekSession, 'performance.timeOrigin'), retainedDeepseekDocument, 'collapse and expand keep the same DeepSeek document');
+  assert.equal(await evaluate(deepseekSession, 'location.href'), retainedDeepseekUrl, 'collapse and expand preserve the DeepSeek conversation');
+  assert.equal(await evaluate(deepseekSession, 'document.querySelector("textarea").value'), 'Keep this DeepSeek draft across collapse');
+  await evaluate(deepseekSession, 'document.querySelector("textarea").value="";document.querySelector("textarea").dispatchEvent(new Event("input",{bubbles:true}))');
+  await until(() => read('!document.getElementById("deepseek-new-chat").disabled'), 'DeepSeek controls recover after the draft is cleared');
+  await click('#account-toggle');
+  await setValue('#chat-provider', 'chatgpt');
+  await until(() => read('document.getElementById("account-panel").hidden && !document.getElementById("chatgpt-pane").hidden && !document.getElementById("chat-provider").disabled'), 'switching back also closes popup');
   assert.equal(await read('document.getElementById("chat-view").hidden'), false);
-  await read('document.getElementById("chat-tab").focus()');
-  await cdp.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'ArrowRight', code: 'ArrowRight', windowsVirtualKeyCode: 39 }, panel);
-  await cdp.send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'ArrowRight', code: 'ArrowRight', windowsVirtualKeyCode: 39 }, panel);
-  assert.equal(await read('document.getElementById("studio-tab").getAttribute("aria-selected")'), 'true');
-  assert.equal(await read('document.activeElement.id'), 'studio-tab');
+  const retainedChatgptDocument = await evaluate(frameSession, 'performance.timeOrigin');
+  const retainedChatgptUrl = await evaluate(frameSession, 'location.href');
+  await checkChatViewportAcrossCollapse(frameSession, '#prompt-textarea');
+  await evaluate(frameSession, 'document.getElementById("prompt-textarea").value="Keep this ChatGPT draft across collapse";document.getElementById("prompt-textarea").hidden=true;document.getElementById("prompt-textarea").dispatchEvent(new Event("input",{bubbles:true}))');
+  await until(() => read('document.getElementById("connection").dataset.state === "connected"'), 'signed-in ChatGPT remains connected with a hidden composer');
+  assert.equal(await read('document.getElementById("connection").hidden'), true, 'connected page does not show Opening ChatGPT');
+  assert.equal(await read('document.getElementById("chat-history-down").disabled'), true, 'connected does not mean ready for navigation');
+  await click('#chat-dock-toggle');
+  await click('#chat-dock-toggle');
+  assert.equal(await read('document.getElementById("connection").hidden'), true, 'expanding connected ChatGPT keeps the loading banner hidden');
+  await evaluate(frameSession, 'const login=document.createElement("button");login.id="lifecycle-login";login.dataset.testid="login-button";login.textContent="Log in";document.body.append(login)');
+  await until(() => read('document.getElementById("connection").dataset.state === "guest"'), 'actual sign-out is reported even without a composer');
+  assert.equal(await read('document.getElementById("connection").hidden'), false, 'a real sign-in requirement is still visible');
+  await evaluate(frameSession, 'document.getElementById("lifecycle-login").remove();document.getElementById("prompt-textarea").hidden=false;document.getElementById("prompt-textarea").dispatchEvent(new Event("input",{bubbles:true}))');
+  await until(() => read('document.getElementById("connection").dataset.state === "ready" && document.getElementById("connection").hidden'), 'ChatGPT returns to ready without a reload');
+  assert.equal(await evaluate(frameSession, 'performance.timeOrigin'), retainedChatgptDocument);
+  assert.equal(await evaluate(frameSession, 'location.href'), retainedChatgptUrl);
+  assert.equal(await evaluate(frameSession, 'document.getElementById("prompt-textarea").value'), 'Keep this ChatGPT draft across collapse');
+  await evaluate(frameSession, 'document.getElementById("prompt-textarea").value="";document.getElementById("prompt-textarea").dispatchEvent(new Event("input",{bubbles:true}))');
+  await cdp.send('Page.bringToFront', {}, panel);
+  await read('document.getElementById("chat-dock-toggle").focus()');
+  await cdp.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Enter', code: 'Enter', text: '\r', windowsVirtualKeyCode: 13 }, panel);
+  await cdp.send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 }, panel);
+  assert.equal(await read('document.getElementById("chat-dock-toggle").getAttribute("aria-expanded")'), 'false');
+  assert.equal(await read('document.getElementById("chat-view").hidden'), true);
+  assert.equal(await read('document.activeElement.id'), 'chat-dock-toggle');
+  assert.equal(await read('Math.abs(document.querySelector(".dock-status-bar").getBoundingClientRect().bottom-innerHeight)<1'), true, 'collapsed status bar returns to the bottom');
+  assert.equal(await read('getComputedStyle(document.querySelector(".dock-status-bar"), "::before").display'), 'none', 'collapsed chat hides its top separator');
+
+  assert.equal(await read('document.querySelectorAll(".tracker-heading, .tracker-monogram").length'), 0, 'branding header removed');
+  assert.equal(await read('document.querySelectorAll(".profile-card").length'), 0, 'profile card removed from the workspace');
+  const retainedJobDraft = await value('#job-description');
+  await click('#studio-dock-toggle');
+  assert.equal(await read('document.getElementById("studio-content").hidden && !document.getElementById("chat-view").hidden'), true, 'collapsing jobs expands chat');
+  assert.equal(await read('document.getElementById("studio-dock-toggle").getAttribute("aria-expanded")'), 'false');
+  assert.equal(await read('document.getElementById("chat-view").getBoundingClientRect().height > innerHeight * .8'), true, 'chat fills the space below the two headers');
+  await screenshot('workspace-accordions.png');
+  await click('#job-tab');
+  assert.equal(await read('!document.getElementById("studio-content").hidden && !document.getElementById("job-panel").hidden && document.getElementById("chat-view").hidden'), true, 'Job form expands while chat collapses');
+  assert.equal(await value('#job-description'), retainedJobDraft, 'accordion retains the job draft');
+  await click('#chat-dock-toggle');
+  assert.equal(await read('document.getElementById("studio-content").hidden && !document.getElementById("chat-view").hidden'), true, 'chat expands while jobs collapse');
+  await click('#results-tab');
+  assert.equal(await read('!document.getElementById("studio-content").hidden && !document.getElementById("results-panel").hidden && document.getElementById("chat-view").hidden'), true, 'Queue expands while chat collapses');
 
   const layouts = [];
   for (const width of [280, 360, 390, 480, 800]) {
@@ -536,11 +644,22 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
       assert.equal(layout.noOverflow, true, `${view} at ${width}px`);
       assert.equal(layout.footerVisible, true);
       assert.equal(layout.actionsVisible, true);
+      assert.equal(await read(`(() => {
+        const job=document.querySelector('.studio-navigation'), chat=document.querySelector('.dock-status-bar');
+        const bars=[job,chat].map(element=>element.getBoundingClientRect());
+        const fullHeight=(selector,bar)=>{const bounds=document.querySelector(selector).getBoundingClientRect();return bounds.top===bar.top && bounds.bottom===bar.bottom;};
+        return bars.every(bar=>bar.height===40 && bar.left===0 && bar.right===innerWidth) &&
+          getComputedStyle(job).backgroundColor===getComputedStyle(chat).backgroundColor &&
+          ['#job-tab','#results-tab','#studio-dock-toggle'].every(selector=>fullHeight(selector,bars[0])) &&
+          ['#chat-dock-toggle','#open-queue','#account-toggle'].every(selector=>fullHeight(selector,bars[1])) &&
+          document.getElementById('job-tab').getBoundingClientRect().left===0 &&
+          document.getElementById('chat-dock-toggle').getBoundingClientRect().left===0;
+      })()`), true, 'compact headers and full-height buttons reach the dock edges at ' + width);
       assert.ok(layout.scrollHeight > 350);
-      assert.equal(await read('document.querySelector(".studio-footer").getBoundingClientRect().height <= 90 && document.querySelector(".queue-bar").getBoundingClientRect().height <= 34'), true, `compact footer at ${width}px`);
+      assert.equal(await read('document.querySelector(".studio-footer").getBoundingClientRect().height <= 90'), true, `compact footer at ${width}px`);
       assert.equal(await read('getComputedStyle(document.getElementById("workspace-status")).position'), 'absolute');
       if (view === 'job') {
-        assert.equal(await read('(() => { const nav=document.querySelector(".tab-navigation").getBoundingClientRect(), read=document.getElementById("read-page").getBoundingClientRect(), tools=document.querySelector(".job-tools").getBoundingClientRect(), toggle=document.querySelector(".keyword-page-toggle").getBoundingClientRect(), company=document.getElementById("job-company").getBoundingClientRect(), role=document.getElementById("job-title").getBoundingClientRect(), url=document.getElementById("job-url").getBoundingClientRect(), jd=document.getElementById("job-description").getBoundingClientRect(); const padding=parseFloat(getComputedStyle(document.querySelector(".job-tools")).paddingRight); return nav.width<120 && toggle.left>=nav.right && read.left>=toggle.right && Math.abs(tools.right-padding-read.right)<1 && read.top<company.top && company.right<jd.left && role.top>company.top && role.right<jd.left && url.top>role.top && url.right<jd.left; })()'), true, `job field layout at ${width}px`);
+        assert.equal(await read('(() => { const nav=document.querySelector(".tab-navigation").getBoundingClientRect(), read=document.getElementById("read-page").getBoundingClientRect(), tools=document.querySelector(".job-tools").getBoundingClientRect(), toggle=document.querySelector(".keyword-page-toggle").getBoundingClientRect(), company=document.getElementById("job-company").getBoundingClientRect(), role=document.getElementById("job-title").getBoundingClientRect(), url=document.getElementById("job-url").getBoundingClientRect(), jd=document.getElementById("job-description").getBoundingClientRect(); const padding=parseFloat(getComputedStyle(document.querySelector(".job-tools")).paddingRight); return nav.width<120 && toggle.left>=nav.right && read.left>=toggle.right && Math.abs(tools.right-padding-read.right)<1 && read.top<company.top && company.right<role.left && Math.abs(role.top-company.top)<1 && url.top>role.top && jd.top>url.bottom; })()'), true, `job field layout at ${width}px`);
       }
       layouts.push(layout);
     }
@@ -551,8 +670,82 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await cdp.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'dark' }] }, panel);
   await screenshot('workspace-dark.png');
   await cdp.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'light' }] }, panel);
-  await click('#chat-tab');
-  return { layouts, checks: ['combined workspace tabs', 'ChatGPT frame and draft retained', 'Studio form retained',
+  await read('if (document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
+  assert.equal(await read('document.querySelectorAll("#studio-tab, #chat-tab, #tracker-return, .chat-dock-heading").length'), 0, 'former tabs and duplicate chat header removed');
+  assert.equal(await read('document.querySelectorAll(".dock-status-bar").length'), 1, 'one status bar serves both collapsed and expanded chat');
+  assert.equal(await read('document.getElementById("chat-dock-toggle").getAttribute("aria-expanded")'), 'true');
+  assert.equal(await read('getComputedStyle(document.querySelector(".dock-status-bar"), "::before").display'), 'block', 'expanded chat shows its top separator');
+  assert.equal(await read('document.getElementById("studio-content").hidden && document.querySelector(".queue-filters").getClientRects().length === 0'), true, 'only the job header remains while chat is open');
+  await click('#account-toggle');
+  assert.equal(await read(`(() => {
+    const bar=document.querySelector('.dock-status-bar').getBoundingClientRect(), account=document.getElementById('account-toggle').getBoundingClientRect(), popup=document.getElementById('account-panel').getBoundingClientRect();
+    const chat=document.getElementById('chat-view').getBoundingClientRect();
+    return account.top>=bar.top && account.bottom<=bar.bottom && Math.abs(bar.bottom-chat.top)<1 && popup.top>=0 && popup.bottom<=innerHeight && (popup.bottom<account.top || popup.top>account.bottom);
+  })()`), true, 'account menu stays in view from the raised status bar');
+  await click('#account-toggle');
+  for (const width of [280, 390, 800]) {
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width, height: 600, deviceScaleFactor: 1, mobile: false }, panel);
+    assert.equal(await read(`(() => {
+      const studio=document.getElementById('studio-view').getBoundingClientRect(), chat=document.getElementById('chat-view').getBoundingClientRect(), bar=document.querySelector('.dock-status-bar').getBoundingClientRect();
+      const capture=document.getElementById('capture-current-job').getBoundingClientRect();
+      return studio.height===bar.height+capture.height && Math.abs(studio.bottom-bar.top)<1 && Math.abs(bar.bottom-chat.top)<1 && Math.abs(chat.bottom-innerHeight)<1 && document.documentElement.scrollWidth<=innerWidth;
+    })()`), true, 'expanded chat and tracker fit a short dock at ' + width);
+  }
+  await cdp.send('Emulation.setDeviceMetricsOverride', { width: 390, height: 900, deviceScaleFactor: 1, mobile: false }, panel);
+  await screenshot('workspace-dock.png');
+  const savedDeepseek = 'https://chat.deepseek.com/a/chat/s/11111111-1111-4111-8111-111111111111';
+  await click('#account-toggle');
+  await setValue('#chat-provider', 'deepseek');
+  await until(() => read('!document.getElementById("chat-provider").disabled && !document.getElementById("deepseek-pane").hidden'), 'DeepSeek selected for saved job');
+  await evaluate(deepseekSession, `history.pushState({},'',${JSON.stringify(savedDeepseek)});dispatchEvent(new PopStateEvent('popstate'));`);
+  await read('new Promise(resolve => setTimeout(resolve, 1700))');
+  await click('#chat-dock-toggle');
+  await click('[data-request-id="1"] [data-action="details"]');
+  await click('#request-connect-chat');
+  const savedRequest = () => read('import(chrome.runtime.getURL("src/queue-store.mjs")).then(module=>module.createQueueStore().read()).then(state=>state.requests.find(item=>item.id===1))');
+  await until(async () => (await savedRequest())?.manualChatUrl === savedDeepseek, 'DeepSeek conversation saved on the job');
+  await closeDialog('request-dialog');
+  await evaluate(deepseekSession, 'history.pushState({},"","/a/chat/s/22222222-2222-4222-8222-222222222222");document.querySelector("textarea").value="Preserve saved-chat draft";document.querySelector("textarea").dispatchEvent(new Event("input",{bubbles:true}))');
+  await until(() => read('document.getElementById("deepseek-new-chat").disabled'), 'saved chat sees live DeepSeek draft guard');
+  await click('[data-request-id="1"] [data-action="review"]');
+  await until(() => text('#workspace-status').then(value => value.includes('Finish your DeepSeek draft')), 'saved chat reports the draft guard');
+  assert.equal(await evaluate(deepseekSession, 'location.pathname'), '/a/chat/s/22222222-2222-4222-8222-222222222222');
+  assert.equal(await evaluate(deepseekSession, 'document.querySelector("textarea").value'), 'Preserve saved-chat draft');
+  await evaluate(deepseekSession, 'document.querySelector("textarea").value="";document.querySelector("textarea").dispatchEvent(new Event("input",{bubbles:true}))');
+  await until(() => read('!document.getElementById("deepseek-new-chat").disabled'), 'saved chat draft cleared');
+  await click('[data-request-id="1"] [data-action="review"]');
+  await until(() => evaluate(deepseekSession, `location.href === ${JSON.stringify(savedDeepseek)}`), 'saved job opens its DeepSeek conversation in the dock');
+  await until(() => read('!document.getElementById("deepseek-new-chat").disabled'), 'saved DeepSeek conversation reconnects');
+  await click('#account-toggle');
+  await setValue('#chat-provider', 'chatgpt');
+  await until(() => read('!document.getElementById("chat-provider").disabled && !document.getElementById("chatgpt-pane").hidden'), 'return to ChatGPT after saved link');
+  await click('#chat-dock-toggle');
+  await click('[data-request-id="1"] [data-action="documents"]');
+  await setValue('#documents-resume', '{}', 'input');
+  assert.equal(await read('document.getElementById("documents-save").disabled'), true, 'invalid resume cannot be saved');
+  const documentRequest = await savedRequest();
+  await read(`(() => { const transfer=new DataTransfer();transfer.items.add(new File([${JSON.stringify(JSON.stringify(documentRequest.resume))}], 'Resume.json', {type:'application/json'}));
+    const field=document.getElementById('documents-file');field.files=transfer.files;field.dispatchEvent(new Event('change',{bubbles:true})); })()`);
+  await until(() => read('!document.getElementById("documents-save").disabled'), 'imported resume validated against the saved job');
+  await click('#documents-cover-enabled');
+  await setValue('#documents-cover-letter', 'A reviewed cover letter for Northstar.', 'input');
+  await screenshot('workspace-documents.png');
+  await closeDialog('documents-dialog');
+  assert.equal((await savedRequest()).coverLetter, undefined, 'cancel leaves saved documents unchanged');
+  await click('[data-request-id="1"] [data-action="documents"]');
+  await click('#documents-cover-enabled');
+  await setValue('#documents-cover-letter', 'A reviewed cover letter for Northstar.', 'input');
+  await click('#documents-save');
+  await until(() => read('!document.getElementById("documents-dialog").open'), 'manual documents saved');
+  assert.equal((await savedRequest()).coverLetter, 'A reviewed cover letter for Northstar.');
+  assert.equal((await savedRequest()).state, 'ready');
+  await click('#chat-dock-toggle');
+  await checkCurrentJobUI({ cdp, panel, read, click, until, screenshot, frameSession, evaluate, checkChatViewportAcrossCollapse });
+  return { layouts, checks: ['single dock with bottom chat accordion and account menu', 'ChatGPT frame and draft retained', 'Studio form retained',
+    'one-click job capture stays available above expanded chat, hides for non-web and saved URLs, and never sends a prompt',
+    'queue search and status filters preserve records', 'exclusive job and chat accordions with matching headers', 'one status bar rises above chat and returns to the bottom on collapse', 'account popup stays in view beside the raised status bar', 'expanded chat and tracker fit narrow and short panels',
+    'saved jobs connect and reopen DeepSeek conversations with a live draft guard',
+    'manual resume JSON import validation and optional cover letter persist; Cancel leaves stored documents unchanged',
     'vertical ChatGPT history arrows follow native order from the top', 'Up disabled on new and most recent chats with no boundary wrapping', 'history navigation blocks drafts and generation and restores native sidebar visibility',
     'Job Queues label and sidebar shortcuts in Settings', 'trusted Ctrl+Up/Down and Ctrl+Left/Right work in the host and ChatGPT iframe', 'Ctrl+Enter adds a validated job once while preserving the ChatGPT draft and blocking native send handlers', 'duplicate Ctrl+Enter shows Already applied without adding, copying or changing the Chat draft', 'dialogs preserve their own keyboard controls',
     'live open-tab navigation and per-tab drafts', 'hover toolbar reveal and dismissal without resizing chat',

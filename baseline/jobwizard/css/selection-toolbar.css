@@ -1,0 +1,428 @@
+:host {
+  all: initial !important;
+  position: fixed !important;
+  inset: 0 auto auto 0 !important;
+  z-index: 2147483646 !important;
+  display: block !important;
+  width: 0 !important;
+  height: 0 !important;
+  color: #191b22 !important;
+  font-family: "Inter", "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  pointer-events: none !important;
+  color-scheme: light !important;
+}
+
+:host([hidden]) {
+  display: none !important;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+button,
+img,
+span {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+.jwst-panel {
+  position: fixed;
+  width: min(316px, calc(100vw - 20px));
+  overflow: hidden;
+  border: 1px solid rgba(220, 228, 238, 0.95);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow:
+    0 14px 34px rgba(25, 43, 70, 0.13),
+    0 2px 8px rgba(25, 43, 70, 0.05);
+  opacity: 0;
+  transform: translateY(3px) scale(0.985);
+  transform-origin: 50% 0;
+  transition: opacity 120ms ease, transform 120ms ease;
+  pointer-events: auto;
+  isolation: isolate;
+}
+
+.jwst-panel[hidden] {
+  display: none;
+}
+
+.jwst-panel[data-placement="above"] {
+  transform-origin: 50% 100%;
+}
+
+.jwst-panel.jwst-panel-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.jwst-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 60px;
+  padding: 13px 12px 8px;
+  border-bottom: 0;
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.jwst-brand {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  margin-left: 4px;
+}
+
+.jwst-brand-mark {
+  display: block;
+  width: 23px;
+  height: 23px;
+  flex: 0 0 auto;
+}
+
+.jwst-brand-text {
+  display: block;
+  color: #202124;
+  font-size: 18px;
+  font-weight: 750;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+}
+
+.jwst-drag-handle {
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  display: grid;
+  width: 54px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+  transform: translateX(-50%);
+  overflow: hidden;
+}
+
+.jwst-drag-handle:hover {
+  background: #f1f5fa;
+}
+
+.jwst-drag-handle:active {
+  cursor: grabbing;
+}
+
+.jwst-drag-handle img {
+  display: block;
+  width: 44px;
+  height: 10px;
+  opacity: 0.26;
+  pointer-events: none;
+}
+
+.jwst-header-controls {
+  display: flex;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
+.jwst-close-trigger {
+  display: grid;
+  width: 34px;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: #f7f9fc;
+  cursor: pointer;
+}
+
+.jwst-close-trigger:hover,
+.jwst-close-trigger[aria-expanded="true"] {
+  background: #eef3f9;
+}
+
+.jwst-close-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+.jwst-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 10px 10px;
+}
+
+.jwst-action {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 15px;
+  min-height: 60px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: #f8fbff;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
+}
+
+.jwst-action:hover {
+  border-color: #cfe0f6;
+  transform: translateY(-1px);
+}
+
+.jwst-action:active {
+  transform: scale(0.992);
+}
+
+.jwst-action-icon {
+  display: inline-flex;
+  width: 38px;
+  height: 38px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(205, 219, 238, 0.72);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.jwst-action[data-action="explain"] {
+  background: #f5f9ff;
+}
+
+.jwst-action[data-action="answer"] {
+  background: #faf8ff;
+}
+
+.jwst-action[data-action="chat"] {
+  background: #f4fafb;
+}
+
+.jwst-action-icon img {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.jwst-action-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.jwst-action-label {
+  overflow: hidden;
+  color: #20232c;
+  font-size: 13.5px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jwst-action-description {
+  overflow: hidden;
+  color: #7d8798;
+  font-size: 11px;
+  font-weight: 450;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jwst-action-chevron {
+  display: block;
+  width: 15px;
+  height: 15px;
+  opacity: 0.34;
+  transition: opacity 100ms ease, transform 100ms ease;
+}
+
+.jwst-action:hover .jwst-action-chevron {
+  opacity: 0.66;
+  transform: translateX(1px);
+}
+
+.jwst-close-menu {
+  position: absolute;
+  top: 60px;
+  right: 10px;
+  left: 10px;
+  z-index: 2;
+  display: flex;
+  min-height: 218px;
+  flex-direction: column;
+  padding: 8px 0 0;
+  border: 0;
+  border-radius: 0 0 18px 18px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: none;
+}
+
+.jwst-close-menu[hidden] {
+  display: none;
+}
+
+.jwst-close-options {
+  display: flex;
+  min-height: 206px;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.jwst-close-options > p {
+  margin: 0 4px 5px;
+  color: #758196;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.jwst-close-menu button {
+  min-height: 50px;
+  padding: 9px 12px;
+  border: 0;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: #f7f9fc;
+  color: #344258;
+  font-size: 12px;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+
+.jwst-close-menu button:hover {
+  border-color: #cbdcf2;
+}
+
+.jwst-close-options button:nth-of-type(2) {
+  background: #f4f8ff;
+}
+
+.jwst-close-options button:nth-of-type(3) {
+  background: #faf8ff;
+}
+
+.jwst-global-confirm {
+  display: flex;
+  min-height: 206px;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px 8px;
+}
+
+.jwst-global-confirm[hidden],
+.jwst-close-options[hidden] {
+  display: none;
+}
+
+.jwst-global-confirm > strong {
+  color: #26364e;
+  font-size: 16px;
+}
+
+.jwst-global-confirm > p {
+  margin: 4px 0 14px;
+  color: #758196;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.jwst-global-confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1.35fr;
+  gap: 8px;
+}
+
+.jwst-global-confirm-actions button {
+  min-height: 42px;
+  border-color: #dbe2eb;
+  border-radius: 9px;
+  color: #5e6979;
+  background: #fff;
+  font-size: 11px;
+  text-align: center;
+}
+
+.jwst-global-confirm-actions [data-confirm-global] {
+  border-color: #bdd5f6;
+  color: #005bd9;
+  background: #f2f7ff;
+}
+
+.jwst-action:focus-visible,
+.jwst-drag-handle:focus-visible,
+.jwst-close-trigger:focus-visible,
+.jwst-close-menu button:focus-visible {
+  outline: 2px solid #6c4cff;
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jwst-panel,
+  .jwst-action,
+  .jwst-action-chevron {
+    transition: none;
+  }
+}
+
+@media (max-width: 372px) {
+  .jwst-action {
+    min-height: 58px;
+    grid-template-columns: 36px minmax(0, 1fr) 14px;
+    gap: 9px;
+    padding: 8px;
+    border-radius: 12px;
+  }
+
+  .jwst-header {
+    min-height: 58px;
+    padding: 12px 10px 8px;
+  }
+
+  .jwst-brand {
+    margin-left: 4px;
+  }
+
+  .jwst-brand-mark {
+    width: 22px;
+    height: 22px;
+  }
+
+  .jwst-brand-text {
+    font-size: 17px;
+  }
+
+  .jwst-drag-handle {
+    width: 50px;
+    height: 15px;
+  }
+
+  .jwst-drag-handle img {
+    width: 40px;
+    height: 10px;
+  }
+}

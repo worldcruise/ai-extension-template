@@ -1,0 +1,590 @@
+#autofill_detail .job_info_page {
+  margin-bottom: 80px;
+  padding: 0 20px;
+  margin-top: 16px;
+}
+#autofill_detail .job_base_info {
+  margin-bottom: 20px;
+}
+#autofill_detail .job_base_info_title {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#autofill_detail .job_base_info h3 {
+  color: #202223;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+#autofill_detail .job_base_info .job_base_info_meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+  align-items: flex-start;
+}
+#autofill_detail .job_base_info .job_base_info_meta .salary {
+  color: #ff7a00;
+  font-size: 16px;
+  font-weight: 600;
+}
+#autofill_detail .job_base_info .job_base_info_meta .location {
+  display: flex;
+  align-items: center;
+  color: #9a9a9a;
+  font-size: 12px;
+  font-weight: 400;
+}
+#autofill_detail .job_base_info .job_base_info_meta .location img {
+  width: 12px;
+  height: 12px;
+  margin-right: 2px;
+}
+#autofill_detail .job_base_info .job_base_info_meta .job_posted_time {
+  display: flex;
+  align-items: center;
+  color: #9a9a9a;
+  font-size: 12px;
+  font-weight: 400;
+}
+#autofill_detail .job_base_info .job_base_info_meta .job_posted_time img {
+  width: 12px;
+  height: 12px;
+  margin-right: 2px;
+  filter: grayscale(1) opacity(0.6);
+}
+
+#autofill_detail .jw-basic-limited-notice {
+  --panel-open-dur: 400ms;
+  --panel-close-dur: 350ms;
+  --panel-translate-y: 4px;
+  --panel-blur: 0px;
+  --panel-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #e5e9ef;
+  border-radius: 16px;
+  background: #fafbfc;
+  color: #202223;
+}
+
+#autofill_detail .job_info_page[data-jw-highlight-limited="true"] .job_keywords,
+#autofill_detail .job_info_page[data-jw-highlight-limited="true"] .job_roles,
+#autofill_detail .job_info_page[data-jw-highlight-limited="true"] .job_qualifacation,
+#autofill_detail .job_info_page[data-jw-highlight-limited="true"] .job_actions,
+#autofill_detail .job_info_page[data-jw-highlight-limited="true"] .job_info_resume_selector {
+  display: none !important;
+}
+#autofill_detail .jw-basic-limited-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin-bottom: 2px;
+  border-radius: 12px;
+  background: #eff2f5;
+}
+#autofill_detail .jw-basic-limited-icon img { width: 20px; height: 20px; }
+#autofill_detail .jw-basic-limited-notice h2 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.4;
+  font-weight: 700;
+}
+#autofill_detail .jw-basic-limited-notice p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #667085;
+}
+#autofill_detail .jw-basic-limited-notice .jw-basic-limited-edit {
+  margin-top: 8px;
+}
+#autofill_detail .jw-basic-limited-notice .jw-basic-limited-note {
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+#autofill_detail .jw-basic-limited-edit:focus-visible { outline: 3px solid #a9caff; outline-offset: 3px; }
+#autofill_detail .jw-basic-limited-edit:active { transform: translateY(0); box-shadow: none; }
+
+.t-panel-slide {
+  transform: translateY(var(--panel-translate-y));
+  opacity: 0;
+  filter: blur(var(--panel-blur));
+  pointer-events: none;
+  transition:
+    transform var(--panel-close-dur) var(--panel-ease),
+    opacity   var(--panel-close-dur) var(--panel-ease),
+    filter    var(--panel-close-dur) var(--panel-ease);
+  will-change: transform, opacity, filter;
+}
+.t-panel-slide[data-open="true"] {
+  transform: translateY(0);
+  opacity: 1;
+  filter: blur(0);
+  pointer-events: auto;
+  transition:
+    transform var(--panel-open-dur) var(--panel-ease),
+    opacity   var(--panel-open-dur) var(--panel-ease),
+    filter    var(--panel-open-dur) var(--panel-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-panel-slide { transition: none !important; }
+  #autofill_detail .jw-basic-limited-edit { transition: none !important; transform: none !important; }
+}
+
+/* Job status tags container */
+#autofill_detail .job_status_tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+/* Job view status tag styles */
+#autofill_detail .job_view_status_tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Previously viewed tag - 更柔和的蓝色 */
+#autofill_detail .job_view_status_tag--viewed {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* New job tag - 更柔和的绿色 */
+#autofill_detail .job_view_status_tag--new {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+/* Autofilled tag - 紫色 */
+#autofill_detail .job_view_status_tag--autofilled {
+  background: rgba(168, 85, 247, 0.1);
+  color: #a855f7;
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+/* Applied tag - 橙色 */
+#autofill_detail .job_view_status_tag--applied {
+  background: rgba(249, 115, 22, 0.1);
+  color: #f97316;
+  border: 1px solid rgba(249, 115, 22, 0.2);
+}
+
+/* Not autofilled tag - 灰色 */
+#autofill_detail .job_view_status_tag--not-autofilled {
+  background: rgba(156, 163, 175, 0.1);
+  color: #9ca3af;
+  border: 1px solid rgba(156, 163, 175, 0.2);
+}
+
+/* Not applied tag - 灰色 */
+#autofill_detail .job_view_status_tag--not-applied {
+  background: rgba(156, 163, 175, 0.1);
+  color: #9ca3af;
+  border: 1px solid rgba(156, 163, 175, 0.2);
+}
+#autofill_detail .job_keywords {
+  margin-bottom: 30px;
+}
+
+#autofill_detail .job_keywords .job_keyword_list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 15px;
+  margin-left: 10px;
+  row-gap: 12px;
+}
+
+#autofill_detail .job_keywords .jw-keyword-disclosure {
+  display: inline-flex;
+  align-items: center;
+  margin: 10px 0 0 10px;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: #0066ff;
+  font-family: var(--jobwizard-font-family);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+#autofill_detail .job_keywords .jw-keyword-disclosure[hidden] {
+  display: none;
+}
+
+#autofill_detail .job_keywords .jw-keyword-disclosure:hover {
+  color: #004fc7;
+  text-decoration: underline;
+}
+
+#autofill_detail .job_keywords .jw-keyword-disclosure:focus-visible {
+  outline: 2px solid #0066ff;
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+#autofill_detail  .job_keywords .skeleton_keyword {
+  width: 30%;
+  height: 22px;
+  border-radius: 3px;
+  animation: skeleton-animation 1s infinite;
+  border: none !important;
+}
+
+#autofill_detail .job_keywords .job_keyword_list li {
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: #f5f5f5;
+  color: #202223;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  height: 32px;
+  padding:0 10px;
+  cursor: pointer;
+}
+
+#autofill_detail .job_keywords .job_keyword_list li[hidden] {
+  display: none;
+}
+
+#autofill_detail .job_keywords .job_keyword_list li.active{
+  color: #0066ff;
+  background: #e1ecff;
+}
+#autofill_detail .job_keyword_list li .keywords_icon {
+  background-image: url("../icons/ai-button.svg");
+  background-repeat: no-repeat;
+  opacity: 0;
+  width: 0;
+  height: 16px;
+  transition: all 0.3s ease-in-out 0s;
+  margin-left: 2px;
+}
+#autofill_detail .job_keyword_list li.active .keywords_icon {
+  width: 18.5px;
+  opacity: 1;
+}
+#autofill_detail .job_keyword_list li:hover{
+  color: #0066ff;
+    background: #e1ecff;
+}
+#autofill_detail .job_keyword_list li:hover .keywords_icon{
+  /* width: 18.5px;
+  opacity: 1; */
+}
+/* Keyword "still preparing… retry" card — escape the keyword-pill li styling
+   so it renders like the role/qualification no_role card. */
+#autofill_detail .job_keywords .job_keyword_list li.no_role {
+  min-width: 100%;
+  width: 100%;
+  height: auto;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  justify-content: flex-start;
+  cursor: auto;
+  font-weight: 400;
+}
+#autofill_detail .job_keywords .job_keyword_list li.no_role:hover {
+  background: #f8f9fa;
+  color: inherit;
+}
+#autofill_detail  .keywords_explanation{
+  display: none;
+  padding: 14px 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  border-radius: 8px;
+  margin-top: 16px;
+  background: #fafcff;
+}
+#autofill_detail  .keywords_explanation.end{
+  display: flex;
+}
+#autofill_detail  .keywords_explanation.active{
+  display: flex;
+}
+#autofill_detail  .keywords_explanation.active::after{
+  content: "";
+  height: 18px;
+  width: 1.4px;
+  background-color: #0066ff; 
+  animation: blink_animation 0.8s infinite;
+}
+
+#autofill_detail  .keywords_explanation .highlighted-keyword{
+  /* background-color: rgba(243, 239, 41, 0.748); */
+  padding: 2px 2px;
+  /* border-radius: 3px; */
+  font-weight: 550;
+  color: #0066ff;
+}
+
+#autofill_detail  .keywords_explanation .keywords_explanation_item{
+  display: grid;
+  grid-template-columns: 80px auto;
+  gap: 13px;
+  color: #535b64;
+  font-feature-settings: "clig" off, "liga" off;
+  font-family: var(--jobwizard-font-family);
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+}
+#autofill_detail  .keywords_explanation .keywords_explanation_item .keywords_explanation_item_title{
+  background: #e1ecff;
+  display: flex;
+  padding: 3.5px 10px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  width: 80px;
+  height: fit-content;
+  text-transform: capitalize;
+  color: #0066ff;
+  text-align: center;
+  font-feature-settings: "clig" off, "liga" off;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+}
+#autofill_detail .job_roles,
+#autofill_detail .job_qualifacation {
+  margin-bottom: 30px;
+}
+#autofill_detail .job_roles .job_roles_list,
+#autofill_detail .job_qualifacation .job_qualifacation_list{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 15px;
+}
+#autofill_detail .job_roles .job_roles_list li:not(.skeleton_line),
+#autofill_detail .job_qualifacation .job_qualifacation_list li:not(.skeleton_line) {
+  color: #202223;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  padding-left: 12px;
+  position: relative;
+}
+ 
+#autofill_detail  .role_item {
+  max-width: 100%;
+  display: flex;
+  align-items: start;
+  gap: 8px;
+  cursor: pointer;
+  padding: 0 2px;
+  position: relative;
+}
+#autofill_detail .role_item>div{
+  padding: 4px 0;
+}
+#autofill_detail .role_item img {
+  width: 14px;
+  height: 14px;
+  position: relative;
+  top: 1px;
+}
+
+#autofill_detail .role_item:hover {
+  border-radius: 6px;
+  background: #f6f6f6;
+}
+
+#autofill_detail .role_item:hover .rq_perf_operate {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 6px;
+}
+#autofill_detail .role_item.no_role {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  cursor: auto;
+}
+
+#autofill_detail .no_role_info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #666;
+}
+
+#autofill_detail .no_role_info img {
+  width: 24px;
+  height: 24px;
+  opacity: 0.7;
+}
+
+#autofill_detail .no_role_info p {
+  margin: 0;
+  font-size: 14px;
+}
+
+#autofill_detail .jw-retry-btn {
+  margin-top: 8px;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 1px solid #d2d2d2;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+#autofill_detail .jw-retry-btn img {
+  width: 14px;
+  height: 14px;
+  opacity: 0.85;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+#autofill_detail .jw-retry-btn:hover:not(:disabled) {
+  border-color: #0066ff;
+  background: #f0f5ff;
+  transform: scale(1.08);
+}
+#autofill_detail .jw-retry-btn:hover:not(:disabled) img {
+  opacity: 1;
+}
+#autofill_detail .jw-retry-btn:disabled {
+  cursor: default;
+  border-color: #ccc;
+  pointer-events: none;
+}
+
+@keyframes jw-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+#autofill_detail .rq_perf_operate {
+  display: none;
+  position: absolute;
+  /* transform: translate(-50%, -100%); */
+  /* top: 0%; */
+  bottom: 0;
+  transform: translate(-20%, 100%);
+  left: 50%;
+  background-color: #fff;
+  border-radius: 6px;
+  padding: 2px 0;
+  font-size: 10px;
+  white-space: nowrap;
+  box-shadow: 0px 2px 30px 0px rgba(0, 0, 0, 0.12);
+  z-index: 99;
+}
+
+#autofill_detail .rq_perf_operate p {
+  cursor: pointer;
+  margin: 0;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 8px 8px 26px;
+  color: #202223;
+  border-radius: 4px;
+}
+#autofill_detail .rq_perf_operate p:nth-child(1){
+  background: url("../icons/explain.svg") 8px center/12px no-repeat;
+}
+#autofill_detail .rq_perf_operate p:nth-child(2){
+  background: url("../icons/re_write_black.svg") 8px center/12px no-repeat;
+}
+#autofill_detail .rq_perf_operate p:nth-child(3){
+  background: url("../icons/add_paper_black.svg") 8px center/12px no-repeat;
+}
+
+#autofill_detail .rq_perf_operate p:hover {
+  background-color: #ECECEC;
+  color: #202223;
+}
+
+#autofill_detail .rq_perf_operate p img {
+  width: 16px;
+}
+
+#autofill_detail .job_actions {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+}
+
+#autofill_detail .btn_save_job {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 20px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  color: #202223;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  white-space: nowrap;
+}
+
+
+#autofill_detail .btn_save_job:hover {
+  background: #f5f5f5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+#autofill_detail .btn_save_job:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+#autofill_detail .btn_save_job img {
+  width: 16px;
+  height: 16px;
+}
+
+#autofill_detail .btn_save_job.saved {
+  background: #e5f0ff;
+  border-color: #06f;
+  color: #06f;
+}
+
+#autofill_detail .jw-basic-limited-retry { width: 100%; margin-top: 10px; }
+#autofill_detail .jw-basic-limited-retry:disabled { opacity: .6; cursor: wait; }

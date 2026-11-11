@@ -1,0 +1,1691 @@
+#autofill_detail .generate_letter_warp {
+  padding: 0 20px 20px;
+  margin-top: 16px;
+}
+
+#autofill_detail .generate_letter_warp .mark,
+#autofill_detail .generate_letter_warp>.title {
+  color: #202223;
+  font-family: var(--jobwizard-font-family);
+  font-weight: 700;
+}
+
+#autofill_detail .generate_letter_warp .mark {
+  font-size: 16px;
+}
+
+#autofill_detail .generate_letter_warp>.title {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  font-size: 24px;
+}
+
+#autofill_detail .generate_letter_warp .position_des,
+#autofill_detail .generate_letter_warp .position_des .job_des {
+  display: flex;
+  gap: 10px;
+}
+
+#autofill_detail .generate_letter_warp .position_des .job_des p {
+  color: #5f6368;
+  font-size: 14px;
+  font-weight: 400;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+#autofill_detail .generate_letter_warp .position_des .job_des img {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  display: none;
+}
+
+#autofill_detail .generate_letter_warp .base_on_des {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  margin: 20px 0;
+  word-break: break-word;
+}
+
+#autofill_detail .generate_letter_warp .base_on_des .resume_file {
+  display: flex;
+  justify-content: space-between;
+  flex: 1;
+  color: #5f6368;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+#autofill_detail .generate_letter_warp .base_on_des .resume_file .resume_name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#autofill_detail .generate_letter_warp .base_on_des .resume_file .resume_file_choose {
+  display: none;
+}
+
+#autofill_detail .generate_letter_warp .preference_des .preference_header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+
+#autofill_detail .generate_letter_warp .preference_des .cover_letter_params {
+  display: none;
+}
+
+#autofill_detail .generate_letter_warp .preference_des .tag_type {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  align-self: stretch;
+  margin-bottom: 15px;
+}
+
+#autofill_detail .generate_letter_warp .preference_des .title {
+  color: #000;
+  font-family: var(--jobwizard-font-family);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+#autofill_detail .generate_letter_warp .preference_des .tag_list {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  align-self: stretch;
+  flex-wrap: wrap;
+}
+
+#autofill_detail .generate_letter_warp .preference_des .tag_list>li {
+  display: flex;
+  padding: 6px 12px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 8px;
+  font-family: var(--jobwizard-font-family);
+  font-size: 14px;
+  font-weight: 400;
+  background: #f5f5f5;
+  color: #202223;
+  cursor: pointer;
+}
+
+#autofill_detail .generate_letter_warp .preference_des .tag_list .tag_active {
+  background: rgba(0, 102, 255, 0.1);
+  color: #06f;
+}
+
+/* Popup */
+#autofill_detail .generate_letter_warp .resumes_base_pup {
+  width: 270px;
+  position: absolute;
+  right: 0;
+  top: 28px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.12);
+  padding: 24px 24px 14px;
+  display: none;
+}
+
+#autofill_detail .generate_letter_warp .resumes_base_pup>.title {
+  display: flex;
+  justify-content: space-between;
+  color: #000;
+  font-family: var(--jobwizard-font-family);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+#autofill_detail .generate_letter_warp .resumes_base_pup .title_img {
+  width: 14px;
+}
+
+#autofill_detail .generate_letter_warp .resumes_base_pup .resumes_list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  color: #5f6368;
+  font-family: var(--jobwizard-font-family);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+#autofill_detail .generate_letter_warp .resumes_base_pup .resumes_hover:hover {
+  background: #f2f2f2;
+}
+
+#autofill_detail .generate_letter_warp .resumes_base_pup .resumes_pdf,
+#autofill_detail .generate_letter_warp .resumes_base_pup .upload {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 12px 8px;
+}
+
+#autofill_detail .generate_letter_warp .resumes_base_pup .resumes_pdf {
+  justify-content: space-between;
+}
+
+#autofill_detail .generate_letter_warp .resumes_base_pup .resumes_img,
+#autofill_detail .generate_letter_warp .resumes_base_pup .icon_img {
+  display: flex;
+  align-items: center;
+}
+
+#autofill_detail .generate_letter_warp .resumes_base_pup .icon_img {
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+#autofill_detail .coverletter_content {
+  margin-top: 20px;
+}
+
+#autofill_detail .coverletter_improve_wrap {
+  position: relative;
+  background: rgba(0, 102, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 102, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 20px;
+  transition: border-color 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.25s ease;
+}
+
+#autofill_detail .coverletter_improve_wrap:focus-within {
+  border-color: rgba(0, 102, 255, 0.18);
+  box-shadow: 0 0 0 1px rgba(0, 102, 255, 0.08);
+  background: rgba(0, 102, 255, 0.04);
+}
+
+#autofill_detail .coverletter_editable_wrap {
+  position: relative;
+}
+
+#autofill_detail .coverletter_content .coverletter {
+  line-height: 150%;
+  padding: 18px 18px 10px;
+  color: #323f52;
+  font-size: 14px;
+  font-weight: 400;
+  margin-bottom: 7px;
+  caret-color: #323f52;
+  max-height: 500px;
+  min-height: 300px;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #55555526 #f4f7ff;
+  outline: none;
+  border: none;
+}
+
+#autofill_detail .coverletter_content .coverletter::after {
+  content: "Click to generate a cover letter or paste yours here for improvement.";
+  display: inline-block;
+  color: #a8a8a8;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+#autofill_detail .coverletter_content .coverletter.active::after,
+#autofill_detail .coverletter_content .coverletter.typing::after,
+#autofill_detail .coverletter_content .coverletter.end::after {  /* Added .end class */
+  content: "";
+  display: none;
+}
+
+#autofill_detail .coverletter_content .coverletter.active:not(.end)::after {
+  content: "";
+  display: inline-block;
+  width: 1px;
+  height: 14px;
+  background-color: #06f;
+  transition: 0.1s;
+  animation: blink_animation 0.8s infinite;
+  position: relative;
+  top: 3px;
+}
+
+#autofill_detail .coverletter_content .coverletter.active.end::after {
+  content: "";
+  display: none;
+}
+
+/* Overlay when not focused: frosted glass + edit hint on hover */
+#autofill_detail .coverletter_overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  cursor: pointer;
+  transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    backdrop-filter 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+}
+
+#autofill_detail .coverletter_editable_wrap:focus-within .coverletter_overlay {
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+#autofill_detail .coverletter_editable_wrap:not(:focus-within) .coverletter_overlay {
+  pointer-events: auto;
+}
+
+#autofill_detail .coverletter_editable_wrap:not(:focus-within) .coverletter_overlay:hover {
+  backdrop-filter: blur(8px) saturate(150%);
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+}
+
+/* Center layer: extra blur, masked — edges stay lighter, center deeper */
+#autofill_detail .coverletter_editable_wrap:not(:focus-within) .coverletter_overlay:hover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  mask-image: radial-gradient(
+    ellipse 70% 70% at 50% 50%,
+    black 0%,
+    transparent 75%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 70% 70% at 50% 50%,
+    black 0%,
+    transparent 75%
+  );
+  mask-mode: alpha;
+  pointer-events: none;
+}
+
+#autofill_detail .coverletter_overlay:active .coverletter_overlay_hint {
+  transform: scale(0.97) translateY(0);
+  transition-duration: 0.08s;
+}
+
+/* Hint UI: frosted glass card — refined, deep, premium, no color clash */
+#autofill_detail .coverletter_overlay_hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 18px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 102, 255, 0.04),
+    0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  opacity: 0;
+  transform: scale(0.92) translateY(6px);
+  transition: opacity 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.3s ease;
+  pointer-events: none;
+}
+
+#autofill_detail .coverletter_editable_wrap:not(:focus-within) .coverletter_overlay:hover .coverletter_overlay_hint {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.1),
+    0 4px 12px rgba(0, 102, 255, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.6) inset;
+}
+
+#autofill_detail .coverletter_overlay_hint_icon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  opacity: 0.9;
+  transition: transform 0.2s ease;
+}
+
+#autofill_detail .coverletter_editable_wrap:not(:focus-within) .coverletter_overlay:hover .coverletter_overlay_hint_icon {
+  animation: coverletter_hint_icon_pulse 2s ease-in-out infinite;
+}
+
+@keyframes coverletter_hint_icon_pulse {
+  0%, 100% { opacity: 0.88; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
+#autofill_detail .coverletter_overlay_hint_text {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1e293b;
+  letter-spacing: 0.02em;
+}
+
+#autofill_detail .coverletter_improve_wrap .improve_wrap {
+  height: 40px;
+  display: none;
+  align-items: flex-end;
+  justify-content: end;
+  gap: 8px;
+  width: auto;
+  /* position: absolute; */
+  /* right: 10px; */
+  /* bottom: 10px; */
+}
+
+#autofill_detail .coverletter_improve_wrap .word_count {
+  width: fit-content;
+  white-space: nowrap;
+  /* position: absolute; */
+  /* left: 10px; */
+  /* bottom: 20px; */
+  font-size: 14px;
+  margin-left: 18px;
+  color: #229b2b;
+}
+
+#autofill_detail .coverletter_improve_wrap:has(.coverletter.active.end) .improve_wrap,
+#autofill_detail .coverletter_improve_wrap:has(.coverletter.typing) .improve_wrap {
+  display: flex;
+}
+
+#autofill_detail .coverletter_improve_wrap .improve_cover_letter_button,
+#autofill_detail .coverletter_improve_wrap .customize_instruction_button {
+  display: inline-flex;
+  padding: 7px 14px;
+  align-items: center;
+  gap: 6px;
+  border-radius: 22px;
+  background: #dceaff;
+  color: #06f;
+  font-size: 12px;
+  font-weight: 400;
+  outline: none;
+  border: none;
+  cursor: pointer;
+}
+
+#autofill_detail .coverletter_improve_wrap .improve_wrap .improve_select_list {
+  display: none;
+  padding: 10px 8px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0px 2px 30px rgba(0, 0, 0, 0.12);
+  position: absolute;
+  bottom: 28px;
+  margin-right: 10px;
+  z-index: 10;  /* [FIX] 盖过 .coverletter_overlay (z-index:1) — ref FIX-2026-0424-001b */
+}
+
+/* [FIX] Click-toggle via JS .active class; replaced CSS :hover approach (ref FIX-2026-0424-001d) */
+#autofill_detail .coverletter_improve_wrap .improve_wrap .improve_select_list.active {
+  display: block;
+}
+
+#autofill_detail .coverletter_improve_wrap .improve_wrap .improve_select_list li {
+  display: flex;
+  padding: 8px 6px;
+  align-items: center;
+  gap: 9px;
+  align-self: stretch;
+  cursor: pointer;
+}
+
+#autofill_detail .coverletter_improve_wrap .improve_wrap .improve_select_list li:hover {
+  border-radius: 5px;
+  background: #ececec;
+}
+
+#autofill_detail .coverletter_improve_wrap .improve_wrap .improve_select_list li span {
+  color: #000;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* Inline Customize Prompt (Bug B path 1) — appears inside .improve_wrap when
+   user clicks "Customize Prompt" button. Replaces the button row without
+   jumping to Chat. See bug-reports-2026-04 "Customize Prompt Bug B". */
+#autofill_detail .coverletter_improve_wrap .improve_wrap .customize_prompt_inline {
+  display: none;
+  flex: 1;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+#autofill_detail .coverletter_improve_wrap .improve_wrap.customize_mode .customize_prompt_inline {
+  display: flex;
+}
+#autofill_detail .coverletter_improve_wrap .improve_wrap.customize_mode .improve_cover_letter_button,
+#autofill_detail .coverletter_improve_wrap .improve_wrap.customize_mode .customize_instruction_button {
+  display: none;
+}
+#autofill_detail .coverletter_improve_wrap .improve_wrap .customize_prompt_input {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 18px;
+  background: #fff;
+  color: #0f172a;
+  font-size: 12px;
+  outline: none;
+}
+#autofill_detail .coverletter_improve_wrap .improve_wrap .customize_prompt_input:focus {
+  border-color: #06f;
+  box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.15);
+}
+#autofill_detail .coverletter_improve_wrap .improve_wrap .customize_prompt_submit {
+  padding: 6px 14px;
+  background: #06f;
+  color: #fff;
+  border: none;
+  border-radius: 18px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+#autofill_detail .coverletter_improve_wrap .improve_wrap .customize_prompt_submit:hover {
+  background: #0056d6;
+}
+#autofill_detail .coverletter_improve_wrap .improve_wrap .customize_prompt_cancel {
+  padding: 0;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #64748b;
+  border: none;
+  border-radius: 50%;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+#autofill_detail .coverletter_improve_wrap .improve_wrap .customize_prompt_cancel:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+#autofill_detail .coverletter_footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+}
+
+#autofill_detail .coverletter_footer .coverletter_action_button {
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: 0 0 32px;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 6px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background-color: transparent;
+  background-image: none;
+  color: #667085;
+  line-height: 0;
+  cursor: pointer;
+  appearance: none;
+  transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease;
+}
+
+#autofill_detail .coverletter_footer .coverletter_action_icon {
+  display: block;
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  opacity: 1;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+#autofill_detail .coverletter_footer .coverletter_action_button:hover:not(:disabled) {
+  border-color: #d8e4ff;
+  background-color: #eef4ff;
+  color: #06f;
+}
+
+#autofill_detail .coverletter_footer .coverletter_action_button:active:not(:disabled) {
+  border-color: #c6d8ff;
+  background-color: #e2ecff;
+  color: #0057db;
+}
+
+#autofill_detail .coverletter_footer .coverletter_action_button:focus-visible {
+  border-color: #06f;
+  outline: 2px solid #06f;
+  outline-offset: 1px;
+}
+
+#autofill_detail .coverletter_footer .coverletter_action_button:disabled {
+  border-color: transparent;
+  background-color: transparent;
+  color: #a8a8a8;
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+#autofill_detail .coverletter_keyboard_wrap,
+#autofill_detail .coverletter_download_wrap {
+  position: relative;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+}
+
+#autofill_detail .download_cover_letter {
+  position: relative;
+}
+
+#autofill_detail .coverletter_download_menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 20;
+  min-width: 76px;
+  padding: 4px;
+  border: 1px solid #d7deea;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(29, 45, 74, 0.16);
+}
+
+#autofill_detail .coverletter_download_menu[hidden] {
+  display: none;
+}
+
+#autofill_detail .coverletter_download_menu button {
+  display: block;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #25324b;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+#autofill_detail .coverletter_download_menu button:hover,
+#autofill_detail .coverletter_download_menu button:focus-visible {
+  background: #eef4ff;
+  color: #06f;
+  outline: none;
+}
+
+#autofill_detail .coverletter_download_wrap[data-downloading="true"] .coverletter_download_menu button {
+  cursor: wait;
+}
+
+#autofill_detail .copy_cover_letter.success,
+#autofill_detail .refresh_cover_letter.success {
+  background-image: url("../icons/success.svg");
+  background-position: center;
+  background-size: 18px;
+  background-repeat: no-repeat;
+}
+
+#autofill_detail .copy_cover_letter.success .coverletter_action_icon,
+#autofill_detail .refresh_cover_letter.success .coverletter_action_icon {
+  visibility: hidden;
+}
+
+#autofill_detail .generate_cover_letter_button {
+  display: flex;
+  height: 50px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 38px;
+  background: #06f;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 400;
+  margin-top: 3vh;
+  outline: none;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  gap: 6px;
+  transition: background .1s ease;
+}
+
+#autofill_detail .generate_cover_letter_button .generate_cover_letter_button_logo {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+#autofill_detail .generate_cover_letter_button:hover {
+  background: rgb(52, 131, 250);
+}
+
+#autofill_detail .generate_cover_letter_button.disable {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Updated feedback styling */
+#autofill_detail .feedback_section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 4px;
+}
+
+#autofill_detail .feedback_section span {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+#autofill_detail .feedback_list span {
+  color: #202223;
+  font-size: 14px;
+}
+
+#autofill_detail .feedback_button {
+  position: relative;
+  background: transparent;
+  border: none;
+  color: #06f;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+#autofill_detail .feedback_button:hover {
+  background-color: rgba(0, 102, 255, 0.1);
+}
+
+#autofill_detail .feedback_list_wrap {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 8px;
+}
+
+/* Maintain hover interaction */
+#autofill_detail .feedback_button::after,
+#autofill_detail .feedback_list_wrap::after {
+  content: '';
+  position: absolute;
+  height: 8px;
+}
+
+#autofill_detail .feedback_button::after {
+  bottom: 100%;
+  left: 0;
+  right: 0;
+}
+
+#autofill_detail .feedback_list_wrap::after {
+  top: 100%;
+  left: 0;
+  right: 0;
+}
+
+#autofill_detail .feedback_button:hover .feedback_list_wrap {
+  display: block;
+}
+
+#autofill_detail .feedback_list a {
+  display: flex;
+  padding: 10px;
+  align-items: center;
+  gap: 12px;
+  align-self: stretch;
+  border-radius: 4px;
+  color: #202223;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  width: 160px;
+  text-decoration: none;
+}
+
+#autofill_detail .feedback_list a:hover {
+  background: #efefef;
+}
+
+#autofill_detail .resume_file .online_profile_btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #f8f8f8;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 4px;
+  width: fit-content;
+}
+
+#autofill_detail .resume_file .online_profile_btn:hover {
+  background-color: #f0f0f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#autofill_detail .resume_file .online_profile_btn img {
+  width: 20px;
+  height: 20px;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+#autofill_detail .resume_file .online_profile_btn:hover img {
+  opacity: 1;
+}
+
+#autofill_detail .resume_file .online_profile_btn span {
+  font-weight: 400;
+  color: #5f6c68;
+  transition: color 0.3s ease;
+}
+
+#autofill_detail .resume_file .online_profile_btn:hover span {
+  color: #525252;
+}
+
+#autofill_detail .resume_file .online_profile_btn::after {
+  content: '→';
+  margin-left: 8px;
+  color: #999;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+#autofill_detail .resume_file .online_profile_btn:hover::after {
+  opacity: 1;
+}
+
+#autofill_detail .cover_letter_history {
+  position: relative;
+  padding: 1px;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#autofill_detail .cover_letter_history .mark {
+  margin: 0;
+}
+
+#autofill_detail .cover_letter_history .cover_letter_history_btn {
+  width: 28px;
+  height: 28px;
+}
+
+#autofill_detail .cover_letter_history .cover_letter_history_btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+#autofill_detail .history_popup {
+  display: none;
+  position: absolute;
+  bottom: -20px;
+  left: 30px;
+  width: 300px;
+  max-height: 400px;
+  background: rgb(218, 216, 216);
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 8px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+#autofill_detail .history_header {
+  padding: 12px;
+  border-bottom: 1px solid #e0e0e0;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: default;
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+#autofill_detail .history_list {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+#autofill_detail .history_list::-webkit-scrollbar {
+  width: 6px;
+}
+
+#autofill_detail .history_list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+#autofill_detail .history_list::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+#autofill_detail .history_list::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+#autofill_detail .history_item {
+  padding: 8px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  font-size: 12px;
+  background: white;
+  transition: background-color 0.2s ease;
+}
+
+#autofill_detail .history_item:hover {
+  background: #f5f5f5;
+}
+
+#autofill_detail .history_item .title {
+  font-weight: 450;
+  margin-bottom: 4px;
+}
+
+#autofill_detail .history_item .date {
+  font-size: 12px;
+  color: #666;
+}
+
+#autofill_detail .history_item .meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: #666;
+}
+
+#autofill_detail .history_item .word-count {
+  color: #229b2b;  /* Matching the green color used for word count elsewhere */
+}
+
+#autofill_detail .coverletter_content .coverletter.preview-mode {
+  color: #939393;  /* A proper grey color for preview text */
+}
+
+/* Inline Confirmation Modal Styles */
+#autofill_detail .confirmation-modal {
+  position: absolute;
+  top: 0px;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001;
+}
+
+#autofill_detail .confirmation-content {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  width: 240px;
+  padding: 16px;
+  cursor: default;
+}
+
+#autofill_detail .confirmation-content h3 {
+  margin: 0 0 8px;
+  color: #202223;
+  font-family: var(--jobwizard-font-family);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#autofill_detail .confirmation-content p {
+  margin: 0 0 16px;
+  color: #5f6368;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+#autofill_detail .confirmation-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+#autofill_detail .confirmation-buttons button {
+  padding: 6px 12px;
+  border-radius: 16px;
+  border: none;
+  font-size: 12px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#autofill_detail .confirmation-buttons .cancel-btn {
+  background: #f5f5f5;
+}
+
+#autofill_detail .confirmation-buttons .cancel-btn:hover {
+  background: #e8e8e8;
+}
+
+#autofill_detail .confirmation-buttons .confirm-btn {
+  background: #1a73e8;
+  color: white;
+}
+
+#autofill_detail .confirmation-buttons .confirm-btn:hover {
+  background: #1557b0;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Disable hover effect when confirmation modal is shown */
+#autofill_detail .confirmation-modal ~ .history_item:hover {
+  background: white;
+  cursor: default;
+}
+
+/* Add new style for recent items */
+#autofill_detail .history_item.recent {
+  background: rgba(142, 142, 142, 0.05); /* Light blue background */
+  border-left: 3px solid #06f; /* Blue accent line */
+}
+
+#autofill_detail .history_item.recent:hover {
+  background: rgba(129, 129, 129, 0.08); /* Slightly darker on hover */
+}
+/* ==========================================================================
+   NEW Cover Letter History Styles (OpenAI / Clean Blue Style)
+   Overrides previous history styles above.
+   ========================================================================== */
+
+#autofill_detail .history_popup {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 12px; /* Slightly more space */
+  bottom: auto;
+  width: 380px;
+  height: 520px; /* Slightly taller for breathing room */
+  background: #ffffff;
+  /* OpenAI Style: Subtle border, soft diffuse shadow */
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  box-shadow: 
+    0 4px 12px -2px rgba(0, 0, 0, 0.08),
+    0 12px 32px -4px rgba(0, 0, 0, 0.12); 
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  animation: history-fade-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smoother ease */
+  white-space: normal;
+  transform-origin: top left;
+  /* Allow tooltips to overflow */
+  overflow: visible !important; 
+}
+
+@keyframes history-fade-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Header Area */
+#autofill_detail .history_header {
+  padding: 16px 20px;
+  /* Very subtle separator or none at all for clean look */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04); 
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  height: 64px;
+  box-sizing: border-box;
+  position: relative;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+#autofill_detail .history_header_actions {
+  display: flex;
+  gap: 4px;
+}
+
+#autofill_detail .history_nav_btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #6b7280; /* Neutral gray */
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+#autofill_detail .history_nav_btn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: #111827;
+}
+
+#autofill_detail .history_header_content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  min-width: 0; /* Allow flex items to shrink */
+}
+
+#autofill_detail .history_title {
+  font-weight: 600;
+  color: #111827; /* Deep black */
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--jobwizard-font-family);
+  flex-shrink: 0; /* Don't shrink title */
+}
+
+#autofill_detail .history_position_tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  background: #f3f4f6; /* Neutral background */
+  color: #374151; /* Dark gray text */
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  max-width: 200px; /* Increased from 140px */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: 1px solid transparent;
+  animation: none;
+  flex-shrink: 1; /* Allow shrinking if needed */
+  min-width: 0; /* Allow text truncation */
+}
+
+#autofill_detail .history_position_tag--clickable {
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+#autofill_detail .history_position_tag--clickable:hover {
+  background: #e5e7eb; /* Slightly darker on hover */
+  color: #111827; /* Darker text on hover */
+}
+
+#autofill_detail .history_position_link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af; /* Subtle gray - OpenAI style */
+  text-decoration: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  flex-shrink: 0; /* Don't shrink link */
+  opacity: 0.6; /* Subtle by default */
+}
+
+#autofill_detail .history_position_link:hover {
+  color: #111827; /* Dark on hover */
+  background: #f3f4f6; /* Very subtle background */
+  opacity: 1; /* Full opacity on hover */
+}
+
+#autofill_detail .history_position_link svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+}
+
+/* Loading */
+#autofill_detail .history_loading {
+  position: absolute;
+  top: 64px; /* Match header height */
+  left: 0;
+  width: 100%;
+  bottom: 52px; /* Match footer height */
+  height: auto; /* Reset fixed height */
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+#autofill_detail .history_loading_spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #111827; /* Black spinner */
+  border-radius: 50%;
+  animation: history-spin 0.8s linear infinite;
+}
+
+@keyframes history-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* List Area */
+#autofill_detail .history_list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  /* Custom Scrollbar - Minimalist */
+  scrollbar-width: thin;
+  scrollbar-color: #e5e7eb transparent;
+}
+
+#autofill_detail .history_list::-webkit-scrollbar {
+  width: 4px;
+}
+
+#autofill_detail .history_list::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 2px;
+}
+
+/* Empty & Error States */
+#autofill_detail .history_empty,
+#autofill_detail .history_error_state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: #6b7280;
+  font-size: 13px;
+  padding: 32px 16px;
+  text-align: center;
+}
+
+#autofill_detail .history_error_message {
+  color: #374151;
+  font-size: 14px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+#autofill_detail .history_error_actions {
+  display: flex;
+  gap: 12px;
+}
+
+#autofill_detail .history_retry_btn {
+  background: #111827; /* Black button */
+  color: white;
+  border: 1px solid transparent;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+#autofill_detail .history_retry_btn:hover {
+  opacity: 0.9;
+  background: #000;
+}
+
+#autofill_detail .history_report_bug_btn {
+  background: transparent;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#autofill_detail .history_report_bug_btn:hover {
+  border-color: #d1d5db;
+  color: #111827;
+  background: #f9fafb;
+}
+
+/* Common Item Styles - OpenAI-style Card Design */
+#autofill_detail .history_item {
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  cursor: pointer;
+  background: white;
+  transition: all 0.2s ease;
+  position: relative;
+  /* Staggered animation - initially hidden */
+  opacity: 0;
+  transform: scale(0.95) translateY(10px);
+  animation: cardStaggerIn 0.35s ease-out forwards;
+}
+
+/* Staggered fade-in animation - OpenAI style */
+@keyframes cardStaggerIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+#autofill_detail .history_item:hover {
+  background: #f9fafb;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+#autofill_detail .history_item:last-child {
+  margin-bottom: 0;
+}
+
+/* 1. Letter Items - Two-part layout: version (left) and content (right) */
+#autofill_detail .history_letter_item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+#autofill_detail .history_letter_item_left {
+  flex-shrink: 0;
+}
+
+#autofill_detail .history_item_version {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 500;
+  color: #636363;
+  background: #f3f3f3;
+  width: 24px;
+  height: 24px;
+  text-align: center;
+  align-content: center;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+  border: 1px solid #dedede;
+}
+
+#autofill_detail .history_letter_item_right {
+  flex: 1;
+  min-width: 0;
+}
+
+#autofill_detail .history_item_preview {
+  margin-bottom: 0;
+}
+
+/* Initial Visible Text */
+#autofill_detail .history_item_text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #111827; /* High contrast */
+  font-weight: 400;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  /* Show 2 lines with ellipsis when not expanded */
+  /* Part1 contains content that fits in exactly 2 lines (measured precisely) */
+}
+
+/* When expanded (hover), remove line-clamp but limit height to 2 lines */
+/* Part1 contains exactly 2 lines of content, so it will show 2 lines without ellipsis */
+#autofill_detail .history_item:hover .history_item_text {
+  display: block; /* Change to block to remove line-clamp */
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  max-height: 3.2em; /* Exactly 2 lines: 2 * 1.6 line-height */
+  overflow: hidden; /* Keep hidden to prevent overflow */
+  /* Part1 content is exactly 2 lines, so max-height will show exactly 2 lines */
+}
+
+/* Interaction Logic */
+/* Part 1 (lines 1-2): Always visible */
+/* Part 2 (lines 3-5): Hidden by default, shown after 2s hover delay */
+/* Height changes naturally as content is shown/hidden */
+
+#autofill_detail .history_item_expanded {
+  /* Initially hidden and takes NO space */
+  display: -webkit-box; /* Use -webkit-box for line-clamp */
+  font-size: 13px;
+  line-height: 1.6;
+  color: #6b7280; /* Muted/Gray for extended content */
+  margin-top: 0;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  /* Part2 contains content from line 3 onwards, limit to 3 lines */
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  /* No delay when hiding (mouseout) */
+  transition: opacity 0.2s ease-out, max-height 0.2s ease-out, margin-top 0.2s ease-out;
+}
+
+#autofill_detail .history_item:hover .history_item_expanded {
+  /* Show after 2s delay with smooth fade-in */
+  /* Part2 shows lines 3-5 (3 lines with ellipsis if longer) */
+  opacity: 1;
+  max-height: 4.8em; /* Height for 3 lines (3 * 1.6 line-height) */
+  margin-top: 4px;
+  /* 2s delay when showing (hover) */
+  transition: opacity 0.3s ease-out 2s, max-height 0.3s ease-out 2s, margin-top 0.3s ease-out 2s;
+}
+
+@keyframes text-fade-in-delayed {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#autofill_detail .history_item_meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+#autofill_detail .history_item_date {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+#autofill_detail .history_item_wordcount {
+  background: transparent;
+  font-weight: 400;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* Word count color grading based on length */
+/* Using #059669 (green-600) as base brightness, applying different hues for visual distinction */
+#autofill_detail .history_item_wordcount.wordcount-short {
+  color: #0891b2; /* cyan-600: 0-200 words - similar brightness to base green */
+}
+
+#autofill_detail .history_item_wordcount.wordcount-medium {
+  color: #059669; /* green-600: 201-400 words (base color - best looking) */
+}
+
+#autofill_detail .history_item_wordcount.wordcount-long {
+  color: #d97706; /* amber-600: 401-600 words - similar brightness */
+}
+
+#autofill_detail .history_item_wordcount.wordcount-very-long {
+  color: #dc2626; /* red-600: 601+ words - similar brightness */
+}
+
+/* 2. Position Items - Two-part layout: content (left) and version count (right) */
+#autofill_detail .history_position_item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  position: relative;
+  /* Staggered animation - initially hidden */
+  opacity: 0;
+  transform: scale(0.95) translateY(10px);
+  animation: cardStaggerIn 0.35s ease-out forwards;
+}
+
+#autofill_detail .history_position_item_content {
+  flex: 1;
+  min-width: 0; /* Allow text truncation */
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#autofill_detail .history_position_item:hover {
+  background: #f9fafb;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+#autofill_detail .history_position_company {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 400;
+  margin-top: 4px;
+  display: block;
+}
+
+#autofill_detail .history_position_current_tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 500;
+  color: #2563eb;
+  background: #dbeafe;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+#autofill_detail .history_position_item_versions {
+  flex-shrink: 0;
+}
+
+#autofill_detail .history_position_version_count {
+  font-size: 12px;
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+#autofill_detail .history_position_item_link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  color: #9ca3af; /* Subtle gray - OpenAI style */
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  opacity: 0;
+}
+
+#autofill_detail .history_position_item:hover .history_position_item_link {
+  opacity: 0.6; /* Subtle visibility on item hover */
+}
+
+#autofill_detail .history_position_item_link:hover {
+  color: #111827; /* Dark on hover */
+  background: #f3f4f6; /* Very subtle background */
+  opacity: 1; /* Full opacity on link hover */
+}
+
+#autofill_detail .history_position_item_link svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+}
+
+/* Removed highlighted background - keep it minimal */
+
+#autofill_detail .history_item_title {
+  font-weight: 500;
+  font-size: 14px;
+  color: #111827;
+  line-height: 1.4;
+}
+
+#autofill_detail .history_position_item_title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Position item title: No hover or click effects - just display text */
+
+#autofill_detail .history_item_title--missing {
+  color: #9ca3af;
+  font-style: normal; /* Removed Italic */
+  font-weight: 400;
+}
+
+#autofill_detail .history_item_count {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  color: #4b5563;
+  background: #f3f4f6;
+  padding: 2px 8px;
+  border-radius: 12px; /* Pill shape */
+  font-weight: 500;
+}
+
+/* Pagination Footer */
+#autofill_detail .history_footer {
+  padding: 12px 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  height: 52px;
+  box-sizing: border-box;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+#autofill_detail .history_pagination {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+#autofill_detail .history_page_btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #6b7280;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+#autofill_detail .history_page_btn:hover:not(.active):not(:disabled) {
+  background: rgba(0, 0, 0, 0.04);
+  color: #111827;
+}
+
+#autofill_detail .history_page_btn.active {
+  background: #111827; /* Black active state */
+  color: white;
+  border-color: transparent;
+  font-weight: 500;
+}
+
+#autofill_detail .history_page_btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+#autofill_detail .history_page_dots {
+  color: #94a3b8;
+  font-size: 12px;
+  padding: 0 4px;
+}
+
+/* Confirmation Modal overrides */
+#autofill_detail .confirmation-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  width: 260px;
+  padding: 20px;
+  text-align: center;
+}
+
+#autofill_detail .confirmation-content h3 {
+  color: #0f172a;
+  font-size: 16px;
+}
+
+#autofill_detail .confirmation-content p {
+  color: #64748b;
+}
+
+#autofill_detail .confirmation-buttons .cancel-btn {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+#autofill_detail .confirmation-buttons .confirm-btn {
+  background: #2563eb;
+  color: white;
+}

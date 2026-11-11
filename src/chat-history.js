@@ -15,11 +15,11 @@
   function ordered(values) {
     return [...new Set((Array.isArray(values) ? values : []).slice(0, 300).map(conversation).filter(Boolean))];
   }
-  function target(values, current, direction) {
+  function target(values, current, direction, pinnedValues = []) {
     if (![-1, 1].includes(direction)) return null;
-    const url = route(current), urls = ordered(values);
+    const url = route(current), pinned = new Set(ordered(pinnedValues)), urls = ordered(values).filter(value => !pinned.has(value));
     if (!url) return null;
-    if (!conversation(url)) return direction === 1 ? urls[0] || null : null;
+    if (!conversation(url) || pinned.has(url)) return direction === 1 ? urls[0] || null : null;
     const index = urls.indexOf(url);
     return index < 0 ? null : urls[index + direction] || null;
   }
@@ -29,7 +29,8 @@
         !route(value.currentUrl) || !Array.isArray(value.urls) || value.urls.length > 300 ||
         value.urls.some(url => !conversation(url)) || value.reason && !reasons.includes(value.reason)) return null;
     if (value.dispatched !== undefined && typeof value.dispatched !== 'boolean') return null;
-    const urls = ordered(value.urls);
+    if (value.pinnedUrls !== undefined && (!Array.isArray(value.pinnedUrls) || value.pinnedUrls.length > 300 || value.pinnedUrls.some(url => !conversation(url)))) return null;
+    const pinnedUrls = ordered(value.pinnedUrls), urls = ordered(value.urls).filter(url => !pinnedUrls.includes(url));
     if (value.chats !== undefined && (!Array.isArray(value.chats) || value.chats.length > 300 ||
         value.chats.some(chat => !chat || !urls.includes(conversation(chat.url)) || typeof chat.title !== 'string' || chat.title.length > 200))) return null;
     const seen = new Set();
@@ -38,21 +39,24 @@
     }).map(chat => ({url:conversation(chat.url),title:chat.title.trim() || 'Untitled chat'}));
     if (value.dispatched && (!conversation(value.target) || !urls.includes(conversation(value.target)))) return null;
     return { loaded:value.loaded, ready:value.ready, hasDraft:value.hasDraft, busy:value.busy,
-      currentUrl:route(value.currentUrl), urls, chats, ...(value.reason ? {reason:value.reason} : {}),
+      currentUrl:route(value.currentUrl), urls, pinnedUrls, chats, ...(value.reason ? {reason:value.reason} : {}),
       ...(value.dispatched !== undefined ? {dispatched:value.dispatched} : {}),
       ...(value.dispatched ? {target:conversation(value.target)} : {}) };
   }
   function createReader({ getConnection, document: doc = document, location: page = location }) {
-    let cache = [], chats = [], loaded = false;
-    const links = () => [...doc.querySelectorAll('nav a[href], aside a[href], #history a[href], [data-testid="history"] a[href]')]
+    let cache = [], chats = [], pinnedUrls = [], loaded = false;
+    const links = () => [...doc.querySelectorAll('nav a[href], aside a[href], #history a[href], [data-testid="history"] a[href], [data-testid*="sidebar"] a[href], #stage-slideover-sidebar a[href]')]
       .filter(link => conversation(link.href)).slice(0, 300);
     const visible = node => node && !node.closest('[hidden], [inert]') && node.getClientRects().length && getComputedStyle(node).visibility !== 'hidden';
-    const control = selectors => [...doc.querySelectorAll(selectors)].find(visible);
-    const emptyHistory = () => Boolean(doc.querySelector('[data-testid="history-empty-state"]')) ||
-      /(?:no chats|no conversations|start a chat)/i.test(doc.querySelector('nav[aria-label="Chat history"], #history, [data-testid="history"]')?.textContent || '');
+    const emptyHistory = () => {
+      const container = doc.querySelector('nav[aria-label="Chat history"], #history, [data-testid="history"]');
+      return Boolean(visible(doc.querySelector('[data-testid="history-empty-state"]')) || visible(container) && /(?:no chats|no conversations|start a chat)/i.test(container.textContent || ''));
+    };
     function remember(found) {
+      const regular = globalThis.AiAgentSidebarHistory.regularHistory(found, conversation);
+      pinnedUrls = regular.pinnedUrls;
       const byUrl = new Map();
-      for (const link of found) { const url = conversation(link.href); if (!byUrl.has(url)) byUrl.set(url, link); }
+      for (const link of regular.links) { const url = conversation(link.href); if (!byUrl.has(url)) byUrl.set(url, link); }
       cache = [...byUrl.keys()];
       chats = cache.map(url => {
         const link = byUrl.get(url);
@@ -65,38 +69,26 @@
     function peek(connection) {
       const found = links();
       if (found.length) remember(found);
-      else if (emptyHistory()) { cache = []; chats = []; loaded = true; }
+      else if (emptyHistory()) remember([]);
       const state = connection || getConnection();
       const editor = doc.querySelector('#prompt-textarea, [data-composer-markdown][contenteditable="true"], textarea[data-mobile-composer-prompt]');
       const draft = editor ? (editor.matches('textarea,input') ? editor.value : editor.textContent || '') : '';
       const editorVisible = editor?.isConnected && editor.getClientRects().length && getComputedStyle(editor).visibility !== 'hidden';
       const streaming = doc.querySelector('[data-is-streaming="true"], button[data-testid="stop-button"], button[aria-label*="stop generating" i], button[aria-label*="stop streaming" i]');
-      if (state.authState === 'signed-out') { cache = []; chats = []; loaded = true; }
-      return { loaded, urls:cache, chats, currentUrl:route(page.href) || origin + '/', ready:state.composerReady === true || Boolean(editorVisible && !editor.disabled),
+      if (state.authState === 'signed-out') remember([]);
+      return { loaded, urls:cache, chats, pinnedUrls, currentUrl:route(page.href) || origin + '/', ready:state.composerReady === true || Boolean(editorVisible && !editor.disabled),
         hasDraft:state.hasDraft === true || Boolean(draft.replace(/[\u200b\ufeff]/g, '').trim()), busy:state.busy === true || Boolean(streaming?.getClientRects().length),
         ...(state.authState === 'signed-out' ? {reason:'signed-out'} : {}) };
     }
     function blocked(state) {
       return state.reason === 'signed-out' ? 'signed-out' : state.hasDraft ? 'draft' : state.busy ? 'generation' : !state.ready ? 'loading' : null;
     }
-    async function withLinks(task) {
-      let opened = false;
-      try {
-        if (!links().length) {
-          const open = control('button[data-testid="open-sidebar-button"], button[aria-label="Open sidebar" i]');
-          if (open) {
-            open.click(); opened = true;
-            for (let count = 0; count < 30 && !links().length; count++) await new Promise(resolve => setTimeout(resolve, 50));
-          }
-        }
-        const found = links();
-        if (found.length) remember(found);
-        else if (emptyHistory()) { cache = []; chats = []; loaded = true; }
-        return task(found);
-      } finally {
-        if (opened) control('button[data-testid="close-sidebar-button"], button[aria-label="Close sidebar" i]')?.click();
-      }
-    }
+    const sidebar = globalThis.AiAgentSidebarHistory.create({ document: doc, links, empty: emptyHistory });
+    const withLinks = (task, canOpen = () => true) => sidebar.withLinks(found => {
+      if (found.length) remember(found);
+      else if (emptyHistory()) remember([]);
+      return task(found);
+    }, { canOpen });
     async function inspect({ readOnly = false } = {}) {
       const state = peek(), reason = blocked(state);
       if (reason && !(readOnly && ['draft', 'generation'].includes(reason))) return {...state,reason};
@@ -109,7 +101,7 @@
         const state = peek(), reason = blocked(state);
         if (reason) { acknowledge({...state,reason,dispatched:false}); return; }
         if (route(data.currentUrl) !== state.currentUrl) { acknowledge({...state,reason:'conversation-changed',dispatched:false}); return; }
-        const next = data.selection === true ? conversation(data.target) : target(state.urls, state.currentUrl, data.direction);
+        const next = data.selection === true ? conversation(data.target) : target(state.urls, state.currentUrl, data.direction, state.pinnedUrls);
         const link = found.find(link => conversation(link.href) === next && (!link.target || link.target === '_self'));
         if (!next || !state.urls.includes(next) || next !== conversation(data.target) || !link?.isConnected) {
           acknowledge({...state,reason:'history-changed',dispatched:false}); return;
@@ -118,7 +110,7 @@
         // turn. Never overwrite a composer or retry a dispatched navigation.
         acknowledge({...state,dispatched:true,target:next});
         link.click();
-      });
+      }, () => !blocked(peek()) && route(data.currentUrl) === route(page.href));
     }
     return { peek, inspect, open };
   }

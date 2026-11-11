@@ -1,0 +1,95 @@
+{
+   "action": {
+      "default_icon": {
+         "128": "icons/thumbnails_128.png",
+         "16": "icons/thumbnails_16.png",
+         "32": "icons/thumbnails_32.png",
+         "48": "icons/thumbnails_48.png"
+      },
+      "default_title": "Auto Form Filler"
+   },
+   "author": "team@jobwizard.ai",
+   "background": {
+      "service_worker": "js/background.js",
+      "type": "module"
+   },
+   "commands": {
+      "shortcut_autofill": {
+         "description": "Autofill",
+         "suggested_key": {
+            "default": "Alt+Shift+D",
+            "mac": "Alt+Shift+D"
+         }
+      },
+      "shortcut_popup": {
+         "description": "Popup/Minimize",
+         "suggested_key": {
+            "default": "Alt+Shift+A",
+            "mac": "Alt+Shift+A"
+         }
+      }
+   },
+   "content_scripts": [ {
+      "all_frames": true,
+      "js": [ "js/workdayNativeTransactions.js" ],
+      "matches": [ "https://*.myworkdayjobs.com/*", "https://*.myworkdaysite.com/*" ],
+      "run_at": "document_start",
+      "world": "MAIN"
+   }, {
+      "all_frames": true,
+      "js": [ "js/governedEvaluationV4Guard.js" ],
+      "matches": [ "\u003Call_urls>" ],
+      "run_at": "document_start"
+   }, {
+      "all_frames": true,
+      "js": [ "js/pluginInteractionBoundary.js", "js/selectionToolbar.js" ],
+      "match_about_blank": true,
+      "match_origin_as_fallback": true,
+      "matches": [ "\u003Call_urls>" ],
+      "run_at": "document_end"
+   }, {
+      "all_frames": true,
+      "css": [ "/css/content_generate.css", "/css/common.css" ],
+      "js": [ "js/jquery-3.7.1.min.js", "js/html2canvas.js", "js/marked.min.js", "js/fuse.min.js", "js/custom-elements.min.js", "js/patternCacheManager.js", "js/chatState.js", "js/bundle.js" ],
+      "matches": [ "\u003Call_urls>" ],
+      "run_at": "document_end",
+      "type": "module"
+   }, {
+      "all_frames": true,
+      "js": [ "js/mainWorldScrollGuard.js" ],
+      "matches": [ "\u003Call_urls>" ],
+      "run_at": "document_start",
+      "world": "MAIN"
+   }, {
+      "all_frames": false,
+      "js": [ "js/demo-mock-data.js", "js/demo-mock-interceptor.js" ],
+      "matches": [ "https://www.jobwizard.ai/demo-job*" ],
+      "run_at": "document_start"
+   }, {
+      "all_frames": false,
+      "css": [ "/css/demo-highlight.css" ],
+      "js": [ "js/demo-utils.js", "js/demo-highlight-config.js", "js/demoHighlight.js" ],
+      "matches": [ "https://www.jobwizard.ai/demo-job*" ],
+      "run_at": "document_end"
+   } ],
+   "description": "Autofill job applications on Workday, Greenhouse, Lever & 500+ sites. AI cover letters, LinkedIn referrals, job tracker & ATS resume",
+   "host_permissions": [ "https://*.jobwizard.ai/*", "https://*/*", "https://api.jobwizard.ai/*" ],
+   "icons": {
+      "128": "icons/thumbnails_128.png",
+      "16": "icons/thumbnails_16.png",
+      "32": "icons/thumbnails_32.png",
+      "48": "icons/thumbnails_48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgLvQaP2+TbtjJyFau5uL1LXu/fxoI6uiqSlwC5DwlacIXCa5N/7mGSGqgvZFAN/YVctNrV8yJ+/K80p4tuGDvFvxKFhYhW9HCbOWyXKvYLWWdqnCLdZZGNp7l6qHUOWbe+a+6CUm1FnJgCgJ03MdkBg3DmZ3gkx1OiZIym7ZhSHHUzQFe/XnCnmsxxuOjieU/+VJmtJ4b/R1BPA/cvXMlRwoxtb8BSCysGd6szuV1F21xl2mqa/HBaTGidMjcXFAXZ58AArKfuA7ihn0+wquyb4ek9bTn5yzrwviG6iuixC0csUJNI9za3EikdpVz3Akdpa4m3sQPiBQ9859JEUhMwIDAQAB",
+   "manifest_version": 3,
+   "minimum_chrome_version": "108",
+   "name": "JobWizard - AI Job Application Autofill, Tracker & ATS Resume Builder",
+   "permissions": [ "background", "storage", "cookies", "scripting", "activeTab", "tabs", "webNavigation" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "1.1.52",
+   "web_accessible_resources": [ {
+      "extension_ids": [ "*" ],
+      "matches": [ "\u003Call_urls>" ],
+      "resources": [ "js/*", "css/*", "fonts/*", "icons/*", "js/marked.min.js", "images/*.png", "demo-job.html", "js/demo-job-loader.js", "js/demo-utils.js", "js/demo-highlight-config.js" ]
+   } ]
+}

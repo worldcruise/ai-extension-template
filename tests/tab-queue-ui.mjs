@@ -20,7 +20,7 @@ export async function checkTabQueue({ cdp, id, workerSession, dockSession, evalu
   const tabKey = 'resume-queue-tab:' + windowId;
   const tabId = await until(() => dock(`chrome.storage.session.get(${JSON.stringify(tabKey)}).then(value=>value[${JSON.stringify(tabKey)}])`), 'dedicated queue tab created');
   assert.equal((await submissions()).length, initialCount, 'choosing/opening a connection never sends');
-  await click('#settings-back'); await click('#review-another'); await click('#profile-details');
+  await click('#settings-back'); await click('#review-another'); await click('#account-toggle'); await click('#profile-details');
   const profile = { ...exampleProfile, name: 'Synthetic Tab Candidate' };
   await dock(`(() => {const transfer=new DataTransfer();transfer.items.add(new File([${JSON.stringify(JSON.stringify(profile))}],"Tab_Profile.json",{type:"application/json"}));
     const field=document.getElementById("profile-file");field.files=transfer.files;field.dispatchEvent(new Event("change",{bubbles:true}));})()`);

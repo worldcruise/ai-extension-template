@@ -1,0 +1,5581 @@
+/*
+ * Phase D chunks D3+D4: import banner-tokens.css for the new v2 banner.
+ * Tokens (state colors / radius / shadow / motion) are co-located in
+ * banner-tokens.css. The legacy `#all_fill_*` rules below keep their
+ * existing visuals; the `.legacy-banner-active` selector at the bottom
+ * controls which generation is shown (default = v2, fallback = legacy).
+ */
+@import url("banner-tokens.css");
+
+/* Start Fill Status CSS */
+#autofill_detail .fill_status {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  /* The status button's 24px expanded end hit-area lives in this gutter.
+     Four extra gutter pixels keep the full 44px target inside the narrow
+     panel without overlapping clickable question text. */
+  padding: 0 24px 0 20px;
+}
+
+#autofill_detail .fill_status_result {
+  width: -webkit-fill-available;
+  background: #ffffff;
+}
+
+#autofill_detail #all_fill_loading {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: rgba(0, 119, 250, 0.1);
+  border: 0.3px solid #0077fa;
+  border-radius: 4.58541px;
+}
+
+#autofill_detail .all_fill_loading_image {
+  width: 18.34px;
+  height: 18.34px;
+}
+
+#autofill_detail .all_fill_loading_text {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-family: var(--jobwizard-font-family);
+  font-weight: 700;
+  line-height: 14px;
+  color: #114c8b;
+}
+
+#autofill_detail #all_fill_successed {
+  display: none;
+  flex-direction: column;
+}
+
+#autofill_detail #all_fill_successed .fill_report_block {
+  margin-top: 10px;
+  margin-bottom: 5px;
+  display: none;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+#autofill_detail #all_fill_successed .fill_report_block .fill_report_label {
+  font-size: 12px;
+  color: gray;
+  margin-right: 10px;
+}
+
+#autofill_detail #all_fill_successed .fill_report_block .fill_report_button {
+  font-size: 12px;
+  color: white;
+  padding: 3px 10px 3px 10px;
+  background-color: #06f;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+#autofill_detail #all_fill_successed_inner {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: rgba(15, 169, 88, 0.1);
+  border: 0.5px solid #0fa958;
+  border-radius: 5px;
+}
+
+#autofill_detail .all_fill_successed_text {
+  display: flex;
+  align-items: center;
+  font-family: var(--jobwizard-font-family);
+  font-weight: 700;
+  font-size: 18px;
+  color: #217046;
+}
+
+#autofill_detail #all_fill_successed_rate {
+  display: flex;
+  align-items: center;
+  padding: 3px 10px;
+  background: #6aa786;
+  border-radius: 3.83096px;
+  font-size: 14px;
+  font-family: var(--jobwizard-font-family);
+  font-weight: 500;
+  color: #ffffff;
+}
+#autofill_detail #all_fill_failed {
+  display: none;
+  flex-direction: column;
+}
+#autofill_detail #all_fill_failed .all_fill_failed_inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: rgba(145, 134, 131, 0.1);
+  border: 0.5px solid #d1d1d1;
+  border-radius: 6px;
+}
+#autofill_detail #all_fill_failed .fill_fail_tip {
+  font-size: 13px;
+  color: gray;
+  margin: 8px 0;
+  display: inline-block;
+  text-align: center;
+  text-decoration: underline;
+  font-style: italic;
+}
+
+#autofill_detail .all_fill_failed_text {
+  display: flex;
+  align-items: center;
+  font-family: var(--jobwizard-font-family);
+  font-weight: 700;
+  font-size: 18px;
+  color: #6b6b6b;
+}
+
+#autofill_detail #all_fill_failed_rate {
+  display: flex;
+  align-items: center;
+  padding: 3px 10px;
+  background: #c5c5c5;
+  border-radius: 3.83096px;
+  font-size: 14px;
+  font-family: var(--jobwizard-font-family);
+  font-weight: 500;
+  color: #ffffff;
+}
+
+/* ───────────────────────────────────────────────────────────────────────
+ * Phase D chunks D3+D4: Banner v2 vs legacy switch.
+ *
+ * Default state (v2 active, no `legacy-banner-active` class on
+ * `#autofill_detail`):
+ *   - v2 banner (#jw_banner_v2) is shown (its own `[hidden]` toggle decides
+ *     visible/hidden per macro state).
+ *   - Legacy `#all_fill_*` elements are FORCED hidden via `!important` —
+ *     calcAutofillRate may still set inline `display:flex/none` on them, but
+ *     v2 mode wins.
+ *
+ * Fallback (legacy active, body of `#autofill_detail` carries
+ * `.legacy-banner-active`):
+ *   - v2 banner hidden; legacy elements behave as before (calcAutofillRate
+ *     toggles inline display).
+ *
+ * BannerRenderer.render() syncs the class based on
+ * `localStorage.__JW_BANNER_V2__`. Default enabled. Set 'false' to flip back.
+ * ─────────────────────────────────────────────────────────────────────── */
+
+/* When v2 active (default — class absent), force legacy hidden. */
+#autofill_detail:not(.legacy-banner-active) #all_fill_loading,
+#autofill_detail:not(.legacy-banner-active) #all_fill_successed,
+#autofill_detail:not(.legacy-banner-active) #all_fill_failed {
+  display: none !important;
+}
+
+/* When legacy active, hide v2 banner. */
+#autofill_detail.legacy-banner-active #jw_banner_v2 {
+  display: none !important;
+}
+
+#autofill_detail .question_title {
+  width: -webkit-fill-available;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 0.458541px solid rgba(0, 0, 0, 0.1);
+}
+
+#autofill_detail .question_title_left {
+  font-size: 18px;
+  font-family: var(--jobwizard-font-family);
+  font-weight: 600;
+  line-height: 17px;
+  display: flex;
+  align-items: center;
+  color: #000000;
+}
+
+#autofill_detail .question_title_right {
+  font-size: 18px;
+  font-family: var(--jobwizard-font-family);
+  font-weight: 600;
+  line-height: 17px;
+  display: flex;
+  align-items: center;
+  color: #000000;
+}
+
+#autofill_detail .qustion_list {
+  /* margin-bottom: 120px;
+  height: 100%; */
+}
+
+#autofill_detail .question_list_wrapper {
+  padding-bottom: 160px;
+  height: 100%;
+}
+
+#autofill_detail .question_list_wrapper .collection_report_block {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 5px 10px;
+  width: calc(100% - 32px);
+  margin: 24px auto 0;
+  padding: 15px 0 0;
+  border-top: 1px solid rgba(24, 24, 27, 0.08);
+  text-align: center;
+}
+
+#autofill_detail .question_list_wrapper .collection_report_block .collection_report_text {
+  font-size: 12px;
+  color: #71717a;
+  line-height: 18px;
+}
+
+#autofill_detail .question_list_wrapper .collection_report_block .collection_report_button {
+  font-size: 12px;
+  min-height: 30px;
+  padding: 4px 7px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #2563eb;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+#autofill_detail .question_list_wrapper .collection_report_block .collection_report_button:hover {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+#autofill_detail .question_list_wrapper .collection_report_block .collection_report_button:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.2);
+  outline-offset: 1px;
+}
+
+/* question item start */
+#autofill_detail .question_items {
+  width: 100%;
+  height: 100%;
+}
+
+#autofill_detail .question_item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+  text-wrap: wrap;
+  word-break: break-word;
+  position: relative;
+}
+
+#autofill_detail .qm_row_body {
+  min-width: 0;
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+#autofill_detail .question_item_text {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 4px 10px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  cursor: pointer;
+  line-height: 140%;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+#autofill_detail .question_item_text:hover .qm_field_label {
+  color: #0057d9;
+}
+
+#autofill_detail .question_item_text:focus-visible {
+  outline: 3px solid rgba(0, 102, 255, 0.35);
+  outline-offset: -3px;
+  border-radius: 8px;
+}
+
+#autofill_detail .qm_field_label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1 1 auto;
+}
+
+#autofill_detail .question_item_text[data-field-type="file"] {
+  overflow: visible;
+}
+#autofill_detail .question_item_text.line_unlimited {
+  overflow: visible;
+}
+#autofill_detail .question_item_text .required::after {
+  content: "*";
+  color: #f24e1e;
+}
+
+#autofill_detail .question_status {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  cursor: pointer;
+  position: relative;
+  /* Keep the historical 20px status-column footprint while expanding the
+     interactive box to WCAG's 44px target. The controlled -24px end margin
+     makes the flex contribution 44 - 24 = 20px; start alignment keeps the icon
+     centered on the same visual status-column axis while the extra hit area
+     uses the panel's existing right gutter instead of covering question text. */
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  margin: 0 -24px 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+#autofill_detail .question_status:hover {
+  background: rgba(0, 102, 255, 0.06);
+}
+
+#autofill_detail .question_item[data-attention-level="attention"] .question_status:hover,
+#autofill_detail .question_item[data-attention-level="warning"] .question_status:hover {
+  background: rgba(180, 83, 9, 0.08);
+}
+
+#autofill_detail .question_item[data-attention-level="error"] .question_status:hover {
+  background: rgba(196, 50, 50, 0.08);
+}
+
+#autofill_detail .question_status[data-field-status="field_skipped"]:hover,
+#autofill_detail .question_status[data-field-status="skipped"]:hover {
+  background: rgba(102, 112, 133, 0.09);
+}
+
+#autofill_detail .question_status:focus-visible {
+  outline: 3px solid rgba(0, 102, 255, 0.45);
+  outline-offset: -3px;
+}
+
+#autofill_detail .question_status_image {
+  width: 20px;
+  height: 20px;
+}
+
+#autofill_detail .question_status .question_status_dropdown,
+#autofill_detail .question_item > .question_status_dropdown {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: 6px;
+  padding: 10px 8px;
+  gap: 6px;
+  background: #fff;
+  box-shadow: 0px 2px 15px 0px rgba(0, 0, 0, 0.12);
+  position: absolute;
+  font-size: 14px;
+  top: -2px;
+  right: 36px;
+  z-index: 999;
+  min-width: 180px;
+}
+#autofill_detail .question_status .question_status_dropdown .qs-dropdown-item,
+#autofill_detail .question_item > .question_status_dropdown .qs-dropdown-item {
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+#autofill_detail .question_status .question_status_dropdown .qs-dropdown-item:hover,
+#autofill_detail .question_item > .question_status_dropdown .qs-dropdown-item:hover {
+  background: #f5f5f5;
+}
+
+#autofill_detail .question_status_image.disable {
+  cursor: not-allowed;
+}
+/* E-Fix6: hover trigger reverted to icon-only. Row-wide hover was too
+   intrusive — tooltips popped up while reading question titles. Icon
+   hover is the intentional gesture. */
+#autofill_detail .question_status:not(.qm_tooltip_suppressed):hover + .question_missing {
+  display: flex;
+}
+#autofill_detail .question_status:not(.qm_tooltip_suppressed):focus-visible + .question_missing {
+  display: flex;
+}
+#autofill_detail .question_item.qm_pinned > .question_missing {
+  display: none;
+}
+#autofill_detail .question_missing {
+  display: none;
+  align-items: center;
+  justify-self: center;
+  position: absolute;
+  right: 44px;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* Phase E2 (2026-05-13): two-row tooltip. The outer
+   #<answerId>_question_missing_info pill stays as the dark capsule; inside
+   it we stack .qm_primary (the headline) and .qm_secondary (the optional
+   subtitle, e.g. "Based on your resume"). The :empty rule keeps the
+   secondary row from leaving a phantom gap when copy is single-line. */
+#autofill_detail [id$="_question_missing_info"] {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  word-wrap: break-word;
+  background-color: #1f2937;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12),
+    0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  color: #fff;
+  min-height: 32px;
+  min-width: 30px;
+  padding: 6px 10px;
+  font-size: 13px;
+  text-align: left;
+  opacity: 1;
+  width: max-content;
+  max-width: min(288px, calc(100vw - 32px));
+}
+
+#autofill_detail [id$="_question_missing_info"] .qm_primary {
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+#autofill_detail [id$="_question_missing_info"] .qm_secondary {
+  color: #e5e7eb;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Hide the secondary row entirely when empty so single-line copy doesn't
+   leave a phantom gap below the headline. */
+#autofill_detail [id$="_question_missing_info"] .qm_secondary:empty {
+  display: none;
+}
+
+/* Expanded explainability uses the same white card language as the existing
+   field-options dropdown. It is pinned only by an intentional click/tap or
+   keyboard activation; hover/focus retains the compact dark preview above. */
+#autofill_detail .question_status_popover {
+  display: none;
+  position: absolute;
+  top: 4px;
+  right: 44px;
+  z-index: 1001;
+  width: min(320px, calc(100% - 52px));
+  max-height: min(360px, 60vh);
+  overflow: auto;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  background: #fff;
+  color: #1f2937;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+#autofill_detail .question_item.qm_pinned > .question_status_popover {
+  display: block;
+}
+
+#autofill_detail .question_item.qm_popover_above > .question_status_popover {
+  top: auto;
+  bottom: 4px;
+}
+
+#autofill_detail .question_status_popover:focus-visible {
+  outline: 3px solid rgba(0, 102, 255, 0.45);
+  outline-offset: 2px;
+}
+
+#autofill_detail .qm_popover_title {
+  padding-right: 8px;
+  color: #111827;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+#autofill_detail .qm_popover_reason {
+  margin-top: 3px;
+  color: #4b5563;
+}
+
+#autofill_detail .qm_filling_details {
+  margin: 0 0 14px;
+}
+#autofill_detail .qm_filling_details[hidden] {
+  display: none;
+}
+#autofill_detail .qm_filling_details > summary {
+  cursor: pointer;
+  color: #64748b;
+  font-size: 13px;
+  padding: 8px 0;
+}
+#autofill_detail .qm_details_secondary {
+  margin: 8px 0 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: #f5f6f9;
+}
+#autofill_detail .qm_details {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 10px 0 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+#autofill_detail .qm_detail {
+  display: grid;
+  grid-template-columns: minmax(88px, 0.8fr) minmax(0, 1.2fr);
+  gap: 8px;
+}
+
+#autofill_detail .qm_detail dt {
+  color: #6b7280;
+}
+
+#autofill_detail .qm_detail dd {
+  min-width: 0;
+  margin: 0;
+  color: #1f2937;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+#autofill_detail .qm_next_action {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 8px;
+  border-radius: 6px;
+  background: #f5f7fb;
+  color: #374151;
+}
+
+#autofill_detail .qm_next_action span {
+  color: #0066ff;
+  font-weight: 600;
+}
+
+#autofill_detail .qm_answer_action_icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+#autofill_detail .qm_details[hidden],
+#autofill_detail .qm_next_action[hidden],
+#autofill_detail .qm_action[hidden] {
+  display: none !important;
+}
+
+#autofill_detail .qm_popover_actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+#autofill_detail .qm_popover_actions button {
+  min-height: 44px;
+  padding: 7px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  color: #374151;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+#autofill_detail .qm_popover_actions .qm_action:first-child:not(.qm_report_action):not(.qm_memory_toggle) {
+  border-color: #0066ff;
+  background: #0066ff;
+  color: #fff;
+}
+
+#autofill_detail .qm_popover_actions .qm_report_action {
+  margin-right: auto;
+  padding-right: 2px;
+  padding-left: 2px;
+  border-color: transparent;
+  color: #b4232e;
+  background: transparent;
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+#autofill_detail .qm_popover_actions .qm_memory_toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: auto;
+}
+
+#autofill_detail .qm_memory_state {
+  min-width: 28px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #e9eef7;
+  color: #475467;
+  font-size: 11px;
+  text-align: center;
+}
+
+#autofill_detail .qm_memory_toggle[aria-checked="true"] .qm_memory_state {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+#autofill_detail .qm_action_description {
+  flex: 1 0 100%;
+  margin: -4px 0 2px;
+  color: #667085;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+#autofill_detail .qm_popover_actions button:hover {
+  filter: brightness(0.97);
+}
+
+#autofill_detail .qm_popover_actions button:focus-visible {
+  outline: 3px solid rgba(0, 102, 255, 0.4);
+  outline-offset: 2px;
+}
+
+#autofill_detail .qm_live {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #autofill_detail .question_status,
+  #autofill_detail .question_status_popover,
+  #autofill_detail [id$="_question_missing_info"] {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  #autofill_detail .question_status,
+  #autofill_detail .question_item_text,
+  #autofill_detail .question_status_popover,
+  #autofill_detail [id$="_question_missing_info"],
+  #autofill_detail .qm_popover_actions button {
+    forced-color-adjust: auto;
+    border-color: ButtonText;
+  }
+
+  #autofill_detail .question_status:focus-visible,
+  #autofill_detail .question_item_text:focus-visible,
+  #autofill_detail .qm_popover_actions button:focus-visible {
+    outline: 2px solid Highlight;
+  }
+}
+
+/* E-Fix4: removed the prior :has(.qm_primary:empty) defense — it was too
+   aggressive. When initial paint ran before fieldTooltipFor was fully wired
+   (or item.fieldState was undefined and the fallback path stamped empty
+   strings), the pill stayed display:none even after StatusObserver flushed
+   real copy. fieldTooltipFor's pending fallback already guarantees a non-
+   empty primary; html.js belt-and-braces fallback below covers the rare
+   cold-start race. If users ever see an empty pill again, that's a real
+   bug we should see, not a silent suppression. */
+#autofill_detail .autofill_footer {
+  display: none;
+  padding: 12px 32px;
+  justify-content: center;
+  align-items: center;
+  align-self: stretch;
+  position: sticky;
+  bottom: 0px;
+  width: 100%;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(2px);
+  z-index: 10;
+}
+#autofill_detail .autofill_footer.active {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+#autofill_detail .autofill_footer .autofill_button {
+  display: flex;
+  height: 50px;
+  flex: 1;
+  border-radius: 50px;
+  justify-content: center;
+  align-items: center;
+  background: #06f;
+  color: #fff;
+  font-family: var(--jobwizard-font-family);
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: background .1s ease;
+  gap: 6px;
+}
+
+#autofill_detail .autofill_footer .autofill_button:hover {
+  background: rgb(52, 131, 250);
+}
+
+#autofill_detail .autofill_footer .autofill_button .autofill_button_logo {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+#autofill_detail .autofill_footer .autofill_button.disabled {
+  background: #d9d9d9;
+  cursor: not-allowed;
+}
+
+/* [ProfileGate] Third-layer click-block: pointer-events:none ensures the
+   button is physically un-clickable while gated, independent of whether
+   jQuery's :not(.disabled) selector is in effect.  Combined with the
+   durable .disabled class and the :not(.jw-profile-gate) click filter in
+   main.js, this gives three independent layers of click prevention. */
+#autofill_detail .autofill_footer .autofill_button.jw-profile-gate {
+  pointer-events: none;
+}
+
+/* ─── Pause affordance (legacy stop-mode class) ─── */
+#autofill_detail .autofill_footer .autofill_button.jw-stop-mode {
+  background: rgba(15, 23, 42, 0.6);
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#autofill_detail .autofill_footer .autofill_button.jw-stop-mode span {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  position: relative;
+  z-index: 3;
+}
+
+/* Override .loading pseudo-elements: repurpose ::after as Pause overlay.
+   .loading.jw-stop-mode has higher specificity than .loading alone,
+   so these rules win over the progress bar / shimmer styles. */
+#autofill_detail .autofill_footer .autofill_button.loading.jw-stop-mode::after {
+  content: 'Ⅱ  Pause';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: #d94f4f;
+  border-radius: inherit;
+  clip-path: none;
+  animation: none;
+  background-size: auto;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 2;
+}
+
+/* Delegated surfaces without a pause protocol retain a truthful terminal action. */
+#autofill_detail .autofill_footer .autofill_button.loading.jw-stop-mode[data-jw-pause-supported="false"]::after {
+  content: '■  Stop';
+}
+
+#autofill_detail .autofill_footer .autofill_button.loading.jw-stop-mode:hover::before {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+#autofill_detail .autofill_footer .autofill_button.loading.jw-stop-mode:hover::after {
+  opacity: 1;
+}
+
+#autofill_detail .autofill_footer .autofill_button.loading.jw-stop-mode:active::after {
+  background: #c44040;
+  opacity: 1;
+  transition-duration: 0.08s;
+}
+
+#autofill_detail .autofill_footer .autofill_button.loading:not(.jw-stop-mode) {
+  background: #d9d9d9;
+  cursor: not-allowed;
+  overflow: hidden;
+}
+
+/* 进度条 - 蓝色 */
+#autofill_detail .autofill_footer .autofill_button.loading::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+  background: #06f;
+  transform-origin: left;
+  transition: transform 0.3s ease;
+  /* 使用 clip-path 来创建圆角效果 */
+  clip-path: inset(0 calc(100% - calc(var(--progress) * 100%)) 0 0 round 25px);
+}
+
+/* 深色能量流动效果 */
+#autofill_detail .autofill_footer .autofill_button.loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    #06f 0%,
+    #003db2 20%,
+    #003db2 35%,
+    #06f 55%
+  );
+  background-size: 200% 100%;
+  animation: gradientFlow 2.5s ease-out infinite;
+  /* 使用相同的 clip-path */
+  clip-path: inset(0 calc(100% - calc(var(--progress) * 100%)) 0 0 round 25px);
+}
+
+/* Start autofill按钮上方状态气泡 */
+/* Base notification styles */
+.status-notification{
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 30px;
+  padding: 8px 26px;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.12);
+  text-align: center;
+  gap: 2px;
+  
+  /* Animation properties */
+  animation: SlideIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Common elements styling */
+
+/* For progress notification */
+.progress-notification .notification-title-wrap {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.status-notification .notification-title-text {
+  font-weight: 500;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.progress-notification .progress-notification-wrap {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.progress-notification .notification-title-emoji {
+  font-size: 14px;
+}
+
+.status-notification .notification-description {
+  font-size: 12px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+/* For completion notification */
+
+.completion-notification .notification-title-emoji {
+  font-size: 18px;
+}
+
+.completion-notification{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* Animation */
+.status-notification.fade-out {
+  animation: SlideOut 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+/* Phase D2 v2 — bell pop-in: subtle scale + slide so the CTA arrives lively but
+   doesn't yank the eye. 250ms cubic-bezier matches our overall motion curve. */
+.status-notification.completion-notification {
+  animation: BellPopIn 0.25s cubic-bezier(0.34, 1.2, 0.64, 1) both;
+}
+@keyframes BellPopIn {
+  0% { opacity: 0; transform: translate(-50%, 8px) scale(0.95); }
+  100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+/* Theme variants */
+/* allRequiredFilled style */
+.status-notification.allRequiredFilled-progress {
+  background: #f1fff2
+}
+
+/* findNewQuestion style */
+.status-notification.findNewQuestion-progress {
+  background: #F1F7FF
+}
+
+.status-notification.findNewQuestion-progress .notification-title-text {
+  color: #06f
+}
+
+.status-notification.findNewQuestion-progress .notification-description {
+  color: rgb(0, 102, 255, 0.6)
+}
+
+.status-notification.completion-notification .notification-title-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.status-notification.allRequiredSuccess-completion {
+  background: #f1fff2;
+  transition: background 0.3s ease;
+  cursor: pointer;
+}
+
+.status-notification.allRequiredSuccess-completion:hover {
+  background: #e6ffe8;  /* 稍微深一点的绿色调 */
+}
+
+.status-notification.allRequiredSuccess-completion .notification-title-text {
+  color: rgb(47, 127, 51);
+}
+
+.status-notification.allRequiredSuccess-completion .notification-description {
+  color: rgba(47, 127, 51, 0.6);
+}
+
+.status-notification.requiredMissing-completion {
+  background: #fff8e6;
+  transition: background 0.3s ease;
+  cursor: pointer;
+}
+
+.status-notification.requiredMissing-completion .notification-title-text {
+  color: rgb(183, 121, 0);
+}
+
+.status-notification.requiredMissing-completion .notification-description {
+  color: rgb(183, 121, 0, 0.6);
+}
+
+.status-notification.requiredMissing-completion:hover {
+  background: #fff2d6;  /* 稍微深一点的暖色调 */
+}
+
+.status-notification.fillTimeout-completion {
+  background: #fff2f2;  /* 浅红色背景 */
+}
+
+.status-notification.fillTimeout-completion .notification-title-text {
+  color: rgb(183, 51, 51);  /* 深红色文字 */
+}
+
+.status-notification.fillTimeout-completion .notification-description {
+  color: rgba(183, 51, 51, 0.6);  /* 半透明深红色文字 */
+}
+
+/* End autofill按钮上方状态气泡 */
+
+/* 文字样式 */
+#autofill_detail .autofill_footer .autofill_button.loading span {
+  position: relative;
+  z-index: 1;
+}
+
+
+/* 成功状态的按钮 */
+#autofill_detail .autofill_footer .autofill_button.completed {
+  background: #1E9600;  /* 更深的绿色 */
+  transition: background 0.3s ease;
+}
+
+/* 庆祝效果的容器 */
+.celebration-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Emoji样式 */
+.celebration-emoji {
+  position: absolute;
+  font-size: 18px;
+  opacity: 0;
+}
+
+.celebration-emoji.left {
+  animation: emojiCenter 0.8s ease-out forwards,
+             emojiMoveLeft 0.8s ease-out 0.8s forwards,
+             emojiFadeOut 0.5s ease-out 3.5s forwards;
+}
+
+.celebration-emoji.right {
+  animation: emojiCenter 0.8s ease-out forwards,
+             emojiMoveRight 0.8s ease-out 0.8s forwards,
+             emojiFadeOut 0.5s ease-out 3.5s forwards;
+}
+
+/* Congratulations文字样式 */
+.celebration-text {
+  position: absolute;
+  width: fit-content;
+  text-align: center;
+  transform: translateY(30px);  /* 增加初始下移距离 */
+  opacity: 0;
+  font-size: 18px;  /* 确保文字大小合适 */
+  animation: textSlideUp 0.8s ease-out 1.6s forwards,
+             textFadeOut 0.5s ease-out 3.5s forwards;
+}
+
+/* UI while autofilling End */
+
+#autofill_detail .form_empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  color: #424242;
+}
+#autofill_detail .form_empty img {
+  width: 256px;
+}
+
+#autofill_detail .form_empty h1 {
+  margin-top: 36px;
+  margin-bottom: 12px;
+  font-size: 24px;
+  font-weight: 700;
+}
+#autofill_detail .form_empty span {
+  color: #7b7a7a;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 30px;
+}
+#autofill_detail .form_empty .no_form_report {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#autofill_detail .form_empty .no_form_report_button_wrap {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+#autofill_detail .form_empty .no_form_report_button_text {
+  color: #8a8a8a;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+#autofill_detail .form_empty .no_form_report_button {
+  display: inline-block;  /* 改为 inline-block */
+  min-width: 100px;
+  max-width: 300px;
+  padding: 10px 20px;
+  /* 移除 justify-content 和 align-items */
+  /* 移除 gap */
+  border-radius: 6px;
+  /* border: 1px solid rgba(0, 0, 0, 0.12); */
+  background: rgb(137, 137, 138);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 400;
+  margin-top: 24px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  /* 文本截断相关属性 */
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 旧的样式已移除，统一使用 error_page_style 中的样式 */
+
+#autofill_detail .form_empty .no_form_report_button:hover {
+  background: #7b7b7c; /* Slightly darker shade of #06f */
+  /* box-shadow: 0 1px 8px rgba(0, 102, 255, 0.2); */
+}
+
+#autofill_detail .form_empty .no_form_report_button:active {
+  transform: scale(0.98);
+}
+
+#autofill_detail .form_empty .no_form_report_button.pressed {
+  background: #e0e0e0;
+  color: #888888;
+  border: 1px solid #d0d0d0;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: not-allowed;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  opacity: 0.8;
+  transform: scale(0.98);
+  text-align: center;
+}
+
+#autofill_detail .form_empty .no_form_report_button.pressed::after {
+  margin-left: 8px;
+  font-weight: bold;
+  color: #4caf50;
+}
+
+#autofill_detail .form_empty .report-confirmation-message {
+  margin-top: 10px;
+  color: #4caf50;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.4;
+  max-width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#autofill_detail .form_empty .other_report_ways_button {
+  font-size: 14px;
+  color: #a8a8a8;
+  cursor: pointer;
+  position: relative;
+  padding: 0 10px 10px;
+}
+
+#autofill_detail .form_empty .other_report_ways_button.email {
+  margin-top: 20px;
+}
+
+#autofill_detail
+  .form_empty
+  .other_report_ways_button:hover
+  .other_report_ways_dropdown {
+  display: flex;
+}
+
+#autofill_detail .form_empty .other_report_ways_dropdown {
+  display: none;
+  padding: 6px;
+  flex-direction: column;
+  align-items: flex-start;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0px 2px 15px 0px rgba(0, 0, 0, 0.12);
+  position: absolute;
+  top: 80%;
+  left: 56%;
+}
+#autofill_detail .form_empty .other_report_ways_dropdown_option {
+  display: flex;
+  position: relative;
+  padding: 6px 12px;
+  align-items: center;
+  gap: 15px;
+  align-self: stretch;
+  border-radius: 4px;
+  color: #202223;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  text-decoration: none;
+  width: 128px;
+  white-space: nowrap;
+}
+#autofill_detail .form_empty .other_report_ways_dropdown_option:hover {
+  background-color: #efefef;
+}
+/* #autofill_detail .form_empty .other_report_ways_dropdown_option .qrcode img {
+  width: 32px;
+  height: 32px;
+  display: block;
+  margin-top: 5px;
+  transition: transform 0.3s ease;
+} */
+#autofill_detail .form_empty .wechat_option {
+  position: relative;
+  display: none;
+}
+
+#autofill_detail .form_empty .wechat_option .qrcode_popup {
+  display: none;
+  position: absolute;
+  top: 150%;
+  right: -8px;
+  padding: 6px;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+}
+
+#autofill_detail .form_empty .wechat_option:hover .qrcode_popup {
+  display: block;
+}
+
+/* form_empty with error_page_style - 统一错误页面样式 */
+#autofill_detail .form_empty.error_page_style {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 76px;
+  height: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px;
+}
+
+#autofill_detail .form_empty.error_page_style.hide {
+  display: none !important;
+}
+
+#autofill_detail .form_empty.error_page_style .error_wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+#autofill_detail .form_empty.error_page_style .error_wrap img {
+  width: 256px;
+  height: 288px;
+}
+
+#autofill_detail .form_empty.error_page_style .error_wrap h1 {
+  margin-top: 36px;
+  margin-bottom: 12px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+#autofill_detail .form_empty.error_page_style .error_wrap span {
+  color: #a8a8a8;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+/* 统一 error_page 和 error_page_style 的按钮容器样式 - 纵向排列 */
+#autofill_detail .error_page .error_wrap .error_actions,
+#autofill_detail .form_empty.error_page_style .error_actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+  width: 100%;
+}
+
+/* 主按钮 - 蓝色（统一样式） */
+#autofill_detail .error_page .error_wrap .manuallyJD,
+#autofill_detail .form_empty.error_page_style .error_action_btn.fill_by_copy_profile {
+  display: flex;
+  min-width: 140px;
+  width: auto;
+  padding: 10px 20px;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  border-radius: 6px;
+  border: 0.782px solid rgba(0, 0, 0, 0.12);
+  background: #06f;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  margin: 0;
+}
+
+#autofill_detail .error_page .error_wrap .manuallyJD:hover,
+#autofill_detail .form_empty.error_page_style .error_action_btn.fill_by_copy_profile:hover {
+  background: #1d4ed8;
+}
+
+/* 次要按钮 - 白色（统一样式） */
+#autofill_detail .error_page .error_wrap .retryCurrentPage,
+#autofill_detail .form_empty.error_page_style .error_action_btn.just_fill_if_out {
+  display: flex;
+  min-width: 140px;
+  width: auto;
+  padding: 10px 20px;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  border-radius: 6px;
+  border: 1px solid #e4e4e7;
+  background: #fff;
+  color: #09090b;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  margin: 0;
+}
+
+#autofill_detail .error_page .error_wrap .retryCurrentPage:hover,
+#autofill_detail .form_empty.error_page_style .error_action_btn.just_fill_if_out:hover {
+  background: #f4f4f5;
+}
+
+/* Try Autofill candidate chooser. It lives entirely inside the extension Shadow
+ * DOM and summarizes read-only candidate metadata before any form is touched. */
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-chooser {
+  box-sizing: border-box;
+  left: 0;
+  right: 0;
+  width: auto;
+  justify-content: center;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* Keep the visual axis centered even when the chooser needs to scroll. A
+   * single reserved gutter shifts the entire state by half a scrollbar. */
+  scrollbar-gutter: stable both-edges;
+  padding: 28px 24px;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-chooser .error_wrap {
+  justify-content: flex-start;
+  box-sizing: border-box;
+  width: min(100%, 370px);
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-chooser .error_wrap h1 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  max-width: 360px;
+  letter-spacing: -0.018em;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-chooser .error_wrap .jw-body {
+  max-width: 350px;
+  margin: 0 0 18px;
+}
+
+#autofill_detail .jw-try-form-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 0;
+  padding: 0;
+}
+
+#autofill_detail .jw-try-form-option {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: 116px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #fff;
+  color: #18181b;
+  cursor: pointer;
+  text-align: left;
+  box-shadow: 0 1px 2px rgba(24, 24, 27, 0.035), 0 7px 20px rgba(24, 24, 27, 0.035);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease, background 180ms ease;
+}
+
+#autofill_detail .jw-try-form-option-main {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 9px;
+  padding: 20px 68px 20px 20px;
+}
+
+#autofill_detail .jw-try-form-option:hover {
+  border-color: #c8ccda;
+  background: #fdfdff;
+  box-shadow: 0 12px 28px rgba(24, 24, 27, 0.075);
+  transform: translateY(-1px);
+}
+
+#autofill_detail .jw-try-form-option:active {
+  transform: translateY(0) scale(0.992);
+}
+
+#autofill_detail .jw-try-form-option:focus-visible {
+  outline: 3px solid rgba(79, 70, 229, 0.2);
+  outline-offset: 2px;
+  border-color: #6366f1;
+}
+
+#autofill_detail .jw-try-form-option:disabled {
+  cursor: wait;
+  opacity: 0.62;
+  transform: none;
+}
+
+#autofill_detail .jw-try-form-option-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+
+#autofill_detail .jw-try-form-title-block {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#autofill_detail .jw-state-try-chooser .jw-try-form-option-head strong {
+  overflow: hidden;
+  color: #18181b;
+  font-size: 17px;
+  font-weight: 680;
+  line-height: 22px;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#autofill_detail .jw-state-try-chooser .jw-try-form-index {
+  color: #8a8a96;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: .055em;
+  line-height: 14px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+#autofill_detail .jw-state-try-chooser .jw-try-form-context {
+  overflow: hidden;
+  color: #71717a;
+  font-size: 11px;
+  line-height: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#autofill_detail .jw-try-form-brand {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 13px;
+  background: rgba(238, 242, 255, 0.66);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%);
+  transition: opacity 220ms ease, transform 240ms cubic-bezier(.22, 1, .36, 1), background 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+#autofill_detail .jw-try-form-brand img {
+  width: 28px;
+  height: 28px;
+  filter: none;
+  opacity: 0.46;
+  transition: filter 220ms ease, opacity 220ms ease, transform 240ms cubic-bezier(.22, 1, .36, 1);
+}
+
+/* Beat the legacy `.error_wrap img { width:256px; height:288px }` rule. */
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-chooser .error_wrap .jw-try-form-brand img {
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  object-fit: contain;
+}
+
+#autofill_detail .jw-try-form-option:hover .jw-try-form-brand,
+#autofill_detail .jw-try-form-option:focus-visible .jw-try-form-brand {
+  border-color: rgba(99, 102, 241, 0.12);
+  background: rgba(238, 242, 255, 0.82);
+  box-shadow: 0 10px 24px rgba(79, 70, 229, 0.12);
+  opacity: 0.68;
+  transform: translateY(-50%);
+}
+
+#autofill_detail .jw-try-form-option:hover .jw-try-form-brand img,
+#autofill_detail .jw-try-form-option:focus-visible .jw-try-form-brand img {
+  filter: none;
+  opacity: 0.46;
+  transform: none;
+}
+
+#autofill_detail .jw-state-try-chooser .jw-try-form-preview {
+  display: flex;
+  min-width: 0;
+  gap: 0;
+  margin-top: 1px;
+  padding-left: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+#autofill_detail .jw-state-try-chooser .jw-try-form-preview > span {
+  position: relative;
+  overflow: hidden;
+  max-width: 112px;
+  padding: 0 16px 0 0;
+  color: #737582;
+  font-size: 12px;
+  line-height: 17px;
+  text-overflow: ellipsis;
+}
+
+#autofill_detail .jw-state-try-chooser .jw-try-form-preview > span:not(:last-child)::after {
+  position: absolute;
+  top: 7px;
+  right: 6px;
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+  background: #c4c7d0;
+  content: '';
+}
+
+#autofill_detail .jw-state-try-chooser .jw-try-form-preview-empty {
+  color: #a1a1aa;
+  font-size: 11px;
+  line-height: 18px;
+}
+
+#autofill_detail .jw-state-try-chooser button.jw-inline-alt {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  padding: 6px 12px;
+  border: 0;
+  background: transparent;
+  color: #71717a;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  margin-top: 0;
+  text-decoration: none;
+}
+
+#autofill_detail .jw-state-try-chooser .jw-try-chooser-support {
+  height: 34px;
+  min-height: 34px;
+  max-height: 34px;
+  margin-top: 0;
+  padding: 6px 12px;
+  border: 0;
+  background: transparent;
+  color: #4f46e5;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+#autofill_detail .jw-state-try-chooser .jw-try-chooser-actions {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin-top: 12px;
+}
+
+#autofill_detail .jw-state-try-chooser .jw-try-chooser-support:hover {
+  text-decoration: underline;
+}
+
+#autofill_detail .jw-state-try-chooser .jw-try-chooser-support:focus-visible {
+  border-radius: 8px;
+  outline: 3px solid rgba(79, 70, 229, 0.18);
+  outline-offset: 1px;
+}
+
+#autofill_detail .jw-state-try-chooser button.jw-inline-alt:hover {
+  color: #3f3f46;
+  text-decoration: underline;
+}
+
+#autofill_detail .jw-state-try-chooser button.jw-inline-alt:focus-visible {
+  border-radius: 8px;
+  outline: 3px solid rgba(37, 99, 235, 0.2);
+  outline-offset: 2px;
+}
+
+/* track.css loads after apply.css and intentionally styles the direct empty-
+ * state body span. Its legacy descendant selector must not inflate every span
+ * inside a chooser card. Keep this selector more specific than that rule. */
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-chooser .error_wrap .jw-try-form-option span {
+  margin: 0;
+  text-align: left;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-chooser .error_wrap .jw-try-form-index {
+  color: #8a8a96;
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 14px;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-chooser .error_wrap .jw-try-form-context {
+  color: #71717a;
+  font-size: 11px;
+  line-height: 15px;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-chooser .error_wrap .jw-try-form-preview > span {
+  color: #737582;
+  font-size: 12px;
+  line-height: 17px;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-chooser .error_wrap .jw-try-form-preview-empty {
+  color: #a1a1aa;
+  font-size: 11px;
+  line-height: 18px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #autofill_detail .jw-try-form-option,
+  #autofill_detail .jw-try-form-brand,
+  #autofill_detail .jw-try-form-brand img {
+    transition: none;
+  }
+
+  #autofill_detail .jw-try-form-option:hover,
+  #autofill_detail .jw-try-form-option:active {
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  #autofill_detail .jw-try-form-option,
+  #autofill_detail .jw-try-form-option:focus-visible {
+    border: 1px solid ButtonText;
+  }
+}
+
+@media (max-height: 680px) {
+  #autofill_detail .form_empty.error_page_style.error_page.jw-state-try-chooser {
+    justify-content: flex-start;
+    padding: 18px 16px 14px;
+  }
+
+  #autofill_detail .form_empty.error_page_style.error_page.jw-state-try-chooser .error_wrap {
+    margin: 0 auto;
+    padding: 0 0 16px;
+  }
+
+  #autofill_detail .jw-try-form-list {
+    gap: 8px;
+  }
+
+  #autofill_detail .jw-try-form-option {
+    min-height: 88px;
+  }
+
+  #autofill_detail .jw-try-form-option-main {
+    padding-top: 12px;
+    padding-bottom: 11px;
+  }
+}
+
+@container jw-autofill-panel (max-width: 410px) {
+  #autofill_detail .form_empty.error_page_style.error_page.jw-state-try-chooser {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+
+  #autofill_detail .jw-try-form-list {
+    padding-right: 3px;
+    padding-left: 3px;
+  }
+
+  #autofill_detail .jw-try-form-option-main {
+    padding-right: 68px;
+    padding-left: 14px;
+  }
+
+  #autofill_detail .jw-state-try-chooser .jw-try-form-preview > span {
+    max-width: 88px;
+  }
+}
+
+/* Pre-consent Autofill opportunity. Candidate discovery is passive; this panel is
+ * shown only when the current page already has a hard-eligible form surface. */
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-opportunity {
+  box-sizing: border-box;
+  left: 0;
+  right: 0;
+  width: auto;
+  justify-content: center;
+  padding: 28px 24px;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-opportunity .error_wrap {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  align-self: center;
+  margin: 0 auto;
+  text-align: center;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-opportunity .error_wrap h1 {
+  max-width: 330px;
+  margin: 0 auto 10px;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-opportunity .error_wrap .jw-body {
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto 22px;
+  text-align: center;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-opportunity .error_actions {
+  align-self: stretch;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  gap: 8px;
+}
+
+#autofill_detail .jw-state-try-opportunity .jw-try-state-emblem,
+#autofill_detail .jw-state-try-chooser .jw-try-state-emblem {
+  width: 52px;
+  height: 52px;
+  margin-bottom: 16px;
+  border-radius: 15px;
+  font-size: 23px;
+  overflow: hidden;
+}
+
+#autofill_detail .jw-state-try-chooser .jw-try-chooser-emblem {
+  width: 44px;
+  height: 44px;
+  margin-bottom: 16px;
+  border-radius: 14px;
+  font-size: 20px;
+  box-shadow: 0 8px 24px rgba(48, 96, 224, 0.1);
+}
+
+/* Use the existing Autofill product icon rather than a platform-dependent emoji. */
+#autofill_detail .form_empty.error_page_style.error_page.jw-apply-state .error_wrap img.jw-try-state-icon {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  object-fit: contain;
+  opacity: 0.58;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-empty {
+  box-sizing: border-box;
+  left: 0;
+  right: 0;
+  width: auto;
+  justify-content: center;
+  padding: 28px 24px;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-empty .error_wrap {
+  width: min(100%, 340px);
+  margin: 0 auto;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-opportunity .error_action_btn.just_fill_if_out.jw-solid {
+  width: 100%;
+  max-width: none;
+  border-color: #0b66ff;
+  background: #0b66ff;
+  color: #fff;
+  font-weight: 600;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-opportunity .error_action_btn.just_fill_if_out.jw-solid:hover {
+  border-color: #0059e6;
+  background: #0059e6;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-opportunity .jw-support-secondary {
+  display: flex;
+  width: 100%;
+  max-width: none;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border: 1px solid #d4d4d8;
+  border-radius: 12px;
+  background: #fff;
+  color: #27272a;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 550;
+  line-height: 20px;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-opportunity .jw-support-secondary:hover {
+  border-color: #a1a1aa;
+  background: #fafafa;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-opportunity button.jw-inline-alt {
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 0;
+  background: transparent;
+  color: #71717a;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-opportunity button.jw-inline-alt:hover {
+  color: #3f3f46;
+  text-decoration: underline;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page.jw-state-try-opportunity button.jw-inline-alt:focus-visible {
+  border-radius: 8px;
+  outline: 3px solid rgba(37, 99, 235, 0.2);
+  outline-offset: 2px;
+}
+
+#autofill_detail .jw-request-site-support.jw-support-request-loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  cursor: wait;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+#autofill_detail .jw-support-button-spinner {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  margin: 0;
+  object-fit: contain;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page .error_wrap img.jw-support-button-spinner {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}
+
+#autofill_detail .form_empty.error_page_style.error_page .error_wrap .jw-request-site-support > span {
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+}
+
+#autofill_detail .jw-state-try-opportunity .jw-request-site-support,
+#autofill_detail .jw-state-try-chooser .jw-request-site-support {
+  box-sizing: border-box;
+  max-height: 44px;
+  white-space: nowrap;
+}
+
+@media (max-height: 680px) {
+  #autofill_detail .form_empty.error_page_style.error_page.jw-state-try-opportunity {
+    padding: 20px 18px 16px;
+  }
+}
+
+#autofill_detail .just_fill_if_out:disabled,
+#autofill_detail .jw-try-form-option[aria-busy="true"] {
+  pointer-events: none;
+}
+
+#autofill_detail .jw-site-support-receipt {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 20px;
+  color: #1b2438;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* Page-owned support receipt. It overlays only the content pane, so the
+ * sidebar remains product navigation and Back can restore the exact underlying
+ * terminal/form state without re-running a request. */
+#autofill_detail .jw-support-page-layer {
+  position: absolute;
+  z-index: 9000;
+  inset: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  padding: 48px 24px 24px;
+  background: #fff;
+  color: #15191f;
+}
+
+#autofill_detail .jw-support-page-back {
+  position: absolute;
+  top: 8px;
+  left: 4px;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #657080;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 650;
+  cursor: pointer;
+}
+#autofill_detail .jw-support-page-back:hover { background: #f2f4f7; color: #303946; }
+#autofill_detail .jw-support-page-back img { width: 16px; height: 16px; opacity: .7; }
+
+#autofill_detail .jw-support-page-content {
+  width: min(430px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+#autofill_detail .jw-support-page-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  box-sizing: border-box;
+  margin-bottom: 18px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+#autofill_detail .jw-support-page-chip.is-success { background: #ecf9f2; color: #177149; }
+#autofill_detail .jw-support-page-chip.is-priority { background: #fff7e9; color: #996611; }
+#autofill_detail .jw-support-page-visual {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+  border-radius: 16px;
+  background: #e8f7ef;
+  box-shadow: 0 4px 14px rgba(20, 30, 50, .07);
+}
+#autofill_detail .jw-support-page-visual.is-priority { background: #fff4df; }
+#autofill_detail .jw-support-page-visual img { width: 24px; height: 24px; object-fit: contain; }
+#autofill_detail .jw-support-page-content h2 {
+  max-width: 420px;
+  margin: 0;
+  color: #15191f;
+  font-size: 20px;
+  line-height: 1.25;
+  letter-spacing: -.01em;
+  font-weight: 600;
+  text-align: center;
+}
+#autofill_detail .jw-support-page-content > p:not(.jw-support-page-promise) {
+  max-width: 395px;
+  margin: 10px 0 0;
+  color: #687383;
+  font-size: 14px;
+  line-height: 1.55;
+}
+#autofill_detail .jw-support-page-layer .jw-support-receipt-host {
+  max-width: 100%;
+  margin-top: 12px;
+}
+#autofill_detail .jw-support-page-queue {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 22px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border: 1px solid #dfe8f6;
+  border-radius: 14px;
+  background: #f5f9ff;
+  color: #50709d;
+  text-align: left;
+}
+#autofill_detail .jw-support-page-queue.is-priority { border-color: #ead9b6; background: #fffaf1; color: #9a6a18; }
+#autofill_detail .jw-support-page-queue > div { display: flex; flex-direction: column; gap: 4px; }
+#autofill_detail .jw-support-page-queue span { color: #7c8693; font-size: 11px; font-weight: 700; letter-spacing: .055em; text-transform: uppercase; }
+#autofill_detail .jw-support-page-queue strong { color: #234f86; font-size: 17px; }
+#autofill_detail .jw-support-page-queue.is-priority strong { color: #8b5c0f; }
+#autofill_detail .jw-support-page-queue > img { width: 21px; height: 21px; object-fit: contain; }
+#autofill_detail .jw-support-page-promise { max-width: 380px; margin: 10px 0 0; color: #626d7b; font-size: 12px; line-height: 1.5; }
+#autofill_detail .jw-support-page-actions { width: 100%; margin-top: 20px; }
+#autofill_detail .jw-support-page-upgrade {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 17px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #ff0080 0%, #7928ca 28%, #0070f3 68%, #38bdf8 100%);
+  background-size: 200% 100%;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 720;
+  cursor: pointer;
+  box-shadow: 0 9px 24px rgba(83, 78, 221, .24);
+  animation: jwAurora 6s ease-in-out infinite;
+}
+#autofill_detail .jw-support-page-upgrade img { width: 17px; height: 17px; filter: brightness(0) invert(1); }
+
+/* Priority picker is deliberately the only modal in this journey. The receipt
+ * remains visible beneath it, and dismissing the picker returns to that receipt. */
+#autofill_detail .jw-support-priority-modal { box-sizing: border-box; padding: 16px; background: rgba(31, 42, 61, .42); backdrop-filter: blur(3px); }
+#autofill_detail .jw-support-priority-modal .modal-content { width: min(390px, calc(100% - 8px)); max-width: 390px; box-sizing: border-box; gap: 0; padding: 28px; border: 0; border-radius: 18px; box-shadow: 0 26px 72px rgba(22, 32, 52, .24); }
+#autofill_detail .jw-support-priority-modal .modal-close { top: 12px; right: 12px; width: 36px; height: 36px; display: grid; place-items: center; padding: 0; border-radius: 10px; }
+#autofill_detail .jw-support-priority-modal .modal-header { flex-direction: column; gap: 14px; padding: 0 28px; text-align: center; }
+#autofill_detail .jw-support-priority-modal .modal-img { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 50%; background: #edf3ff; }
+#autofill_detail .jw-support-priority-sparkle { width: 22px; height: 22px; object-fit: contain; }
+#autofill_detail .jw-support-priority-modal .modal-title { color: #131d34; font-size: 22px; font-weight: 760; letter-spacing: -.035em; line-height: 1.15; text-align: center; }
+#autofill_detail .jw-support-priority-modal .modal-body { margin-top: 12px; }
+#autofill_detail .jw-support-priority-intro { margin: 0; color: #66718a; font-size: 13px; line-height: 20px; text-align: center; }
+#autofill_detail .jw-support-priority-modal .modal-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+#autofill_detail .jw-support-priority-modal .modal-button.confirm,
+#autofill_detail .jw-support-priority-modal .modal-button.second {
+  width: 100%;
+  min-height: 74px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px 16px;
+  border: 1px solid #e2e5eb;
+  border-radius: 13px;
+  background: #fff;
+  color: #1b2438;
+  text-align: left;
+  box-shadow: none;
+}
+#autofill_detail .jw-support-priority-modal .modal-button.confirm:hover,
+#autofill_detail .jw-support-priority-modal .modal-button.second:hover { border-color: #9bbcff; background: #f7faff; transform: translateY(-1px); }
+#autofill_detail .jw-support-priority-modal .modal-button:has(.is-ultra) { border-color: #ecd38e; background: #fffcf3; }
+#autofill_detail .jw-support-priority-option-copy { display: flex; flex-direction: column; gap: 3px; }
+#autofill_detail .jw-support-priority-option-copy strong { color: #1b2438; font-size: 16px; }
+#autofill_detail .jw-support-priority-option-copy small { color: #858e9b; font-size: 11px; font-weight: 500; }
+#autofill_detail .jw-support-priority-modal .modal-button > b { color: #2d66ca; font-size: 12px; }
+#autofill_detail .jw-support-priority-modal .modal-button:has(.is-ultra) > b { color: #92620b; }
+
+@container jw-autofill-panel (max-width: 400px) {
+  #autofill_detail .jw-support-page-layer { padding: 44px 20px 22px; }
+}
+
+#autofill_detail .jw-support-receipt-host {
+  overflow: hidden;
+  color: #66718a;
+  font-size: 12px;
+  font-weight: 450;
+  line-height: 22px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#autofill_detail .jw-support-queue-card {
+  padding: 14px;
+  border: 1px solid #dce3f0;
+  border-radius: 10px;
+  background: #f8faff;
+  box-shadow: 0 1px 2px rgba(35, 49, 78, 0.02);
+  text-align: left;
+}
+
+#autofill_detail .jw-support-queue-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+#autofill_detail .jw-support-queue-head > strong {
+  color: #192238;
+  font-size: 14px;
+  font-weight: 720;
+  letter-spacing: -0.012em;
+  line-height: 22px;
+}
+
+#autofill_detail .jw-support-queue-head > span {
+  flex: 0 0 auto;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #e9edf5;
+  color: #6e7991;
+  font-size: 11px;
+  font-weight: 760;
+  letter-spacing: .035em;
+  line-height: 16px;
+  text-transform: uppercase;
+}
+
+#autofill_detail .jw-site-support-receipt[data-plan="plus"] .jw-support-queue-head > span {
+  background: #eef0ff;
+  color: #5264c9;
+}
+
+#autofill_detail .jw-site-support-receipt[data-plan="pro"] .jw-support-queue-head > span {
+  background: #fff2cc;
+  color: #92620b;
+}
+
+#autofill_detail .jw-support-eta {
+  margin-top: 8px;
+  color: #4f5d77;
+  font-size: 13px;
+  line-height: 19px;
+}
+
+#autofill_detail .jw-support-eta strong {
+  color: inherit;
+  font-weight: 520;
+}
+
+#autofill_detail .jw-support-upgrade-section {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #dce3f0;
+}
+
+#autofill_detail .jw-support-upgrade-heading {
+  margin-bottom: 10px;
+  color: #69748c;
+  font-size: 13px;
+  line-height: 19px;
+}
+
+#autofill_detail .jw-support-plan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#autofill_detail .jw-support-plan-row {
+  display: flex;
+  min-height: 50px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: #fff;
+}
+
+/* Static Aurora is intentionally restrained to the Plus outline. The card
+ * interior and all CTAs remain calm, solid surfaces. */
+#autofill_detail .jw-support-plan-row.is-plus {
+  border-color: transparent;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(112deg, rgba(112, 140, 255, .48), rgba(188, 120, 229, .38), rgba(82, 202, 219, .42)) border-box;
+}
+
+#autofill_detail .jw-support-plan-row.is-pro {
+  border-color: #ecd38e;
+  background: #fffcf3;
+}
+
+#autofill_detail .jw-support-plan-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+#autofill_detail .jw-support-plan-name {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #192238;
+  font-size: 14px;
+  font-weight: 730;
+  line-height: 19px;
+}
+
+#autofill_detail .jw-support-plan-copy > span {
+  color: #98a3b8;
+  font-size: 11px;
+  line-height: 16px;
+}
+
+#autofill_detail .jw-support-plan-row > strong {
+  flex: 0 0 auto;
+  color: #315bea;
+  font-size: 13px;
+  font-weight: 720;
+  letter-spacing: -0.01em;
+  line-height: 20px;
+}
+
+#autofill_detail .jw-support-plan-row.is-pro > strong {
+  color: #92620b;
+}
+
+#autofill_detail .jw-support-plan-badge {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #edf0ff;
+  color: #7e88a5;
+  font-size: 9px;
+  font-weight: 760;
+  letter-spacing: .035em;
+  line-height: 14px;
+  text-transform: uppercase;
+}
+
+#autofill_detail .jw-support-plan-badge.is-pro {
+  background: #fff0bd;
+  color: #90640f;
+}
+
+#autofill_detail .jw-support-ack-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid #dce3f0;
+  border-radius: 10px;
+  background: #f8faff;
+  text-align: left;
+}
+
+#autofill_detail .jw-support-ack-card strong {
+  color: #192238;
+  font-size: 16px;
+  font-weight: 720;
+}
+
+#autofill_detail .jw-support-ack-card span {
+  color: #66718a;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+/* Mount this receipt inside .main_content_warp so it is centered in the actual
+ * product pane rather than across the pane plus the 66px sidebar rail. */
+#autofill_detail .jw-site-support-modal {
+  box-sizing: border-box;
+  padding: 16px;
+  background: rgba(31, 42, 61, 0.42);
+  backdrop-filter: blur(3px);
+}
+
+#autofill_detail .jw-site-support-modal .modal-content {
+  width: min(344px, calc(100% - 8px));
+  max-width: 344px;
+  max-height: calc(100% - 20px);
+  overflow: auto;
+  box-sizing: border-box;
+  gap: 0;
+  padding: 24px;
+  border: 0;
+  border-radius: 14px;
+  box-shadow: 0 26px 72px rgba(22, 32, 52, 0.24);
+  animation: jw-site-support-modal-in 320ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+#autofill_detail .jw-site-support-modal .modal-close {
+  top: 12px;
+  right: 12px;
+  display: none;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 20px;
+}
+
+#autofill_detail .jw-site-support-modal .modal-close:hover {
+  background: #f4f4f5;
+}
+
+#autofill_detail .jw-site-support-modal .modal-header {
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 30px;
+}
+
+#autofill_detail .jw-site-support-modal .modal-img {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  flex: 0 0 42px;
+  border-radius: 50%;
+  background: #e5f8f0;
+}
+
+#autofill_detail .jw-site-support-check {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  animation: jw-site-support-check-in 420ms cubic-bezier(.34, 1.56, .64, 1) 100ms both;
+}
+
+#autofill_detail .jw-site-support-modal .modal-img img.jw-site-support-check {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+}
+
+#autofill_detail .jw-site-support-modal .modal-title {
+  color: #131d34;
+  font-size: 20px;
+  font-weight: 760;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  text-align: center;
+}
+
+#autofill_detail .jw-site-support-modal .modal-body {
+  margin: 8px 0 0;
+  text-align: left;
+}
+
+#autofill_detail .jw-site-support-modal .modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 18px;
+}
+
+#autofill_detail .jw-site-support-modal .modal-button {
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: transform 160ms ease, background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+#autofill_detail .jw-site-support-modal .modal-button.confirm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  text-align: center;
+  background: #315bea;
+  box-shadow: 0 8px 20px rgba(49, 91, 234, 0.2);
+}
+
+#autofill_detail .jw-site-support-modal .modal-button.confirm:hover {
+  background: #284fd6;
+  box-shadow: 0 10px 24px rgba(49, 91, 234, 0.25);
+  transform: translateY(-1px);
+}
+
+#autofill_detail .jw-site-support-modal .modal-button.cancel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 1px solid #d7deeb;
+  background: #fff;
+  color: #455168;
+}
+
+#autofill_detail .jw-site-support-modal .modal-button.cancel:hover {
+  border-color: #c4cede;
+  background: #f8faff;
+  color: #303b51;
+}
+
+#autofill_detail .jw-site-support-modal .modal-button:active {
+  transform: scale(.98);
+}
+
+@keyframes jw-site-support-modal-in {
+  from { opacity: 0; transform: translateY(10px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes jw-site-support-check-in {
+  from { opacity: 0; transform: scale(.55) rotate(-12deg); }
+  to { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #autofill_detail .jw-support-button-spinner,
+  #autofill_detail .jw-site-support-check,
+  #autofill_detail .jw-site-support-modal .modal-content {
+    animation: none;
+  }
+}
+
+#autofill_detail .form_empty.error_page_style .report_support_wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* 最弱按钮 - 纯文本（统一样式） */
+#autofill_detail .error_page .error_wrap .analyzeCurrentPage,
+#autofill_detail .form_empty.error_page_style .report_support_text {
+  font-size: 14px;
+  line-height: 20px;
+  color: #a8a8a8;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+  text-align: center;
+  font-weight: 400;
+  margin: 0;
+}
+
+#autofill_detail .error_page .error_wrap .analyzeCurrentPage:hover,
+#autofill_detail .form_empty.error_page_style .report_support_text:hover {
+  color: #7b7b7c;
+}
+
+#autofill_detail .form_empty.error_page_style .report_support_wrapper .other_report_ways {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 8px;
+  z-index: 1000;
+  /* 添加 padding 区域，防止鼠标移出去时 dropdown 消失 */
+  padding-top: 8px;
+}
+
+#autofill_detail .form_empty.error_page_style .report_support_wrapper .other_report_ways::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 8px;
+}
+
+#autofill_detail .form_empty.error_page_style .report_support_wrapper .other_report_ways_dropdown {
+  display: none;
+  padding: 6px;
+  flex-direction: column;
+  align-items: flex-start;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0px 2px 15px 0px rgba(0, 0, 0, 0.12);
+  min-width: 160px;
+}
+
+#autofill_detail .form_empty.error_page_style .report_support_wrapper.active .other_report_ways_dropdown {
+  display: flex;
+}
+
+#autofill_detail .form_empty.error_page_style .report_support_wrapper .other_report_ways_dropdown_option {
+  display: flex;
+  position: relative;
+  padding: 10px 16px;
+  align-items: center;
+  gap: 15px;
+  align-self: stretch;
+  border-radius: 4px;
+  color: #202223;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  text-decoration: none;
+  width: 100%;
+  white-space: nowrap;
+}
+
+#autofill_detail .form_empty.error_page_style .report_support_wrapper .other_report_ways_dropdown_option:hover {
+  background-color: #efefef;
+}
+
+#autofill_detail .form_empty.error_page_style .report_support_wrapper .other_report_ways_dropdown_option.report_bug_option {
+  color: #202223;
+}
+
+#autofill_detail .form_empty.error_page_style .report_support_wrapper .wechat_option {
+  display: flex;
+  position: relative;
+}
+
+/* WeChat QR Code Mask */
+#autofill_detail .wechat_qrcode_mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  z-index: 10001;
+  pointer-events: auto;
+}
+
+#autofill_detail .wechat_qrcode_modal {
+  position: relative;
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  max-width: 90%;
+  max-height: 90%;
+  z-index: 10002;
+  min-width: 250px;
+  width: auto;
+  height: auto;
+  visibility: visible !important;
+  opacity: 1 !important;
+  flex-shrink: 0;
+}
+
+#autofill_detail .wechat_qrcode_close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+#autofill_detail .wechat_qrcode_close:hover {
+  background: #f0f0f0;
+}
+
+#autofill_detail .wechat_qrcode_title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+#autofill_detail .wechat_qrcode_image {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+}
+
+/* question item end */
+
+/* review page */
+#autofill_detail .review_page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  gap: 24px;
+}
+#autofill_detail .review_page_content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+#autofill_detail .review_page_header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+#autofill_detail .review_page_header_img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: rgb(76, 175, 80, 0.1);
+  border-radius: 50%;
+} 
+#autofill_detail .review_page_header_img img {
+  width: 32px;
+  height: 32px;
+}
+#autofill_detail .review_page_header_title {
+  font-size: 20px;
+  font-weight: 500;
+  text-align: center;
+  color: #202223;
+}
+#autofill_detail .review_page_desc {
+  font-size: 14px;
+  font-weight: 400;
+  color: rgb(32, 34, 35, 0.7);
+  text-align: center;
+}
+#autofill_detail .review_page_button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 46px;
+  gap: 8px;
+  border-radius: 6px;
+  background: #4CAF50;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+#autofill_detail .review_page_button:hover {
+  background: #31a335;
+}
+#autofill_detail .review_page_button:hover .review_page_button_img {
+  animation: moveAndDisappear 1s forwards;
+}
+
+#autofill_detail .review_page_button_text {
+  font-size: 16px;
+  font-weight: 400;
+  color: #ffffff;
+  text-align: center;
+}
+#autofill_detail .review_page_button_img img {
+  width: 16px;
+  height: 16px;
+}
+/* 动画定义 */
+@keyframes gradientMove {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@keyframes waveMove {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 40px 0;
+  }
+}
+/* Apply collection loading: use the same chip / emblem / title / body grammar as
+   This-isn't-a-form and Ready-to-Easy-Apply. The document scan is the only
+   repeating motion in the takeover state, so the panel stays calm and stable. */
+#autofill_detail .jw-apply-state.jw-state-detecting.form_empty.error_page_style.error_page .error_wrap .jw-body {
+  max-width: 270px;
+  margin-bottom: 0;
+}
+#autofill_detail .jw-state-detecting .jw-collection-loading-emblem {
+  color: #3060e0;
+}
+#autofill_detail .jw-state-detecting .jw-collection-loading-visual {
+  display: block;
+  width: 30px;
+  height: 30px;
+  overflow: visible;
+}
+#autofill_detail .jw-state-awaiting-action .jw-collection-awaiting-status {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+}
+#autofill_detail .jw-state-awaiting-action.form_empty.error_page_style.error_page .error_wrap .error_actions {
+  width: auto;
+  align-items: center;
+}
+#autofill_detail .jw-state-detecting .jw-collection-scan-line {
+  transform-origin: center;
+  animation: jwCollectionScan 1.8s cubic-bezier(.4, 0, .2, 1) infinite;
+}
+@keyframes jwCollectionScan {
+  0%, 12% { transform: translateY(0); opacity: 0; }
+  24% { opacity: 1; }
+  76% { opacity: 1; }
+  88%, 100% { transform: translateY(12px); opacity: 0; }
+}
+/* Enrichment inspects additional content without moving the surrounding card. */
+#autofill_detail .jw-state-detecting .jw-collection-search-lens {
+  animation: jwCollectionSearch 2.6s ease-in-out infinite;
+}
+@keyframes jwCollectionSearch {
+  0%, 100% { transform: translate(-1px, 1px); }
+  50% { transform: translate(1px, -1px); }
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* LinkedIn collection lifecycle: the first 300ms is intentionally silent;
+   partial snapshots keep real rows visible and add one quiet, keyed tail. */
+#autofill_detail .jw-collection-grace {
+  min-height: 260px;
+}
+#autofill_detail .jw-collection-indicator {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+  box-sizing: border-box;
+  gap: 11px;
+  margin: 8px 18px 12px;
+  padding: 9px 11px;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  color: #667085;
+  background: #F7F8FA;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.035);
+  font-size: 13px;
+  line-height: 18px;
+}
+#autofill_detail .jw-collection-checking-icon {
+  position: relative;
+  display: grid;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid #E1E4E9;
+  border-radius: 10px;
+  color: #7A8494;
+  background: #EEF0F3;
+}
+#autofill_detail .jw-collection-checking-icon svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+#autofill_detail .jw-collection-checking-dot {
+  transform-origin: 14.75px 5.25px;
+  animation: jwCollectionCheckingPulse 1.8s ease-in-out infinite;
+}
+#autofill_detail .jw-collection-checking-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 1px;
+}
+#autofill_detail .jw-collection-checking-copy strong {
+  color: #4B5565;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+}
+#autofill_detail .jw-collection-checking-copy > span {
+  color: #7A8494;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 17px;
+}
+#autofill_detail .jw-collection-awaiting-tail {
+  border-color: #E7E8EB;
+  background: #F8F8F9;
+  box-shadow: none;
+}
+#autofill_detail .jw-collection-awaiting-tail .jw-collection-checking-copy {
+  flex: 1 1 auto;
+}
+#autofill_detail .jw-collection-awaiting-action-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#autofill_detail .jw-state-awaiting-action .jw-collection-awaiting-action-group {
+  width: 100%;
+}
+#autofill_detail .jw-state-awaiting-action .jw-collection-awaiting-action-group .jw-linkedin-awaiting-action {
+  flex: 1 1 0;
+}
+#autofill_detail .jw-collection-awaiting-tail-icon {
+  color: #737B88;
+  background: #F0F1F3;
+}
+#autofill_detail .jw-linkedin-awaiting-action {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 9px 15px;
+  border: 1px solid #D8E5FA;
+  border-radius: 10px;
+  color: #145FC4;
+  background: #F4F8FF;
+  font-family: var(--jobwizard-font-family);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color .16s ease, background .16s ease, color .16s ease;
+}
+#autofill_detail .jw-linkedin-awaiting-action:hover {
+  border-color: #BFD4F5;
+  background: #EAF2FF;
+}
+#autofill_detail .jw-linkedin-awaiting-action:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, .22);
+  outline-offset: 2px;
+}
+#autofill_detail .jw-linkedin-awaiting-action:disabled,
+#autofill_detail .jw-linkedin-awaiting-action.jw-cta-busy {
+  opacity: .62;
+  pointer-events: none;
+}
+#autofill_detail .jw-collection-awaiting-action-compact {
+  min-height: 32px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #FFFFFF;
+}
+@keyframes jwCollectionCheckingPulse {
+  0%, 100% { transform: scale(.72); opacity: .42; }
+  50% { transform: scale(1); opacity: .92; }
+}
+#autofill_detail .jw-collection-indicator .spinner {
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #D5DAE2;
+  border-top-color: #667085;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+#autofill_detail .jw-collection-warning {
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  color: var(--jw-chip-c, #8a5614);
+  background: var(--jw-chip-bg, rgba(199, 125, 46, 0.1));
+}
+#autofill_detail .jw-collection-warning > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+#autofill_detail .jw-collection-warning strong {
+  color: #7c4810;
+  font-size: 12px;
+  font-weight: 600;
+}
+#autofill_detail .jw-collection-warning button {
+  flex: 0 0 auto;
+  padding: 5px 9px;
+  border: 1px solid rgba(138, 86, 20, 0.16);
+  border-radius: 8px;
+  background: #fff;
+  color: #8a5614;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+#autofill_detail .jw-collection-warning button:hover {
+  background: rgba(255, 255, 255, 0.72);
+}
+#autofill_detail .jw-collection-warning button:focus-visible {
+  outline: 2px solid #0a66c2;
+  outline-offset: 2px;
+}
+#autofill_detail .jw-collection-warning button:disabled {
+  cursor: wait;
+  opacity: 0.58;
+}
+#autofill_detail .jw-collection-terminal-emblem {
+  font-weight: 650;
+}
+#autofill_detail .jw-collection-terminal-icon {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+#autofill_detail .form_empty.error_page_style.error_page.jw-apply-state .error_wrap .jw-collection-terminal-emblem > .jw-collection-terminal-icon {
+  width: 24px;
+  height: 24px;
+  max-width: 24px;
+  max-height: 24px;
+  object-fit: contain;
+}
+#autofill_detail .jw-collection-awaiting-emblem {
+  color: #667085;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #autofill_detail .jw-state-detecting,
+  #autofill_detail .jw-state-detecting .es-chip,
+  #autofill_detail .jw-state-detecting .es-emblem,
+  #autofill_detail .jw-collection-indicator,
+  #autofill_detail .jw-collection-checking-dot,
+  #autofill_detail .jw-collection-terminal-emblem,
+  #autofill_detail .jw-state-timeout,
+  #autofill_detail .jw-state-timeout *,
+  #autofill_detail .jw-state-error,
+  #autofill_detail .jw-state-error *,
+  #autofill_detail .jw-state-empty,
+  #autofill_detail .jw-state-empty * {
+    animation: none !important;
+    transition: none !important;
+  }
+  #autofill_detail .jw-state-detecting .jw-collection-scan-line,
+  #autofill_detail .jw-state-detecting .jw-collection-search-lens,
+  #autofill_detail .jw-collection-indicator .spinner {
+    animation: none !important;
+  }
+}
+/* Emoji居中显示动画 */
+@keyframes emojiCenter {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Emoji向左移动动画 */
+@keyframes emojiMoveLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100px);  /* 增加移动距离 */
+  }
+}
+
+/* Emoji向右移动动画 */
+@keyframes emojiMoveRight {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100px);  /* 增加移动距离 */
+  }
+}
+
+/* 文字滑入动画 */
+@keyframes textSlideUp {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 淡出动画 */
+@keyframes emojiFadeOut {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes textFadeOut {
+  to {
+    opacity: 0;
+  }
+}
+
+/* 波浪移动动画 */
+@keyframes waveMove {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 80px 0;  /* 调整移动距离 */
+  }
+}
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0% 0;
+  }
+}
+
+@keyframes SlideIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 20px) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+@keyframes SlideOut {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 20px) scale(0.9);
+  }
+}
+@keyframes moveAndDisappear {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* switch component */
+#switch_component.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+#switch_component .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+#switch_component .slider:before {
+  position: absolute;
+  content: '';
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+#switch_component input:checked + .slider {
+  background-color: #2196f3;
+}
+
+#switch_component input:focus + .slider {
+  box-shadow: 0 0 1px #2196f3;
+}
+
+#switch_component input:checked + .slider:before {
+  transform: translateX(26px);
+}
+#switch_component {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+#switch_component input:checked + .slider:before {
+  transform: translateX(16px);
+}
+#switch_component {
+  width: 40px;
+  height: 24px;
+}
+
+#switch_component .slider:before {
+  height: 16px;
+  width: 16px;
+}
+#switch_component input:checked + .slider:before {
+  transform: translateX(16px);
+}
+/* 动画效果 */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(33, 150, 243, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
+  }
+}
+
+#switch_component input:checked + .slider.pulse:before {
+  animation: pulse 1.5s infinite;
+}
+
+#autofill_detail .autofill_setting {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  background-color: #cccccc;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#autofill_detail .autofill_setting:hover:not(:has(.autofill_setting_dropdown:hover)) {
+  background-color: #bdbdbd;
+}
+
+#autofill_detail .autofill_setting img {
+  width: 20px;
+  height: 20px;
+}
+
+/* 下拉菜单容器 */
+
+#autofill_detail .autofill_setting_dropdown {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 12px;
+  z-index: 1000;
+  min-width: 230px;
+  margin-top: 5px;
+  animation: dropdownFadeIn 0.2s ease;
+}
+
+/* 设置区块 */
+
+#autofill_detail .autofill_setting_dropdown .setting-header {
+  display: flex;
+  font-size: 14px;
+  font-weight: 600;
+  color: #09090b;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 10px;
+}
+
+#autofill_detail .autofill_setting_dropdown .section-divider {
+  width: 100%;
+  height: 1px;
+  background-color: #f4f4f5;
+  margin: 2px 0;
+}
+
+
+
+#autofill_detail .autofill_setting_dropdown .setting-section {
+  padding: 8px 0 0 0;
+}
+
+
+#autofill_detail .autofill_setting_dropdown .setting-section:last-child {
+  margin-bottom: 0;
+}
+
+/* 区块标题 */
+#autofill_detail .autofill_setting_dropdown .section-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #09090b;
+  margin-bottom: 3px;
+  padding-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 设置项 */
+/* 设置项容器 */
+#autofill_detail .autofill_setting_dropdown .setting-item {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* 设置项内容（包含 radio 和 text） */
+#autofill_detail .autofill_setting_dropdown .setting-item-content {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+/* 设置项文字部分（包含 label 和 desc） */
+#autofill_detail .autofill_setting_dropdown .setting-item-content-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* 设置项描述 */
+#autofill_detail .autofill_setting_dropdown .setting-item-desc {
+  font-size: 12px;
+  font-weight: 400;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+#autofill_detail .autofill_setting_dropdown .setting-item:hover {
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+/* 单选框样式 */
+#autofill_detail .autofill_setting_dropdown .setting-item input[type="radio"] {
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+/* 标签样式 */
+#autofill_detail .autofill_setting_dropdown .setting-item label {
+  font-size: 14px;
+  color: #09090b;
+  font-weight: 400;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* 下拉菜单动画 */
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 选中状态样式 */
+#autofill_detail .autofill_setting_dropdown .setting-item input[type="radio"]:checked + label {
+  color: #1a73e8;
+  font-weight: 500;
+}
+
+/* 设置项激活状态 */
+#autofill_detail .autofill_setting_dropdown .setting-item:active {
+  background: #e8e8e8;
+}
+
+/* Settings panel styles moved to sidebar.css (personal_card_warp scope) */
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * Phase E3 + E-Fix1 (2026-05-13): panel-side Jump highlight.
+ *
+ * When the banner's Jump CTA is clicked, onCtaClick (js/main.js) scrolls the
+ * target question_item into view and adds .jw-question-pulse. The cue points
+ * the user at "this is the field the banner was nagging you about".
+ *
+ * E-Fix1 redesign (Chen feedback: previous fill+border combo felt heavy and
+ * out of step with the plugin's "精致大气" tone):
+ *   - Removed background-color fill — the row keeps its native paper-white
+ *     surface so the eye doesn't lock onto a swatch of orange.
+ *   - Switched inset border to OUTER box-shadow glow. No layout shift; the
+ *     glow extends past the row edge, reading as a soft halo instead of a
+ *     boxed-in marker.
+ *   - Single ease-out pulse over 0.9s instead of an 1.8s in/out/in/out
+ *     four-stop oscillation. One graceful ping, then gone.
+ *   - Alpha cap 0.28 (vs prior 0.55) keeps it gentle next to the banner's
+ *     own orange so the two surfaces respond to each other instead of
+ *     fighting for attention.
+ *
+ * Color: rgba(242, 78, 30, …) is the same #f24e1e token used by the banner
+ * need-required state and the required::after asterisk — same family, lower
+ * volume.
+ *
+ * prefers-reduced-motion: static, faint outline (no animation, no fill).
+ * ───────────────────────────────────────────────────────────────────────── */
+@keyframes JWQuestionPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(242, 78, 30, 0); }
+  30%  { box-shadow: 0 0 0 4px rgba(242, 78, 30, 0.28); }
+  100% { box-shadow: 0 0 0 0 rgba(242, 78, 30, 0); }
+}
+#autofill_detail .question_item.jw-question-pulse {
+  animation: JWQuestionPulse 0.9s ease-out 1;
+  border-radius: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  #autofill_detail .question_item.jw-question-pulse {
+    animation: none;
+    box-shadow: 0 0 0 2px rgba(242, 78, 30, 0.22);
+    transition: box-shadow 0.4s ease;
+  }
+}
+
+/* Autofill status Task-flow V3.
+   Scoped to Autofill so shared Resume/Cover Letter/Track picker consumers
+   retain their existing layout and behavior. */
+#autofill_detail .question_item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 52px;
+  min-height: 56px;
+  align-items: center;
+}
+#autofill_detail .qm_row_body { min-width: 0; }
+#autofill_detail .question_item_text {
+  min-height: 55px;
+  padding: 0 0 0 15px;
+  font-size: 13px;
+  font-weight: 600;
+}
+#autofill_detail .question_status {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  place-items: center;
+  justify-content: center;
+  justify-self: center;
+  border-radius: 10px;
+}
+#autofill_detail .question_item[data-attention-level="complete"] .question_status:hover,
+#autofill_detail .question_item[data-attention-level="complete"] .question_status:focus-visible {
+  background: #ecfbf2;
+}
+#autofill_detail .question_item[data-attention-level="attention"] .question_status:hover,
+#autofill_detail .question_item[data-attention-level="attention"] .question_status:focus-visible,
+#autofill_detail .question_item[data-attention-level="warning"] .question_status:hover,
+#autofill_detail .question_item[data-attention-level="warning"] .question_status:focus-visible {
+  background: #fff5e8;
+}
+#autofill_detail .question_item[data-attention-level="error"] .question_status:hover,
+#autofill_detail .question_item[data-attention-level="error"] .question_status:focus-visible {
+  background: #fff0f1;
+}
+#autofill_detail .question_missing { right: 52px; }
+#autofill_detail [id$="_question_missing_info"] {
+  width: 235px;
+  max-width: min(235px, calc(100vw - 105px));
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #202733;
+  box-shadow: 0 12px 26px rgba(16, 24, 40, 0.22);
+}
+#autofill_detail [id$="_question_missing_info"] .qm_primary {
+  font-size: 12px;
+  line-height: 1.35;
+}
+#autofill_detail [id$="_question_missing_info"] .qm_secondary {
+  margin-top: 1px;
+  color: #d4d9e2;
+  font-size: 10px;
+  line-height: 1.4;
+}
+#autofill_detail .question_status_popover {
+  top: 4px;
+  right: 52px;
+  width: min(340px, calc(100% - 60px));
+  max-height: min(520px, 72vh);
+  padding: 16px;
+  border: 2px solid #7c8799;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 24px 56px rgba(16, 24, 40, 0.24);
+  color: #111827;
+}
+#autofill_detail .question_status_popover[data-tone="success"] { border-color: #118a45; }
+#autofill_detail .question_status_popover[data-tone="loading"] { border-color: #1469f5; }
+#autofill_detail .question_status_popover[data-tone="warning"] { border-color: #b45309; }
+#autofill_detail .question_status_popover[data-tone="error"] { border-color: #cf3f46; }
+#autofill_detail .qm_popover_header {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 44px;
+  align-items: start;
+  gap: 10px;
+}
+#autofill_detail .qm_popover_icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 11px;
+  background: #eff2f6;
+}
+#autofill_detail .question_status_popover[data-tone="success"] .qm_popover_icon { background: #eaf8ef; }
+#autofill_detail .question_status_popover[data-tone="loading"] .qm_popover_icon { background: #edf4ff; }
+#autofill_detail .question_status_popover[data-tone="warning"] .qm_popover_icon { background: #fff4e7; }
+#autofill_detail .question_status_popover[data-tone="error"] .qm_popover_icon { background: #fff0f1; }
+#autofill_detail .qm_popover_icon img { width: 20px; height: 20px; }
+#autofill_detail .qm_popover_heading { min-width: 0; }
+#autofill_detail .qm_popover_eyebrow {
+  overflow: hidden;
+  margin: 1px 0 3px;
+  color: #727e90;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+#autofill_detail .qm_popover_title {
+  padding: 0;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.28;
+}
+#autofill_detail .qm_popover_close {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  margin: -8px -8px 0 0;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+}
+#autofill_detail .qm_popover_close:hover,
+#autofill_detail .qm_popover_close:focus-visible { background: #f0f3f7; }
+#autofill_detail .qm_popover_close img { width: 20px; height: 20px; opacity: 0.72; }
+#autofill_detail .qm_popover_reason {
+  margin: 14px 0 0;
+  color: #475467;
+  font-size: 12px;
+  line-height: 1.55;
+}
+#autofill_detail .qm_details {
+  gap: 0;
+  margin-top: 14px;
+  padding: 10px 11px;
+  border: 0;
+  border-radius: 9px;
+  background: #f6f8fb;
+}
+#autofill_detail .qm_detail {
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 8px;
+  padding: 4px 0;
+}
+#autofill_detail .qm_detail dt { color: #7b8697; font-size: 10px; }
+#autofill_detail .qm_detail dd { color: #263244; font-size: 10px; font-weight: 700; }
+#autofill_detail .qm_popover_actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+#autofill_detail .qm_popover_actions button {
+  min-height: 44px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 800;
+}
+#autofill_detail .qm_popover_actions .qm_action:first-child:not(.qm_report_action):not(.qm_memory_toggle) {
+  border-color: #1469f5;
+  background: #1469f5;
+}
+#autofill_detail .qm_popover_actions .qm_action:only-child { grid-column: 1 / -1; }
+/* A lone primary action followed only by the Report link gets the full row —
+   half-width reads as a missing second button. */
+#autofill_detail .qm_popover_actions .qm_action:first-child:has(+ .qm_report_action:last-child) {
+  grid-column: 1 / -1;
+}
+#autofill_detail .qm_popover_actions .qm_report_action {
+  grid-column: 1 / -1;
+  justify-self: center;
+  margin: 0;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: #b4232e;
+  font-size: 10px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+#autofill_detail .qm_popover_actions .qm_memory_toggle {
+  grid-column: 1 / -1;
+  width: 100%;
+  justify-content: space-between;
+  margin: 0;
+  border-color: #d8e2f0;
+  background: #f7faff;
+}
+#autofill_detail .qm_action_description {
+  grid-column: 1 / -1;
+  margin: -3px 0 2px;
+  font-size: 10px;
+}
+#autofill_detail .qm_resume_item { min-height: 64px; }
+#autofill_detail .qm_resume_row {
+  display: grid;
+  grid-template-columns: minmax(72px, 0.8fr) minmax(0, 2fr);
+  align-items: center;
+  gap: 10px;
+  padding-left: 15px;
+}
+#autofill_detail .qm_resume_row .question_item_text {
+  min-width: 0;
+  min-height: 63px;
+  padding: 0;
+}
+#autofill_detail .select_pdf_wrap[data-resume-surface="autofill"] {
+  position: static;
+  display: block;
+  min-width: 0;
+}
+#autofill_detail .select_pdf_wrap[data-resume-surface="autofill"]:empty { display: none; }
+#autofill_detail .jw_resume_selector_shell[data-resume-surface="autofill"] {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+}
+#autofill_detail .jw_resume_selector_shell[data-resume-surface="autofill"] .select_pdf {
+  min-width: 0;
+  max-width: none;
+  width: 100%;
+  height: 44px;
+  padding: 8px 10px;
+  border: 1px solid #c7d8ef;
+  border-radius: 9px;
+  background: #f7faff;
+  box-shadow: none;
+}
+#autofill_detail .jw_resume_selector_shell[data-resume-surface="autofill"] .pfd_meta {
+  min-width: 0;
+  overflow: hidden;
+}
+#autofill_detail .jw_resume_selector_shell[data-resume-surface="autofill"] .pfd_meta span {
+  overflow: hidden;
+  color: #344054;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#autofill_detail .jw_resume_selector_shell[data-resume-surface="autofill"] .close_autofill_resume {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+}
+#autofill_detail .jw_resume_selector_shell[data-resume-surface="autofill"] .close_autofill_resume:hover,
+#autofill_detail .jw_resume_selector_shell[data-resume-surface="autofill"] .close_autofill_resume:focus-visible {
+  background: #eef2f6;
+}
+#autofill_detail .jw_resume_selector_shell[data-resume-surface="autofill"] .close_autofill_resume img {
+  width: 16px;
+  height: 16px;
+}
+#autofill_detail .autofill_footer {
+  height: auto;
+  padding: 12px 14px 14px;
+  border-top: 1px solid #dde3eb;
+  background: #fff;
+  backdrop-filter: none;
+}
+#autofill_detail .autofill_footer.active { gap: 8px; }
+#autofill_detail .autofill_footer .autofill_button {
+  min-height: 48px;
+  height: 48px;
+  border-radius: 999px;
+  background: #1469f5;
+  font-size: 16px;
+  font-weight: 700;
+  gap: 7px;
+}
+#autofill_detail .autofill_footer .autofill_button .autofill_button_logo {
+  width: 18px;
+  height: 18px;
+}
+#autofill_detail .autofill_setting {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  background: transparent;
+}
+#autofill_detail .autofill_setting:hover { background: transparent; }
+#autofill_detail .autofill_setting_trigger {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: #edf1f5;
+  cursor: pointer;
+}
+#autofill_detail .autofill_setting_trigger:hover,
+#autofill_detail .autofill_setting_trigger:focus-visible,
+#autofill_detail .autofill_setting_trigger[aria-expanded="true"] { background: #e3e9ef; }
+#autofill_detail .autofill_setting_trigger img {
+  width: 19px;
+  height: 19px;
+  filter: brightness(0) saturate(100%) invert(35%) sepia(13%) saturate(812%) hue-rotate(179deg) brightness(93%);
+}
+#autofill_detail .autofill_setting_dropdown {
+  right: 0;
+  bottom: calc(100% + 10px);
+  width: min(320px, calc(100vw - 28px));
+  min-width: 0;
+  max-height: min(560px, calc(100vh - 100px));
+  overflow: auto;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid #dce3ec;
+  border-radius: 14px;
+  box-shadow: 0 20px 48px rgba(16, 24, 40, 0.2);
+}
+#autofill_detail .autofill_setting_dropdown .setting-header {
+  justify-content: space-between;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 2px 6px 8px;
+  font-size: 15px;
+}
+#autofill_detail .autofill_setting_dropdown .autofill_setting_close {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  cursor: pointer;
+}
+#autofill_detail .autofill_setting_dropdown .autofill_setting_close:hover,
+#autofill_detail .autofill_setting_dropdown .autofill_setting_close:focus-visible { background: #f0f3f7; }
+#autofill_detail .autofill_setting_dropdown .autofill_setting_close img { width: 18px; height: 18px; }
+#autofill_detail .autofill_setting_dropdown .setting-section { padding: 7px 0; }
+#autofill_detail .autofill_setting_dropdown .section-title {
+  margin: 0;
+  padding: 0 8px 5px;
+  color: #727e90;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+#autofill_detail .autofill_setting_dropdown .setting-item {
+  min-height: 44px;
+  padding: 7px 8px;
+  justify-content: center;
+  border-radius: 9px;
+}
+#autofill_detail .autofill_setting_dropdown button.setting-item {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+#autofill_detail .autofill_setting_dropdown .setting-item-content { margin: 0; }
+#autofill_detail .autofill_setting_dropdown .setting-item-content-text { min-width: 0; gap: 2px; }
+#autofill_detail .autofill_setting_dropdown .setting-item input[type="radio"],
+#autofill_detail .autofill_setting_dropdown .setting-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0 10px 0 0;
+  accent-color: #1469f5;
+}
+#autofill_detail .autofill_setting_dropdown .setting-item label {
+  color: #263244;
+  font-size: 12px;
+  font-weight: 700;
+}
+#autofill_detail .autofill_setting_dropdown .setting-item-label {
+  color: #263244;
+  font-size: 12px;
+  font-weight: 700;
+}
+#autofill_detail .autofill_setting_dropdown .setting-item-desc {
+  font-size: 10px;
+  line-height: 1.4;
+}
+#autofill_detail .autofill_setting_dropdown .section-divider {
+  margin: 2px 0;
+  background: #e8edf3;
+}
+@media (prefers-reduced-motion: reduce) {
+  #autofill_detail .autofill_setting_dropdown {
+    animation: none;
+    scroll-behavior: auto;
+  }
+  #autofill_detail .autofill_setting_dropdown .setting-item {
+    transition: none;
+  }
+}
+@media (max-width: 360px) {
+  #autofill_detail .qm_resume_row {
+    grid-template-columns: minmax(64px, 0.7fr) minmax(0, 1.5fr);
+    gap: 7px;
+  }
+  #autofill_detail .question_status_popover {
+    right: 48px;
+    width: min(320px, calc(100% - 54px));
+  }
+}
+
+/* Task-flow V3.1 visual contract: start */
+#autofill_detail {
+  --jw-v31-type-field-size: 14px;
+  --jw-v31-type-field-weight: 600;
+  --jw-v31-type-value-size: 12px;
+  --jw-v31-type-value-weight: 500;
+  --jw-v31-type-meta-size: 12px;
+  --jw-v31-type-body-size: 13px;
+  --jw-v31-type-action-size: 13px;
+  --jw-v31-weight-regular: 400;
+  --jw-v31-weight-medium: 500;
+  --jw-v31-weight-semibold: 600;
+  --jw-v31-weight-bold: 700;
+  box-sizing: border-box;
+  min-width: 0;
+  container-type: inline-size;
+  container-name: jw-autofill-panel;
+}
+
+#autofill_detail .fill_status {
+  padding: 0;
+}
+
+#autofill_detail .question_title,
+#autofill_detail .question_item,
+#autofill_detail .question_item *,
+#autofill_detail .autofill_footer,
+#autofill_detail .autofill_footer *,
+#autofill_detail .autofill_setting_dropdown,
+#autofill_detail .autofill_setting_dropdown * {
+  box-sizing: border-box;
+}
+
+#autofill_detail .question_title {
+  display: grid;
+  min-height: 34px;
+  grid-template-columns: minmax(0, 1fr) 52px;
+  align-items: center;
+  padding: 0 0 0 16px;
+  border-top: 1px solid #edf0f4;
+  border-bottom: 1px solid #dfe5ec;
+}
+
+#autofill_detail .question_title_left,
+#autofill_detail .question_title_right {
+  color: #7b8698;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+#autofill_detail .question_title_right {
+  justify-self: center;
+}
+
+#autofill_detail .question_item {
+  display: grid;
+  height: 57px;
+  min-height: 57px;
+  grid-template-columns: minmax(0, 1fr) 38px 52px;
+  align-items: stretch;
+  border-bottom: 1px solid #e1e6ed;
+  background: #fff;
+  transition: background-color 180ms cubic-bezier(.2, .8, .2, 1),
+    box-shadow 180ms cubic-bezier(.2, .8, .2, 1);
+}
+
+#autofill_detail .question_item:hover,
+#autofill_detail .question_item:focus-within,
+#autofill_detail .question_item[data-title-mode="editing"],
+#autofill_detail .question_item[data-title-mode="action"] {
+  background: #f8fbff;
+}
+
+#autofill_detail .question_item[data-title-mode="editing"],
+#autofill_detail .question_item[data-title-mode="action"] {
+  box-shadow: inset 3px 0 0 #1769f6;
+}
+
+#autofill_detail .qm_row_body {
+  min-width: 0;
+  height: 57px;
+  grid-column: 1;
+  grid-row: 1;
+}
+
+#autofill_detail .question_item_text {
+  display: flex;
+  width: 100%;
+  height: 57px;
+  min-height: 57px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 3px;
+  padding: 0 4px 0 16px;
+  line-height: 1.2;
+}
+
+#autofill_detail .qm_field_title_line {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  flex: 0 1 auto;
+  align-items: baseline;
+  gap: 1px;
+}
+
+#autofill_detail .qm_field_label {
+  min-width: 0;
+  flex: 0 1 auto;
+  width: auto;
+  max-width: 100%;
+  overflow: hidden;
+  color: #172033;
+  font-size: var(--jw-v31-type-field-size);
+  font-weight: var(--jw-v31-type-field-weight);
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#autofill_detail .qm_required_mark {
+  flex: 0 0 auto;
+  color: #f24e1e;
+  font-size: var(--jw-v31-type-field-size);
+  font-weight: var(--jw-v31-type-field-weight);
+  line-height: 1.2;
+}
+
+/* Title correction: the approved A interaction reserves a narrow edit column
+   so the pencil can fade in without moving the title or status control. */
+#autofill_detail .qm_title_edit_control {
+  position: relative;
+  /* Keep the row affordance above row content, below the sticky footer (10). */
+  z-index: 1;
+  grid-column: 2;
+  grid-row: 1;
+  width: 38px;
+  height: 44px;
+  align-self: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(3px) scale(.96);
+  transition: opacity 140ms ease,
+    transform 180ms cubic-bezier(.2, .8, .2, 1);
+}
+
+#autofill_detail .qm_title_edit_trigger {
+  display: grid;
+  width: 38px;
+  height: 44px;
+  min-width: 38px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: background-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 120ms ease;
+}
+
+#autofill_detail .qm_title_edit_trigger img {
+  width: 15px;
+  height: 15px;
+}
+
+#autofill_detail .question_item[data-title-mode="display"]:hover > .qm_title_edit_control,
+#autofill_detail .question_item[data-title-mode="display"]:focus-within > .qm_title_edit_control {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0) scale(1);
+}
+
+#autofill_detail .qm_title_edit_trigger:disabled {
+  opacity: .42;
+  cursor: not-allowed;
+}
+
+#autofill_detail .qm_title_edit_trigger:not(:disabled):hover,
+#autofill_detail .qm_title_edit_trigger:not(:disabled):focus-visible {
+  background: #e9f2ff;
+  box-shadow: 0 3px 10px rgba(0, 102, 255, .12);
+  transform: translateY(-1px);
+}
+
+#autofill_detail .qm_title_edit_trigger:not(:disabled):active {
+  box-shadow: none;
+  transform: translateY(0) scale(.94);
+}
+
+#autofill_detail .qm_title_edit_tooltip {
+  position: absolute;
+  z-index: 1002;
+  right: 18px;
+  bottom: calc(100% + 5px);
+  width: max-content;
+  max-width: 180px;
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 7px;
+  background: #202b3b;
+  box-shadow: 0 8px 20px rgba(16, 24, 40, .2);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transform: translateY(4px) scale(.98);
+  transform-origin: right bottom;
+  transition: opacity 120ms ease,
+    transform 150ms cubic-bezier(.2, .8, .2, 1),
+    visibility 0s linear 150ms;
+}
+
+#autofill_detail .qm_title_edit_trigger:hover + .qm_title_edit_tooltip,
+#autofill_detail .qm_title_edit_trigger:focus-visible + .qm_title_edit_tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  transition-delay: 80ms, 80ms, 0s;
+}
+
+#autofill_detail .qm_title_edit_trigger:disabled + .qm_title_edit_tooltip {
+  opacity: 0;
+  visibility: hidden;
+}
+
+#autofill_detail .qm_title_editor,
+#autofill_detail .qm_title_action_strip {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  width: 100%;
+  height: 57px;
+  min-height: 57px;
+}
+
+#autofill_detail .qm_sr_only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+#autofill_detail .qm_title_editor[hidden],
+#autofill_detail .qm_title_action_strip[hidden] {
+  display: none !important;
+}
+
+#autofill_detail .question_item[data-title-mode="editing"] > .qm_row_body,
+#autofill_detail .question_item[data-title-mode="editing"] > .qm_title_edit_control,
+#autofill_detail .question_item[data-title-mode="editing"] > .question_status,
+#autofill_detail .question_item[data-title-mode="editing"] > .question_missing,
+#autofill_detail .question_item[data-title-mode="editing"] > .question_status_popover,
+#autofill_detail .question_item[data-title-mode="action"] > .qm_row_body,
+#autofill_detail .question_item[data-title-mode="action"] > .qm_title_edit_control,
+#autofill_detail .question_item[data-title-mode="action"] > .question_status,
+#autofill_detail .question_item[data-title-mode="action"] > .question_missing,
+#autofill_detail .question_item[data-title-mode="action"] > .question_status_popover {
+  display: none !important;
+}
+
+#autofill_detail .qm_title_editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px 34px;
+  align-items: center;
+  gap: 5px;
+  padding: 11px 10px 11px 16px;
+  background: #f8fbff;
+  animation: qm-title-surface-enter 190ms cubic-bezier(.2, .8, .2, 1) both;
+}
+
+#autofill_detail .qm_title_input {
+  width: 100%;
+  min-width: 0;
+  height: 34px;
+  margin: 0;
+  padding: 0 9px;
+  border: 1px solid #a9c7f6;
+  border-radius: 8px;
+  outline: 0;
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .04),
+    0 0 0 2px rgba(0, 102, 255, .06);
+  color: #172033;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  transition: border-color 140ms ease,
+    box-shadow 180ms ease,
+    background-color 140ms ease;
+}
+
+#autofill_detail .qm_title_input:focus {
+  border-color: #4f8ff7;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, .14),
+    0 5px 14px rgba(0, 76, 190, .09);
+}
+
+#autofill_detail .qm_title_input[aria-invalid="true"] {
+  border-color: #d92d20;
+  box-shadow: 0 0 0 2px rgba(217, 45, 32, .1);
+}
+
+#autofill_detail .qm_title_icon_action {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  margin: 0;
+  padding: 0;
+  place-items: center;
+  border: 1px solid #d6dce5;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: background-color 140ms ease,
+    border-color 140ms ease,
+    box-shadow 160ms ease,
+    transform 120ms ease;
+}
+
+#autofill_detail .qm_title_icon_action img {
+  width: 16px;
+  height: 16px;
+  transition: transform 140ms ease;
+}
+
+#autofill_detail .qm_title_save {
+  border-color: #76aafb;
+  background: #eaf2ff;
+  box-shadow: 0 2px 8px rgba(0, 102, 255, .08);
+}
+
+#autofill_detail .qm_title_save:hover,
+#autofill_detail .qm_title_save:focus-visible {
+  border-color: #4f8ff7;
+  background: #dceaff;
+  box-shadow: 0 5px 14px rgba(0, 102, 255, .14);
+  transform: translateY(-1px);
+}
+
+#autofill_detail .qm_title_save:disabled {
+  border-color: #d7dce3;
+  background: #f1f3f6;
+  cursor: not-allowed;
+  opacity: .5;
+}
+
+#autofill_detail .qm_title_cancel:hover,
+#autofill_detail .qm_title_cancel:focus-visible {
+  border-color: #c7ced8;
+  background: #f3f5f8;
+  box-shadow: 0 5px 14px rgba(31, 42, 55, .09);
+  transform: translateY(-1px);
+}
+
+#autofill_detail .qm_title_icon_action:not(:disabled):hover img {
+  transform: scale(1.06);
+}
+
+#autofill_detail .qm_title_icon_action:not(:disabled):active {
+  box-shadow: none;
+  transform: translateY(0) scale(.95);
+}
+
+#autofill_detail .qm_title_action_strip {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px 7px 16px;
+  background: #f8fbff;
+  animation: qm-title-surface-enter 180ms cubic-bezier(.2, .8, .2, 1) both;
+}
+
+#autofill_detail .qm_title_state_copy {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+#autofill_detail .qm_title_state_icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  border-radius: 50%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 18px 18px;
+}
+
+#autofill_detail .qm_title_state_copy > span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+#autofill_detail .qm_title_state_copy strong,
+#autofill_detail .qm_title_state_copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#autofill_detail .qm_title_state_copy strong {
+  color: #172033;
+  font-size: var(--jw-v31-type-field-size);
+  font-weight: var(--jw-v31-type-field-weight);
+  line-height: 1.2;
+}
+
+#autofill_detail .qm_title_state_copy small {
+  color: #6a7587;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+#autofill_detail .qm_title_state_actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+#autofill_detail .qm_title_text_action {
+  min-width: 0;
+  height: 32px;
+  margin: 0;
+  padding: 0 9px;
+  border-radius: 7px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: background-color 140ms ease,
+    border-color 140ms ease,
+    transform 120ms ease;
+}
+
+#autofill_detail .qm_title_text_action_primary {
+  border: 1px solid #76aafb;
+  background: #eaf2ff;
+  color: #175cd3;
+}
+
+#autofill_detail .qm_title_text_action_secondary {
+  border: 1px solid #d4dae3;
+  background: #fff;
+  color: #475467;
+}
+
+#autofill_detail .qm_title_text_action:hover,
+#autofill_detail .qm_title_text_action:focus-visible {
+  transform: translateY(-1px);
+}
+
+#autofill_detail .qm_title_text_action_primary:hover,
+#autofill_detail .qm_title_text_action_primary:focus-visible {
+  border-color: #4f8ff7;
+  background: #dceaff;
+}
+
+#autofill_detail .qm_title_text_action_secondary:hover,
+#autofill_detail .qm_title_text_action_secondary:focus-visible {
+  border-color: #bfc7d3;
+  background: #f7f8fa;
+}
+
+#autofill_detail .qm_title_text_action:active {
+  transform: translateY(0) scale(.96);
+}
+
+#autofill_detail .qm_title_action_strip[data-title-state="manual-protected"] .qm_title_state_copy strong,
+#autofill_detail .qm_title_action_strip[data-title-state="refill-success"] .qm_title_state_copy strong,
+#autofill_detail .qm_title_action_strip[data-title-state="stale-ignored"] .qm_title_state_copy strong {
+  color: #067647;
+}
+
+#autofill_detail .qm_title_action_strip[data-title-state="locate-not-found"] .qm_title_state_copy strong,
+#autofill_detail .qm_title_action_strip[data-title-state="locate-stale"] .qm_title_state_copy strong {
+  color: #b54708;
+}
+
+@keyframes qm-title-surface-enter {
+  from {
+    opacity: .55;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#autofill_detail .qm_field_value {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  color: #6a7587;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#autofill_detail .qm_field_value[hidden] {
+  display: none;
+}
+
+#autofill_detail .question_status {
+  display: grid;
+  grid-column: 3;
+  grid-row: 1;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  align-self: center;
+  justify-self: center;
+  margin: 0;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  transition: background-color 170ms ease, box-shadow 170ms ease;
+}
+
+#autofill_detail .question_status_image {
+  width: 20px;
+  height: 20px;
+}
+
+#autofill_detail .question_missing {
+  right: 52px;
+}
+
+#autofill_detail [id$="_question_missing_info"] {
+  width: 224px;
+  max-width: min(224px, calc(100vw - 80px));
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: #202b3b;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.22);
+}
+
+#autofill_detail [id$="_question_missing_info"] .qm_primary {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+#autofill_detail [id$="_question_missing_info"] .qm_secondary {
+  margin-top: 1px;
+  color: #d7dde7;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+#autofill_detail .question_status_popover {
+  top: 4px;
+  right: 8px;
+  width: min(320px, calc(100% - 8px));
+  max-height: min(520px, 72vh);
+  overflow: auto;
+  padding: 16px;
+  border: 0;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 22px 52px rgba(18, 32, 56, 0.24);
+  color: #172033;
+}
+
+#autofill_detail .question_status_popover[data-tone] {
+  border: 0;
+}
+
+#autofill_detail .qm_popover_header {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 44px;
+  align-items: start;
+  gap: 10px;
+}
+
+#autofill_detail .qm_popover_icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 11px;
+  background: #f1f4f8;
+}
+
+#autofill_detail .qm_popover_icon img {
+  width: 20px;
+  height: 20px;
+}
+
+#autofill_detail .qm_popover_eyebrow {
+  margin: 1px 0 3px;
+  color: #6c788d;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+#autofill_detail .qm_popover_title {
+  padding: 0;
+  color: #172033;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+#autofill_detail .qm_popover_close {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  margin: -4px -4px 0 0;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+}
+
+#autofill_detail .qm_popover_close:hover,
+#autofill_detail .qm_popover_close:focus-visible {
+  background: #f1f4f7;
+}
+
+#autofill_detail .qm_popover_close img {
+  width: 18px;
+  height: 18px;
+}
+
+#autofill_detail .qm_popover_reason {
+  margin: 14px 0 13px;
+  color: #506077;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+#autofill_detail .qm_details {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 11px;
+  background: #f5f7fa;
+}
+
+#autofill_detail .qm_detail {
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 8px;
+  padding: 3px 0;
+}
+
+#autofill_detail .qm_detail dt {
+  color: #7b8799;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+#autofill_detail .qm_detail dd {
+  color: #2d394d;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+#autofill_detail .qm_popover_actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 0;
+}
+
+#autofill_detail .qm_popover_actions button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+}
+
+#autofill_detail .qm_popover_actions .qm_action:first-child:not(.qm_report_action):not(.qm_memory_toggle) {
+  border-color: #1769f6;
+  background: #1769f6;
+  color: #fff;
+}
+
+#autofill_detail .qm_popover_actions[data-primary-action-count="1"] > .qm_primary_action {
+  grid-column: 1 / -1;
+}
+
+#autofill_detail .qm_popover_actions[data-primary-action-count="3"] > .qm_primary_action:first-child {
+  grid-column: 1 / -1;
+}
+
+#autofill_detail .qm_popover_actions:has(> [data-action="answer_textarea"]) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+#autofill_detail .qm_popover_actions > [data-action="answer_textarea"] {
+  gap: 7px;
+}
+
+#autofill_detail .qm_popover_actions .qm_report_action {
+  grid-column: 1 / -1;
+  min-height: 44px;
+  justify-self: center;
+  margin: 0 auto -6px;
+  padding: 10px;
+  border: 0;
+  background: transparent;
+  color: #b32632;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+#autofill_detail .qm_popover_actions .qm_memory_toggle {
+  grid-column: 1 / -1;
+  justify-content: center;
+  gap: 8px;
+}
+
+#autofill_detail .qm_action_description {
+  grid-column: 1 / -1;
+}
+
+#autofill_detail .qm_memory_state {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+#autofill_detail .qm_action_description {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+#autofill_detail .qm_resume_item {
+  height: 57px;
+  min-height: 57px;
+}
+
+#autofill_detail .qm_resume_row {
+  display: grid;
+  height: 57px;
+  grid-template-columns: minmax(68px, 0.72fr) minmax(0, 1.72fr);
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px 0 16px;
+}
+
+/* A verified file hides the picker; release its reserved grid column too. */
+#autofill_detail .qm_resume_row:has(> .select_pdf_wrap[data-resume-surface="autofill"][hidden]),
+#autofill_detail .qm_resume_row:has(> .select_pdf_wrap[data-resume-surface="autofill"]:empty) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+#autofill_detail .qm_resume_row .question_item_text {
+  width: auto;
+  height: 57px;
+  min-height: 57px;
+  padding: 0;
+}
+
+#autofill_detail .select_pdf_wrap[data-resume-surface="autofill"] {
+  min-width: 0;
+}
+
+#autofill_detail .select_pdf_wrap[data-resume-surface="autofill"]:empty {
+  display: none;
+}
+
+#autofill_detail .jw_resume_selector_shell[data-resume-surface="autofill"] {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 4px;
+}
+
+#autofill_detail .jw_resume_selector_shell[data-resume-surface="autofill"] .select_pdf {
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  padding: 7px 9px;
+  border: 1px solid #c7d8ef;
+  border-radius: 9px;
+  background: #f7faff;
+  box-shadow: none;
+}
+
+#autofill_detail .jw_resume_selector_shell[data-resume-surface="autofill"] .pdf_icon {
+  width: 12px;
+  height: 12px;
+}
+
+#autofill_detail .jw_resume_selector_shell[data-resume-surface="autofill"] .pfd_meta {
+  min-width: 0;
+  overflow: hidden;
+}
+
+#autofill_detail .jw_resume_selector_shell[data-resume-surface="autofill"] .pfd_meta span {
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#autofill_detail .jw_resume_selector_shell[data-resume-surface="autofill"] .arrow {
+  width: 12px;
+  height: 12px;
+}
+
+#autofill_detail .jw_resume_selector_shell[data-resume-surface="autofill"] .close_autofill_resume {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+}
+
+#autofill_detail .jw_resume_selector_shell[data-resume-surface="autofill"] .close_autofill_resume:hover,
+#autofill_detail .jw_resume_selector_shell[data-resume-surface="autofill"] .close_autofill_resume:focus-visible {
+  background: #eef2f6;
+}
+
+#autofill_detail .autofill_footer {
+  min-height: 76px;
+  height: auto;
+  padding: 12px 14px;
+  gap: 10px;
+  border-top: 1px solid #dfe5ec;
+  background: #fff;
+  backdrop-filter: none;
+}
+
+#autofill_detail .autofill_footer.active {
+  gap: 10px;
+}
+
+#autofill_detail .autofill_footer .autofill_button {
+  height: 50px;
+  min-height: 50px;
+  border-radius: 999px;
+  background: #1769f6;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+#autofill_detail .autofill_setting {
+  width: 50px;
+  height: 50px;
+  flex: 0 0 50px;
+}
+
+#autofill_detail .autofill_setting_trigger {
+  display: grid;
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: #eef2f6;
+}
+
+#autofill_detail .autofill_setting_trigger:hover,
+#autofill_detail .autofill_setting_trigger:focus-visible,
+#autofill_detail .autofill_setting_trigger[aria-expanded="true"] {
+  background: #e6eefb;
+}
+
+#autofill_detail .autofill_setting_dropdown {
+  right: 0;
+  bottom: calc(100% + 10px);
+  width: min(320px, calc(100vw - 28px));
+  box-sizing: border-box;
+  min-width: 0;
+  max-height: min(460px, calc(100vh - 120px));
+  margin: 0;
+  /* No top padding here — it moved onto the sticky .setting-header below.
+     A scroll container's top padding sits *above* where a `top: 0` sticky
+     child comes to rest, so a 16px strip of scrolled-away content stayed
+     visible above the header. Owning that strip with the header closes it. */
+  padding: 0 16px 16px;
+  overflow: auto;
+  border: 0;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 22px 52px rgba(18, 32, 56, 0.24);
+  animation: none;
+}
+
+#autofill_detail .autofill_setting_dropdown .setting-header {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  min-height: 60px; /* 44px header + the 16px top padding it now absorbs */
+  margin: 0 0 8px;
+  padding: 16px 0 0;
+  background: #fff;
+}
+
+#autofill_detail .autofill_setting_dropdown .setting-header strong {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+#autofill_detail .autofill_setting_dropdown .autofill_setting_close {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+}
+
+#autofill_detail .autofill_setting_dropdown .setting-section {
+  padding: 6px 0;
+}
+
+#autofill_detail .autofill_setting_dropdown .section-title {
+  padding: 0 8px 5px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+#autofill_detail .autofill_setting_dropdown .setting-item {
+  min-height: 44px;
+  padding: 7px 8px;
+  border-radius: 9px;
+}
+
+#autofill_detail .autofill_setting_dropdown .setting-item label,
+#autofill_detail .autofill_setting_dropdown .setting-item-label {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+#autofill_detail .autofill_setting_dropdown .setting-item input[type="radio"]:checked + label {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+#autofill_detail .autofill_setting_dropdown .setting-item-desc {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+#autofill_detail .question_item_text:focus-visible,
+#autofill_detail .qm_title_edit_trigger:focus-visible,
+#autofill_detail .qm_title_input:focus-visible,
+#autofill_detail .qm_title_icon_action:focus-visible,
+#autofill_detail .qm_title_text_action:focus-visible,
+#autofill_detail .question_status:focus-visible,
+#autofill_detail .qm_popover_close:focus-visible,
+#autofill_detail .qm_popover_actions button:focus-visible,
+#autofill_detail .autofill_setting_trigger:focus-visible,
+#autofill_detail .autofill_setting_close:focus-visible {
+  outline: 3px solid rgba(23, 105, 246, 0.32);
+  outline-offset: 2px;
+}
+
+@container jw-autofill-panel (max-width: 360px) {
+  #autofill_detail .qm_title_editor {
+    padding-right: 8px;
+    padding-left: 13px;
+  }
+
+  #autofill_detail .qm_title_action_strip {
+    gap: 6px;
+    padding-right: 8px;
+    padding-left: 13px;
+  }
+
+  #autofill_detail .qm_title_state_copy {
+    gap: 6px;
+  }
+
+  #autofill_detail .qm_title_text_action {
+    padding-right: 7px;
+    padding-left: 7px;
+  }
+
+  #autofill_detail .question_status_popover {
+    right: 8px;
+    left: auto;
+    width: min(320px, calc(100% - 8px));
+    max-width: calc(100cqw - 74px);
+  }
+
+  #autofill_detail .autofill_setting_dropdown {
+    right: 0;
+    left: auto;
+    width: calc(100cqw - 80px);
+    max-width: calc(100cqw - 80px);
+  }
+
+  #autofill_detail .qm_resume_row {
+    grid-template-columns: minmax(60px, 0.64fr) minmax(0, 1.36fr);
+    gap: 6px;
+  }
+}
+
+@media (max-width: 360px) {
+  #autofill_detail .qm_title_editor {
+    padding-right: 8px;
+    padding-left: 13px;
+  }
+
+  #autofill_detail .qm_title_action_strip {
+    gap: 6px;
+    padding-right: 8px;
+    padding-left: 13px;
+  }
+
+  #autofill_detail .qm_title_state_copy {
+    gap: 6px;
+  }
+
+  #autofill_detail .qm_title_text_action {
+    padding-right: 7px;
+    padding-left: 7px;
+  }
+
+  #autofill_detail .question_status_popover {
+    right: 8px;
+    left: auto;
+    width: min(320px, calc(100% - 8px));
+    max-width: calc(100vw - 74px);
+  }
+
+  #autofill_detail .autofill_setting_dropdown {
+    right: 0;
+    left: auto;
+    width: calc(100vw - 80px);
+    max-width: calc(100vw - 80px);
+  }
+
+  #autofill_detail .qm_resume_row {
+    grid-template-columns: minmax(60px, 0.64fr) minmax(0, 1.36fr);
+    gap: 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #autofill_detail .question_item,
+  #autofill_detail .question_item_text,
+  #autofill_detail .qm_title_edit_control,
+  #autofill_detail .qm_title_edit_trigger,
+  #autofill_detail .qm_title_edit_tooltip,
+  #autofill_detail .qm_title_editor,
+  #autofill_detail .qm_title_input,
+  #autofill_detail .qm_title_icon_action,
+  #autofill_detail .qm_title_action_strip,
+  #autofill_detail .qm_title_text_action,
+  #autofill_detail .question_status,
+  #autofill_detail .question_status_popover,
+  #autofill_detail .qm_popover_close,
+  #autofill_detail .qm_popover_actions button,
+  #autofill_detail .autofill_setting_trigger,
+  #autofill_detail .autofill_setting_dropdown,
+  #autofill_detail .autofill_setting_dropdown .setting-item {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  #autofill_detail .question_status_popover,
+  #autofill_detail .autofill_setting_dropdown {
+    border: 1px solid CanvasText;
+  }
+
+  #autofill_detail .question_item_text,
+  #autofill_detail .qm_title_edit_trigger,
+  #autofill_detail .qm_title_input,
+  #autofill_detail .qm_title_icon_action,
+  #autofill_detail .qm_title_text_action,
+  #autofill_detail .qm_title_edit_tooltip,
+  #autofill_detail .qm_title_editor,
+  #autofill_detail .qm_title_action_strip,
+  #autofill_detail .question_status,
+  #autofill_detail .qm_popover_close,
+  #autofill_detail .qm_popover_actions button,
+  #autofill_detail .autofill_setting_trigger,
+  #autofill_detail .autofill_setting_close {
+    border: 1px solid ButtonText;
+    forced-color-adjust: auto;
+  }
+}
+/* Task-flow V3.1 visual contract: end */
+
+/* Tracking-owned Autofill identity: this surface explains the canonical web
+   setting and never presents a second set of mutable tracking controls. */
+#autofill_detail .autofill_setting_dropdown .jw-email-tracking-summary {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 11px 12px 12px;
+  border: 1px solid #dfe6ef;
+  border-radius: 11px;
+  background: #f8fafc;
+}
+
+#autofill_detail .autofill_setting_dropdown .jw-email-tracking-summary-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+#autofill_detail .autofill_setting_dropdown .jw-email-tracking-status-dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  border-radius: 50%;
+  background: #98a2b3;
+}
+
+#autofill_detail .autofill_setting_dropdown .jw-email-tracking-status {
+  min-width: 0;
+  color: #263244;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+#autofill_detail .autofill_setting_dropdown .jw-email-tracking-address-label {
+  margin-top: 2px;
+  color: #727e90;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+#autofill_detail .autofill_setting_dropdown .jw-email-tracking-address {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: #172033;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+#autofill_detail .autofill_setting_dropdown .jw-email-tracking-description {
+  margin: 0;
+}
+
+#autofill_detail .autofill_setting_dropdown .jw-email-tracking-manage {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 34px;
+  margin-top: 3px;
+  padding: 7px 10px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid #bfd1ee;
+  border-radius: 8px;
+  background: #fff;
+  color: #1769f6;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+  cursor: pointer;
+}
+
+#autofill_detail .autofill_setting_dropdown .jw-email-tracking-manage:hover,
+#autofill_detail .autofill_setting_dropdown .jw-email-tracking-manage:focus-visible {
+  border-color: #8db3ee;
+  background: #edf4ff;
+}
+
+#autofill_detail .autofill_setting_dropdown .jw-email-tracking-summary[data-tracking-state="proxy-active"] .jw-email-tracking-status-dot,
+#autofill_detail .autofill_setting_dropdown .jw-email-tracking-summary[data-tracking-state="personal-connected"] .jw-email-tracking-status-dot {
+  background: #15956f;
+}
+
+#autofill_detail .autofill_setting_dropdown .jw-email-tracking-summary[data-tracking-state="personal-connecting"] .jw-email-tracking-status-dot,
+#autofill_detail .autofill_setting_dropdown .jw-email-tracking-summary[data-tracking-state="personal-setup-required"] .jw-email-tracking-status-dot {
+  background: #d68a16;
+}
+
+#autofill_detail .autofill_setting_dropdown .jw-email-tracking-summary[data-tracking-state="error"] .jw-email-tracking-status-dot {
+  background: #d04444;
+}
+
+@media (forced-colors: active) {
+  #autofill_detail .autofill_setting_dropdown .jw-email-tracking-summary,
+  #autofill_detail .autofill_setting_dropdown .jw-email-tracking-manage {
+    border: 1px solid CanvasText;
+    forced-color-adjust: auto;
+  }
+}
+
+/* Field-scoped context editor. This replaces only the action grid while open;
+   the status card remains pinned so user input is never lost to a repaint. */
+#autofill_detail .qm_context_editor {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 9px;
+  width: 100%;
+}
+
+#autofill_detail .question_status_popover[data-icon-asset="icon_ai_sparkles_outline_blue"] .qm_popover_icon {
+  background: #edf4ff;
+}
+
+#autofill_detail .qm_context_label {
+  color: #344054;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+#autofill_detail .qm_context_input {
+  width: 100%;
+  min-height: 92px;
+  box-sizing: border-box;
+  padding: 10px 11px;
+  resize: vertical;
+  border: 1px solid #cfd7e6;
+  border-radius: 9px;
+  background: #fff;
+  color: #172033;
+  font: inherit;
+  line-height: 1.45;
+}
+
+#autofill_detail .qm_context_input:focus-visible {
+  outline: 3px solid rgba(0, 102, 255, 0.25);
+  outline-offset: 1px;
+  border-color: #0066ff;
+}
+
+#autofill_detail .qm_context_memory {
+  display: grid;
+  gap: 3px;
+}
+
+#autofill_detail .qm_context_memory_card_title {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+#autofill_detail .qm_context_memory_source {
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(23, 105, 246, 0.08);
+  color: #1769f6;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+#autofill_detail .qm_popover_actions .qm_context_memory_card:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+#autofill_detail .qm_context_memory_help {
+  color: #667085;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+#autofill_detail .qm_context_memory_help .jw_memory_settings_link {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #1769f6;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+#autofill_detail .qm_context_memory_help .jw_memory_settings_link:hover,
+#autofill_detail .qm_context_memory_help .jw_memory_settings_link:focus-visible {
+  color: #0f54c8;
+}
+
+#autofill_detail .qm_context_memory_help:empty {
+  display: none;
+}
+
+#autofill_detail .qm_context_controls {
+  display: grid;
+  grid-template-columns: minmax(80px, auto) minmax(0, 1fr);
+  gap: 8px;
+}
+
+#autofill_detail .qm_context_controls .qm_context_cancel {
+  border-color: #cfd7e6;
+  background: #fff;
+  color: #344054;
+}
+
+#autofill_detail .qm_context_controls .qm_context_generate {
+  border-color: #1769f6;
+  background: #1769f6;
+  color: #fff;
+}
+
+#autofill_detail .qm_context_controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+#autofill_detail .qm_context_controls button[aria-busy="true"] {
+  cursor: wait;
+}
+
+@media (max-width: 360px) {
+  #autofill_detail .qm_context_controls {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* First-use Proxy disclosure: accepting the notice, managing the persistent
+   setting, and changing this one form are three distinct user decisions. */
+#autofill_detail .jw-proxy-first-use-modal .modal-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+#autofill_detail .jw-proxy-first-use-modal .jw-proxy-continue {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+#autofill_detail .jw-proxy-first-use-modal .modal-button {
+  min-width: 0;
+  white-space: normal;
+}
+
+/* Excluded fields are explanatory metadata, never question rows or fill controls. */
+#autofill_detail .jw-excluded-fields-notice {
+  margin: 8px 16px 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f7f8fa;
+  color: #596274;
+  font-size: 13px;
+  line-height: 1.5;
+}
+#autofill_detail .jw-excluded-fields-notice summary { cursor: pointer; font-weight: 500; }
+#autofill_detail .jw-excluded-fields-notice summary:focus-visible { outline: 2px solid #2166ed; outline-offset: 3px; }
+#autofill_detail .jw-excluded-fields-description { margin-top: 8px; }
+#autofill_detail .jw-excluded-fields-notice ul { margin: 6px 0 0; padding-left: 18px; }
+
+#autofill_detail .jw-excluded-fields-notice ul { list-style: none; padding-left: 0; }
+#autofill_detail .jw-excluded-fields-notice li { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; }
+#autofill_detail .jw-excluded-fields-notice li > span { overflow-wrap: anywhere; }
+#autofill_detail .jw-excluded-field-action { border: 1px solid #d9dfeb; border-radius: 6px; background: white; color: #2166ed; font-size: 12px; padding: 5px 8px; cursor: pointer; flex-shrink: 0; }
+#autofill_detail .jw-excluded-field-action:disabled { opacity: .5; cursor: wait; }
+#autofill_detail .jw-excluded-field-action:focus-visible { outline: 2px solid #2166ed; outline-offset: 2px; }
+#autofill_detail .jw-manual-account-field { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 12px; border-top: 1px solid #e5e9f0; }
+#autofill_detail .jw-manual-account-field strong { font-size: 13px; overflow-wrap: anywhere; }
+#autofill_detail .jw-manual-account-field small { display: block; color: #778195; font-size: 12px; margin-top: 4px; }
+#autofill_detail .jw-manual-field-actions { display: flex; gap: 6px; flex-shrink: 0; }
+#autofill_detail .jw-excluded-field-error:not(:empty) { margin-top: 8px; color: #9b3e20; font-size: 12px; }
+
+/* Insight uses the same loading emblem as job reading; only its inner match
+   mark moves, so changing stages does not move the panel or its text. */
+#autofill_detail .analytics .jw-state-detecting .jw-body {
+  min-height: 3.1em;
+}
+#autofill_detail .jw-state-detecting [data-jw-loading-visual="profile-match"] {
+  --jw-match-cycle: 1800ms;
+}
+#autofill_detail .jw-state-detecting .jw-profile-match-person {
+  animation: jwProfileMatchPerson var(--jw-match-cycle) ease-in-out infinite;
+}
+#autofill_detail .jw-state-detecting .jw-profile-match-check {
+  transform-origin: 16px 20px;
+  animation: jwProfileMatchCheck var(--jw-match-cycle) ease-in-out infinite;
+}
+@keyframes jwProfileMatchPerson {
+  0%, 100% { opacity: .6; transform: translateX(1px); }
+  45%, 70% { opacity: 1; transform: translateX(0); }
+}
+@keyframes jwProfileMatchCheck {
+  0%, 18%, 100% { opacity: .2; transform: scale(.85); }
+  45%, 72% { opacity: 1; transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #autofill_detail .jw-state-detecting .jw-profile-match-person,
+  #autofill_detail .jw-state-detecting .jw-profile-match-check {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1;
+  }
+}
+
+/* One presentation component: the scrolling question body and its fixed
+   actions share visibility in the same style pass. Legacy .active writes
+   cannot leave actions behind when Reading or a new job replaces the list. */
+#autofill_detail .page_content > .autofill_footer {
+  display: none;
+}
+#autofill_detail .page_content:not(:has(> .jw-application-action-dock)):has(> #apply_content .question_list_wrapper:not([hidden]) .qustion_list:not([hidden]) > .question_item:not([hidden])) > .autofill_footer {
+  display: flex;
+}
+/* Existing native empty-entry steps (e.g. Add Experience) explicitly publish
+   their start action through the same component projector. */
+#autofill_detail .page_content > .autofill_footer[data-jw-empty-entry="true"] {
+  display: flex;
+}
+#autofill_detail .page_content:has(> #apply_content .jw-state-detecting) > .autofill_footer,
+#autofill_detail .page_content:has(> .jw-application-action-dock) > .autofill_footer {
+  display: none;
+}
+
+/* Only section headers express hierarchy. Every question retains the same
+   width, alignment and ordinary actions, regardless of its section depth. */
+#autofill_detail .jw-question-group {
+  border-bottom: 0;
+}
+#autofill_detail .jw-question-group[hidden] { display: none; }
+#autofill_detail .jw-question-group-header {
+  display: grid;
+  /* Match the question row's 52px status column, including its icon center. */
+  grid-template-columns: minmax(0, 1fr) 52px;
+  width: 100%;
+  min-height: 28px;
+  box-sizing: border-box;
+  align-items: center;
+  gap: 0;
+  margin: 0;
+  padding: 5px 0 5px 16px;
+  border: 0;
+  border-bottom: 1px solid #edf0f4;
+  border-radius: 0;
+  background: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: left;
+  cursor: pointer;
+}
+#autofill_detail .jw-question-group-title { grid-column: 1; grid-row: 1; font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; }
+/* Decorative marker stays with the first line without altering the label. */
+#autofill_detail .jw-question-group-title {
+  position: relative;
+  padding-left: 10px;
+}
+#autofill_detail .jw-question-group-title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6.5px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .55;
+  pointer-events: none;
+}
+/* Group progress stays out of the heading; individual rows own status. */
+#autofill_detail .jw-question-group-status { display: none; }
+#autofill_detail .jw-question-group > .question_item,
+#autofill_detail .jw-question-group > .jw-question-group { margin-left: 0; }
+#autofill_detail .jw-question-group .jw-question-group > .jw-question-group-header {
+  min-height: 28px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background: #fafbfc;
+}
+#autofill_detail .jw-question-group .jw-question-group > .jw-question-group-header .jw-question-group-title {
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: none;
+}
+#autofill_detail .jw-question-group-header:hover,
+#autofill_detail .jw-question-group .jw-question-group > .jw-question-group-header:hover { background: #f4f6f8; }
+#autofill_detail .jw-question-group-header:focus-visible { outline: 2px solid #1769f6; outline-offset: -2px; }
+#autofill_detail .jw-question-group-chevron {
+  display: block;
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+  margin-left: 0;
+  object-fit: contain;
+}
+#autofill_detail .jw-question-group[data-collapsed="true"] > .jw-question-group-header .jw-question-group-chevron {
+  margin-left: 0;
+  transform: rotate(-90deg);
+}
+#autofill_detail .jw-question-group-status[hidden] { display: none; }
+/* Presentation collapse never changes a field's canonical hidden/status state. */
+#autofill_detail .jw-question-group[data-collapsed="true"] > :not(.jw-question-group-header) { display: none !important; }
+#autofill_detail .jw-question-group-title { min-width: 0; overflow-wrap: anywhere; }
+#autofill_detail .jw-question-group-status { flex-shrink: 0; }
+#autofill_detail .page_content:not(:has(> .jw-application-action-dock)):has(> #apply_content .question_list_wrapper:not([hidden]) .qustion_list:not([hidden]) .jw-question-group:not([hidden]) .question_item:not([hidden])) > .autofill_footer {
+  display: flex;
+}
+#autofill_detail .page_content:has(> #apply_content .jw-state-detecting) > .autofill_footer,
+#autofill_detail .page_content:has(> .jw-application-action-dock) > .autofill_footer {
+  display: none;
+}
+
+/* Keep the native checked/keyboard contract while presenting a display toggle. */
+#autofill_detail .autofill_setting_dropdown .jw-question-groups-setting .setting-item-content {
+  width: 100%;
+}
+#autofill_detail .autofill_setting_dropdown .jw-question-groups-setting .setting-item-content-text {
+  flex: 1;
+}
+#autofill_detail .autofill_setting_dropdown #showQuestionGroups {
+  appearance: none;
+  -webkit-appearance: none;
+  order: 2;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 20px;
+  box-sizing: border-box;
+  margin: 0 0 0 12px;
+  padding: 2px;
+  border: 1px solid #aeb9c8;
+  border-radius: 999px;
+  background: #c5cdd8;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+#autofill_detail .autofill_setting_dropdown #showQuestionGroups::before {
+  content: "";
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px #00000020;
+  transition: transform 120ms ease;
+}
+#autofill_detail .autofill_setting_dropdown #showQuestionGroups:checked {
+  background: #1769f6;
+  border-color: #1769f6;
+}
+#autofill_detail .autofill_setting_dropdown #showQuestionGroups:checked::before {
+  transform: translateX(12px);
+}
+#autofill_detail .autofill_setting_dropdown #showQuestionGroups:focus-visible {
+  outline: 2px solid #1769f6;
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  #autofill_detail .autofill_setting_dropdown #showQuestionGroups,
+  #autofill_detail .autofill_setting_dropdown #showQuestionGroups::before { transition: none; }
+}
+@media (forced-colors: active) {
+  #autofill_detail .autofill_setting_dropdown #showQuestionGroups { background: Canvas; border-color: ButtonText; forced-color-adjust: none; }
+  #autofill_detail .autofill_setting_dropdown #showQuestionGroups::before { background: ButtonText; }
+  #autofill_detail .autofill_setting_dropdown #showQuestionGroups:checked { background: Highlight; border-color: Highlight; }
+  #autofill_detail .autofill_setting_dropdown #showQuestionGroups:checked::before { background: HighlightText; }
+}
+
+/* Ordinary completed-step navigation keeps the existing action/settings row. */
+#autofill_detail .autofill_footer.jw-ordinary-footer-with-hint {
+  flex-wrap: wrap;
+  height: auto;
+  min-height: 80px;
+}
+#autofill_detail .autofill_footer .jw-ordinary-footer-hint {
+  flex: 0 0 100%;
+  margin: 0;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+}
+#autofill_detail .autofill_footer .jw-ordinary-footer-button {
+  padding-inline: 4px;
+  gap: 4px;
+  text-align: center;
+  line-height: 1.2;
+}
+#autofill_detail .autofill_footer .jw-ordinary-footer-button:focus-visible {
+  outline: 2px solid #06f;
+  outline-offset: 3px;
+}
+#autofill_detail .autofill_footer .jw-ordinary-footer-button[aria-disabled="true"] {
+  cursor: default;
+}
+#autofill_detail .autofill_footer .jw-ordinary-footer-button .flex,
+#autofill_detail .autofill_footer .jw-ordinary-footer-button span {
+  justify-content: center;
+  text-align: center;
+}
+
+#autofill_detail .autofill_footer .jw-ordinary-footer-button .autofill_button_logo {
+  display: none;
+}
+
+/* Decorative action icons share the existing review icon's 24px stroke grid. */
+#autofill_detail .autofill_footer .jw-ordinary-footer-button::before {
+  content:""; position:static; display:block; flex:0 0 16px; width:16px; height:16px;
+  background:currentColor; mask:var(--jw-footer-action-icon) center / contain no-repeat;
+  -webkit-mask:var(--jw-footer-action-icon) center / contain no-repeat;
+  pointer-events:none;
+}
+#autofill_detail .autofill_footer .jw-ordinary-footer-button[data-jw-ordinary-kind="jump"] { --jw-footer-action-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%229%22%2F%3E%3Cpath%20d%3D%22M12%207.5v5M12%2016h.01%22%2F%3E%3C%2Fsvg%3E"); }
+#autofill_detail .autofill_footer .jw-ordinary-footer-button[data-jw-ordinary-action="next"],
+#autofill_detail .autofill_footer .jw-ordinary-footer-button[data-jw-ordinary-action="save_continue"] { --jw-footer-action-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%2012h14m-6-6%206%206-6%206%22%2F%3E%3C%2Fsvg%3E"); }
+#autofill_detail .autofill_footer .jw-ordinary-footer-button[data-jw-ordinary-action="review"] { --jw-footer-action-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%225%22%20y%3D%224%22%20width%3D%2214%22%20height%3D%2217%22%20rx%3D%222%22%2F%3E%3Cpath%20d%3D%22M9%204V2h6v2M8%2013l3%203%205-6%22%2F%3E%3C%2Fsvg%3E"); }
+#autofill_detail .autofill_footer .jw-ordinary-footer-button[data-jw-ordinary-action="submit"] { --jw-footer-action-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M21%203%2010%2014M21%203l-7%2018-4-7-7-4%2018-7Z%22%2F%3E%3C%2Fsvg%3E"); }
+#autofill_detail .autofill_footer .jw-ordinary-footer-button[data-jw-ordinary-kind="manual"] { --jw-footer-action-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M14%203H6a2%202%200%200%200-2%202v14a2%202%200%200%200%202%202h12a2%202%200%200%200%202-2v-8M14%203h7v7M21%203l-10%2010%22%2F%3E%3C%2Fsvg%3E"); }

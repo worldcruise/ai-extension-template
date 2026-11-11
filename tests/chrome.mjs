@@ -82,7 +82,7 @@ const fixtureServer = await serveFixture((request, response) => {
   requests++;
   if (request.headers.host?.startsWith('chat.deepseek.com')) {
     response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'X-Frame-Options': 'DENY', 'Content-Security-Policy': "frame-ancestors 'none'" });
-    response.end(`<!doctype html><html><head><style>body{font:16px system-ui}nav{display:flex;gap:20px}textarea{width:90%;margin-top:80px}</style></head><body><button type="button" aria-label="Search chats" onclick="document.getElementById('native-search-dialog').showModal()">Search chats</button><dialog id="native-search-dialog"><input placeholder="Search chats"></dialog><nav><a href="/a/chat/recent">Recent DeepSeek chat</a><a href="/a/chat/older">Older DeepSeek chat</a></nav><h1>DeepSeek fixture</h1><textarea placeholder="Message DeepSeek"></textarea><script>document.querySelectorAll('a').forEach(link=>link.onclick=event=>{event.preventDefault();history.pushState({},'',link.getAttribute('href'));});</script></body></html>`);
+    response.end(`<!doctype html><html><head><style>body{font:16px system-ui}nav{display:flex;gap:20px}textarea{width:90%;margin-top:80px}</style></head><body><button type="button" aria-label="Search chats" onclick="document.getElementById('native-search-dialog').showModal()">Search chats</button><dialog id="native-search-dialog"><input placeholder="Search chats"></dialog><div id="history-open" role="button" tabindex="0" style="position:absolute;left:8px;top:8px;width:24px;height:24px"><svg width="20" height="20"><path d="M2 2h16v16H2z"/></svg></div><div id="history-close" role="button" tabindex="0" style="position:absolute;left:8px;top:8px;width:24px;height:24px" hidden><svg width="20" height="20"><path d="M2 2h16v16H2z"/></svg></div><nav id="history" hidden><div><h3>Pinned</h3><a href="/a/chat/s/pinned-old">Pinned older chat</a><h3>Recent</h3><a href="/a/chat/s/11111111-1111-4111-8111-111111111111">Recent DeepSeek chat</a><a href="/a/chat/s/22222222-2222-4222-8222-222222222222">Older DeepSeek chat</a></div></nav><section id="fixture-cookie-banner" role="dialog" style="position:fixed;top:110px;left:10px;right:10px;padding:20px;background:white;border:1px solid black;z-index:20"><p>We use cookies</p><button id="fixture-cookie-reject" onclick="document.getElementById('fixture-cookie-banner').hidden=true;document.body.dataset.cookieChoice='reject'">Reject all</button><button id="fixture-cookie-accept" onclick="document.getElementById('fixture-cookie-banner').hidden=true;document.body.dataset.cookieChoice='accept'">Accept all</button></section><h1>DeepSeek fixture</h1><textarea placeholder="Message DeepSeek"></textarea><script>const nav=document.getElementById('history'),saved=nav.innerHTML,open=document.getElementById('history-open'),close=document.getElementById('history-close');nav.replaceChildren();open.onclick=()=>{setTimeout(()=>{nav.innerHTML=saved;nav.hidden=false;open.hidden=true;close.hidden=false;nav.querySelectorAll('a').forEach(link=>link.onclick=event=>{event.preventDefault();setTimeout(()=>{history.pushState({},'',link.getAttribute('href'));nav.hidden=false;open.hidden=true;close.hidden=false;},150);});},250);};close.onclick=()=>{nav.hidden=true;nav.replaceChildren();open.hidden=false;close.hidden=true;};</script></body></html>`);
     return;
   }
   const extractionPage=jobFixtureResponse(request.headers.host?.split(':')[0],request.url);
@@ -127,6 +127,7 @@ const activeSessions = new Set();
 const errors = [];
 const contexts = new Map();
 const savedChats = [
+  { title: 'Pinned older chat', url: '/c/pinned-old', pinned: true },
   { title: 'Resume planning', url: '/c/saved-resume' },
   { title: 'Interview notes', url: '/c/saved-interview' },
   { title: 'Resume <img src=x onerror=alert(1)>', url: '/c/saved-literal' },
@@ -136,8 +137,8 @@ const fixture = guest => `<!doctype html><html><head><meta name="viewport" conte
 <style>body{margin:0;background:#fff;color:#202526;font:15px system-ui;display:flex;flex-direction:column;min-height:100vh}main{flex:1;display:grid;place-content:center;text-align:center;padding:24px}h1{font-size:25px;font-weight:550}p{color:#727b7b;font-size:13px}form{margin:18px;border:1px solid #dce3df;border-radius:22px;padding:16px;background:#f6f8f7}textarea{border:0;resize:none;background:transparent;width:100%;font:14px system-ui;outline:none}button{border:0;background:#147d66;color:white;padding:8px 14px;border-radius:20px}</style>
 </head><body><button type="button" aria-label="Search chats" onclick="document.getElementById('native-search-dialog').showModal()">Search chats</button><dialog id="native-search-dialog"><input placeholder="Search chats"></dialog><button id="sidebar-open" type="button" data-testid="open-sidebar-button" aria-label="Open sidebar" style="position:absolute;top:12px;left:12px">Chats</button><button id="sidebar-close" type="button" data-testid="close-sidebar-button" aria-label="Close sidebar" hidden style="position:absolute;top:12px;left:12px">Close chats</button><nav id="history" aria-label="Chat history" hidden style="position:absolute;top:50px;left:12px;max-width:250px;background:white;padding:12px;border:1px solid #ddd"></nav><main><h1>What can I help with?</h1><p>Local ChatGPT fixture · no live account</p></main><form ${guest ? 'data-logged-out' : ''}><textarea id="prompt-textarea" placeholder="Ask anything"></textarea>${guest ? '<button type="button" data-testid="login-button">Log in</button>' : ''}</form><script>
 const sidebarHistory=document.getElementById('history'), sidebarOpen=document.getElementById('sidebar-open'), sidebarClose=document.getElementById('sidebar-close');
-sidebarOpen.addEventListener('click',()=>{sidebarHistory.replaceChildren(...${JSON.stringify(savedChats)}.map(chat=>{const link=document.createElement('a');link.href=chat.url;link.textContent=chat.title;link.style.display='block';link.addEventListener('click',event=>{if(link.origin===location.origin && /^\\/c\\//.test(link.pathname)){event.preventDefault();window.history.pushState({},'',link.pathname);dispatchEvent(new PopStateEvent('popstate'));}});return link}));sidebarHistory.hidden=false;sidebarOpen.hidden=true;sidebarClose.hidden=false;});
-sidebarClose.addEventListener('click',()=>{sidebarHistory.hidden=true;sidebarOpen.hidden=false;sidebarClose.hidden=true;});
+sidebarOpen.addEventListener('click',()=>{sidebarHistory.replaceChildren(...${JSON.stringify(savedChats)}.map(chat=>{const link=document.createElement('a');link.href=chat.url;link.textContent=chat.title;if(chat.pinned)link.dataset.pinned='true';link.style.display='block';link.addEventListener('click',event=>{if(link.origin===location.origin && /^\\/c\\//.test(link.pathname)){event.preventDefault();window.history.pushState({},'',link.pathname);dispatchEvent(new PopStateEvent('popstate'));}});return link}));sidebarHistory.hidden=false;sidebarOpen.hidden=true;sidebarClose.hidden=false;});
+sidebarClose.addEventListener('click',()=>{sidebarHistory.hidden=true;sidebarHistory.replaceChildren();sidebarOpen.hidden=false;sidebarClose.hidden=true;});
 </script><script>(${queueFixtureScript.toString()})();</script></body></html>`;
 
 try {
@@ -209,11 +210,13 @@ try {
   const state = () => read('document.getElementById("connection").dataset.state');
   await until(() => read('document.documentElement.dataset.studioReady === "true"'), 'combined workspace startup');
   assert.equal(await read('document.querySelectorAll(".job-request").length'), 0, 'real queue starts empty');
-  await click('#review-another'); await click('#profile-details'); await click('#reset-examples');
-  await click('#chat-tab');
+  await click('#review-another'); await click('#account-toggle'); await click('#profile-details'); await click('#reset-examples');
+  await read('if (document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
   await until(async () => await state() === 'ready', 'embedded ChatGPT readiness');
   assert.equal(await read('document.getElementById("connection").hidden'), true);
   assert.equal(await read('document.getElementById("deepseek-frame").hasAttribute("src")'), false, 'DeepSeek stays unloaded until selected');
+  await read('globalThis.prematureDeepseekMessages=0;document.getElementById("deepseek-frame").contentWindow.postMessage=()=>{prematureDeepseekMessages++;throw new Error("DeepSeek command reached initial extension-origin document")};document.getElementById("deepseek-frame").dispatchEvent(new Event("load"))');
+  assert.equal(await read('prematureDeepseekMessages'), 0, 'initial iframe load sends no DeepSeek window messages');
   await read('globalThis.originalChatFrame = document.getElementById("chatgpt-frame"); document.getElementById("chat-provider").value = "deepseek"; document.getElementById("chat-provider").dispatchEvent(new Event("change"))');
   await until(() => read('!document.getElementById("deepseek-pane").hidden'), 'DeepSeek provider selection');
   assert.equal(await read('document.getElementById("deepseek-frame").src'), 'https://chat.deepseek.com/');
@@ -221,6 +224,17 @@ try {
   await until(() => read('!document.getElementById("deepseek-new-chat").disabled'), 'DeepSeek toolbar connected');
   const deepseekTarget = await until(async () => (await targets()).find(target => target.type === 'iframe' && target.url.startsWith('https://chat.deepseek.com/')), 'DeepSeek fixture frame');
   const deepseekSession = await session(deepseekTarget.targetId);
+  await until(() => evaluate(deepseekSession, 'Boolean(document.getElementById("fixture-cookie-reject"))'), 'DeepSeek cookie fixture ready');
+  assert.equal(await evaluate(deepseekSession, 'document.getElementById("fixture-cookie-banner").hidden'), false, 'cookie choice is left to the user on first use');
+  await cdp.send('Page.bringToFront', {}, panel);
+  await read('Promise.all(document.getAnimations().filter(animation=>Number.isFinite(animation.effect.getComputedTiming().endTime)).map(animation=>animation.finished.catch(()=>{})))');
+  const cookieButton = await evaluate(deepseekSession, '(()=>{const r=document.getElementById("fixture-cookie-reject").getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2}})()');
+  const framePosition = await read('(()=>{const r=document.getElementById("deepseek-frame").getBoundingClientRect();return{x:r.x,y:r.y}})()');
+  await cdp.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: framePosition.x + cookieButton.x, y: framePosition.y + cookieButton.y }, panel);
+  for (const type of ['mousePressed', 'mouseReleased']) await cdp.send('Input.dispatchMouseEvent', { type, x: framePosition.x + cookieButton.x, y: framePosition.y + cookieButton.y, button: 'left', clickCount: 1 }, panel);
+  await until(() => read('chrome.storage.local.get("deepseekCookieChoice").then(value=>value.deepseekCookieChoice?.kind==="reject-optional")'), 'trusted cookie choice remembered');
+  await until(() => evaluate(deepseekSession, 'document.getElementById("fixture-cookie-banner").hidden'), 'cookie banner dismissed');
+  const deepseekDocument = await evaluate(deepseekSession, 'performance.timeOrigin');
   await click('#deepseek-chat-toolbar-reveal');
   await click('#deepseek-chat-toolbar-pin');
   assert.equal(await read('document.getElementById("deepseek-chat-toolbar-shell").dataset.pinned'), 'true');
@@ -231,8 +245,20 @@ try {
   assert.equal(await read('document.getElementById("deepseek-native-search-status").hidden'), true, 'DeepSeek query accepted without error');
   assert.equal(await read('document.querySelectorAll("#deepseek-company-chat-list").length'), 0);
   await evaluate(deepseekSession, 'document.getElementById("native-search-dialog").close()');
+  await until(() => read('!document.getElementById("deepseek-chat-history-down").disabled'), 'DeepSeek history available with sidebar closed');
+  assert.equal(await evaluate(deepseekSession, 'document.getElementById("history").hidden && !document.querySelectorAll("#history a").length'), true, 'DeepSeek history is unmounted while closed');
   await click('#deepseek-chat-history-down');
-  await until(() => evaluate(deepseekSession, 'location.pathname === "/a/chat/recent"'), 'DeepSeek native history navigation');
+  await until(() => evaluate(deepseekSession, 'location.pathname === "/a/chat/s/11111111-1111-4111-8111-111111111111"'), 'DeepSeek native history navigation');
+  await until(() => evaluate(deepseekSession, 'document.getElementById("history").hidden'), 'DeepSeek restores closed sidebar after first arrow');
+  assert.equal(await evaluate(deepseekSession, 'performance.timeOrigin'), deepseekDocument, 'arrow navigation preserves the DeepSeek document');
+  assert.equal(await evaluate(deepseekSession, 'document.getElementById("fixture-cookie-banner").hidden'), true, 'cookie banner stays dismissed between chats');
+  await until(() => read('!document.getElementById("deepseek-chat-history-down").disabled'), 'DeepSeek first navigation acknowledged');
+  await click('#deepseek-chat-history-down');
+  await until(() => read('!document.getElementById("deepseek-chat-history-up").disabled'), 'older DeepSeek chat enables Up before opening a pin');
+  await evaluate(deepseekSession, 'history.pushState({},"","/a/chat/s/pinned-old")');
+  await until(() => read('document.getElementById("deepseek-chat-history-up").disabled && !document.getElementById("deepseek-chat-history-down").disabled'), 'pinned DeepSeek chat offers newest regular chat');
+  await click('#deepseek-chat-history-down');
+  await until(() => evaluate(deepseekSession, 'location.pathname === "/a/chat/s/11111111-1111-4111-8111-111111111111" && document.getElementById("history").hidden'), 'DeepSeek leaves a pinned chat for newest regular history');
   await evaluate(deepseekSession, 'document.querySelector("textarea").value="Keep my draft";document.querySelector("textarea").dispatchEvent(new Event("input",{bubbles:true}))');
   await until(() => read('document.getElementById("deepseek-new-chat").disabled && document.getElementById("deepseek-reload").disabled && document.getElementById("deepseek-chat-history-down").disabled'), 'DeepSeek draft guards');
   await click('#deepseek-zoom-in');
@@ -241,14 +267,22 @@ try {
   await evaluate(deepseekSession, 'document.querySelector("textarea").value="";document.querySelector("textarea").dispatchEvent(new Event("input",{bubbles:true}))');
   await until(() => read('!document.getElementById("deepseek-chat-history-down").disabled'), 'DeepSeek draft cleared');
   await click('#deepseek-chat-history-down');
-  await until(() => evaluate(deepseekSession, 'location.pathname === "/a/chat/older"'), 'DeepSeek older history navigation');
+  await until(() => evaluate(deepseekSession, 'location.pathname === "/a/chat/s/22222222-2222-4222-8222-222222222222"'), 'DeepSeek older history navigation');
+  await until(() => read('!document.getElementById("deepseek-chat-history-up").disabled'), 'DeepSeek newer arrow available with closed sidebar');
+  await click('#deepseek-chat-history-up');
+  await until(() => evaluate(deepseekSession, 'location.pathname === "/a/chat/s/11111111-1111-4111-8111-111111111111" && document.getElementById("history").hidden'), 'DeepSeek newer navigation restores closed sidebar');
+  await until(() => read('!document.getElementById("deepseek-chat-history-down").disabled'), 'DeepSeek older arrow restored');
+  await click('#deepseek-chat-history-down');
+  await until(() => evaluate(deepseekSession, 'location.pathname === "/a/chat/s/22222222-2222-4222-8222-222222222222" && document.getElementById("history").hidden'), 'DeepSeek older navigation from closed sidebar');
+  assert.equal(await evaluate(deepseekSession, 'performance.timeOrigin'), deepseekDocument, 'repeated arrows do not reload DeepSeek');
   await click('#deepseek-open-tab');
-  await until(async () => (await targets()).some(target => target.type === 'page' && target.url === 'https://chat.deepseek.com/a/chat/older'), 'DeepSeek current conversation opens in tab');
+  await until(async () => (await targets()).some(target => target.type === 'page' && target.url === 'https://chat.deepseek.com/a/chat/s/22222222-2222-4222-8222-222222222222'), 'DeepSeek current conversation opens in tab');
   const beforeDeepseekReload = await evaluate(deepseekSession, 'performance.timeOrigin');
   await click('#deepseek-reload');
-  await until(async () => await evaluate(deepseekSession, 'performance.timeOrigin') !== beforeDeepseekReload && await evaluate(deepseekSession, 'location.pathname === "/a/chat/older"'), 'DeepSeek reload document');
+  await until(async () => await evaluate(deepseekSession, 'performance.timeOrigin') !== beforeDeepseekReload && await evaluate(deepseekSession, 'location.pathname === "/a/chat/s/22222222-2222-4222-8222-222222222222"'), 'DeepSeek reload document');
   await until(() => read('!document.getElementById("deepseek-reload").disabled'), 'DeepSeek reload reconnects');
-  assert.equal(await evaluate(deepseekSession, 'location.pathname'), '/a/chat/older', 'reload keeps DeepSeek conversation');
+  assert.equal(await evaluate(deepseekSession, 'location.pathname'), '/a/chat/s/22222222-2222-4222-8222-222222222222', 'reload keeps DeepSeek conversation');
+  await until(() => evaluate(deepseekSession, 'document.getElementById("fixture-cookie-banner").hidden && document.body.dataset.cookieChoice === "reject"'), 'explicit reload reuses the remembered cookie choice');
   await evaluate(deepseekSession, 'const stop=document.createElement("button");stop.dataset.testid="stop-button";stop.textContent="Stop";document.body.append(stop)');
   await until(() => read('document.getElementById("deepseek-new-chat").disabled'), 'DeepSeek generation blocks new chat');
   await evaluate(deepseekSession, 'document.querySelector("[data-testid=stop-button]").remove()');
@@ -267,7 +301,7 @@ try {
   assert.equal(await read('globalThis.originalChatFrame === document.getElementById("chatgpt-frame")'), true, 'switching retains ChatGPT frame identity');
   const iframeTarget = await until(async () => (await targets()).find(target => target.type === 'iframe' && target.url.startsWith('https://chatgpt.com/')), 'ChatGPT frame');
   const frameSession = await session(iframeTarget.targetId);
-  const workspace = await checkWorkspaceUI({ cdp, panel, read, click, frameSession, evaluate, artifacts, until });
+  const workspace = await checkWorkspaceUI({ cdp, panel, read, click, frameSession, deepseekSession, evaluate, artifacts, until });
   if (process.argv.includes('--workspace-only')) {
     assert.deepEqual(errors, []);
     const report = { fixtureOnly: true, workspaceOnly: true, workspace };
@@ -292,7 +326,7 @@ try {
     const restoredSession = await session(restoredToolbar.targetId);
     await until(() => evaluate(restoredSession, 'document.getElementById("chat-toolbar-pin")?.getAttribute("aria-pressed") === "true"'), 'saved toolbar pin restored in a new panel');
     assert.equal(await evaluate(restoredSession, 'document.getElementById("chat-toolbar-shell").dataset.open'), 'true');
-    await evaluate(restoredSession, 'document.getElementById("chat-tab").click()');
+    await evaluate(restoredSession, 'if (document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
     assert.equal(await evaluate(restoredSession, 'document.getElementById("chatgpt-frame").getBoundingClientRect().top >= document.getElementById("chat-toolbar").getBoundingClientRect().bottom'), true, 'restored pin reserves space in the new panel');
   } finally {
     await cdp.send('Target.closeTarget', { targetId: restoredToolbar.targetId });
@@ -422,7 +456,7 @@ try {
     dockSession = tabQueue.dockSession;
   }
   editorBoundaries = await checkEditorBoundaries({ cdp, id, evaluate, until, session, contexts });
-  await evaluate(dockSession, 'document.getElementById("chat-tab").click()');
+  await evaluate(dockSession, 'if (document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
   await until(async () => await evaluate(dockSession, 'document.getElementById("connection")?.dataset.state') === 'ready', 'native dock ChatGPT readiness');
   const dockContexts = await evaluate(workerSession, 'chrome.runtime.getContexts({contextTypes:["SIDE_PANEL"]})');
   await cdp.send('Page.navigate', { url: 'about:blank#another-page' }, await session(source.targetId));

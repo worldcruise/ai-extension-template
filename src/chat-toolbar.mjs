@@ -41,8 +41,8 @@ export function createChatToolbar({ currentUrl, onHistoryNeeded = () => {}, onNa
   void browser.storage.local.get(pinKey).then(data => { if (!pinRevision && data[pinKey] === true) setPinned(true); }).catch(() => {});
   function updateCurrent() {
     const canMove = history.enabled && history.ready && !history.pending && !history.hasDraft && !history.busy && !history.navigating && history.reason !== 'signed-out';
-    newer.disabled = !canMove || !history.loaded || !routes.target(history.urls, currentUrl(), -1);
-    older.disabled = !canMove || Boolean(history.loaded && !routes.target(history.urls, currentUrl(), 1));
+    newer.disabled = !canMove || (history.loaded ? !routes.target(history.urls, currentUrl(), -1, history.pinnedUrls) : !routes.conversation(currentUrl()));
+    older.disabled = !canMove || Boolean(history.loaded && !routes.target(history.urls, currentUrl(), 1, history.pinnedUrls));
     const blocked = history.hasDraft ? 'Finish or clear the draft before switching chats.' : history.busy ? 'Wait for the response to finish before switching chats.'
       : !history.ready || !history.enabled ? `${providerName} is not ready.` : '';
     newer.title = blocked || (newer.disabled ? 'No newer conversation is available.' : `Newer ${providerName} conversation`);
@@ -79,7 +79,7 @@ export function createChatToolbar({ currentUrl, onHistoryNeeded = () => {}, onNa
   document.addEventListener('keydown', event => {
     keyboardMode = true;
     if (event.key !== 'Escape' || shell.dataset.open !== 'true' || q('#chat-view').hidden || root !== document && root.hidden) return;
-    event.preventDefault(); searchStatus.hidden = true; hide(); q('#chat-tab').focus();
+    event.preventDefault(); searchStatus.hidden = true; hide(); q('#chat-dock-toggle').focus();
   });
   window.addEventListener('pagehide', () => clearTimeout(hideTimer), { once: true });
   updateCurrent();

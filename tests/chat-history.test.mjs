@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import '../src/chat-history.js';
+import '../src/sidebar-history.js';
 
 const { target, ordered, snapshot, createReader } = globalThis.AiAgentChatHistory;
 const url = id => `https://chatgpt.com/c/${id}`;
@@ -18,11 +19,24 @@ test('chat history follows top-to-bottom order without wrapping past new, newest
   assert.equal(target(urls,urls[0],0),null);
 });
 
+test('pinned conversations are skipped, with pinned and new chats starting at the newest regular conversation', () => {
+  const pins = [url('pin')], all = [url('pin'), url('newest'), url('oldest')];
+  for (const current of ['https://chatgpt.com/', url('pin')]) {
+    assert.equal(target(all, current, 1, pins), url('newest'));
+    assert.equal(target(all, current, -1, pins), null);
+  }
+  assert.equal(target(all, url('newest'), -1, pins), null);
+  assert.equal(target(all, url('newest'), 1, pins), url('oldest'));
+  assert.equal(target(all, url('oldest'), 1, pins), null);
+  assert.equal(target(all, url('not-loaded'), 1, pins), null);
+  assert.equal(target(pins, url('pin'), 1, pins), null);
+});
+
 test('history identities are bounded, deduplicated, and restricted to ChatGPT conversation routes', () => {
   assert.deepEqual(ordered([url('a')+'?private=query',url('a')+'#hash','https://evil.test/c/chat','https://chatgpt.com/auth/login','https://chatgpt.com/','https://chatgpt.com/g/team/c/b']), [url('a'),'https://chatgpt.com/g/team/c/b']);
   const value = {loaded:true,ready:true,hasDraft:false,busy:false,currentUrl:'https://chatgpt.com/',urls:[url('a')]};
   assert.ok(snapshot(value));
-  for (const extra of [{urls:['https://evil.test/c/chat']},{urls:Array(301).fill(url('a'))},{currentUrl:'https://chatgpt.com/auth/login'},{hasDraft:'false'},{dispatched:true,target:url('missing')}]) assert.equal(snapshot({...value,...extra}),null);
+  for (const extra of [{urls:['https://evil.test/c/chat']},{urls:Array(301).fill(url('a'))},{pinnedUrls:['https://evil.test/c/chat']},{pinnedUrls:Array(301).fill(url('a'))},{pinnedUrls:'invalid'},{currentUrl:'https://chatgpt.com/auth/login'},{hasDraft:'false'},{dispatched:true,target:url('missing')}]) assert.equal(snapshot({...value,...extra}),null);
 });
 
 test('history snapshots forward only bounded titles and known conversation references', () => {
@@ -43,7 +57,7 @@ function readerFixture(t) {
   globalThis.getComputedStyle = () => ({visibility:'visible'});
   t.after(() => { globalThis.getComputedStyle = before; });
   const clicked = [];
-  const links = ['a','b','c'].map(id => ({href:url(id),textContent:` Chat ${id} `,target:'',isConnected:true,click:()=>clicked.push(id)}));
+  const links = ['a','b','c'].map(id => ({href:url(id),textContent:` Chat ${id} `,target:'',isConnected:true,closest:()=>null,getClientRects:()=>[{}],click:()=>clicked.push(id)}));
   const editor = {value:'',isConnected:true,disabled:false,matches:()=>true,getClientRects:()=>[{}]};
   const state = {composerReady:true,hasDraft:false,busy:false,authState:'unknown'};
   const page = {href:url('a')};
@@ -51,6 +65,24 @@ function readerFixture(t) {
     querySelector:selector => selector.startsWith('#prompt-textarea') ? editor : null};
   return {clicked,links,editor,state,page,reader:createReader({getConnection:()=>state,document:doc,location:page})};
 }
+
+test('pinning a cached target prevents its dispatch and duplicate pinned links stay excluded', async t => {
+  const fixture = readerFixture(t), replies = [];
+  fixture.links[0].textContent = 'Pinned';
+  assert.deepEqual(fixture.reader.peek().urls, [url('a'), url('b'), url('c')], 'titles never imply pin status');
+  fixture.links[1].closest = selector => selector.includes('data-pinned') ? {} : null;
+  fixture.links.push({ ...fixture.links[1], closest: () => null });
+  const state = fixture.reader.peek();
+  assert.deepEqual(state.urls, [url('a'), url('c')]);
+  assert.deepEqual(state.pinnedUrls, [url('b')]);
+  await fixture.reader.open({currentUrl:url('a'),target:url('b'),direction:1}, value=>replies.push(value));
+  assert.equal(replies.at(-1).dispatched, false);
+  assert.deepEqual(fixture.clicked, []);
+  fixture.page.href = url('b');
+  await fixture.reader.open({currentUrl:url('b'),target:url('a'),direction:1}, value=>replies.push(value));
+  assert.equal(replies.at(-1).dispatched, true);
+  assert.deepEqual(fixture.clicked, ['a']);
+});
 
 test('native history navigation rechecks drafts and generation immediately before clicking', async t => {
   const fixture = readerFixture(t), replies = [];

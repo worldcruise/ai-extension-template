@@ -1,0 +1,16 @@
+<svg width="110" height="110" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Larger Check Mark 1 -->
+  <path d="M12 20 L20 28 L39 10" fill="none" stroke="#0066FF" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Shortened Rounded Line 1 -->
+  <rect x="50" y="13" width="42" height="14" rx="7" ry="7" fill="#0066FF"/>
+  
+  <!-- Larger Check Mark 2 -->
+  <path d="M12 50 L20 58 L39 40" fill="none" stroke="#0066FF" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Shortened Rounded Line 2 -->
+  <rect x="50" y="43" width="42" height="14" rx="7" ry="7" fill="#0066FF"/>
+  
+  <!-- Larger Check Mark 3 -->
+  <path d="M12 80 L20 88 L39 70" fill="none" stroke="#0066FF" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Shortened Rounded Line 3 -->
+  <rect x="50" y="73" width="42" height="14" rx="7" ry="7" fill="#0066FF"/>
+</svg>

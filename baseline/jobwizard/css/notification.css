@@ -1,0 +1,372 @@
+/* Submission Notification Styles */
+/* These styles were previously defined in JS and applied via jQuery .css() */
+
+.jw-submission-notification {
+  background-color: #ffffff;
+  color: #1a1a1a;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+  z-index: 999999;
+  opacity: 0;
+  position: fixed;
+  bottom: -100%;
+  right: 24px;
+  width: 380px;
+  font-family: var(--jobwizard-font-family);
+  font-size: 14px;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  text-align: left;
+  cursor: default;
+  user-select: none;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transform: translateY(20px) scale(0.95);
+  will-change: transform, opacity;
+}
+
+/* ── Mini Icon Status: replaces logo img with status icon ── */
+
+/* 3D flip transition for swapping the img src */
+.mini_plugin_logo img.jw-img-flip-out {
+  animation: jw-flip-out 0.2s ease-in forwards;
+}
+
+.mini_plugin_logo img.jw-img-flip-in {
+  animation: jw-flip-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes jw-flip-out {
+  0%   { transform: scale(1) rotateY(0); opacity: 1; }
+  100% { transform: scale(0.6) rotateY(90deg); opacity: 0; }
+}
+
+@keyframes jw-flip-in {
+  0%   { transform: scale(0.6) rotateY(-90deg); opacity: 0; }
+  100% { transform: scale(1) rotateY(0); opacity: 1; }
+}
+
+/* ── Saving: gentle float + shimmer sweep ── */
+.mini_plugin_logo.jw-save-loading img {
+  animation: jw-save-float 2s ease-in-out infinite;
+}
+
+.mini_plugin_logo.jw-save-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: jw-shimmer-sweep 2s ease-in-out infinite;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Gentle float: small vertical bobbing */
+@keyframes jw-save-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+
+/* Shimmer light sweep across the icon */
+@keyframes jw-shimmer-sweep {
+  0%   { left: -100%; opacity: 0; }
+  30%  { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+
+/* ── Success: celebratory bounce + glow burst ── */
+.mini_plugin_logo.jw-save-success img {
+  animation: jw-success-bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mini_plugin_logo.jw-save-success {
+  animation: jw-success-glow 0.8s ease-out;
+}
+
+@keyframes jw-success-bounce {
+  0%   { transform: scale(0.5); }
+  50%  { transform: scale(1.15); }
+  70%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+@keyframes jw-success-glow {
+  0%   { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.6); }
+  40%  { box-shadow: 0 0 16px 4px rgba(52, 199, 89, 0.3); }
+  100% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
+}
+
+/* ── Error: shake + red flash ── */
+.mini_plugin_logo.jw-save-error img {
+  animation: jw-error-shake 0.5s cubic-bezier(.36,.07,.19,.97);
+}
+
+.mini_plugin_logo.jw-save-error {
+  animation: jw-error-flash 0.6s ease-out;
+  cursor: pointer;
+}
+
+@keyframes jw-error-shake {
+  10%, 90% { transform: translateX(-1.5px); }
+  20%, 80% { transform: translateX(2.5px); }
+  30%, 50%, 70% { transform: translateX(-3px); }
+  40%, 60% { transform: translateX(3px); }
+}
+
+@keyframes jw-error-flash {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.6); background: #fff; }
+  20%  { box-shadow: 0 0 12px 3px rgba(255, 59, 48, 0.3); background: #fff5f5; }
+  100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); background: #fff; }
+}
+
+.jw-submission-notification.jw-error-notification {
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.jw-notification-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.jw-notification-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.jw-logo-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.jw-logo-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.jw-logo-title span {
+  font-weight: 700;
+  font-size: 16px;
+  color: #111;
+}
+
+.jw-error-notification .jw-logo-title span {
+  color: #d32f2f;
+  font-weight: 700;
+}
+
+.jw-sub-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #555;
+  margin-top: 6px;
+  padding-bottom: 4px;
+}
+
+.jw-close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+.jw-close-btn:hover {
+  opacity: 0.8;
+}
+
+.jw-button-container {
+  display: flex;
+  gap: 8px;
+}
+
+.jw-button-container {
+  display: flex;
+  gap: 8px;
+}
+
+.jw-error-notification .jw-button-container {
+  justify-content: center;
+}
+
+.jw-notification-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.jw-notification-btn:active {
+  transform: scale(0.98);
+}
+
+.jw-notification-btn:hover {
+  opacity: 0.8;
+}
+
+.jw-notification-btn.jw-primary {
+  background-color: #0066ff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.jw-notification-btn.jw-primary:hover {
+  background-color: #0052cc;
+}
+
+.jw-error-notification .jw-notification-btn.jw-primary.jw-retry-btn {
+  background-color: #d32f2f;
+  color: white;
+}
+
+.jw-error-notification .jw-notification-btn.jw-primary.jw-retry-btn:hover {
+  background-color: #c62828;
+}
+
+.jw-notification-btn.jw-secondary {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.jw-notification-btn.jw-secondary:hover {
+  background-color: #e5e5e5;
+}
+
+.jw-error-notification .jw-notification-btn.jw-secondary.jw-report-bug-btn {
+  background-color: #ffffff;
+  border: 1px solid #d32f2f;
+  color: #d32f2f;
+}
+
+.jw-error-notification .jw-notification-btn.jw-secondary.jw-report-bug-btn:hover {
+  background-color: #ffebee;
+}
+
+.jw-notification-countdown {
+  font-size: 12px;
+  color: #999;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.jw-applications-count {
+  font-size: 13px;
+  color: #444;
+  margin-top: 8px;
+  margin-bottom: 2px;
+  line-height: 1.4;
+}
+
+.jw-confirmation-text {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.4;
+  margin-top: 10px;
+}
+
+.jw-error-notification .jw-confirmation-text {
+  color: #555;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.jw-loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0;
+  color: #0066ff;
+  margin-top: 4px;
+}
+
+.jw-loading-spinner svg {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Toggle switch styles (if used) */
+.jw-toggle-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.jw-toggle-label {
+  font-size: 13px;
+  color: #666;
+  cursor: pointer;
+}
+
+.jw-toggle {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  background-color: #ddd;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.jw-toggle.active {
+  background-color: #0066ff;
+}
+
+.jw-toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: left 0.2s;
+}
+
+.jw-toggle.active .jw-toggle-knob {
+  left: 18px;
+}
+

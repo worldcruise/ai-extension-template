@@ -1,0 +1,743 @@
+{
+  "reviewDate": "2026-11-10",
+  "scope": "Static inspection of supplied local builds; no vendor account requests or ATS writes performed.",
+  "packages": [
+    {
+      "id": "jobright",
+      "root": "baseline/jobright",
+      "name": "Jobright Autofill – Instant Job Applications, Job Match, AI Tailor Resume",
+      "version": "1.26.1",
+      "manifestVersion": 3,
+      "permissions": [
+        "storage",
+        "scripting",
+        "declarativeNetRequest",
+        "cookies",
+        "webNavigation",
+        "alarms"
+      ],
+      "hostPermissions": [
+        "http://*/*",
+        "https://*/*",
+        "<all_urls>"
+      ]
+    },
+    {
+      "id": "simplify",
+      "root": "baseline/Simplify",
+      "name": "Simplify Copilot - Autofill job applications, job tracker & AI resumes",
+      "version": "3.1.14",
+      "manifestVersion": 3,
+      "permissions": [
+        "activeTab",
+        "alarms",
+        "cookies",
+        "contextMenus",
+        "offscreen",
+        "storage",
+        "tabs",
+        "unlimitedStorage",
+        "webNavigation",
+        "webRequest"
+      ],
+      "hostPermissions": [
+        "*://*/*"
+      ]
+    },
+    {
+      "id": "jobwizard",
+      "root": "baseline/jobwizard",
+      "name": "JobWizard - AI Job Application Autofill, Tracker & ATS Resume Builder",
+      "version": "1.1.52",
+      "manifestVersion": 3,
+      "permissions": [
+        "background",
+        "storage",
+        "cookies",
+        "scripting",
+        "activeTab",
+        "tabs",
+        "webNavigation"
+      ],
+      "hostPermissions": [
+        "https://*.jobwizard.ai/*",
+        "https://*/*",
+        "https://api.jobwizard.ai/*"
+      ]
+    }
+  ],
+  "catalog": {
+    "atsRootKeys": 58,
+    "atsConfigurationsWithUrls": 54,
+    "atsNames": [
+      "ADP",
+      "ADP2",
+      "Amazon",
+      "Apple",
+      "AshbyHQ",
+      "Avature",
+      "BambooHR",
+      "BrassRing",
+      "BreezyHR",
+      "ByteDance",
+      "Comeet",
+      "Cursor",
+      "DayforceHCM",
+      "Dover",
+      "Eightfold",
+      "FreshTeam",
+      "Google",
+      "GovernmentJobs",
+      "Greenhouse",
+      "Gusto",
+      "HiBob",
+      "ICIMS",
+      "IBM",
+      "Indeed",
+      "JazzHR",
+      "JobScore",
+      "Jobvite",
+      "Lever",
+      "LinkedIn",
+      "Mechanize",
+      "Meta",
+      "Naukri",
+      "Okta",
+      "OracleCloud",
+      "Paylocity",
+      "PinpointHQ",
+      "Polymer",
+      "Recruitee",
+      "Rippling",
+      "Roblox",
+      "SaaSHR",
+      "SEEK",
+      "SmartRecruiters",
+      "SuccessFactors",
+      "Taleo",
+      "TalNet",
+      "Tesla",
+      "TikTok",
+      "TriNetHire",
+      "Uber",
+      "Ultipro",
+      "Waymo",
+      "Workable",
+      "Workday"
+    ],
+    "boardNames": [
+      "Handshake",
+      "Indeed",
+      "LinkedIn",
+      "WelcomeToTheJungle"
+    ],
+    "resumeScoreConfigs": 58,
+    "examples": [
+      {
+        "name": "Workday",
+        "defaultMethod": "react",
+        "inputSelectorKeys": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+          "16",
+          "17",
+          "18",
+          "19",
+          "20",
+          "21",
+          "22",
+          "23",
+          "24"
+        ],
+        "trackedInputSelectorKeys": [
+          "0",
+          "1",
+          "2"
+        ],
+        "jobDescriptionPath": ".//div[@aria-label=\"Job Posting Description\"]//div[@data-automation-id=\"jobPostingDescription\"]",
+        "jobTitlePath": ".//h2[@data-automation-id=\"jobPostingHeader\"]"
+      },
+      {
+        "name": "Greenhouse",
+        "defaultMethod": "react",
+        "inputSelectorKeys": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+          "16",
+          "17",
+          "18",
+          "19",
+          "20",
+          "21",
+          "22",
+          "23",
+          "24"
+        ],
+        "trackedInputSelectorKeys": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14"
+        ],
+        "jobDescriptionPath": [
+          ".//div[@id=\"app_body\"]//div[@id=\"content\"]",
+          ".//div[contains(@class, \"job__description\") or contains(@class, \"job-description\")]",
+          ".//*[@id=\"main\"]//div[@class=\"page-positions__content\"]",
+          ".//ion-content/main/ng-component/section/article/markdown[descendant::div[@class=\"content-intro\"]]",
+          ".//div[@data-job-id]"
+        ],
+        "jobTitlePath": [
+          ".//div[@id=\"app_body\"]//h1[@class=\"app-title\"]",
+          ".//div[contains(@class, \"job__title\")]/h1",
+          ".//div[@class=\"section-body\"]/h1",
+          ".//header/h1",
+          ".//div[@data-job-id]//h1[1]"
+        ]
+      },
+      {
+        "name": "Lever",
+        "inputSelectorKeys": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+          "16",
+          "17",
+          "18",
+          "19",
+          "20",
+          "21",
+          "22",
+          "23",
+          "24"
+        ],
+        "trackedInputSelectorKeys": [
+          "0",
+          "1",
+          "2"
+        ],
+        "jobDescriptionPath": [
+          ".//div[@data-qa=\"job-description\"]/parent::*",
+          ".//meta[@name=\"twitter:description\" or @property=\"og:description\"]/@content"
+        ],
+        "jobTitlePath": [
+          ".//div[contains(@class, \"posting-header\")]/div[contains(@class, \"posting-headline\")]/h2",
+          ".//div[contains(@class, \"posting-header\")]/h2"
+        ]
+      },
+      {
+        "name": "AshbyHQ",
+        "inputSelectorKeys": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+          "16",
+          "17",
+          "18",
+          "19",
+          "20",
+          "21",
+          "22",
+          "23",
+          "24"
+        ],
+        "trackedInputSelectorKeys": [
+          "0",
+          "1",
+          "2",
+          "3"
+        ],
+        "jobDescriptionPath": ".//div[@id=\"overview\"]/div[contains(@class, \"descriptionText\")]",
+        "jobTitlePath": ".//h1[contains(@class, \"_title_\") and contains(@class, \"ashby-job-posting-heading\")]"
+      }
+    ]
+  },
+  "files": [
+    {
+      "path": "baseline/jobright/helper-app.41ea2652.js",
+      "bytes": 8705922,
+      "sha256": "7178fa439972584435f54135199635241407da41a9946fa838844013300691f8"
+    },
+    {
+      "path": "baseline/jobright/static/background/index.js",
+      "bytes": 1026844,
+      "sha256": "622188f972fc3e1b52bc4f9a49b65998af7dab877e46b868de8bd47fc1fd98f8"
+    },
+    {
+      "path": "baseline/jobright/field-discovery.d71b3ac3.js",
+      "bytes": 18762,
+      "sha256": "f197b3ac83cde8fa90dc61b1ea132d5e96be8331c9d302a5c728db324403ffd4"
+    },
+    {
+      "path": "baseline/Simplify/contentScriptMain.js",
+      "bytes": 2393109,
+      "sha256": "58d7793051993a1e092cd271630a7fbc39d6b49c1845a75f9834267745a983b0"
+    },
+    {
+      "path": "baseline/Simplify/background.js",
+      "bytes": 2206868,
+      "sha256": "c7dbd43e13bb45cf07666aa0dbd4eaa7a91d1d953b561262d6cc870d5a21e5ad"
+    },
+    {
+      "path": "baseline/jobwizard/js/jdSource.js",
+      "bytes": 7888,
+      "sha256": "d421272186f5528fab3bd04c8baece64280bef6ca5db38791748ba3a37c861ab"
+    },
+    {
+      "path": "baseline/jobwizard/js/jobIdentity.js",
+      "bytes": 10393,
+      "sha256": "6260c6cb1662381f770be1ac3ed5edfa74b43ea37f555e563d6ce0ce5b36d9f8"
+    },
+    {
+      "path": "baseline/jobwizard/js/bundle.js",
+      "bytes": 6629104,
+      "sha256": "db1c95ef9f49dcb1c0e5e00f8f291c2df2a7f1119538d1f9332d5bc5d374e412"
+    },
+    {
+      "path": "baseline/jobwizard/js/formCollectionLifecycle.js",
+      "bytes": 10720,
+      "sha256": "10e559b5078b3fc0cad69a2408a7333f83bf9feede06e64dfb06ba0b4b7f9196"
+    },
+    {
+      "path": "baseline/jobwizard/js/typeaheadFill.js",
+      "bytes": 27897,
+      "sha256": "742c1ccff4ed654886992cb81f3af613b1cc3831b310eef34aadcb1a8ecd34ed"
+    },
+    {
+      "path": "baseline/jobwizard/js/iframeWriteScope.js",
+      "bytes": 3052,
+      "sha256": "2d6a7751dad0553b7a0dc7c1460422c06fba9b4bed634c9a071e31b1944564a8"
+    },
+    {
+      "path": "baseline/jobwizard/js/applicationSubmitAuthority.js",
+      "bytes": 3206,
+      "sha256": "cbe828fcf69d90798da2f873d4d6f2e7cc8e2b574769b8bd2d75962853c82583"
+    },
+    {
+      "path": "baseline/jobwizard/js/patternCacheManager.js",
+      "bytes": 4599,
+      "sha256": "6dd5b61a448c143962766b4c3755baa581f6a128e8b1128ff65928bbd3840c5c"
+    },
+    {
+      "path": "baseline/jobright/manifest.json",
+      "bytes": 3931,
+      "sha256": "8e46df26a653bdaffbfb4397e4938fac0dedc5c305c46f4818cb651b52f500e2"
+    },
+    {
+      "path": "baseline/Simplify/manifest.json",
+      "bytes": 3008,
+      "sha256": "8a1bcf38d5643269b1b055b8fb3e322a752a7789dd58ce7661240d031d0076cf"
+    },
+    {
+      "path": "baseline/jobwizard/manifest.json",
+      "bytes": 4059,
+      "sha256": "9c6b8a12037f052f87f871b959a6abe088a2573e27b1b7891b544b3d23a40ef8"
+    },
+    {
+      "path": "baseline/Simplify/remoteConfig.json",
+      "bytes": 38358740,
+      "sha256": "084357f281b95fb2db746d73fbaea792ecfadf16729a51cfd6e6afa7176a64d4"
+    },
+    {
+      "path": "baseline/Simplify/pageScript.js",
+      "bytes": 83607,
+      "sha256": "ef9d905e87c1954e6f4c4419c70211595cae8138290f24c6fa7b95bfee40b23f"
+    },
+    {
+      "path": "baseline/Simplify/content-scripts/content.js",
+      "bytes": 22331,
+      "sha256": "bf4b0430f841808166ac97371c96d53c641ebd9e17fad2490ded5088f33f7dcb"
+    },
+    {
+      "path": "baseline/jobwizard/js/background.js",
+      "bytes": 354952,
+      "sha256": "bf807e6fad988d1a87404c307ce551d84c590c9242f9c383fc5607c098b6e69d"
+    },
+    {
+      "path": "baseline/jobwizard/js/choiceOwnershipResolver.js",
+      "bytes": 48795,
+      "sha256": "98fcdbd4f445fbf1ca35e1a0e379307896aeda325b160c27dde874b56e65a13b"
+    },
+    {
+      "path": "baseline/jobwizard/js/workdayNativeTransactions.js",
+      "bytes": 14546,
+      "sha256": "54517435d5811b32186448aae8cab6b975bc422afe90222c492d2daf10534985"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "J01",
+      "path": "baseline/jobright/helper-app.41ea2652.js",
+      "marker": "class ej{static create",
+      "found": true,
+      "offsetUtf16": 4579389,
+      "byteOffset": 4579389,
+      "line": 872,
+      "excerpt": "ance,isolved:Y.Isolved,jacobs:V.Jacobs,careerstoasttab:x.CareersToasttab,jobdiva:W.Jobdiva},eD=null;class ej{static create(){let e=(0,eF.getTargetName)();if(e)return eD=new e_[e],(0,u.initializeAtsJobApplied)(e),eD}}r.default=ej},{\"~contents/sites/walton\":\"1mTv5\",\"~contents/sites/taxcreditco\":\"km8eq\",\"~contents/sites/adp-taxcredits\":\"f94a7\",\"~contents/sites/jobcredits\":\"kQSNc\",\"~contents/sites/paycor\":\"gXc1o\",\"~contents/sites/ats-job-applied\":\"5x2Kp\",\"~contents/sites/adobe\":\"eGEF6\",\"~contents/sites/adp-myjobs\":\"i9smx\",\"~contents/sites/adp-recruiting\":\"9zFM0\",\"~contents/sites/adp-workforcenow\":\"8CqoG\",\"~contents/sites/amazon\":\"de7zi\",\"~contents/sites/apple\":\"c6v3o\",\"~contents/sites/ashby\":\"9H7dQ\",\"~contents/sites/avature\":\"g7awH\",\"~contents/"
+    },
+    {
+      "id": "J02",
+      "path": "baseline/jobright/static/background/index.js",
+      "marker": "/swan/share/job/",
+      "found": true,
+      "offsetUtf16": 286097,
+      "byteOffset": 286097,
+      "line": 9,
+      "excerpt": "ent-Type\":\"application/json\"},body:JSON.stringify(e)}).then(e=>e.json()),y=e=>fetch(`${o.API_DOMAIN}/swan/share/job/${e}`,{credentials:\"include\"}).then(e=>e.json()),_=e=>\"l_null\"===e?Promise.resolve(null):fetch(`${o.API_DOMAIN}/swan/share/job/banner/${e}`,{credentials:\"include\"}).then(e=>e.json())},{\"./autofill-info\":\"5veUj\",\"./env-resolver\":\"6nlTt\",\"@parcel/transformer-js/src/esmodule-helpers.js\":\"hbR2Q\"}],\"5veUj\":[function(e,t,r){var a=e(\"@parcel/transformer-js/src/esmodule-helpers.js\");a.defineInteropFlag(r),a.export(r,\"isAutofillInfoRevision\",()=>n),a.export(r,\"isAutofillInfoSaveSuccess\",()=>s),a.export(r,\"isAutofillInfoConflict\",()=>i),a.export(r,\"parseAutofillInfoSaveResponse\",()=>l),a.export(r,\"parseAutofillInfoGetResponse\",()=>c),a."
+    },
+    {
+      "id": "J03",
+      "path": "baseline/jobright/static/background/index.js",
+      "marker": "/swan/import/job",
+      "found": true,
+      "offsetUtf16": 307976,
+      "byteOffset": 307976,
+      "line": 9,
+      "excerpt": "t.json();return r?.success===!1?null:r?.result??null},l=async e=>{let t=await fetch(`${n.API_DOMAIN}/swan/import/job`,{method:\"POST\",headers:{\"Content-Type\":\"application/json\"},body:JSON.stringify(e)});if(!t.ok)throw Error(`Failed to import job: ${t.statusText}`);let r=await t.json(),a=r?.result;if(r?.success!==!0||\"string\"!=typeof a||!a.trim())throw Error(\"Failed to import job\");return a}},{\"./env-resolver\":\"6nlTt\",\"@parcel/transformer-js/src/esmodule-helpers.js\":\"hbR2Q\"}],gI90n:[function(e,t,r){e(\"@parcel/transformer-js/src/esmodule-helpers.js\").defineInteropFlag(r);var a=e(\"~api/autoFill\"),n=e(\"~enums/http\");let o=async(e,t)=>{await (0,a.fetchRuleByElements)(e.body.params,e.body.sceneToken).then(e=>{if(e?.errorCode===40008){t.send({data:"
+    },
+    {
+      "id": "J04",
+      "path": "baseline/jobright/static/background/index.js",
+      "marker": "/swan/autofill/fill-v2-stream",
+      "found": true,
+      "offsetUtf16": 76851,
+      "byteOffset": 76851,
+      "line": 1,
+      "excerpt": "),f.signal.aborted))throw new g(\"Autofill cancelled\",\"cancelled\");let l=await fetch(`${d.API_DOMAIN}/swan/autofill/fill-v2-stream`,{method:\"POST\",body:JSON.stringify((0,s.sanitizeAutofillRequestOptions)((0,u.withAutofillContext)({...e,token:p.token}),r)),headers:{\"Content-Type\":\"application/json\",Accept:\"text/event-stream\",...a?{\"X-Autofill-Scene-Token\":a}:{}},credentials:\"include\",signal:f.signal}),m=l.headers.get(\"Content-Type\")?.split(\";\",1)[0].trim().toLowerCase()===\"text/event-stream\";if(!m||!l.ok){let e;try{e=await l.json()}catch{throw new g(\"Invalid Autofill response\",l.ok?void 0:l.status)}if(!l.ok||e?.success===!1||\"number\"==typeof e?.errorCode&&0!==e.errorCode&&1e4!==e.errorCode)throw new g(\"Autofill request failed\",l.status,e?.err"
+    },
+    {
+      "id": "J05",
+      "path": "baseline/jobright/field-discovery.d71b3ac3.js",
+      "marker": "collectEvidence",
+      "found": true,
+      "offsetUtf16": 5614,
+      "byteOffset": 5614,
+      "line": 1,
+      "excerpt": "e,t,r){var o=e(\"@parcel/transformer-js/src/esmodule-helpers.js\");o.defineInteropFlag(r),o.export(r,\"collectEvidence\",()=>n.collectEvidence),o.export(r,\"applyProposals\",()=>l.applyProposals),o.export(r,\"modelRequest\",()=>l.modelRequest),o.export(r,\"recognizeFields\",()=>l.recognizeFields),o.export(r,\"discoverFields\",()=>s);var n=e(\"./collect\"),l=e(\"./recognize\"),i=e(\"./schema\");async function s(e,t,r={}){r.signal?.throwIfAborted();let o=(0,n.collectEvidence)(e),i=(0,l.recognizeFields)(o.snapshot);if(!i.fields.some(e=>\"unresolved\"===e.source))return i;let s=()=>{let t=(0,n.collectEvidence)(e,o.snapshot.snapshotId);return!e.isConnected||JSON.stringify(t.snapshot)!==JSON.stringify(o.snapshot)||[...o.bindings].some(([e,r])=>t.bindings.get(e)!==r)"
+    },
+    {
+      "id": "J06",
+      "path": "baseline/jobright/helper-app.41ea2652.js",
+      "marker": "class q{watchManualFieldProgress",
+      "found": true,
+      "offsetUtf16": 3309140,
+      "byteOffset": 3309140,
+      "line": 832,
+      "excerpt": "Marker)({...e,regular:{...R(e),...R(t,r)},...n.length||o.length?{fillDataList:[...n,...o]}:{}},e,t)}class q{watchManualFieldProgress(e,t){this.stopManualFieldProgress?.(),this.stopManualFieldProgress=(0,c.bindManualFieldProgress)(e,this.progressTracker,t)}constructor(){this.coverLetterFillTask=null,this.completedCoverLetterInputs=new Set,this.hasComboQuestions=!1,this.comboQuestionSettleDelayMs=300,this.comboQuestionQuietPeriodMs=0,this.comboQuestionSettleMaxWaitMs=300,this.comboQuestionMaxRounds=1,this.timeTrace={rulesParseStartTime:0,requestStartTime:0,fillStartTime:0},this.submitTrackingAbortController=null,this.falconResponseAccumulator=new T.FalconResponseAccumulator,this.streamedRegularRules=new WeakSet,this.streamedRegularOperations="
+    },
+    {
+      "id": "J07",
+      "path": "baseline/jobright/helper-app.41ea2652.js",
+      "marker": "function E(e,t,r={}){let n=new URL(`/jobs/info/${t}`,e)",
+      "found": true,
+      "offsetUtf16": 2097092,
+      "byteOffset": 2097092,
+      "line": 398,
+      "excerpt": "_PREFIX))return;let n=r.find(e=>e.resumeId===t),i=n?.resumeId?.trim();if(!(!i||n?.primary))return i}function E(e,t,r={}){let n=new URL(`/jobs/info/${t}`,e),o=r.resumeId?.trim();return n.searchParams.set(\"plugin_tailor\",\"1\"),o&&n.searchParams.set(u,o),w(n.toString(),t)}function C(e){return(0,i.matchesAnyDomain)(e.toLowerCase(),c)}function x(e,t){return d.some(r=>(0,i.matchesAnyDomain)(e,r)&&(0,i.matchesAnyDomain)(t,r))}function A(e,t,r){let n=e.toLowerCase(),o=t.toLowerCase();return(0,i.isDomainMatch)(n,o)||(0,i.isDomainMatch)(o,n)||x(n,o)||null!==(0,l.getInventoryMatchSourceByUrl)(r)}function T(e,t){let r=e.toLowerCase(),n=t.toLowerCase();return(0,i.isDomainMatch)(r,n)||(0,i.isDomainMatch)(n,r)||x(r,n)}function k(e,t,r){let n;if(!t||!e||e.s"
+    },
+    {
+      "id": "J08",
+      "path": "baseline/jobright/static/background/index.js",
+      "marker": "/swan/resume-tailor/history",
+      "found": true,
+      "offsetUtf16": 290437,
+      "byteOffset": 290437,
+      "line": 9,
+      "excerpt": "type.hasOwnProperty.call(t,\"success\")&&!0!==t.success?null:t}let d=async e=>e?fetch(`${o.API_DOMAIN}/swan/resume-tailor/history?jobId=${encodeURIComponent(e)}&t=${new Date().getTime()}`,{headers:{\"Content-Type\":\"application/json\"},credentials:\"include\"}).then(async e=>u(e)):null,p=async e=>{if(!e)return null;let t=encodeURIComponent(e);return fetch(`${o.HOST_DOMAIN}/api/resume/get-filename?jobId=${t}`,{headers:{\"Content-Type\":\"application/json\"},credentials:\"include\"}).then(async e=>{let t=await u(e);return t&&\"string\"==typeof t.result?t:null})},f=async e=>e?fetch(`${o.API_DOMAIN}/swan/agent/resume/view?tailorId=${encodeURIComponent(e)}&t=${new Date().getTime()}`,{headers:{\"Content-Type\":\"application/json\"},credentials:\"include\"}).then(u):n"
+    },
+    {
+      "id": "J09",
+      "path": "baseline/jobright/static/background/index.js",
+      "marker": "/swan/autofill/cover-letter",
+      "found": true,
+      "offsetUtf16": 71336,
+      "byteOffset": 71336,
+      "line": 1,
+      "excerpt": "{try{return await e.json()}catch{return null}}async function i(e){let t=await fetch(`${n.API_DOMAIN}/swan/autofill/cover-letter`,{method:\"POST\",headers:{\"Content-Type\":\"application/json\"},credentials:\"include\",body:JSON.stringify(e)}),r=await s(t);if(!t.ok||r?.success!==!0)throw new o(t.status,r);if(r.result?.jobId!==e.jobId)throw Error(\"Generated cover letter does not match the requested job\");if(\"string\"!=typeof r.result?.coverLetterId||!r.result.coverLetterId.trim()||\"string\"!=typeof r.result?.markdown||!r.result.markdown.trim())throw Error(\"Generated cover letter is not a usable document\");return r.result}},{\"./env-resolver\":\"6nlTt\",\"@parcel/transformer-js/src/esmodule-helpers.js\":\"hbR2Q\"}],\"5I4lI\":[function(e,t,r){var a,n,o,s,i=e(\"@par"
+    },
+    {
+      "id": "J10",
+      "path": "baseline/jobright/static/background/index.js",
+      "marker": "/api/resume-tailor/download",
+      "found": true,
+      "offsetUtf16": 290113,
+      "byteOffset": 290113,
+      "line": 9,
+      "excerpt": "entials:\"include\"})},c=async(e,t)=>{let{style:r,template:a,...n}=e||{};return fetch(`${o.API_DOMAIN}/api/resume-tailor/download`,{method:\"POST\",body:JSON.stringify({...n,resumeId:e?.resumeTailor?.resumeId??void 0}),credentials:\"include\"})};async function u(e){if(!e.ok)return null;let t=await e.json();return t&&Object.prototype.hasOwnProperty.call(t,\"success\")&&!0!==t.success?null:t}let d=async e=>e?fetch(`${o.API_DOMAIN}/swan/resume-tailor/history?jobId=${encodeURIComponent(e)}&t=${new Date().getTime()}`,{headers:{\"Content-Type\":\"application/json\"},credentials:\"include\"}).then(async e=>u(e)):null,p=async e=>{if(!e)return null;let t=encodeURIComponent(e);return fetch(`${o.HOST_DOMAIN}/api/resume/get-filename?jobId=${t}`,{headers:{\"Content-Ty"
+    },
+    {
+      "id": "J11",
+      "path": "baseline/jobright/helper-app.41ea2652.js",
+      "marker": "ensureAutocheckCheckboxAnswers",
+      "found": true,
+      "offsetUtf16": 6758000,
+      "byteOffset": 6758000,
+      "line": 1037,
+      "excerpt": "andler:(e,t)=>(0,u.fillRadioGroupFiled)(e,t),options:{expectArray:!0}}}}getSiteName(){return\"lever\"}ensureAutocheckCheckboxAnswers(e){(!this.answer.regular||\"object\"!=typeof this.answer.regular||Array.isArray(this.answer.regular))&&(this.answer.regular={});let t=this.answer.regular,r=e=>Object.keys(t).some(t=>(0,o.isMatched)(e,t));for(let n of e)n.type===a.FIELD_TYPE.CHECKBOX&&f(n)&&!r(n.label)&&(t[n.label]=n.options?.[0]||n.label||(0,d.autocheck).defaultValue())}async runPreFillForm(){this.taskQueue.add(u.preFillForm),await this.taskQueue.run()}async extractFormRules(){return(0,c.extractRules)()}formatAnswer(e){return(0,s.formatAnswer)(e)}async doFillForm(e=!1){await this.initializeFillForm();let t=await this.extractAndPrepareFormRules();t"
+    },
+    {
+      "id": "S01",
+      "path": "baseline/Simplify/contentScriptMain.js",
+      "marker": "FO=({remoteConfigValues",
+      "found": true,
+      "offsetUtf16": 908611,
+      "byteOffset": 909121,
+      "line": 1,
+      "excerpt": "alaryLow=Math.round(a)),l&&(c.salaryHigh=Math.round(l)),o&&(c.currencyType=o),s&&(c.payPeriod=s),c},FO=({remoteConfigValues:e,ATSKey:t,ATSConfig:n,resumeScoreConfig:r,trackedObj:o,trackedObjExtractor:i})=>({currentUrl:s,previousFound:a})=>{const l={};t&&(l.ATSKey=t);const c=kO(n,s,e?.canonicalScraperIdentities);c.trackedObj?(l.trackedObj=c.trackedObj,l.trackedObjExtractor=c.trackedObjExtractor):e?.canonicalScraperIdentities&&n?.trackedObjAuthoritative?l.trackedObjUnavailable=!0:o&&(l.trackedObj=o,l.trackedObjExtractor=i);const u={},d=EO(jO(Ne(r?.jobTitlePath)||\"\")),p=((e,t=Ft)=>{if(!e?.length)return\"\";const n=Ae(e);for(let i=0;i<n.length;i+=1)try{const e=ke(n[i],document.documentElement);for(let n=0;n<e.length;n+=1){const r=e[n],o=r instanc"
+    },
+    {
+      "id": "S02",
+      "path": "baseline/Simplify/contentScriptMain.js",
+      "marker": "url:`${d}/builder?${o}`",
+      "found": true,
+      "offsetUtf16": 11709,
+      "byteOffset": 11709,
+      "line": 1,
+      "excerpt": "RIComponent(e)}=${encodeURIComponent(t)}`,\"\").join(\"&\");g.runtime.sendMessage({method:\"openWebPage\",url:`${d}/builder?${o}`})},x=(e,t,n=0)=>{n<3&&g.runtime.sendMessage({method:\"addRecommendationReaction\",params:{id:e,reaction:t}}).then(r=>{r||setTimeout(()=>x(e,t,n+1),500*(n+1))}).catch(r=>{setTimeout(()=>x(e,t,n+1),500*(n+1))})},w=/(z|[+-]\\d{2}:?\\d{2})$/i,k=e=>{let t=e;return\"string\"!=typeof e||w.test(e)||(t=`${e}Z`),new Date(t).toLocaleDateString(\"en-US\",{month:\"short\",day:\"numeric\",year:\"numeric\"})},S=(e,t=!1)=>{let n=e;\"string\"==typeof e&&\"z\"!==e.slice(-1).toLowerCase()&&(n=`${e}Z`);const r=new Date(n);return t?`${r.getMonth()+1}/${r.getDate()}`:`${r.getMonth()+1}/${r.getDate()}/${r.getFullYear().toString().substring(2)}`};var C=e=>e.wr"
+    },
+    {
+      "id": "S03",
+      "path": "baseline/Simplify/background.js",
+      "marker": "/v2/candidate/me/copilot/answer/batch",
+      "found": true,
+      "offsetUtf16": 2132153,
+      "byteOffset": 2145457,
+      "line": 1,
+      "excerpt": "=0;r<e.length;r+=t)n.push(e.slice(r,r+t));return n},wZ=async(e,t)=>{const n=Bo(await(async(e,t)=>V(\"/v2/candidate/me/copilot/answer/batch\",{...t,method:\"POST\",headers:{\"Content-Type\":\"application/json\",...(e=>{if(!e)return{};if(e instanceof Headers)return Object.fromEntries(e.entries());if(Symbol.iterator in e)return Object.fromEntries(Array.from(e,e=>Array.from(e)));const t={};for(const[n,r]of Object.entries(e))void 0!==r&&(t[n]=r);return t})(t?.headers)},body:JSON.stringify(e)}))({requests:e},t),\"candidateCopilotAnswerBatchEndpoint\").responses;if(n.length!==e.length)throw new Error(`Copilot batch length mismatch: sent ${e.length}, received ${n.length}`);return n},vZ=e=>\"unanswerable\"===e?.kind&&e.reason===z,IZ={kind:\"unanswerable\",reason:"
+    },
+    {
+      "id": "S04",
+      "path": "baseline/Simplify/background.js",
+      "marker": "/v2/candidate/me/copilot/cover-letter",
+      "found": true,
+      "offsetUtf16": 16870,
+      "byteOffset": 16870,
+      "line": 1,
+      "excerpt": "e,t])=>{void 0!==t&&n.append(e,null===t?\"null\":String(t))});const r=n.toString();return r.length>0?`/v2/candidate/me/copilot/cover-letter/from-template/${e}?${r}`:`/v2/candidate/me/copilot/cover-letter/from-template/${e}`})(e,n),{...r,method:\"PUT\",headers:{\"Content-Type\":\"application/json\",...(e=>{if(!e)return{};if(e instanceof Headers)return Object.fromEntries(e.entries());if(Symbol.iterator in e)return Object.fromEntries(Array.from(e,e=>Array.from(e)));const t={};for(const[n,r]of Object.entries(e))void 0!==r&&(t[n]=r);return t})(r?.headers)},body:JSON.stringify(t)}),Y=async(e,t,n,r)=>V(((e,t)=>{const n=new URLSearchParams;Object.entries(t||{}).forEach(([e,t])=>{void 0!==t&&n.append(e,null===t?\"null\":String(t))});const r=n.toString();retur"
+    },
+    {
+      "id": "S05",
+      "path": "baseline/Simplify/background.js",
+      "marker": "/v3/resume/score",
+      "found": true,
+      "offsetUtf16": 1666418,
+      "byteOffset": 1679385,
+      "line": 1,
+      "excerpt": "f(i)return i;const a=iH.get(r);if(a)return a;const o=(async()=>{try{const i=Bo(await(async(e,t)=>V(\"/v3/resume/score\",{...t,method:\"POST\",headers:{\"Content-Type\":\"application/json\",...(e=>{if(!e)return{};if(e instanceof Headers)return Object.fromEntries(e.entries());if(Symbol.iterator in e)return Object.fromEntries(Array.from(e,e=>Array.from(e)));const t={};for(const[n,r]of Object.entries(e))void 0!==r&&(t[n]=r);return t})(t?.headers)},body:JSON.stringify(e)}))({resume_id:n,keywords:{high_priority:e,low_priority:t}}),\"resumeScoreResumeV3\"),a=i.keywords.match,o=aH[a.tier]||aH.none,s={matching:a.matching,missing:a.missing,count:a.count,percentage:i.score,message:o.message,color:o.color};return a.count>=12&&a.high_priority&&a.low_priority&&(s."
+    },
+    {
+      "id": "S06",
+      "path": "baseline/Simplify/contentScriptMain.js",
+      "marker": "const s=Uint8Array.from(i.arrayBuffer)",
+      "found": true,
+      "offsetUtf16": 110409,
+      "byteOffset": 110654,
+      "line": 1,
+      "excerpt": "e,name:n});if(200!==i.status)throw new Error(`Invalid file (status code was ${i.status}, not 200)`);const s=Uint8Array.from(i.arrayBuffer),a=new File([s.buffer],i.filename,{type:i.type}),l=new DataTransfer;return l.items.add(a),t.files=l.files,o=!0,_o(t,r),So(),!0}catch(i){return o&&_o(t,r),!1}},Oo=async(e,t,n,r)=>!!t&&Io(t,async o=>!!t.isConnected&&(!!o||Po(await(r?.())??e,t,n))),Lo=\"user-agent\",Ro=\"\",Do=\"function\",Fo=\"object\",Bo=\"string\",$o=\"undefined\",zo=\"browser\",Uo=\"cpu\",Vo=\"device\",Ho=\"engine\",qo=\"os\",Wo=\"result\",Ko=\"name\",Yo=\"type\",Go=\"vendor\",Jo=\"version\",Zo=\"architecture\",Qo=\"major\",Xo=\"model\",ei=\"console\",ti=\"mobile\",ni=\"tablet\",ri=\"smarttv\",oi=\"wearable\",ii=\"xr\",si=\"embedded\",ai=\"inapp\",li=\"brands\",ci=\"formFactors\",ui=\"fullVersio"
+    },
+    {
+      "id": "S07",
+      "path": "baseline/Simplify/contentScriptMain.js",
+      "marker": "useResumeExperience",
+      "found": true,
+      "offsetUtf16": 839674,
+      "byteOffset": 840135,
+      "line": 1,
+      "excerpt": "esume:g,coverLetter:y,setCoverLetter:b,requestGPTCoverLetter:v,selectedSkills:x,setSelectedSkills:w,useResumeExperience:k,setUseResumeExperience:S,applicationEmail:C=null})=>{const A=t?.location||\"\",E=R_(),j=(0,Zu.useMemo)(()=>n?Lc(n,5):null,[n]),T=(0,Zu.useRef)(null);return(0,Zu.useMemo)(()=>{if(!j)return null;const t=j.user_id?.startsWith(\"e2e-persona-\");if(C&&!O_(j)&&(j.email=C),D_&&!t){if(j.email&&!O_(j)){const e=function(e){if(!D_||!e||!e.includes(\"@\"))return e;const[t,n]=e.split(\"@\"),r=t.replace(/(?:\\+e2e\\d+|e2e\\d+)$/i,\"\"),o=`e2e${F_}`;return B_?t===`${r}+${o}`?e:`${r}+${o}@${n}`:t===`${r}${o}`?e:`${r}${o}@${n}`}(j.email);e&&(j.email=e)}if(j.phone){const e=function(e){if(!D_||!e)return e;if(e.replace(/\\D/g,\"\").length<7)return e;let t="
+    },
+    {
+      "id": "S08",
+      "path": "baseline/Simplify/background.js",
+      "marker": "candidateWriteAndSaveCoverLetterFromTemplate",
+      "found": true,
+      "offsetUtf16": 2137939,
+      "byteOffset": 2151243,
+      "line": 1,
+      "excerpt": "id 0,job_description:t?.description||void 0,company_name:t?.companyName||void 0,prompt:e||void 0}),\"candidateWriteAndSaveCoverLetterFromTemplate\"),a=i?.html_content;return a?{kind:\"template\",html:a,savedId:i?.id,savedName:i?.name}:null}return{kind:\"plain\",html:Bo(await(async(e,t)=>V(\"/v2/candidate/me/copilot/cover-letter\",{...t,method:\"POST\",headers:{\"Content-Type\":\"application/json\",...(e=>{if(!e)return{};if(e instanceof Headers)return Object.fromEntries(e.entries());if(Symbol.iterator in e)return Object.fromEntries(Array.from(e,e=>Array.from(e)));const t={};for(const[n,r]of Object.entries(e))void 0!==r&&(t[n]=r);return t})(t?.headers)},body:JSON.stringify(e)}))({tracked_obj:t?.trackedObj||\"\",job_title:t?.title||\"\",job_description:t?.descr"
+    },
+    {
+      "id": "W01",
+      "path": "baseline/jobwizard/js/jdSource.js",
+      "marker": "collectFrameSnapshot",
+      "found": true,
+      "offsetUtf16": 1198,
+      "byteOffset": 1198,
+      "line": 1,
+      "excerpt": ");return n.hash=\"\",n.href}catch(e){return\"\"}}e.JW_JdSource=Object.freeze({parseGreenhouseEmbedUrl:I,collectFrameSnapshot:async function(e={}){let u=String(window.location.href);if(window.self===window.top)return{isTop:!0,url:u};let t;try{t=new URL(u)}catch(e){return null}var n=t.searchParams.getAll(\"for\"),r=t.searchParams.getAll(\"token\");if(\"https:\"!==t.protocol||t.username||t.password||t.port||!/^(?:boards|job-boards)(?:\\.eu)?\\.greenhouse\\.io$/.test(t.hostname)||\"/embed/job_app\"!==t.pathname||1!==n.length||1!==r.length||!/^[a-z0-9_-]+$/i.test(n[0])||!/^\\d+$/.test(r[0]))return null;let c={key:`greenhouse:${t.hostname.includes(\".eu.\")?\"eu\":\"us\"}:${n[0].toLowerCase()}:`+r[0],tenant:n[0].toLowerCase(),jobId:r[0],url:u},d='form,input,textarea,s"
+    },
+    {
+      "id": "W02",
+      "path": "baseline/jobwizard/js/jobIdentity.js",
+      "marker": "referenceKey",
+      "found": true,
+      "offsetUtf16": 9958,
+      "byteOffset": 9958,
+      "line": 1,
+      "excerpt": "reeze({contract:1,user_position_id:e.user_position_id.toLowerCase(),binding_id:e.binding_id}):null},referenceKey:e=>{e=o(e);return e?e.id+`:${e.identity_generation}:`+e.jd_fingerprint:\"\"},responseConfirmsIdentity:function(e,t){if(!o(e?.public_position_ref))return!1;let i=n(\"string\"==typeof t?t:t?.canonical_url);return!(!i||\"string\"!=typeof t&&t?.key!==i.key)&&Array.isArray(e.confirmed_identities)&&e.confirmed_identities.slice(0,100).some(e=>e?.key===i.key&&n(e.canonical_url)?.key===i.key)},contract:1,ruleVersion:s})}(globalThis);"
+    },
+    {
+      "id": "W03",
+      "path": "baseline/jobwizard/js/bundle.js",
+      "marker": "buildInsightV2RequestData(e=null)",
+      "found": true,
+      "offsetUtf16": 3585119,
+      "byteOffset": 3588356,
+      "line": 4648,
+      "excerpt": ".states.KeywordsList||n.keywords,1200),e('Job description',t.web_content,18e3),r.join('\\n').trim()},buildInsightV2RequestData(e=null){var t='function'==typeof getCorrectUrlForApi?getCorrectUrlForApi():window.location.href,n=__content_handler.states.RequestValue||{},r=__content_handler.methods.buildInsightV2JobText(),i=String(n.web_content||'').trim(),o=80<=i.length||120<=r.length,t={position_url:n.url||t,url:n.url||t,model_route:'quality',helper_msg:'From Insight v2 Sean-gated frontend',...!0===n.manual_input?{manual_input:!0}:{},...n.web_content_source?{web_content_source:n.web_content_source}:{}};return o&&(t.jd_text=r,t.web_content=i||r),e&&(t.resume_id=e),n.force_refresh&&(t.force_refresh=!0),t},buildInsightV2AnalysisPayload(e={}){var t"
+    },
+    {
+      "id": "W04",
+      "path": "baseline/jobwizard/js/bundle.js",
+      "marker": "getInsightV2ResumeDraftPdf:e",
+      "found": true,
+      "offsetUtf16": 1194445,
+      "byteOffset": 1195110,
+      "line": 498,
+      "excerpt": "d_jobWizard_requeset(\"cover_letter/export\",e,\"download\",void 0,{timeout:3e4,downloadTimeoutMs:3e4}),getInsightV2ResumeDraftPdf:e=>send_jobWizard_requeset(\"insight_v2/resume_draft_pdf\",e,\"download\",void 0,{timeout:12e4,downloadTimeoutMs:12e4}).then(e=>e&&'object'==typeof e&&!Array.isArray(e)&&'string'==typeof e.__downloadData?{base64:e.__downloadData,resumeBaseSource:e.insight_v2?.resume_base_source||'',draftSource:e.insight_v2?.draft_source||'',jdSource:e.insight_v2?.jd_source||''}:e),deleteResume:e=>send_jobWizard_requeset(\"profile/delete_resume\",e),getResumeList:(e,t={})=>send_jobWizard_requeset(\"profile/resume_list\",e,\"post\",void 0,t),setDefaultResume:e=>send_jobWizard_requeset(\"profile/resume_set_default\",e,\"post\"),uploadFile:e=>send_jo"
+    },
+    {
+      "id": "W05",
+      "path": "baseline/jobwizard/js/bundle.js",
+      "marker": "method:\"cover_letter\"",
+      "found": true,
+      "offsetUtf16": 6454040,
+      "byteOffset": 6466104,
+      "line": 5496,
+      "excerpt": "tes.RequestValue?.url||location.href,web_content:__content_handler.states.RequestValue?.web_content,method:\"cover_letter\",text:'undefined'!=typeof originalText&&null!==originalText?originalText:\"\",user_instruction:t,resume_id:e?.cvid||\"\"},{jobFeatureOwner:n}):_jwReleaseCoverLetterRequest(__content_handler.states,n)})}}}),h.on(\"click\",\".coverletter_content .copy_cover_letter\",function(e){var t;return $(this).parent(\".coverletter_footer\").hasClass(\"active\")&&(t=h.find(\".coverletter\").html(),__content_handler.methods.copyText(t.replace(/<br>/g,'\\n')),$(this).addClass(\"success\"),setTimeout(()=>{$(this).removeClass(\"success\")},1e3)),!1}),h.on(\"click\",\".coverletter_content .refresh_cover_letter\",function(e){if($(this).parent(\".coverletter_footer\""
+    },
+    {
+      "id": "W06",
+      "path": "baseline/jobwizard/js/bundle.js",
+      "marker": "send_jobWizard_requeset(\"uinf\",s",
+      "found": true,
+      "offsetUtf16": 1193589,
+      "byteOffset": 1194254,
+      "line": 498,
+      "excerpt": "{...e,timeout:e.timeout??45e3};return!0===e.deferUinfTimeoutSurface&&(d.deferUinfTimeoutSurface=!0),send_jobWizard_requeset(\"uinf\",s,void 0,void 0,d).then(e=>(e&&'object'==typeof e&&(e._client_request_ms=Date.now()-c,e._backend_answered_count=e._backend_answered_count||0,e._backend_response_ms=e._backend_response_ms||0,'function'==typeof _jwStoreAttemptedAutofillSnapshot?_jwStoreAttemptedAutofillSnapshot(t.uuid,s.question_info,e.question_info,{url:t.url}):'function'==typeof _jwStoreAutofillSnapshot&&_jwStoreAutofillSnapshot(t.uuid,[],{url:t.url,snapshot_stage:'attempted'}),_jwCaptureEmailFillNotice(e.email_fill,l)),e))},savePosition:e=>send_jobWizard_requeset(\"save_position\",e),deletePosition:e=>send_jobWizard_requeset(\"delete_position\",e),"
+    },
+    {
+      "id": "W07",
+      "path": "baseline/jobwizard/js/formCollectionLifecycle.js",
+      "marker": "Form controls changed during collection",
+      "found": true,
+      "offsetUtf16": 6345,
+      "byteOffset": 6345,
+      "line": 1,
+      "excerpt": "rface?.root,f(t).surface?.readControls,f(t).surface?.readMetadata))throw f(t).stale++,(r=new Error('Form controls changed during collection')).name='AbortError',r.code='form_controls_changed',r;n.candidate&&i.concat(a,o).forEach(e=>{Object.prototype.hasOwnProperty.call(n.candidate,e)&&(t[e]=n.candidate[e])}),e.onPublish?.(n.candidate),f(t).commits++,n.change&&(!0===e.deferEvidence?(f(t).pendingChange=n.change,f(t).pendingPublication={ticket:n,change:n.change,epoch:n.epoch,commitRevision:f(t).commits}):y(t,n.change))},finish:function(e,t,n){var r=f(e);n&&(r.pendingPublication?.ticket===t&&(r.pendingChange=null,r.pendingPublication=null),r.failures++,c(e),e.InfoFormStatus)&&(e.InfoFormStatus.changed=!0),r.revision!==t.revision&&(e._domDirtyFl"
+    },
+    {
+      "id": "W08",
+      "path": "baseline/jobwizard/js/typeaheadFill.js",
+      "marker": "dom_readback_timeout",
+      "found": true,
+      "offsetUtf16": 5909,
+      "byteOffset": 5909,
+      "line": 1,
+      "excerpt": "f(!n())return{committed:!1,reason:'commit_owner_stale'};if(Date.now()>b)return{committed:!1,reason:'dom_readback_timeout'};var x=R(S=x),z=!!x&&(!!c&&x===c||s&&!!m&&x===m||!!d&&x===d||!!g&&x===g)&&x!==u,k=Date.now();if(z){z=s&&x===m?\"value:\"+x:d&&x===d?\"state-display:\"+x:g&&x===g?\"owner-state-unavailable-display:\"+x:\"label:\"+x;if(w!==z&&(w=z,C=k),k-C>=y){if(!n())return{committed:!1,reason:'commit_owner_stale'};z=i(await r());if(!n())return{committed:!1,reason:'commit_owner_stale'};if(Date.now()>b)return{committed:!1,reason:'dom_readback_timeout'};if(R(z)===x)return Date.now()>b||!n()?{committed:!1,reason:'dom_readback_timeout'}:Object.assign({},t,{commitIssued:!0,committed:!0,committedDisplayText:z,selectedStateVerified:!(!d||x!==d),selected"
+    },
+    {
+      "id": "W09",
+      "path": "baseline/jobwizard/js/iframeWriteScope.js",
+      "marker": "readManualRevision",
+      "found": true,
+      "offsetUtf16": 719,
+      "byteOffset": 719,
+      "line": 1,
+      "excerpt": " of r.fields.values()){var t=Array.from(n.resolveControls()||[]);if(r.owner.fields.get(n.id)!==r||n.readManualRevision()!==n.manualRevision||t.length!==n.controls.length||t.some((e,r)=>e!==n.controls[r]||!1===e.isConnected||e.ownerDocument!==n.document))return b(r),!1}if(null!=e){var o=r.fields.get(String(e));if(!o||null!=n&&!o.controls.includes(n))return!1}return!0}catch(e){return b(r),!1}}return Object.freeze({capture:function(e){var{ownerKey:r,requestId:n,isOwnerCurrent:t}=e||{},o=Number(e?.runGeneration),s=Number(e?.attemptSequence),i=Number(e?.expiresAt);if(!r||!n||'function'!=typeof t||!Number.isSafeInteger(o)||o<=0||!Number.isSafeInteger(s)||s<=0||!Number.isFinite(i)||i<=g()||!Array.isArray(e.fields)||!e.fields.length)return null;var"
+    },
+    {
+      "id": "W10",
+      "path": "baseline/jobwizard/js/applicationSubmitAuthority.js",
+      "marker": "isTrusted",
+      "found": true,
+      "offsetUtf16": 268,
+      "byteOffset": 268,
+      "line": 1,
+      "excerpt": "(e=>n.applicationOwner[e]??null)):'',p=e=>'function'==typeof d?.Event&&e instanceof d.Event&&!0===e.isTrusted;return Object.freeze({create:function({handler:t,getContext:a}){let o=null,i=e=>{o&&(o.active=!1,o.reason=e||'invalidated')},r=(e,n)=>{var t;return!(!e||o!==e||!e.active||(t=a(),(!e.accountId||String(t.accountId||'')!==e.accountId||!0!==t.job?.identityCurrent||t.job.jobKey!==e.jobKey||t.job.generation!==e.jobGeneration||!l(t.application)||l(t.application)!==e.applicationKey||n&&l(n)!==e.applicationKey)&&(i('application_or_account_changed'),1)))};function u(e,n,t){return o={active:!0,mode:!0===e?.loaded&&!0===e.enabled?'auto':'review',accountId:String(e?.accountId||''),applicationKey:l(n),jobKey:t.jobKey,jobGeneration:t.generation,ru"
+    },
+    {
+      "id": "W11",
+      "path": "baseline/jobwizard/js/patternCacheManager.js",
+      "marker": "updatePatternSuccessRate",
+      "found": true,
+      "offsetUtf16": 1843,
+      "byteOffset": 1843,
+      "line": 1,
+      "excerpt": "a].push(n),this.updateCacheStats(s[e]),s[e].lastUpdated=Date.now(),await this.saveDomainCache(t,s)},updatePatternSuccessRate:async function(t,e,a,n){var s=await this.loadDomainCache(t);if(s&&s[e]&&s[e].patterns)for(var r of Object.keys(s[e].patterns)){r=s[e].patterns[r];if(Array.isArray(r)){r=r.find(t=>t.id===a);if(r){r.successRate=.9*r.successRate+.1*(n?1:0),r.usageCount++,r.lastUsed=Date.now(),this.updateCacheStats(s[e]),s[e].lastUpdated=Date.now(),await this.saveDomainCache(t,s);break}}}},updateCacheStats:function(n){if(n.patterns){let t=0,e=0,a=0;for(var s of Object.keys(n.patterns)){s=n.patterns[s];if(Array.isArray(s)){t+=s.length;for(var r of s)e+=r.usageCount||0,a+=(r.successRate||0)*(r.usageCount||0)}}n.stats={totalPatterns:t,totalU"
+    },
+    {
+      "id": "W12",
+      "path": "baseline/jobwizard/js/bundle.js",
+      "marker": "buildInsightV2PdfDraftPayload()",
+      "found": true,
+      "offsetUtf16": 3589278,
+      "byteOffset": 3592515,
+      "line": 4648,
+      "excerpt": "1===t.length?\"1 selected\":t.length+\" selected\";e.find(\".insight_v2_action_selected_count\").text(r)},buildInsightV2PdfDraftPayload(){var e=__content_handler.states.InsightV2Run||{},t=e.requestData||__content_handler.methods.buildInsightV2RequestData(),n=__content_handler.methods.buildInsightV2AnalysisPayload(e),e=__content_handler.methods.ensureInsightV2SelectedActions(e),e=__content_handler.methods.getInsightV2SelectedActions(e),r=t.jd_text||__content_handler.methods.buildInsightV2JobText(),n={...t,position_url:t.position_url||t.url||window.location.href,url:t.url||t.position_url||window.location.href,model_route:t.model_route||'quality',helper_msg:'From Insight v2 Sean-gated PDF draft action',analysis_payload:n,selected_actions:e};return r"
+    }
+  ]
+}

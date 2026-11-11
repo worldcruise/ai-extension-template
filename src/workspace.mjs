@@ -12,6 +12,8 @@ import { createWorkspaceShortcuts } from './workspace-shortcuts.mjs';
 import { BUILD } from './runtime-info.mjs';
 import { createChatProviders } from './chat-providers.mjs';
 import { createDeepseekToolbar } from './deepseek-toolbar.mjs';
+import { createWorkspaceDock } from './workspace-dock.mjs';
+import { chatProviderForUrl } from './saved-chat.mjs';
 
 const q = selector => document.querySelector(selector);
 renderIcons();
@@ -49,29 +51,54 @@ function bindTabs(entries, onSelect, onBeforeSelect) {
 }
 
 let chat;
+let deepseekChat;
 let chatProviders;
 let workspaceShortcuts;
-const selectView = bindTabs([
-  { id: 'studio', tab: q('#studio-tab'), panel: q('#studio-view') },
-  { id: 'chat', tab: q('#chat-tab'), panel: q('#chat-view') }
-], id => {
-  q('#settings-view').hidden = id !== 'settings';
-  if (id === 'chat') requestAnimationFrame(() => chat?.probe());
-  else chat?.hideControls();
+const { select: selectView } = createWorkspaceDock({
+  onOpen: () => requestAnimationFrame(() => {
+    chat?.probe();
+    deepseekChat?.probe();
+  }),
+  onClose: () => {
+    chat?.probe();
+    deepseekChat?.probe();
+    chat?.hideControls();
+  },
+  onStudioChange: setStudioExpanded
 });
 
 const studioScroll = q('#studio-scroll');
 const studioPositions = { job: 0, results: 0 };
 let studioPanel = 'results';
+function setStudioExpanded(expanded) {
+  const content = q('#studio-content'), toggle = q('#studio-dock-toggle');
+  if (expanded === !content.hidden) return;
+  if (!expanded) studioPositions[studioPanel] = studioScroll.scrollTop;
+  content.hidden = !expanded;
+  q('#studio-view').dataset.collapsed = String(!expanded);
+  document.body.classList.toggle('studio-dock-collapsed', !expanded);
+  toggle.setAttribute('aria-expanded', String(expanded));
+  toggle.title = `${expanded ? 'Collapse' : 'Expand'} job form and queue`;
+  toggle.setAttribute('aria-label', toggle.title);
+  if (expanded) studioScroll.scrollTop = studioPositions[studioPanel];
+  else if (content.contains(document.activeElement)) toggle.focus();
+}
+q('#studio-dock-toggle').addEventListener('click', () => selectView(q('#studio-content').hidden ? 'studio' : 'chat'));
+q('.studio-navigation').addEventListener('click', event => {
+  if (event.target.closest('button')) return;
+  q('#studio-dock-toggle').click();
+  q('#studio-dock-toggle').focus();
+});
 const selectStudioTab = bindTabs([
   { id: 'job', tab: q('#job-tab'), panel: q('#job-panel') },
   { id: 'results', tab: q('#results-tab'), panel: q('#results-panel') }
 ], id => {
+  selectView('studio');
   studioScroll.scrollTop = studioPositions[id];
   q('#job-actions').hidden = id !== 'job';
   q('#results-actions').hidden = id !== 'results';
 }, id => {
-  studioPositions[studioPanel] = studioScroll.scrollTop;
+  if (!q('#studio-content').hidden) studioPositions[studioPanel] = studioScroll.scrollTop;
   studioPanel = id;
 });
 
@@ -128,12 +155,19 @@ const studio = createStudio({
   showChat: (url, { connection = connectionSettings.mode() } = {}) => {
     if (!url) { selectView('chat'); return; }
     void (async () => {
+      if (chatProviderForUrl(url) === 'deepseek') {
+        await chatProviders.showProvider('deepseek');
+        if (chatProviders.current() !== 'deepseek') return;
+        selectView('chat');
+        await deepseekChat.openConversation(url);
+        return;
+      }
       await chatProviders.showChatGPT();
       if (connection === 'tab') { await queue.pause(); await tabChat.queue.openConversation(url); await tabChat.open(); }
       else await chat?.openConversation(url);
-    })().catch(error => studio.tabError(error.message));
+    })().catch(error => studio.chatError(error.message));
   },
-  getCurrentChat: () => selectedConnection()?.getCurrentChat(),
+  getCurrentChat: () => chatProviders?.current() === 'deepseek' ? deepseekChat?.getCurrentChat() : selectedConnection()?.getCurrentChat(),
   moveTab: direction => browserTabs?.move(direction)
 });
 const pageHighlights = createPageHighlights();
@@ -174,8 +208,8 @@ chat = createChatSidebar({
   onShortcut: action => workspaceShortcuts?.run(action),
 });
 chat.setNavigationGuard(() => queue.pause());
-createDeepseekToolbar();
-chatProviders = createChatProviders({ beforeChange: async () => {
+deepseekChat = createDeepseekToolbar();
+chatProviders = createChatProviders({ onSelect: () => { selectView('chat'); closeAccount(true); }, beforeChange: async () => {
   if (queue.snapshot().control.ownerId || queue.snapshot().starting) throw new Error('Wait for the current resume job to finish before switching providers.');
   await queue.pause();
 } });
@@ -183,6 +217,15 @@ workspaceShortcuts = createWorkspaceShortcuts({ selectView, selectJob: () => sel
 window.addEventListener('pagehide', () => queue.dispose(), { once: true });
 
 const accountToggle = q('#account-toggle');
+function positionAccount() {
+  const panel = q('#account-panel');
+  if (panel.hidden) return;
+  const bounds = accountToggle.getBoundingClientRect();
+  const above = bounds.top - 12, below = innerHeight - bounds.bottom - 12;
+  const placeAbove = above >= panel.scrollHeight + 2 || above >= below;
+  panel.dataset.placement = placeAbove ? 'above' : 'below';
+  panel.style.maxHeight = `${Math.max(0, placeAbove ? above : below)}px`;
+}
 function closeAccount(focus = false) {
   q('#account-panel').hidden = true;
   accountToggle.setAttribute('aria-expanded', 'false');
@@ -192,12 +235,14 @@ accountToggle.addEventListener('click', () => {
   const open = q('#account-panel').hidden;
   q('#account-panel').hidden = !open;
   accountToggle.setAttribute('aria-expanded', String(open));
+  if (open) positionAccount();
 });
+q('#profile-details').addEventListener('click', () => closeAccount(true), true);
+window.addEventListener('resize', positionAccount);
 document.addEventListener('click', event => { if (!event.target.closest('.account-wrap')) closeAccount(); });
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && !q('#account-panel').hidden) { event.preventDefault(); closeAccount(true); }
 });
-q('#account-chat').addEventListener('click', () => { closeAccount(); selectView('chat'); });
 async function checkConnection() {
   q('#chat-connection-title').textContent = 'Checking connection…';
   q('#chat-connection-message').textContent = 'Reading the ChatGPT page. No message will be sent.';
@@ -261,4 +306,4 @@ q('#account-sign-in').addEventListener('click', () => {
 q('#account-settings').addEventListener('click', () => {
   closeAccount(); selectView('settings'); q('.settings-tabs [aria-selected="true"]').focus();
 });
-q('#settings-back').addEventListener('click', () => { selectView('studio'); q('#studio-tab').focus(); });
+q('#settings-back').addEventListener('click', () => { selectView('studio'); q('.studio-tabs [aria-selected="true"]').focus(); });

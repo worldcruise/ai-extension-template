@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Find Referrers — JobWizard</title>
+  <link rel="icon" href="icons/thumbnails_32.png" type="image/png" />
+  <link rel="stylesheet" href="css/referrer-agent.css" />
+</head>
+<body>
+
+<!--
+  Layout: compact extension panel ~360×520 (min-height), header pinned, morph card body.
+  Single-card morphing phases: planning → angles → search → ranking(C film-strip) → VA list.
+  No horizontal scrolling, no giant vertical stretch — everything inside the shell.
+-->
+
+<div class="ra-shell">
+
+  <!-- ─── Mini header ─────────────────────────────────── -->
+  <header class="ra-mh">
+    <div class="ra-mh-logo">J</div>
+    <span class="ra-mh-name">JobWizard</span>
+    <span class="ra-mh-job" id="raJobInfo">Find Referrers</span>
+  </header>
+
+  <!-- ─── Morph body ──────────────────────────────────── -->
+  <div class="ra-body">
+    <div class="ra-morph-wrap">
+      <div class="ra-morph-card" id="raMorphCard">
+
+        <!-- Initial loading state (replaced immediately by JS) -->
+        <div class="ra-phase-center">
+          <div class="ra-big-sp"></div>
+          <div class="ra-ph-title">Starting Referral Agent…</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div><!-- /ra-shell -->
+
+<script src="js/referrer-agent.js"></script>
+</body>
+</html>

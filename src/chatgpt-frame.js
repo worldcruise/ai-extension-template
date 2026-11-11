@@ -12,6 +12,13 @@
   let fontPercent = 100;
   let fontStyle;
   let fontTargets = new Set();
+  let previousInert = null;
+  function setInteractive(active) {
+    const root = document.documentElement;
+    if (!root || typeof active !== 'boolean') return;
+    if (!active && previousInert === null) { previousInert = root.inert; root.inert = true; }
+    else if (active && previousInert !== null) { root.inert = previousInert; previousInert = null; }
+  }
   const heldShortcuts = new Set();
   const consume = event => { event.preventDefault(); event.stopImmediatePropagation(); };
   window.addEventListener('keydown', event => {
@@ -109,6 +116,7 @@
         typeof event.data.nonce !== 'string' || event.data.nonce.length > 100) return;
     if (event.data.type === 'probe') {
       nonce = event.data.nonce;
+      setInteractive(event.data.interactive);
       setFontSize(event.data.fontScale);
       sendState(true);
     }

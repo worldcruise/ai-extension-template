@@ -1,10 +1,23 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { duplicateJobUrl, findExistingJob } from '../src/job-duplicates.mjs';
+import { duplicateJobUrl, findExistingJob, jobUrlInList } from '../src/job-duplicates.mjs';
 
 const input = (job = {}, candidateId = 'candidate-1') => ({ candidateId, tailor: true,
   job: { company: 'Northstar Labs', url: 'https://jobs.example.test/opening/42', ...job } });
 const request = (options = {}) => ({ id: 'request-1', state: 'queued', input: input(), ...options });
+
+test('one-click capture checks URLs across the candidate list, including examples and failures', () => {
+  const url = 'https://jobs.example.test/opening/42/?utm_source=mail';
+  for (const options of [{}, { state: 'ready' }, { state: 'invalid-output' }, { isExample: true }]) {
+    assert.equal(jobUrlInList(url, 'candidate-1', [request(options)]), true);
+  }
+  assert.equal(jobUrlInList(url, 'candidate-2', [request()]), false);
+  assert.equal(jobUrlInList(url, 'candidate-1', [request({ state: 'cancelled' })]), false);
+  assert.equal(jobUrlInList('https://jobs.example.test/opening/43', 'candidate-1', [request()]), false);
+  for (const value of ['', 'not a URL', 'chrome://settings', 'file:///job.html', 'javascript:alert(1)', null]) {
+    assert.equal(jobUrlInList(value, 'candidate-1', [request()]), false);
+  }
+});
 
 test('company or URL independently matches existing queued and saved jobs for the same candidate', () => {
   assert.deepEqual(findExistingJob(input({ company: '  NORTHSTAR\u00a0 Labs  ', url: 'https://other.test/77' }), [request()]),

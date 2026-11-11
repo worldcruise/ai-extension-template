@@ -11,26 +11,29 @@ function setup(saved = 'chatgpt', beforeChange = async () => {}) {
       getAttribute(name) { return this[name] || null; } });
     return nodes.get(id);
   } };
-  const writes = [], opened = [];
+  const writes = [], opened = [], selected = [];
   const browser = { storage: { local: { get: async () => ({ chatProvider: saved }), set: async value => writes.push(value) } },
     tabs: { create: async value => opened.push(value) } };
-  return { connection: createChatProviders({ document, browser, beforeChange }), nodes, writes, opened };
+  return { connection: createChatProviders({ document, browser, beforeChange, onSelect: provider => selected.push(provider) }), nodes, writes, opened, selected };
 }
 const settle = () => new Promise(resolve => setImmediate(resolve));
 
 test('saved provider restores lazily and switching preserves both frame identities and routes', async () => {
-  const { connection, nodes, writes, opened } = setup();
+  const { connection, nodes, writes, opened, selected } = setup();
   await connection.ready;
+  assert.deepEqual(selected, [], 'restoring preferences does not open Chat');
   const frame = nodes.get('deepseek-frame'), select = nodes.get('chat-provider');
   assert.equal(frame.src, undefined);
   select.value = 'deepseek'; select.listeners.change(); await settle();
   assert.equal(frame.src, DEEPSEEK_HOME);
   assert.equal(nodes.get('chatgpt-pane').hidden, true);
   assert.equal(nodes.get('deepseek-pane').hidden, false);
-  frame.src = DEEPSEEK_HOME + 'a/chat/kept';
+  assert.deepEqual(selected, ['deepseek']);
+  frame.src = DEEPSEEK_HOME + 'a/chat/s/kept';
   await connection.showChatGPT();
+  assert.deepEqual(selected, ['deepseek'], 'programmatic selection does not dismiss menus');
   select.value = 'deepseek'; select.listeners.change(); await settle();
-  assert.equal(frame.src, DEEPSEEK_HOME + 'a/chat/kept');
+  assert.equal(frame.src, DEEPSEEK_HOME + 'a/chat/s/kept');
   assert.equal(nodes.get('deepseek-frame'), frame);
   assert.deepEqual(writes.at(-1), { chatProvider: 'deepseek' });
   nodes.get('deepseek-open').listeners.click(); await settle();
@@ -40,7 +43,7 @@ test('saved provider restores lazily and switching preserves both frame identiti
 });
 
 test('active-job guard rejects switching without loading DeepSeek or saving preference', async () => {
-  const { connection, nodes, writes } = setup('chatgpt', async () => { throw new Error('Job active'); });
+  const { connection, nodes, writes, selected } = setup('chatgpt', async () => { throw new Error('Job active'); });
   await connection.ready;
   const select = nodes.get('chat-provider'); select.value = 'deepseek'; select.listeners.change(); await settle();
   assert.equal(connection.current(), 'chatgpt');
@@ -48,6 +51,7 @@ test('active-job guard rejects switching without loading DeepSeek or saving pref
   assert.equal(nodes.get('deepseek-frame').src, undefined);
   assert.equal(nodes.get('provider-status').textContent, 'Job active');
   assert.deepEqual(writes, []);
+  assert.deepEqual(selected, [], 'rejected selection leaves the menu open');
 });
 
 test('DeepSeek header changes only match its HTTPS host in extension subframes', () => {

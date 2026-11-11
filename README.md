@@ -1,8 +1,17 @@
 # AI Agent Template
 
-A Chrome Manifest V3 extension with a combined **ChatGPT + Resume Studio** workspace.
+A Chrome Manifest V3 extension with an **Application Tracker dock** and ChatGPT / DeepSeek chat.
 Current version: **0.5.0**. See [CHANGELOG.md](CHANGELOG.md) for the checkpoint details.
-Open the user-icon menu and choose **ChatGPT** or **DeepSeek** under Chat provider. The
+Click the bottom status bar to lift it and reveal chat beneath it. Click the same
+raised bar to return to the job workspace. Only one accordion is expanded at a
+time: opening chat hides all job content, and selecting Job form or Queue closes
+chat. Collapsing keeps the loaded chat at the same viewport size off-screen,
+with input and focus disabled until expansion. Both headers share the same height and background. The former
+Resume Studio / Chat tabs have been removed. Collapse chat to use the full dock.
+The padded Job form / Queue row is also an accordion header. Its chevron or empty
+area switches between job content and chat while preserving drafts. Candidate
+selection and profile import are available under **User menu → Candidate profile**.
+Open the user-icon menu in the bottom status bar and choose **ChatGPT** or **DeepSeek** under Chat provider. The
 selection is saved on this device; both frames stay mounted to preserve drafts.
 DeepSeek loads on first selection and uses your separate DeepSeek browser session.
 Use **Open / sign in to DeepSeek** if sign-in or chat is blocked inside the panel,
@@ -12,12 +21,24 @@ the current conversation in a tab, and a separately saved pin preference.
 Drafts and active responses block navigation and reload. History uses only native
 loaded conversation links; no prompt insertion or sending is performed.
 Automatic sending is disabled. Add saves the job and copies its prompt, keeping
-your selected provider. Paste and send manually when ready. Saved result links
-and retained connection diagnostics still use ChatGPT.
+your selected provider. Paste and send manually when ready. A saved job can be
+connected to the current conversation in either provider from Details. Open chat
+on the job reopens that link, preserving draft and active-response guards.
 DeepSeek sending and resume response capture are not integrated yet. Live DeepSeek
 embedding and sign-in need verification with your account.
-The Chat view embeds ChatGPT using your browser's session. Resume Studio is based
-on `baseline/combined-chatgpt-resume-studio-code` and now has a persistent generation queue.
+The chat pane uses your browser sessions. The queue adapts
+`baseline/application-tracker-queue-demo.html` and the sibling
+`ApplicationTracker_v2.1` project's compact job cards, labelled actions,
+job-description-first details, and grouped forms. Search by company or role and
+filter by status; the selected candidate scopes the list. Go to apply opens the
+saved listing, and View resume opens its local preview. Existing job capture,
+profile import, templates, and manual prompt copying remain connected to storage.
+The **Documents** form accepts pasted or imported resume JSON plus an optional
+cover letter. It validates the resume against the saved candidate and job, then
+marks the job Ready. Cancel leaves the stored documents unchanged; a stale editor
+cannot overwrite a newer job update. Saved delivery history is retained.
+The sibling project's autofill engine and document export pipeline are not part
+of this UI adaptation.
 
 Studio includes JSON candidate-profile import, job-description extraction,
 template/prompt previews, request details, resume previews, and JSON copy.
@@ -37,7 +58,7 @@ keeps the 1.25 s quiet check. Streaming must stop, the delivery must match, and
 the result must still pass local validation and saving. ChatGPT's generation time
 is outside the extension's control.
 
-**Check existing company or URL** is on by default in Review Job and is saved on
+**Check existing company or URL** is on by default in Job form and is saved on
 this device. Add to queue and Ctrl+Enter check the selected candidate's existing
 queue entries and saved results. A matching company name or job URL shows
 **Already applied** with the matching list and stops before saving, copying, or
@@ -54,7 +75,7 @@ Saved results, Details, Review, preview, save retry, and cancellation remain
 available. PDF/DOCX export remains unavailable.
 
 ChatGPT stays mounted when switching views, preserving its conversation and composer.
-The header holds Resume Studio, Chat, and account controls. New chat, reload, and
+The bottom status bar holds chat, queue, and account controls. New chat, reload, and
 open-in-tab actions sit in a toolbar hidden by default. Hover over the top edge
 of Chat to slide it down; moving away hides it again. New chat (+) and reload sit
 on the left; text-size, open-in-tab, and pin controls sit on the right. Pin the toolbar
@@ -74,12 +95,28 @@ and shows an error; it never inserts a query into the message composer.
 Resume results still keep their originating conversation links in Details and
 Review. These saved request links are separate from the provider's native search.
 
-Stacked Up/Down controls immediately to the right of search browse ChatGPT's own
-loaded conversation history in its displayed order. Down from a new chat opens the
-most recent conversation; Up stops at the most recent conversation and is disabled
-on a new chat. The oldest loaded conversation disables Down. Navigation pauses
+Stacked Up/Down controls immediately to the right of search browse each provider's
+loaded conversation history, skipping entries marked as pinned or grouped under
+Pinned. Down from a new or pinned chat opens the most recent regular conversation;
+Up stops at the most recent regular conversation and is disabled on new or pinned
+chats. The oldest loaded regular conversation disables Down. Navigation pauses
 while a draft or generation is active. Reading history restores the native sidebar's
-previous visibility. Native search uses the provider's own navigation behavior.
+previous visibility. Both providers' arrows work with the native sidebar closed:
+history is briefly revealed when needed, read in native order, and restored to
+its previous visibility. DeepSeek retains the loaded list in panel memory when
+the sidebar removes its links. Each arrow rechecks fresh links, the current
+conversation, drafts, and generation. DeepSeek also recognizes its unlabeled
+top-left sidebar icon and waits for delayed history. Its arrows use native in-page
+navigation without reloading the iframe, preserving the current session and sidebar
+visibility. Mounted hidden links are reused without opening the sidebar. There is
+no automatic full-reload fallback; failures show a message in the toolbar. Native search uses
+the provider's own navigation behavior.
+
+DeepSeek cookie consent is remembered only after you make a choice in its cookie
+banner. On later loads, the same recognized button is selected automatically;
+the extension does not choose Accept or Reject for you. Choices stay in local
+extension storage. Custom checkbox preferences remain managed by DeepSeek and
+clear any earlier remembered generic action. Authentication cookies are untouched.
 
 Chat uses the full remaining panel height, with no Studio footer. Studio queue actions stay fixed
 below the scrolling content. Model and thinking settings are managed inside
@@ -123,7 +160,7 @@ the same read and works across job sites without another extension-icon click.
 Declining keeps the fields unchanged. Navigation while consent is pending cancels
 that read. Press
 **Ctrl+Shift+F** (**Command+Shift+F** on macOS) for the same action from the job
-page; it opens the sidebar and selects Studio's Review Job view automatically.
+page; it opens the sidebar and selects Job form automatically.
 The shortcut uses temporary active-tab access without requesting persistent website
 permission. Reading progress stays in the button; results fill the editable fields
 and actual errors open a dialog. There is no inline Read page status row.
@@ -131,16 +168,16 @@ Open **User menu → Settings → Keyboard shortcuts** to see the current assign
 and choose **Change shortcut** to customize it in Chrome. Existing Chrome assignments
 can keep the previous shortcut; Settings and the Read page tooltip show the actual binding.
 
-The **Job Queues** tab contains queued jobs and saved results. While Resume Studio
+The **Queue** tab contains queued jobs and saved results. While the tracker
 or the embedded ChatGPT has focus, these sidebar shortcuts are available:
 
 | Shortcut | Action |
 | --- | --- |
-| Ctrl+Up | Open Resume Studio |
-| Ctrl+Down | Open Chat |
+| Ctrl+Up | Collapse chat and focus the tracker |
+| Ctrl+Down | Expand chat |
 | Ctrl+Left | Previous browser tab (the `<` action) |
 | Ctrl+Right | Next browser tab (the `>` action) |
-| Ctrl+Enter | Save, copy, and send the prepared job in a new Sidebar Chat |
+| Ctrl+Enter | Save the prepared job, copy its prompt, and expand chat |
 
 Settings → Keyboard shortcuts lists these bindings. Ctrl+Enter uses the same job
 validation and Add action as the button, preserves the ChatGPT draft, and adds one
@@ -250,8 +287,12 @@ The frame integration is adapted from the reference sidebar's architecture. Its
 header rule removes `X-Frame-Options` and `Content-Security-Policy` for ChatGPT
 subframe requests initiated by **this extension only**. Ordinary tabs and frames
 on other websites do not match. Keyword preferences use local extension storage.
+The tabs permission supplies the current page URL so **Add This Job in One Click**
+appears only for HTTP/HTTPS pages absent from the selected candidate’s job list.
+The button stays available above the chat accordion, reads the page, saves the job,
+and copies its prompt for manual sending. Tracking parameters do not create duplicates.
 Job reading and highlighting use scripting on the selected job page. Read page
-requests optional HTTP/HTTPS website access only when clicked; Chrome's permission
+and one-click capture request optional HTTP/HTTPS website access only when clicked; Chrome's permission
 dialog controls approval. The extension icon and shortcut can instead use
 [temporary active-tab access](https://developer.chrome.com/docs/extensions/develop/concepts/activeTab).
 No backend service, API key, or OAuth setup is required.

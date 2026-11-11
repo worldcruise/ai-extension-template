@@ -1,0 +1,3696 @@
+/* Start Root CSS */
+.autofill_detail_bg {
+  z-index: 9999999999;
+  box-sizing: border-box;
+  position: relative;
+}
+
+#autofill_detail {
+  height: 100%;
+  width: 420px;
+  min-width: 420px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  background-color: #ffffff;
+
+  font-size: 20px;
+  color: black;
+  display: flex;
+  transition: transform 0.4s, backdrop-filter 0.2s ease-out, padding-right .3s ease-out;
+  z-index: 9999;
+  pointer-events: auto;
+}
+
+#autofill_detail::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  backdrop-filter: blur(0);
+  transition: backdrop-filter 0.2s ease-out;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Squeeze-to-mini bubble snap: the panel is sucked into the mini bubble's
+   anchor. Animates the individual `scale` property (not `transform`) so the
+   drag's inline transform and the 0.4s transform transition are untouched;
+   the transform-origin is set from JS to the bubble's position. */
+#autofill_detail.jw_panel_snap_shrink {
+  animation: jw_panel_shrink_to_mini 0.38s forwards;
+  pointer-events: none;
+}
+
+@keyframes jw_panel_shrink_to_mini {
+  0% {
+    scale: 1;
+    opacity: 1;
+    animation-timing-function: ease-out;
+  }
+  22% {
+    scale: 1.01;
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.55, 0, 0.72, 0.3);
+  }
+  100% {
+    scale: 0.04;
+    opacity: 0.1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #autofill_detail.jw_panel_snap_shrink {
+    animation: none;
+  }
+}
+
+/* End Root CSS */
+#autofill_detail .sidebar_warp {
+  width: 66px;
+  height: 100%;
+  background: #fafafa;
+  position: relative;
+}
+/* #autofill_detail .sidebar_small_menu {
+  width: 100%;
+  opacity: 0.4;
+}
+#autofill_detail .sidebar_small_menu.hidden{
+  display: none;
+}
+#autofill_detail .sidebar_small_menu:hover{
+  background-color: #e7e7e7;
+  opacity: 1;
+}
+#autofill_detail .sidebar_small_menu.selected{
+  background-color: #e7e7e7;
+  opacity: 1;
+}
+#autofill_detail .sidebar_small_menu .small_li {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 10px 10px 10px;
+}
+#autofill_detail .sidebar_small_menu img {
+  width: 24px;
+} */
+#autofill_detail .sidebar_top {
+  padding: 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+#autofill_detail .sidebar_top > img {
+  width: 18px;
+}
+
+/* #autofill_detail .sidebar_menu.small {
+  position: absolute;
+  left: -107px;
+  top: 55px;
+  z-index: 9999;
+  background-color: #f7f7f7;
+  padding: 5px 10px 5px 10px;
+  border-radius: 20px;
+} */
+
+#autofill_detail .sidebar_menu.hidden {
+  display: none;
+}
+
+#autofill_detail .sidebar_item {  
+  padding: 0.8vh 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #3a3a3a;
+  font-family: var(--jobwizard-font-family);
+  font-size: 13px;
+  font-weight: 400;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.12s ease-in;
+}
+#autofill_detail .sidebar_item .imgBg{
+  position: relative;
+  width: 86%;
+  height: 40px;
+}
+#autofill_detail .sidebar_menu > .sidebar_item:hover {
+  transform: scale(1.1);
+}
+
+#autofill_detail .sidebar_menu > .sidebar_item.more-button {
+  overflow: visible;
+}
+
+#autofill_detail .sidebar_menu > .sidebar_item.more-button:hover {
+  transform: none;
+  color: #202223;
+  font-weight: 400;
+}
+
+#autofill_detail .sidebar_menu > .sidebar_item.more-button:hover > :not(.more_popup_container) {
+  transform: scale(1.1); 
+  /* color: #0066FF;
+  font-weight: 500; */
+}
+
+#autofill_detail .sidebar_item.active{
+  transform: scale(1.1);
+}
+
+#autofill_detail .sidebar_item.hidden {
+  display: none;
+}
+
+#autofill_detail .sidebar_item.more-button {
+  display: none;
+  position: relative;
+  cursor: pointer;
+}
+
+#autofill_detail .sidebar_item.more-button.show {
+  display: flex;
+}
+
+#autofill_detail .sidebar_menu > .sidebar_item.more-button:hover .more_popup_container {
+  transform: none;
+}
+
+#autofill_detail .sidebar_menu > .sidebar_item.more-button .more_popup_container {
+  position: absolute;
+  right: 110%;
+  top: 0;
+  z-index: 1000;
+  transform: none !important;
+  transition: none !important;
+}
+/* mid sidebar menu */
+#autofill_detail .mid_sidebar_menu{
+  display: none;
+  position: relative;
+  margin-top: 10px;
+}
+#autofill_detail .mid_sidebar_menu .menu_icon{
+  height: 24px;
+  width: 24px;
+  margin: 0 auto;
+  cursor: pointer;
+  background:url("../icons/menu.svg") center/24px no-repeat;
+}
+#autofill_detail .mid_sidebar_menu .menu_icon.active{
+  background:url("../icons/menu_active.svg") center/24px no-repeat;
+}
+#autofill_detail .mid_sidebar_menu .menu_popup{
+  top: -20px;
+  position: absolute;
+  right: 80px;
+  background: #fff;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.12);
+  z-index: 999;
+  width: max-content;
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: none;
+}
+#autofill_detail .mid_sidebar_menu .menu_popup .sidebar_item{
+  flex-direction: row;
+  justify-content: center;
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  text-wrap: nowrap;
+  gap: 8px;
+}
+#autofill_detail .mid_sidebar_menu .menu_popup .sidebar_item .imgBg{
+  width: 22px;
+  height: 22px;
+}
+#autofill_detail .mid_sidebar_menu .menu_popup .sidebar_item .sidebar-text{
+  flex: 1;
+  text-align: left;
+}
+/* mid sidebar menu end*/
+#autofill_detail .more_popup {
+  display: none;
+  flex-direction: column;
+  align-items: flex-start;
+  background: white;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.12);
+  z-index: 1000;
+  width: max-content;
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+#autofill_detail .more_popup .sidebar_item {
+  transform: none !important;
+  transition: none !important;
+  background-color: white;
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  text-wrap: nowrap;
+  gap: 8px;
+}
+
+#autofill_detail .more_popup .sidebar_item:hover {
+  background-color: #f0f0f0;
+  color: #202223;
+  font-weight: 400;
+  transform: none !important;
+}
+
+#autofill_detail .more_popup .sidebar_item .imgBg {
+  height: 22px;
+  width: 22px;
+}
+
+#autofill_detail .sidebar_item.active .imgBg{
+  border-top-right-radius: 50%;
+  border-bottom-right-radius: 50%;
+  /*background: #ffffff;*/
+  position: relative;
+  /* width: 90%;
+  height: 40px; */
+}
+
+#autofill_detail .sidebar_icon {
+  position: absolute;
+  left: 50%;
+  top:50%;
+  transform: translate(-50%, -50%); 
+  margin-bottom: 6px;
+  width: 22px;
+  height: 22px;
+  opacity: 1;
+  visibility: visible;
+}
+#autofill_detail .sidebar_active_icon{
+  position: absolute;
+  left: 50%;
+  top:50%;
+  transform: translate(-50%, -50%); 
+  margin-bottom: 6px;
+  width: 22px;
+  height: 22px;
+  opacity: 0;
+  visibility: hidden;
+}
+
+#autofill_detail .sidebar_beta_tag{
+  font-size: 10px;
+  line-height: 12px;
+  padding: 1px 6px;
+  margin-top: 3px;
+  color: #0066FF;
+  background-color: #0066FF1A;
+  border-radius: 4px;
+}
+
+#autofill_detail .sidebar-text {
+  text-align: center;
+  /* disable text selection to look better even when user accidently selects */
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
+
+#autofill_detail .sidebar_item.active .sidebar-text {
+  color: #06f;
+  transition: all 0.12s ease-in;
+  font-weight: 500;
+}
+/* #autofill_detail .sidebar_item:hover > :not(.more_popup_container) .sidebar-text{
+  color: #06f;
+  transition: all 0.12s ease-in;
+  font-weight: 500;
+} */
+/* #autofill_detail .sidebar_item:hover > :not(.more_popup_container) .sidebar_active_icon{
+  opacity: 1;
+  visibility: visible;
+  transition: all 0.12s ease-in;
+} */
+/* #autofill_detail .sidebar_item:hover > :not(.more_popup_container) .sidebar_icon{
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.12s ease-in;
+} */
+#autofill_detail .sidebar_item.active:hover .sidebar_active_icon {
+  opacity: 1;
+  visibility: visible;
+}
+
+#autofill_detail .sidebar_item.active:hover .sidebar_icon {
+  opacity: 0;
+  visibility: hidden;
+}
+
+#autofill_detail .sidebar_alert {
+  display: none;
+  position: absolute;
+  bottom: 1vh;
+  width: 100%;
+  text-align: center;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#autofill_detail .personal_menu {
+  position: absolute;
+  bottom: 3.2vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #fafafa;
+  /* padding-bottom: 2vh; */
+}
+
+#autofill_detail .personal_menu .personal_menu_item {
+  height: 32px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The Direct line entry (and Update log) wraps its <i> icon inside an <a>
+   for click semantics. Without explicit centering rules on that <a>, the
+   <i> floats top-left inside the 100%×100% block and the visible icon
+   drifts off-center. Apply the same flex-center as the <li> so the icon
+   sits dead-center, matching feedback / personal which don't have the
+   <a> wrapper. */
+#autofill_detail .personal_menu .personal_menu_item > a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  line-height: 1;
+}
+
+#autofill_detail .personal_menu .personal_menu_item .update_icon,
+#autofill_detail .personal_menu .personal_menu_item .feedback_icon,
+#autofill_detail .personal_menu .personal_menu_item .personal_icon,
+#autofill_detail .personal_menu .personal_menu_item .direct_line_icon{
+  opacity: 0.4;
+  transition: opacity 0.1s ease;
+}
+
+#autofill_detail .personal_menu .personal_menu_item .update_icon:hover,
+#autofill_detail .personal_menu .personal_menu_item .feedback_icon:hover,
+#autofill_detail .personal_menu .personal_menu_item .personal_icon:hover,
+#autofill_detail .personal_menu .personal_menu_item .direct_line_icon:hover {
+  opacity: 0.5;
+  cursor: pointer;
+}
+#autofill_detail .personal_menu .update .update_icon {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  background: url("../icons/what's\_new.svg") center/24px no-repeat;
+}
+/* [Pro design v5 · 2026-06-03] Direct line sidebar icon — Pro tier gets the
+   gold envelope; Free tier gets the grey envelope with padlock overlay. The
+   variant is driven by `data-plan-locked` on the parent <li>, set at runtime
+   by initializeDirectLineModule(). Pro icon stays at slightly higher
+   opacity than the legacy default — it's a Pro perk, not a quiet utility. */
+#autofill_detail .personal_menu .direct_line .direct_line_icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background: url("../icons/sidebarDirectLine.svg") center/24px no-repeat;
+}
+#autofill_detail .personal_menu .direct_line[data-plan-locked="pro"] .direct_line_icon {
+  opacity: 0.85;
+}
+#autofill_detail .personal_menu .direct_line[data-plan-locked="pro"] .direct_line_icon:hover {
+  opacity: 1;
+}
+#autofill_detail .personal_menu .direct_line[data-plan-locked="free"] .direct_line_icon,
+#autofill_detail .personal_menu .direct_line[data-plan-locked="unknown"] .direct_line_icon {
+  background: url("../icons/sidebarDirectLineLocked.svg") center/24px no-repeat;
+}
+#autofill_detail .personal_menu .personal_menu_item.direct_line {
+  cursor: pointer;
+}
+#autofill_detail .personal_menu .feedback .feedback_icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background: url("../icons/feedback.svg") center/24px no-repeat;
+}
+#autofill_detail .personal_menu .report .report_icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background: url("../icons/report_icon.svg") center/24px no-repeat;
+}
+#autofill_detail .personal_menu .personal .personal_icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background: url("../icons/person_icon.svg") center/24px no-repeat;
+}
+
+#autofill_detail .sidebar_warp .version {
+  position: absolute;
+  bottom: 1.2vh;
+  font-size: 12px;
+  line-height: 1;
+  color: #a8a8a8;
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* personal html */
+#autofill_detail .personal_card_warp {
+  cursor: auto;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s linear 200ms, opacity 200ms;
+  width: min(340px, calc(100vw - 24px));
+  max-height: 700px;
+  display: inline-flex;
+  padding: 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: #ffffff;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  backdrop-filter: blur(8px);
+  position: absolute;
+  right: 80%;
+  bottom: 60%;
+  overflow: hidden;
+  transform-origin: bottom right;
+  z-index: 99999;
+}
+
+#autofill_detail .personal_card_warp .personal_card_main {
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+/*
+ * Native scrollbars can be hidden by the OS until scrolling begins. This cue
+ * stays product-owned: it only appears when overview content really overflows,
+ * softens after the first scroll, and leaves completely at the end.
+ */
+#autofill_detail .personal_card_warp .personal_scroll_cue {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  z-index: 4;
+  height: 38px;
+  padding: 16px 0 1px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  color: #737985;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.88) 46%,
+    #ffffff 78%
+  );
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  user-select: none;
+  transform: translateY(5px);
+  transition:
+    opacity 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 320ms;
+}
+
+#autofill_detail .personal_card_warp .personal_scroll_cue_label {
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  opacity: 0.88;
+  transition: opacity 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#autofill_detail .personal_card_warp .personal_scroll_cue_chevron {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 12px;
+  margin-bottom: 1px;
+  background: url("../icons/icon_chevron_right.svg") center / 12px 12px no-repeat;
+  opacity: 0.64;
+  transform: rotate(90deg);
+  transition: opacity 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#autofill_detail .personal_menu .personal .personal_card_warp.showing.personal-scroll-cue-visible:not(.showing-settings):not(.showing-resume-list) .personal_scroll_cue {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition:
+    opacity 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s;
+}
+
+#autofill_detail .personal_menu .personal .personal_card_warp.showing.personal-scroll-cue-visible.personal-scroll-cue-started:not(.showing-settings):not(.showing-resume-list) .personal_scroll_cue {
+  opacity: 0.82;
+  transform: translateY(2px);
+}
+
+#autofill_detail .personal_card_warp.personal-scroll-cue-started .personal_scroll_cue_label {
+  opacity: 0.52;
+}
+
+#autofill_detail .personal_card_warp.personal-scroll-cue-started .personal_scroll_cue_chevron {
+  opacity: 0.39;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #autofill_detail .personal_card_warp .personal_scroll_cue {
+    transition-duration: 0.01ms;
+  }
+
+  #autofill_detail .personal_card_warp .personal_scroll_cue_label,
+  #autofill_detail .personal_card_warp .personal_scroll_cue_chevron {
+    transition-duration: 0.01ms;
+  }
+}
+
+#autofill_detail .personal_card_warp.mid{
+  height: 300px;
+  overflow-y: scroll;
+}
+
+#autofill_detail:has(.personal_card_warp.showing)::before {
+  backdrop-filter: blur(2px);
+  z-index: 10000;
+}
+
+#autofill_detail .personal_menu .personal .personal_card_warp.showing {
+  visibility: visible;
+  opacity: 1;
+  min-height: 420px;
+  transition: visibility 0s, opacity 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  animation: magicDrawer 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+#autofill_detail .personal_card_warp.hiding {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s linear 200ms, opacity 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  animation: magicDrawerHide 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+#autofill_detail .personal_card_warp .personal_info {
+  display: flex;
+  padding: 10px 0px;
+  align-items: center;
+  gap: 12px;
+  align-self: stretch;
+}
+#autofill_detail .personal_card_warp .personal_info > img {
+  width: 48px;
+  height: 48px;
+  border-radius: 32px;
+}
+#autofill_detail .personal_card_warp .personal_info .personal_info_meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  flex: 1 0 0;
+}
+#autofill_detail .personal_card_warp .personal_info .flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  color: #3c3c3c;
+  font-family: var(--jobwizard-font-family);
+  font-size: 18px;
+  font-weight: 700;
+}
+#autofill_detail .personal_card_warp .personal_info .identity {
+  display: none;
+  padding: 4px 9px;
+  align-items: center;
+  gap: 6px;
+  border-radius: 3px;
+  background: rgba(0, 102, 255, 0.05);
+  color: #06f;
+  font-family: var(--jobwizard-font-family);
+  font-size: 14px;
+  font-weight: 400;
+}
+#autofill_detail .personal_card_warp .personal_info .job_expect {
+  display: none;
+}
+#autofill_detail .personal_card_warp .personal_info .job_expect > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  color: #a8a8a8;
+  font-family: var(--jobwizard-font-family);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* User Profile Summary */
+#autofill_detail .personal_card_warp .user_profile_summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  margin-bottom: 12px;
+}
+
+#autofill_detail .personal_card_warp .user_profile_avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+#autofill_detail .personal_card_warp .user_profile_avatar .avatar_img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 6px;
+}
+
+#autofill_detail .personal_card_warp .user_profile_info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+#autofill_detail .personal_card_warp .user_profile_name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  font-family: var(--jobwizard-font-family);
+  line-height: 16px;
+}
+
+#autofill_detail .personal_card_warp .user_profile_email {
+  font-size: 12px;
+  font-weight: 400;
+  color: #6b7280;
+  font-family: var(--jobwizard-font-family);
+  line-height: 16px;
+}
+
+/* Skeleton Loading States */
+#autofill_detail .personal_card_warp .user_profile_summary.loading .user_profile_avatar {
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+#autofill_detail .personal_card_warp .user_profile_summary.loading .user_name_text,
+#autofill_detail .personal_card_warp .user_profile_summary.loading .user_email_text {
+  display: inline-block;
+  height: 1em;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  color: transparent;
+}
+
+#autofill_detail .personal_card_warp .user_profile_summary.loading .user_name_text {
+  width: 120px;
+}
+
+#autofill_detail .personal_card_warp .user_profile_summary.loading .user_email_text {
+  width: 160px;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+#autofill_detail .personal_card_warp .plan_info {
+  display: flex;
+  width: 100%;
+  padding: 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #f3f4f6;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  margin-bottom: 12px;
+  /* [R3] Allow tooltip to escape this container so the `i` popover never
+     clips against the right card edge. Card itself still has overflow:hidden
+     for border-radius clipping, so we contain by repositioning the tooltip
+     rather than letting it bleed all the way out. */
+  overflow: visible;
+}
+#autofill_detail .personal_card_warp .plan_info .title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+#autofill_detail .personal_card_warp .plan_info .title_left {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  line-height: 1;
+}
+#autofill_detail .personal_card_warp .plan_info .plan_title_text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  font-family: var(--jobwizard-font-family);
+  letter-spacing: -0.005em;
+  line-height: 1;
+}
+#autofill_detail .personal_card_warp .plan_info .pro {
+  display: inline-flex;
+  padding: 2px 8px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+  background: linear-gradient(to right, #0066ff 0%, #0088ff 100%);
+  color: #ffffff;
+  font-family: var(--jobwizard-font-family);
+  font-size: 11.5px;
+  font-weight: 500;
+  height: 20px;
+  line-height: 1;
+  box-shadow: 0 1px 2px rgba(0, 102, 255, 0.2);
+}
+#autofill_detail .personal_card_warp .plan_info .credits_info {
+  display: flex;
+  flex-direction: column;
+  /* [R2 fix] stretch children full-width so the eyebrow divider and quota
+     progress bars span the whole card instead of stopping mid-width. */
+  align-items: stretch;
+  gap: 10px;
+  align-self: stretch;
+  width: 100%;
+}
+#autofill_detail .personal_card_warp .plan_info .credits_info > * {
+  align-self: stretch;
+}
+#autofill_detail .personal_card_warp .plan_info .details {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  align-self: stretch;
+  margin-bottom: 0;
+}
+#autofill_detail .personal_card_warp .plan_info .credits_usage_label {
+  font-size: 12px;
+  font-weight: 400;
+  color: #6b7280;
+  font-family: var(--jobwizard-font-family);
+}
+#autofill_detail .personal_card_warp .plan_info .per_day_label {
+  font-size: 12px;
+  font-weight: 400;
+  color: #9ca3af;
+  font-family: var(--jobwizard-font-family);
+}
+#autofill_detail .personal_card_warp .plan_info .data_ratio_wrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: var(--jobwizard-font-family);
+}
+#autofill_detail .personal_card_warp .plan_info .data_ratio_main {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1;
+}
+#autofill_detail .personal_card_warp .plan_info .data_ratio_slash {
+  font-size: 14px;
+  font-weight: 400;
+  color: #9ca3af;
+}
+#autofill_detail .personal_card_warp .plan_info .data_ratio_limit {
+  font-size: 14px;
+  font-weight: 400;
+  color: #9ca3af;
+}
+.runout {
+  color: #9c0000 !important;
+}
+#autofill_detail .personal_card_warp .plan_info .usage_prog_bk {
+  width: 100%;
+  height: 6px;
+  border-radius: 9999px;
+  background: #f3f4f6;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  margin-bottom: 8px;
+}
+#autofill_detail .personal_card_warp .plan_info .usage_prog_fr {
+  width: 0%;
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(to right, #0066ff 0%, #0088ff 100%);
+  transition: width 0.3s ease;
+}
+#autofill_detail .personal_card_warp .plan_info .manage_tag {
+  display: flex;
+  padding: 8px 16px;
+  margin-top: 8px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+  background: #0066ff;
+  color: #ffffff;
+  font-family: var(--jobwizard-font-family);
+  font-size: 12px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: none;
+  height: 32px;
+  width: 100%;
+  box-shadow: 0 1px 2px rgba(0, 102, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+#autofill_detail .personal_card_warp .plan_info .manage_tag::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+#autofill_detail .personal_card_warp .plan_info .manage_tag:hover {
+  background: #0052cc;
+  box-shadow: 0 2px 4px rgba(0, 102, 255, 0.25);
+}
+
+#autofill_detail .personal_card_warp .plan_info .manage_tag:hover::before {
+  left: 100%;
+}
+
+/* [Billing v1] Launch trial 锁定态：浅蓝底 + 锁前缀，明显"等开放"非"可点击" */
+#autofill_detail .personal_card_warp .plan_info .manage_tag.manage_tag_trial_locked {
+  background: rgba(0, 102, 255, 0.06);
+  color: rgba(0, 82, 204, 0.85);
+  box-shadow: none;
+  cursor: default;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border: 1px solid rgba(0, 102, 255, 0.12);
+}
+#autofill_detail .personal_card_warp .plan_info .manage_tag.manage_tag_trial_locked::before {
+  display: none;
+}
+#autofill_detail .personal_card_warp .plan_info .manage_tag.manage_tag_trial_locked:hover {
+  background: rgba(0, 102, 255, 0.06);
+  box-shadow: none;
+}
+
+/* ============================================================
+   [Billing v1 — R2] Multi-pool quota list — premium / calm / on-brand blue.
+
+   Design intent:
+     • Generous breathing room, tabular numbers, full-width hairline divider.
+     • Brand blue (#0066FF → #4DA3FF) for the only saturated element (bar fill).
+     • No meaningless motion: removed row hover lift (carried no information).
+       Only state changes that mean something get visual change (heat warn/full,
+       skeleton load, trial mute).
+     • A single `i` info icon next to the eyebrow opens a custom tooltip
+       explaining the pools — replaces the redundant "Resets daily" chip.
+     • Per-row native `title` retained (information-bearing per-pool detail).
+   ============================================================ */
+
+/* [R3] Allow credits_info container to render the i-tooltip overflow.
+   plan_info already opens overflow:visible; this lifts the wrapper too. */
+#autofill_detail .personal_card_warp .plan_info .credits_info {
+  overflow: visible;
+}
+
+/* Eyebrow row — full-width divider above, label left-aligned.
+   [R3] In trial mode this whole eyebrow is hidden via display:none below —
+   the numbers don't matter when everything is unlimited. */
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_pools_header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  margin: 12px 0 2px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(15, 23, 42, 0.07);
+  width: 100%;
+  align-self: stretch;
+  font-family: var(--jobwizard-font-family);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.085em;
+  text-transform: uppercase;
+  color: rgba(71, 85, 105, 0.72);
+}
+/* Hide eyebrow entirely in trial — "Today's usage" is meaningless when unlimited. */
+#autofill_detail .personal_card_warp .plan_info .credits_info[data-trial="1"] .quota_pools_header {
+  display: none;
+}
+/* In trial we still need a hairline between Plan header and the pool list. */
+#autofill_detail .personal_card_warp .plan_info .credits_info[data-trial="1"] .quota_pools {
+  border-top: 1px solid rgba(15, 23, 42, 0.07);
+  padding-top: 12px;
+  margin-top: 0;
+}
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_pools_eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+/* Info icon: subtle circle with `i`. [R3] Now lives in the Plan title row;
+   tooltip anchors right-aligned to avoid clipping on the right card edge. */
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_pools_info,
+#autofill_detail .personal_card_warp .plan_info .title .quota_pools_info {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(0, 102, 255, 0.08);
+  color: rgba(0, 82, 204, 0.75);
+  cursor: help;
+  transition: background 0.18s ease, color 0.18s ease;
+  outline: none;
+  flex-shrink: 0;
+}
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_pools_info:hover,
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_pools_info:focus-visible,
+#autofill_detail .personal_card_warp .plan_info .title .quota_pools_info:hover,
+#autofill_detail .personal_card_warp .plan_info .title .quota_pools_info:focus-visible {
+  background: rgba(0, 102, 255, 0.16);
+  color: #0052cc;
+}
+#autofill_detail .personal_card_warp .plan_info .quota_pools_info_icon {
+  font-family: ui-serif, Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 600;
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: none;
+  pointer-events: none;
+  transform: translateY(-0.5px);
+}
+/* [R3] Custom tooltip — anchored to the LEFT edge of the icon so it slides
+   leftward (icon is on the LEFT side of the card now, next to "Plan"), then
+   we cap max-width well below card width (340px - 24px padding = 316px usable).
+   No clipping because plan_info / credits_info now allow overflow:visible. */
+#autofill_detail .personal_card_warp .plan_info .quota_pools_tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: -4px;
+  transform: translateY(-2px);
+  width: max-content;
+  max-width: 240px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.94);
+  color: rgba(241, 245, 249, 0.96);
+  font-family: var(--jobwizard-font-family);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.005em;
+  text-transform: none;
+  line-height: 1.45;
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.18),
+    0 2px 6px rgba(15, 23, 42, 0.12);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0.18s;
+  z-index: 100;
+  white-space: normal;
+}
+#autofill_detail .personal_card_warp .plan_info .quota_pools_tooltip::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: 8px;
+  width: 8px;
+  height: 8px;
+  background: rgba(15, 23, 42, 0.94);
+  transform: rotate(45deg);
+  border-radius: 1px;
+}
+#autofill_detail .personal_card_warp .plan_info .quota_pools_info:hover .quota_pools_tooltip,
+#autofill_detail .personal_card_warp .plan_info .quota_pools_info:focus-visible .quota_pools_tooltip {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0s;
+}
+
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_pools {
+  display: flex;
+  flex-direction: column;
+  /* [R3] 14px gap — let rows breathe without going airy. */
+  gap: 14px;
+  margin: 12px 0 8px;
+  width: 100%;
+  align-self: stretch;
+}
+
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: default;
+  width: 100%;
+  align-self: stretch;
+  /* No transform on hover — meaningless motion removed (R2). */
+  /* [R3] No dividers between rows — bar itself supplies the rhythm. */
+}
+
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_row_top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--jobwizard-font-family);
+  font-size: 12px;
+  line-height: 1.15;
+}
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_label {
+  /* [R3] 12px / 500 — sits BELOW the 13px Plan title in hierarchy. */
+  color: rgba(30, 41, 59, 0.82);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.005em;
+}
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_ratio {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  color: rgba(71, 85, 105, 0.85);
+  font-weight: 500;
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_used {
+  color: rgba(15, 23, 42, 0.92);
+  font-weight: 600;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_slash {
+  margin: 0 3px;
+  color: rgba(148, 163, 184, 0.7);
+  font-weight: 400;
+}
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_limit {
+  color: rgba(100, 116, 139, 0.85);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+/* [R4] Removed: .quota_unlimited "Unlimited" pill.
+   Trial users get Pro experience capped at 50/day per pool — showing them
+   "Unlimited" sets up a betrayal at hit 50. Real used/limit numbers now
+   render in trial too; trial-specific UI cues live on the "Pro Trial" chip
+   and "🔒 Opens June 1" CTA, plus the muted bar palette below. */
+
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_bar_bk {
+  position: relative;
+  width: 100%;
+  align-self: stretch;
+  /* [R3] 4px in real-billing mode — more present so the brand-blue fill reads
+     clearly without being heavy. Trial mode drops back to 3px (below). */
+  height: 4px;
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.055);
+  overflow: hidden;
+}
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_bar_fr {
+  height: 100%;
+  width: 0%;
+  border-radius: 9999px;
+  /* [R3] Brand blue with higher saturation midpoint — more visible at low %. */
+  background: linear-gradient(90deg, #0066FF 0%, #1E78FF 60%, #3D97FF 100%);
+  transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+              background 0.3s ease, opacity 0.3s ease;
+  box-shadow: 0 0 6px rgba(0, 122, 255, 0.22);
+}
+/* [R4 → 2026-05-19 fidelity fix] Launch trial bar palette.
+   Previously the trial bars used `rgba(0,102,255,0.06)` track + `rgba(0,102,255,0.55)`
+   fill — visually disappeared on light backgrounds (Chen's image #7 shows
+   nearly-invisible Cover Letter and Chat bars). Prototype trial bars use
+   neutral gray track + full-saturation blue gradient fill. Match.
+   The "calmer state" cue now comes from the slightly thinner 3px track
+   alone, not from semi-transparent paint. */
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_pools[data-launch-trial="1"] .quota_bar_bk {
+  background: rgba(15, 23, 42, 0.07);
+  height: 3px;
+}
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_pools[data-launch-trial="1"] .quota_bar_fr {
+  background: linear-gradient(90deg, #0066FF 0%, #1E78FF 60%, #3D97FF 100%);
+  box-shadow: none;
+}
+
+/* Heat: ≥80% amber, =100% rose. Subtle hue only, never alarmist.
+   Applies uniformly across free / pro / trial — backend caps everyone at
+   the same 50/day per pool during launch trial, so a 40/50 trial user
+   deserves the same warn signal a free user gets. */
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_row[data-heat="warn"] .quota_bar_fr {
+  background: linear-gradient(90deg, #F59E0B 0%, #FB923C 100%);
+  box-shadow: 0 0 5px rgba(245, 158, 11, 0.25);
+}
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_row[data-heat="warn"] .quota_used {
+  color: #B45309;
+}
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_row[data-heat="full"] .quota_bar_fr {
+  background: linear-gradient(90deg, #F43F5E 0%, #EC4899 100%);
+  box-shadow: 0 0 5px rgba(244, 63, 94, 0.28);
+}
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_row[data-heat="full"] .quota_used {
+  color: #BE123C;
+}
+
+/* Skeleton shimmer while quotas haven't loaded yet — premium loading state. */
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_pools[data-loaded="0"] .quota_used,
+#autofill_detail .personal_card_warp .plan_info .credits_info .quota_pools[data-loaded="0"] .quota_limit {
+  color: transparent;
+  background: linear-gradient(90deg,
+    rgba(0, 102, 255, 0.08) 0%,
+    rgba(0, 102, 255, 0.18) 50%,
+    rgba(0, 102, 255, 0.08) 100%);
+  background-size: 200% 100%;
+  border-radius: 3px;
+  animation: jw-quota-shimmer 1.4s ease-in-out infinite;
+  display: inline-block;
+  min-width: 22px;
+}
+@keyframes jw-quota-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+#autofill_detail .personal_card_warp .plan_info .limit_reset_time {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+  font-family: var(--jobwizard-font-family);
+}
+#autofill_detail .personal_card_warp .plan_info #limit_reset {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 0;
+}
+
+/* ============================================================
+   [Archetype D · P0-4] Plan card 3 voices: Pro / Trial / Free
+   Trial earns a micro-hero strip (sheen + countdown pill + warm title).
+   Pro/Free use a single voice line under the Plan header. Badge tints
+   shift by data-plan; quota list / footer unchanged (already R3/R4 tuned).
+   ============================================================ */
+
+/* — Per-plan badge tint (preserves .pro class shape, swaps gradient). */
+#autofill_detail .personal_card_warp .plan_info[data-plan="free"] .pro {
+  background: rgba(15, 23, 42, 0.06);
+  color: rgba(30, 41, 59, 0.78);
+  box-shadow: none;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="trial"] .pro {
+  background: linear-gradient(135deg, #0066ff 0%, #00b3ff 100%);
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 102, 255, 0.28);
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .pro {
+  background: linear-gradient(135deg, #6d28d9 0%, #a855f7 100%);
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(109, 40, 217, 0.28);
+}
+/* pro fallthrough already styled by .plan_info .pro above */
+/* Cold-start: while subscription data hasn't arrived, mute the badge so
+   it doesn't read as a confident "Pro" for 200–400ms before settling. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="unknown"] .pro {
+  background: rgba(15, 23, 42, 0.05);
+  color: rgba(30, 41, 59, 0.55);
+  box-shadow: none;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+/* — One-line plan voice under header. Empty in trial (hero carries it). */
+#autofill_detail .personal_card_warp .plan_info .plan_voice {
+  margin: -6px 0 12px;
+  font-family: var(--jobwizard-font-family);
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: rgba(71, 85, 105, 0.85);
+  letter-spacing: 0.005em;
+  align-self: stretch;
+  width: 100%;
+}
+#autofill_detail .personal_card_warp .plan_info .plan_voice:empty,
+#autofill_detail .personal_card_warp .plan_info[data-plan="trial"] .plan_voice,
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .plan_voice,
+#autofill_detail .personal_card_warp .plan_info[data-plan="unknown"] .plan_voice {
+  display: none;
+}
+
+/* — Micro-hero. Default: hidden. Trial AND Pro both get the dark navy
+     strip — Pro deserves equal visual gravity (premium tier shouldn't
+     feel less than the freebie trial). Differences below by [data-plan]:
+     pill text via JS, heartbeat colour, sheen tempo, right-tail visibility.
+     Free stays simple-voiced — that's the falloff Chen wanted on expiry. */
+#autofill_detail .personal_card_warp .plan_info .plan_trial_hero {
+  display: none;
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="trial"] .plan_trial_hero,
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .plan_trial_hero {
+  display: block;
+  position: relative;
+  /* Card has padding:12px; pull hero to bleed edge-to-edge then re-pad inside. */
+  margin: -12px -12px 12px;
+  padding: 12px 14px 11px;
+  /* Multi-layer metal vocabulary (matches the Direct line panel strip):
+     1) thin top-edge highlight band
+     2) top-left brushed sheen
+     3) base diagonal gradient with extra stops for tonal variation */
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, transparent 14%, transparent 100%),
+    radial-gradient(ellipse 60% 80% at 18% 0%, rgba(255, 255, 255, 0.06), transparent 55%),
+    linear-gradient(135deg, #0a1530 0%, #0f2657 35%, #14306b 65%, #0b1f4c 85%, #0a1530 100%);
+  color: #ffffff;
+  overflow: hidden;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  /* Gold hairline along the top + inner highlight catches light at the rim;
+     soft inner bottom shadow + faint white seam below ground the strip on
+     the white card body. Same recipe as .jw-dl-strip. */
+  border-top: 1px solid rgba(212, 176, 106, 0.45);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+/* Pro variant tilts the gradient slightly warmer (subtle gold-into-navy
+   warmth) — the cue is small but reads as "this is the destination" vs
+   trial's cooler urgency. Layered on top of the shared metal recipe above. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .plan_trial_hero {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, transparent 14%, transparent 100%),
+    radial-gradient(ellipse 60% 80% at 18% 0%, rgba(255, 255, 255, 0.06), transparent 55%),
+    radial-gradient(120% 80% at 100% 0%, rgba(245, 208, 98, 0.12) 0%, transparent 55%),
+    linear-gradient(135deg, #0a1530 0%, #0f2657 35%, #1a2e6e 65%, #14306b 85%, #0a1530 100%);
+  border-top-color: rgba(212, 176, 106, 0.55);
+}
+/* Sheen — slow horizontal sweep, info-bearing (says "this is special"). */
+#autofill_detail .personal_card_warp .plan_info[data-plan="trial"] .plan_trial_hero::before,
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .plan_trial_hero::before {
+  content: "";
+  position: absolute;
+  top: 0; left: -120%;
+  width: 55%; height: 100%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.09),
+    transparent);
+  pointer-events: none;
+}
+/* Trial sheen — 6.5s, brisker; trial is a moment that's leaving. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="trial"] .plan_trial_hero::before {
+  animation: jw-plan-hero-sheen 6.5s ease-in-out infinite;
+}
+/* Pro sheen — 12s, slower and more sovereign. Pro isn't going anywhere. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .plan_trial_hero::before {
+  animation: jw-plan-hero-sheen 12s ease-in-out infinite;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 230, 168, 0.07),
+    transparent);
+}
+@keyframes jw-plan-hero-sheen {
+  0%        { left: -120%; }
+  70%, 100% { left: 200%; }
+}
+#autofill_detail .personal_card_warp .plan_info .plan_hero_row {
+  display: flex;
+  align-items: center;
+  gap: 10px;  /* prototype: 10px (was 8px) */
+  font-family: var(--jobwizard-font-family);
+}
+#autofill_detail .personal_card_warp .plan_info .plan_hero_pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px 2px 7px;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  border-radius: 9999px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+}
+/* Pro pill: warmer border + tiny extra spec-weight to read as "earned tier". */
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .plan_hero_pill {
+  background: rgba(245, 208, 98, 0.08);
+  border-color: rgba(245, 208, 98, 0.22);
+  color: rgba(255, 244, 214, 0.95);
+}
+/* Heartbeat dot before the pill label — life sign.
+   Trial: soft white-blue (brand cool urgency).
+   Pro:   warm gold (sovereign premium, slower beat). */
+#autofill_detail .personal_card_warp .plan_info .plan_hero_pill::before {
+  content: "";
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #c8e2ff;
+  box-shadow: 0 0 6px rgba(126, 184, 255, 0.6);
+  animation: jw-plan-hero-blink 1.7s ease-in-out infinite;
+  flex: 0 0 5px;
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .plan_hero_pill::before {
+  background: #f5d062;
+  box-shadow: 0 0 8px rgba(245, 208, 98, 0.55);
+  animation: jw-plan-hero-blink 2.4s ease-in-out infinite;
+}
+@keyframes jw-plan-hero-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+#autofill_detail .personal_card_warp .plan_info .plan_hero_pill_sep {
+  opacity: 0.55;
+}
+#autofill_detail .personal_card_warp .plan_info .plan_hero_until {
+  margin-left: auto;
+  font-size: 11px;  /* prototype: 11px (was 10.5px) */
+  color: rgba(255, 255, 255, 0.55);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+}
+#autofill_detail .personal_card_warp .plan_info .plan_hero_title {
+  margin: 8px 0 0;
+  font-family: var(--jobwizard-font-family);
+  font-size: 13px;  /* prototype: 13px (was 12.5px) */
+  font-weight: 600;
+  line-height: 1.35;  /* prototype: 1.35 */
+  letter-spacing: -0.005em;
+  color: #ffffff;
+}
+/* Pro title — slightly warmer text tone matches the gold accents. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .plan_hero_title {
+  color: rgba(255, 250, 235, 0.98);
+}
+
+/* ============================================================
+   [D Fusion mode · 2026-05-19] When hero is active (trial/pro), the
+   card stops being "title row + body padded inside 12px gutter" and
+   becomes "hero-top + body-with-its-own-padding". Solves three
+   regressions Chen flagged:
+     1. Hero only stacked over .title row → duplicate plan identity.
+        Fix: hide .title row entirely when hero is on.
+     2. Hero didn't fill card width (align-items:flex-start on .plan_info
+        sized hero to content width, negative margin only painted past).
+        Fix: padding:0 + overflow:hidden + native stretch.
+     3. Quota row / footer didn't match prototype detail (bold number,
+        " today" suffix, footer text-link instead of big button).
+        Fix: scoped overrides on .quota_used / .quota_ratio::after /
+        #limit_reset / .manage_tag.
+   Free state untouched — keeps the Plan + Free badge title row,
+   "Today's usage" eyebrow, and full-width "Get more" button as the
+   only plan signal it has.
+   ============================================================ */
+#autofill_detail .personal_card_warp .plan_info[data-plan="trial"],
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] {
+  padding: 0;
+  align-items: stretch;
+  overflow: hidden;  /* clip hero corners to card border-radius */
+}
+/* Hero replaces the title row → hide it. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="trial"] .title,
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .title {
+  display: none;
+}
+/* Hero true edge-to-edge now that .plan_info has no padding. Top corners
+   match the card; bottom flat so it joins the body cleanly.
+   Padding 14/18/12 per prototype .pc-micro-hero — wider side gutters
+   so pill + title breathe against the card edges. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="trial"] .plan_trial_hero,
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .plan_trial_hero {
+  margin: 0;
+  padding: 14px 18px 12px;
+  border-radius: 8px 8px 0 0;
+}
+/* Body wrapper — credits_info gets the inner gutter now.
+   Prototype .pc-body uses 14/18/16 — match. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="trial"] .credits_info,
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .credits_info {
+  padding: 14px 18px 16px;
+  gap: 14px;
+}
+/* Eyebrow "Today's usage" — already hidden for trial via earlier R3 rule;
+   also hide for pro so both fusion-mode flavors render the same body. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .credits_info .quota_pools_header {
+  display: none;
+}
+/* Pool list trim — prototype .pc-quotas gap is 11px (row-to-row).
+   Tighter than my earlier 16px (which Chen felt over-spaced after I
+   over-corrected for "no breathing room"). Prototype proportion is
+   the target — row-to-row 11px + internal label-to-bar 5px. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="trial"] .credits_info .quota_pools,
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .credits_info .quota_pools {
+  margin: 0;
+  gap: 11px;
+  border-top: none;
+  padding-top: 0;
+}
+
+/* Quota row typography — match prototype: ratio sits at 10.5px with
+   <strong>-equivalent bold on the consumed number, /limit + " today"
+   in normal weight + muted. No size jump between number and /limit —
+   weight + colour carry the emphasis, prototype-style. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="trial"] .credits_info .quota_used,
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .credits_info .quota_used {
+  color: #0b0d10;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="trial"] .credits_info .quota_slash,
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .credits_info .quota_slash {
+  color: rgba(148, 163, 184, 0.75);
+  margin: 0 1px;
+  font-weight: 400;
+  font-size: 10.5px;
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="trial"] .credits_info .quota_limit,
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .credits_info .quota_limit {
+  color: rgba(107, 114, 128, 0.85);
+  font-weight: 400;
+  font-size: 10.5px;
+}
+/* " today" suffix on the ratio — small, muted, only in fusion mode. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="trial"] .credits_info .quota_ratio::after,
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .credits_info .quota_ratio::after {
+  content: " today";
+  color: rgba(148, 163, 184, 0.7);
+  font-weight: 400;
+  margin-left: 4px;
+  font-size: 10.5px;
+  letter-spacing: 0.002em;
+}
+/* Label — prototype .pc-quota-label is 11.5px / 500. Balance with
+   the 11.5px / 600 number — same baseline, weight is the differentiator. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="trial"] .credits_info .quota_label,
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .credits_info .quota_label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: rgba(15, 23, 42, 0.88);
+}
+
+/* Footer — collapse #limit_reset from vertical stack to horizontal row
+   (left: reset hint, right: text-link manage CTA). Hairline divider above. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="trial"] #limit_reset,
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] #limit_reset {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(15, 23, 42, 0.07);
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="trial"] #limit_reset .limit_reset_time,
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] #limit_reset .limit_reset_time {
+  font-size: 11.5px;
+  color: rgba(107, 114, 128, 0.92);
+  margin: 0;
+  letter-spacing: 0.002em;
+}
+/* manage_tag stays a full-width CTA in trial/pro modes too — the "Opens June 1"
+   placeholder is the *future upgrade button*, not a text caption. Locking it
+   visually as a disabled-style button (per default `.manage_tag_trial_locked`
+   block above at L776-791) preserves users' mental model: "this slot is the
+   upgrade action, it just isn't open yet." */
+
+/* ============================================================
+   [Pro design v5 · 2026-06-03] Pro-only quota card visual upgrade.
+
+   Layer added on top of the existing fusion-mode block above. Free / trial
+   visuals stay untouched — only data-plan="pro" gets the new palette so we
+   can ship without regressing the Free / Trial states.
+
+   Three swaps:
+     1. Plan hero strip → metal-navy → near-black gradient + 1px gold top
+        edge + faint sheen. Replaces the warmer pro-tinted navy above.
+     2. Quota bars (all 5) → gold gradient at every fill level, including
+        100%. Pro value accumulation is continuous gold; the wall message
+        comes from the CTA + copy, not red collision language.
+     3. "Get more" manage_tag → 白底金边金字 outline. Matches the v5 mini
+        prototype + the Direct line panel CTA so the gold language is
+        unified across the Pro identity surface.
+   ============================================================ */
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .plan_trial_hero {
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(255, 255, 255, 0.06) 0%, transparent 60%),
+    linear-gradient(135deg, #1e3a5f 0%, #0f172a 50%, #020617 100%);
+  border-top: 1px solid rgba(212, 176, 106, 0.4);
+}
+/* Subtle gold-sheen line across the very top edge — anchors the gold
+   language (pill + bars + CTA) into the navy gradient. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .plan_trial_hero::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(212, 176, 106, 0.35) 30%,
+    rgba(212, 176, 106, 0.18) 60%,
+    transparent 100%);
+  pointer-events: none;
+}
+
+/* Quota bars — ALL 5 pools gold on Pro, including 100% wall.
+   Override both base + heat states (warn/full) so a hit-50 wall reads as
+   "gold accumulation, you used your full Pro day" instead of pink danger. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .credits_info .quota_bar_fr {
+  background: linear-gradient(90deg, #d4b06a 0%, #b8923d 100%);
+  box-shadow: 0 0 6px rgba(212, 176, 106, 0.25);
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .credits_info .quota_row[data-heat="warn"] .quota_bar_fr,
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .credits_info .quota_row[data-heat="full"] .quota_bar_fr {
+  background: linear-gradient(90deg, #d4b06a 0%, #b8923d 100%);
+  box-shadow: 0 0 6px rgba(212, 176, 106, 0.3);
+}
+/* Wall (100%) used number — gold-deep, not rose/pink. Matches the bar. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .credits_info .quota_row[data-heat="full"] .quota_used,
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .credits_info .quota_row[data-heat="warn"] .quota_used {
+  color: #b8923d;
+}
+
+/* "Get more" CTA → white bg + 1.5px gold border + gold text.
+   Override the solid blue `.manage_tag` from the legacy free state. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .manage_tag {
+  background: #ffffff;
+  color: #b8923d;
+  border: 1.5px solid #d4b06a;
+  box-shadow: none;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .manage_tag::before {
+  /* Suppress the blue sweep — gold outline doesn't need it. */
+  display: none;
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] .manage_tag:hover {
+  background: #faf6ed;
+  border-color: #b8923d;
+  box-shadow: 0 4px 12px -6px rgba(212, 176, 106, 0.45);
+}
+/* "Get more" is a compact pill on the RIGHT of the footer row (reset hint
+   left, button right) — not a full-width bar. Override the base width:100%
+   (legacy free-state CTA) that was making it sprawl. Pro + trial footers. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="pro"] #limit_reset .manage_tag,
+#autofill_detail .personal_card_warp .plan_info[data-plan="trial"] #limit_reset .manage_tag {
+  width: auto;
+  flex: 0 0 auto;
+  margin-top: 0;
+  padding: 7px 18px;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   [Ultra apex · 2026-06-09] Ultra plan card — top of the Free→Pro→Ultra
+   ladder. Self-contained additive layer (same isolation strategy as the
+   Pro v5 block above): everything Ultra needs is declared here against
+   [data-plan="ultra"], so Free / Pro / Trial stay untouched.
+
+   Ultra shares Pro's hero-mode SKELETON (hero strip replaces the title row,
+   body gets inner padding, footer goes horizontal, numbers emphasised) — that
+   sameness IS the family cohesion. The VISUALS are pushed to the apex: deeper
+   obsidian base, dominant + more saturated gold, gold-filled "UNLIMITED" pill,
+   ∞ glyph on the title, flowing-gold "no ceiling" bars (NOT cap meters), and a
+   主黑副金 CTA that carries the heaviest gold-zone weight.
+   ============================================================ */
+/* — Fusion-mode skeleton (mirrors the trial/pro structural rules) — */
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] {
+  padding: 0;
+  align-items: stretch;
+  overflow: hidden;
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .title {
+  display: none;
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .credits_info {
+  padding: 14px 18px 16px;
+  gap: 14px;
+}
+/* Body matches Pro exactly (eyebrow hidden, " today" suffix, same number
+   typography) — keeps the two premium tiers' bodies identical for cohesion. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .credits_info .quota_pools_header {
+  display: none;
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .credits_info .quota_pools {
+  margin: 0;
+  gap: 11px;
+  border-top: none;
+  padding-top: 0;
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .credits_info .quota_used {
+  color: #0b0d10;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .credits_info .quota_slash {
+  color: rgba(148, 163, 184, 0.75);
+  margin: 0 1px;
+  font-weight: 400;
+  font-size: 10.5px;
+}
+/* ∞ a touch larger than the digits so it reads as the glyph it is. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .credits_info .quota_limit {
+  color: rgba(107, 114, 128, 0.9);
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 1;
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .credits_info .quota_ratio::after {
+  content: " today";
+  color: rgba(148, 163, 184, 0.7);
+  font-weight: 400;
+  margin-left: 4px;
+  font-size: 10.5px;
+  letter-spacing: 0.002em;
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .credits_info .quota_label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: rgba(15, 23, 42, 0.88);
+}
+
+/* — Hero strip — apex obsidian base + dominant gold — */
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .plan_trial_hero {
+  display: block;
+  position: relative;
+  margin: 0;
+  padding: 14px 18px 12px;
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+  color: #ffffff;
+  /* Deeper than Pro's navy: near-black obsidian with a stronger top-right
+     gold radial → the gold is the protagonist here, not an accent. */
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 14%, transparent 100%),
+    radial-gradient(135% 95% at 100% 0%, rgba(245, 208, 98, 0.22) 0%, transparent 56%),
+    radial-gradient(ellipse 60% 80% at 16% 0%, rgba(255, 255, 255, 0.06), transparent 55%),
+    linear-gradient(135deg, #0b0f1d 0%, #0a1228 32%, #0e1733 62%, #070b18 85%, #04060e 100%);
+  border-top: 1px solid rgba(212, 176, 106, 0.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.32);
+}
+/* Gold hairline along the BOTTOM seam too — richer gold framing than Pro's
+   top-only line; the strip feels bracketed in gold. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .plan_trial_hero::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212, 176, 106, 0.5) 50%, transparent);
+  pointer-events: none;
+}
+/* Sheen — warm gold, 10s (between trial's 6.5s urgency and pro's 12s calm). */
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .plan_trial_hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 228, 160, 0.10), transparent);
+  animation: jw-plan-hero-sheen 10s ease-in-out infinite;
+  pointer-events: none;
+}
+/* Gold-filled "UNLIMITED" pill (Pro's pill is a faint white/gold tint —
+   Ultra's is filled gold, the apex signal). Gold heartbeat. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .plan_hero_pill {
+  background: linear-gradient(135deg, rgba(245, 208, 98, 0.22), rgba(184, 146, 61, 0.14));
+  border: 1px solid rgba(212, 176, 106, 0.6);
+  color: #f6e6bb;
+  letter-spacing: 0.10em;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 1px 6px rgba(212, 176, 106, 0.22);
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .plan_hero_pill::before {
+  background: #f5d062;
+  box-shadow: 0 0 9px rgba(245, 208, 98, 0.75);
+  animation: jw-plan-hero-blink 2.8s ease-in-out infinite;
+}
+/* Title — warm white, ∞ glyph prefix in gold. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .plan_hero_title {
+  color: #fff7e6;
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .plan_hero_title::before {
+  content: "\221E";
+  color: #f5d062;
+  font-size: 15px;
+  font-weight: 700;
+  margin-right: 7px;
+  filter: drop-shadow(0 0 5px rgba(245, 208, 98, 0.5));
+  vertical-align: -1px;
+}
+
+/* — Unlimited bars — flowing gold "no ceiling", NOT cap meters.
+   JS sets width:100% for unlimited pools; the moving transparent→gold→
+   transparent band reads as an endless flow, not a maxed-out solid fill.
+   Faint gold track underneath. (Replaces the old bug where ∞ + used>0
+   painted a SOLID 100% bar that misread as "hit the cap".) — */
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .credits_info .quota_bar_bk {
+  background: rgba(212, 176, 106, 0.10);
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .credits_info .quota_bar_fr {
+  background: linear-gradient(90deg, rgba(212, 176, 106, 0) 0%, rgba(212, 176, 106, 0.55) 50%, rgba(212, 176, 106, 0) 100%);
+  background-size: 200% 100%;
+  animation: jw-ultra-bar-flow 4.5s ease-in-out infinite;
+  box-shadow: none;
+}
+@keyframes jw-ultra-bar-flow {
+  0%   { background-position: -100% 0; }
+  50%  { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* — Footer — horizontal: "No daily cap" left, 主黑副金 CTA right. — */
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] #limit_reset {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(15, 23, 42, 0.07);
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] #limit_reset .limit_reset_time {
+  font-size: 11.5px;
+  color: rgba(107, 114, 128, 0.92);
+  margin: 0;
+  letter-spacing: 0.002em;
+}
+/* 主黑副金 CTA — same vocabulary as the Direct Line panel CTA (navy→black
+   gradient + gold text + gold top-edge). Distinct from Pro's white+gold-
+   outline: Ultra's action carries the heaviest gold-zone weight in the tier
+   ladder. Blue sweep ::before suppressed. */
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] #limit_reset .manage_tag {
+  width: auto;
+  flex: 0 0 auto;
+  margin-top: 0;
+  padding: 7px 18px;
+  white-space: nowrap;
+  background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 50%, #020617 100%);
+  color: #d4b06a;
+  border: 0;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow:
+    inset 0 1px 0 rgba(212, 176, 106, 0.55),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.35),
+    0 4px 12px rgba(2, 6, 23, 0.28);
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .manage_tag::before {
+  display: none;
+}
+#autofill_detail .personal_card_warp .plan_info[data-plan="ultra"] .manage_tag:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #244672 0%, #0f172a 50%, #020617 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 176, 106, 0.65),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.4),
+    0 8px 16px rgba(2, 6, 23, 0.32),
+    0 0 0 1px rgba(212, 176, 106, 0.32);
+}
+
+#autofill_detail .personal_card_warp .profile_info {
+  display: flex;
+  padding: 8px 0;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  align-self: stretch;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  border-top: 1px solid #f3f4f6;
+  color: #374151;
+  font-family: var(--jobwizard-font-family);
+  font-size: 12px;
+  font-weight: 400;
+}
+#autofill_detail .personal_card_warp .profile_info a {
+  text-decoration: none;
+  color: #374151;
+}
+#autofill_detail .personal_card_warp .profile_info > p,
+#autofill_detail .personal_card_warp .profile_info a,
+#autofill_detail .personal_card_warp .profile_info > div {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  padding: 10px;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  gap: 8px;
+  color: #374151;
+}
+#autofill_detail .personal_card_warp .profile_info a:hover,
+#autofill_detail .personal_card_warp .profile_info p:hover,
+#autofill_detail .personal_card_warp .profile_info > div:hover {
+  background: #f9fafb;
+  cursor: pointer;
+}
+
+#autofill_detail .personal_card_warp .profile_info a[href*="Delete"] p,
+#autofill_detail .personal_card_warp .profile_info a[href*="delete"] p {
+  color: #dc2626 !important;
+  font-weight: 400;
+}
+
+#autofill_detail .personal_card_warp .profile_info a[href*="Delete"]:hover,
+#autofill_detail .personal_card_warp .profile_info a[href*="delete"]:hover {
+  background: #fef2f2;
+}
+
+#autofill_detail .personal_card_warp .profile_info a[href*="Delete"]:hover p,
+#autofill_detail .personal_card_warp .profile_info a[href*="delete"]:hover p {
+  color: #dc2626 !important;
+}
+
+/* Profile setting */
+#autofill_detail .personal_card_warp .profile_setting {
+  /* Temporary hide the personal card */
+  display: flex;
+  /* display: none; */
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  align-self: stretch;
+}
+/* Profile setting -- General part */
+#autofill_detail .personal_card_warp .profile_setting .setting_divider {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  background: #F2F2F2;
+}
+#autofill_detail .personal_card_warp .profile_setting .profile_setting_container {
+  display: flex;
+  padding: 10px 10px;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  align-self: stretch;
+  border-radius: 8px;
+  background: #fff;
+  color: #202223;
+  font-family: var(--jobwizard-font-family);
+  font-size: 14px;
+  font-weight: 400;
+}
+#autofill_detail .personal_card_warp .profile_setting .container_description {
+  color: #A8A8A8;
+  font-family: var(--jobwizard-font-family);
+  font-size: 10px;
+  font-weight: 400;
+}
+#autofill_detail .personal_card_warp .profile_setting .setting_content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 5px;
+  align-self: stretch;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: var(--jobwizard-font-family);
+  color: #202223;
+}
+#autofill_detail .personal_card_warp .profile_setting .setting_content .setting_tips {
+  width: 210px;
+  font-size: 12px;
+  font-weight: 400;
+  font-family: var(--jobwizard-font-family);
+  color: #bbbbbb;
+}
+#autofill_detail .personal_card_warp .profile_setting .toggle_switch {
+  display: flex;
+  position: relative;
+  padding: 6px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 30px;
+  background: #ccc;
+  width: 28px;
+  height: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#autofill_detail .personal_card_warp .profile_setting .toggle_switch.active {
+  background: #0066FF;
+}
+
+#autofill_detail .personal_card_warp .profile_setting .toggle_switch .toggle_switch_circle {
+  position: absolute;
+  left: 18%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  transition: left 0.3s;
+}
+
+#autofill_detail .personal_card_warp .profile_setting .toggle_switch.active .toggle_switch_circle {
+  left: 56%;
+}
+/* Profile setting -- PDF part */
+#autofill_detail .personal_card_warp .profile_setting .pdf_setting {
+  /* display: none; */
+  /* Hide for now */
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  position: relative;
+  padding: 12px 10px;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  cursor: pointer;
+}
+#autofill_detail .personal_card_warp .profile_setting .pdf_setting_content {
+  width: 192px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  align-self: stretch;
+  gap: 10px;
+  cursor: pointer;
+}
+#autofill_detail .personal_card_warp .profile_setting .pdf_setting_content .pdf_name {
+  max-width: 150px;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: var(--jobwizard-font-family);
+  color: #A8A8A8;
+}
+#autofill_detail .personal_card_warp .profile_setting:not(.loading) .pdf_setting_content .pdf_name:empty::before {
+  content: attr(data-placeholder);
+  color: #A8A8A8;
+  font-weight: 300;
+}
+#autofill_detail .personal_card_warp .profile_setting.loading .pdf_setting_content .pdf_name {
+  background-color: #e1e1e1;
+  width: 128px;
+  height: 8px;
+  border-radius: 30px;
+}
+/* Profile setting -- LinkedIn part */
+#autofill_detail .personal_card_warp .profile_setting .linkedin_setting_container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+}
+#autofill_detail .personal_card_warp .profile_setting .linkedin_setting {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  padding: 12px 10px;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-self: stretch;
+}
+#autofill_detail .personal_card_warp .profile_setting .linkedin_setting_edit {
+  display: flex;
+  padding: 6px 2px;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+}
+#autofill_detail .personal_card_warp .profile_setting .linkedin_setting_edit .linkedin_setting_edit_data_container {
+  width: 220px;
+  padding: 6px 8px;
+  border-radius: 2px;
+  background-color: transparent;
+}
+
+#autofill_detail .personal_card_warp .profile_setting .linkedin_setting_edit .linkedin_setting_edit_data {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; 
+  font-size: 14px;
+  font-weight: 400;
+  font-family: var(--jobwizard-font-family);
+  color: #A8A8A8;
+}
+
+#autofill_detail .personal_card_warp .profile_setting:not(.loading) .linkedin_setting_edit .linkedin_setting_edit_data:empty::before {
+  content: attr(data-placeholder);
+  color: #A8A8A8;
+  font-weight: 300;
+}
+
+#autofill_detail .personal_card_warp .profile_setting .linkedin_setting_edit .linkedin_setting_edit_data.editing {
+  outline: none;
+  color: #202223;
+  overflow-x: auto;
+  scrollbar-width: none;
+  text-overflow: clip;
+}
+
+#autofill_detail .personal_card_warp .profile_setting .linkedin_setting_edit .linkedin_setting_edit_data_container:has(.linkedin_setting_edit_data.editing) {
+  background-color: #f2f2f2;
+}
+
+#autofill_detail .personal_card_warp .profile_setting.loading .linkedin_setting_edit .linkedin_setting_edit_data {
+  background-color: #e1e1e1;
+  width: 128px;
+  height: 8px;
+  border-radius: 30px;
+}
+#autofill_detail .personal_card_warp .profile_setting .linkedin_setting_edit .linkedin_setting_edit_btn {
+  width: 16px;
+  height: 16px;
+  opacity: 0.3;
+  cursor: pointer;
+}
+#autofill_detail .personal_card_warp .profile_setting .linkedin_setting_edit .linkedin_setting_edit_btn:hover {
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+/* Profile setting -- Active Learning part */
+#autofill_detail .personal_card_warp .profile_setting .activeLearning_setting_container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+}
+#autofill_detail .personal_card_warp .profile_setting .activeLearning_setting {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  padding: 12px 10px;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+}
+#autofill_detail .personal_card_warp .profile_setting .activeLearning_setting_manage {
+  display: none;
+  /* Hide for now */
+  /* display: block; */
+  width: 100%;
+  padding: 12px 10px;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: var(--jobwizard-font-family);
+  color: #202223;
+  cursor: pointer;
+}
+
+/* Profile setting -- Export Application part */
+#autofill_detail .personal_card_warp .profile_setting .export_application_setting_container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+}
+
+#autofill_detail .personal_card_warp .profile_setting .export_application_setting {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  padding: 12px 10px;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+}
+
+#autofill_detail .personal_card_warp .profile_setting .export_application_setting_manage {
+  width: 100%;
+  padding: 12px 10px;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: var(--jobwizard-font-family);
+  color: #202223;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#autofill_detail .personal_card_warp .profile_setting .export_application_setting_manage:hover {
+  background-color: #f2f2f2;
+}
+
+
+/* feedback */
+#autofill_detail .personal_menu .feedback_list_wrap {
+  /* display: none; */
+  display: inline-flex;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s linear 200ms, opacity 200ms;
+  padding: 10px 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0px 2px 15px 0px rgba(0, 0, 0, 0.12);
+  position: absolute;
+  z-index: 1000;
+  right: 80%;
+  bottom: 60%;
+  transform-origin: bottom right;
+}
+
+/* Mark as styles moved to track.css */
+/* Mark as styles moved to track.css */
+
+#autofill_detail .feedback_list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  gap: 6px;
+}
+#autofill_detail .personal_menu .feedback_list_wrap.showing {
+  visibility: visible;
+  opacity: 1;
+  transition: visibility 0s, opacity 200ms;
+  animation: magicDrawer 0.2s ease-out forwards;
+}
+#autofill_detail .feedback_list_wrap.hiding {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s linear 200ms, opacity 200ms;
+  animation: magicDrawerHide 0.2s ease-in forwards;
+}
+#autofill_detail .feedback_list_wrap a {
+  display: flex;
+  padding: 10px 10px;
+  align-items: center;
+  gap: 12px;
+  align-self: stretch;
+  border-radius: 4px;
+  color: #202223;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  width: 160px;
+  text-decoration: none;
+}
+#autofill_detail .feedback_list_wrap a img {
+  width: 24px;
+  height: 24px;
+}
+#autofill_detail .feedback_list_wrap a:hover {
+  background: #efefef;
+}
+#autofill_detail .feedback_list_wrap .feedback_wechat {
+  width: 160px;
+  color: #202223;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  font-size: 14px;
+  font-family: inherit;
+  text-align: left;
+  padding: 10px 10px;
+  gap: 12px;
+  align-items: center;
+  cursor: pointer;
+  display: none;
+  position: relative;
+  text-decoration: none;
+}
+#autofill_detail .feedback_list_wrap .feedback_wechat .feedback_wechat_qrcode {
+  display: none;
+  position: absolute;
+  right: 110%;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+}
+#autofill_detail .feedback_list_wrap .feedback_wechat:hover,
+#autofill_detail .feedback_list_wrap .feedback_wechat:focus-visible {
+  background: #efefef;
+}
+#autofill_detail .feedback_list_wrap .feedback_wechat:focus-visible {
+  outline: 2px solid #0a66c2;
+  outline-offset: 2px;
+}
+#autofill_detail .feedback_list_wrap .feedback_wechat:hover .feedback_wechat_qrcode,
+#autofill_detail .feedback_list_wrap .feedback_wechat:focus .feedback_wechat_qrcode,
+#autofill_detail .feedback_list_wrap .feedback_wechat:focus-within .feedback_wechat_qrcode {
+  display: block;
+}
+
+/* 内容 */
+#autofill_detail .main_content_warp {
+  width: calc(100% - 70px);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+#autofill_detail .main_content_header {
+  display: none;
+  align-items: center;
+  padding: 16px 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+#autofill_detail .main_content_header img {
+  user-select: none;
+}
+#autofill_detail .main_content_body {
+  height: 100%;
+  overflow: hidden;
+}
+#autofill_detail .main_content_warp .page_content {
+  display: none;
+  height: 100%;
+  /* padding: 0 20px; */
+  overflow: auto;
+  position: relative;
+}
+#autofill_detail .main_content_warp .page_content#chat_content {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+#autofill_detail .main_content_warp .page_content#chat_content .chatbox_header {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+#autofill_detail .main_content_warp .page_content#chat_content .chatbox_related_container {
+  min-width: 0;
+  max-width: 100%;
+  position: sticky;
+  top: 76px; /* main_symbol height: 24px padding + ~28px title + 24px padding */
+  z-index: 1000;
+  flex-shrink: 0;
+}
+#autofill_detail .main_content_warp .page_content#chat_content .chatbox_main_container {
+  min-width: 0;
+  flex: 1;
+  overflow: auto;
+  overflow-x: hidden;
+}
+#autofill_detail .main_content_warp .page_content .chatbox_header > :not(.main_symbol) {
+  padding: 0 20px;
+}
+#autofill_detail .main_content_warp .page_content.active {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Board guidance uses the same state card as Autofill, below each real header. */
+#autofill_detail.jw-job-board .jw-job-board-page > :not(.main_symbol):not(.jw-job-selection) {
+  display: none !important;
+}
+#autofill_detail .jw-job-selection {
+  flex: 1;
+  min-height: 280px;
+  position: relative;
+}
+#autofill_detail .jw-job-selection > .form_empty.error_page_style {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  height: auto;
+  box-sizing: border-box;
+}
+#autofill_detail .jw-job-selection-compact {
+  flex: 0 0 auto;
+  min-height: 0;
+  padding: 12px 20px;
+  border-bottom: 1px solid #e9ecf0;
+  color: #657083;
+  font-size: 13px;
+  line-height: 1.5;
+}
+#autofill_detail .jw-job-selection-compact strong,
+#autofill_detail .jw-job-selection-compact span {
+  display: block;
+}
+
+@keyframes magicDrawer {
+  0% {
+      transform: translate(5%, 5%) scale(0);
+      opacity: 0;
+  }
+  100% {
+      transform: translate(0, 0) scale(1);
+      opacity: 1;
+  }
+}
+
+@keyframes magicDrawerHide {
+  0% {
+      transform: translate(0, 0) scale(1);
+      opacity: 1;
+  }
+  100% {
+      transform: translate(5%, 5%) scale(0);
+      opacity: 0;
+  }
+}
+
+/* ============================================
+   email_input_popup — Archetype B (Conversation), P1·d (2026-05-19)
+   Inline sidebar input for setting the autofill email. Floating
+   popup anchored to the right of the Autofill sidebar item.
+   Pure CSS rewrite — preserves .show toggle, input value read, and
+   .cancel_button / .save_button JS handlers (main.js:~1994).
+   Also removes a stale `border: 2px solid red` debug style.
+   ============================================ */
+#autofill_detail .email_input_popup {
+  display: none;
+  position: absolute;
+  right: 110%;
+  top: 50%;
+  transform: translateY(-50%);
+  box-sizing: border-box;
+  padding: 16px 16px 14px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow:
+    0 16px 40px rgba(8, 10, 14, 0.16),
+    0 3px 8px rgba(8, 10, 14, 0.06);
+  width: 280px;
+  z-index: 999999;
+  font-family: var(--jobwizard-font-family);
+}
+
+#autofill_detail .email_input_popup.show {
+  display: block !important;  /* override JS that may set inline style */
+  animation: jw-email-popup-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes jw-email-popup-in {
+  from { opacity: 0; transform: translateY(-50%) translateX(6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(-50%) translateX(0)   scale(1); }
+}
+
+#autofill_detail .email_input_popup .popup_title {
+  color: #0b0d10;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  margin: 0 0 10px;
+}
+
+#autofill_detail .email_input_popup input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid rgba(15, 17, 21, 0.14);
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13px;
+  color: #0b0d10;
+  margin: 0 0 12px;
+  background: #ffffff;
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+#autofill_detail .email_input_popup input:focus {
+  border-color: #0066ff;
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.10);
+}
+#autofill_detail .email_input_popup input::placeholder {
+  color: #9aa3af;
+}
+
+#autofill_detail .email_input_popup .popup_buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+#autofill_detail .email_input_popup button {
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  border: none;
+  transition: background .2s ease, color .2s ease, filter .2s ease,
+              box-shadow .2s ease, transform .12s ease;
+}
+
+#autofill_detail .email_input_popup .cancel_button {
+  background: transparent;
+  color: rgba(75, 85, 99, 0.92);
+}
+#autofill_detail .email_input_popup .cancel_button:hover {
+  background: rgba(15, 17, 21, 0.05);
+  color: #0b0d10;
+}
+#autofill_detail .email_input_popup .cancel_button:active {
+  transform: scale(0.98);
+}
+
+#autofill_detail .email_input_popup .save_button {
+  background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 102, 255, 0.22);
+}
+#autofill_detail .email_input_popup .save_button:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 4px 12px rgba(0, 102, 255, 0.28);
+}
+#autofill_detail .email_input_popup .save_button:active {
+  transform: scale(0.98);
+}
+
+/* ── Approved quiet Settings refinement ────────────────── */
+#autofill_detail .personal_card_warp .personal_card_settings {
+  --jw-settings-ink: #1a1a1c;
+  --jw-settings-secondary: #6e6e73;
+  --jw-settings-tertiary: #92929a;
+  --jw-settings-line: rgba(15, 23, 42, 0.07);
+  --jw-settings-hover: #f7f7f8;
+  --jw-settings-selected: #f2f2f2;
+  --jw-settings-pressed: #ececee;
+  --jw-settings-accent: #0a7aff;
+  --jw-settings-danger: #c9342f;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  color: var(--jw-settings-ink);
+  background: #ffffff;
+  border-radius: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(6px);
+  transition:
+    opacity 200ms ease,
+    transform 200ms cubic-bezier(0.2, 0.75, 0.25, 1),
+    visibility 200ms;
+  overflow: hidden;
+  font-family: var(--jobwizard-font-family);
+  -webkit-font-smoothing: antialiased;
+}
+
+#autofill_detail .personal_menu .personal .personal_card_warp.showing.showing-settings {
+  height: var(
+    --jw-personal-card-open-height,
+    min(420px, calc(100vh - 24px))
+  );
+  min-height: var(
+    --jw-personal-card-open-height,
+    min(420px, calc(100vh - 24px))
+  );
+  max-height: var(
+    --jw-personal-card-open-height,
+    calc(100vh - 24px)
+  );
+}
+
+@supports (height: 100dvh) {
+  #autofill_detail .personal_menu .personal .personal_card_warp.showing.showing-settings {
+    height: var(
+      --jw-personal-card-open-height,
+      min(420px, calc(100dvh - 24px))
+    );
+    min-height: var(
+      --jw-personal-card-open-height,
+      min(420px, calc(100dvh - 24px))
+    );
+    max-height: var(
+      --jw-personal-card-open-height,
+      calc(100dvh - 24px)
+    );
+  }
+}
+
+#autofill_detail .personal_card_warp.showing-settings .personal_card_main {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(-6px);
+  transition:
+    opacity 200ms ease,
+    transform 200ms cubic-bezier(0.2, 0.75, 0.25, 1),
+    visibility 200ms;
+}
+
+#autofill_detail .personal_card_warp.showing-settings .personal_card_settings {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  width: auto;
+  height: auto;
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+#autofill_detail .personal_card_settings button,
+#autofill_detail .personal_card_settings label {
+  font-family: inherit;
+}
+
+#autofill_detail .personal_card_settings button {
+  color: inherit;
+}
+
+#autofill_detail .personal_card_settings .stg_overview,
+#autofill_detail .personal_card_settings .stg_language_panel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  border-radius: 0;
+  background: #ffffff;
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  transition:
+    opacity 200ms ease,
+    transform 200ms cubic-bezier(0.2, 0.75, 0.25, 1),
+    visibility 200ms;
+}
+
+#autofill_detail .personal_card_settings.showing-language .stg_overview {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(-8px);
+}
+
+#autofill_detail .personal_card_settings .stg_language_panel {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(8px);
+}
+
+#autofill_detail .personal_card_settings.showing-language .stg_language_panel {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+#autofill_detail .personal_card_settings .stg_header,
+#autofill_detail .personal_card_settings .stg_language_header {
+  box-sizing: border-box;
+  height: 48px;
+  min-height: 48px;
+  padding: 0 12px;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  align-items: center;
+  gap: 0;
+  border-bottom: 1px solid var(--jw-settings-line);
+  background: #ffffff;
+}
+
+#autofill_detail .personal_card_settings .stg_language_header {
+  position: relative;
+  grid-template-columns: 44px minmax(0, 1fr) minmax(56px, auto);
+}
+
+#autofill_detail .personal_card_settings .settings_back,
+#autofill_detail .personal_card_settings .stg_language_back {
+  position: relative;
+  inset: auto;
+  width: 44px;
+  height: 44px;
+  margin-left: -8px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transform: none;
+  transition: none;
+}
+
+#autofill_detail .personal_card_settings .settings_back::before,
+#autofill_detail .personal_card_settings .stg_language_back::before {
+  content: "";
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: transparent;
+  transition: background-color 160ms ease;
+}
+
+#autofill_detail .personal_card_settings .settings_back:hover,
+#autofill_detail .personal_card_settings .settings_back:active,
+#autofill_detail .personal_card_settings .stg_language_back:hover,
+#autofill_detail .personal_card_settings .stg_language_back:active {
+  background: transparent;
+  transform: none;
+}
+
+#autofill_detail .personal_card_settings .settings_back:hover::before,
+#autofill_detail .personal_card_settings .stg_language_back:hover::before {
+  background: var(--jw-settings-hover);
+}
+
+#autofill_detail .personal_card_settings .settings_back:active::before,
+#autofill_detail .personal_card_settings .stg_language_back:active::before {
+  background: var(--jw-settings-pressed);
+}
+
+#autofill_detail .personal_card_settings .resume_list_back_arrow {
+  position: relative;
+  z-index: 1;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  border: 0;
+  background: url("../icons/icon_chevron_right.svg") center / 14px 14px no-repeat;
+  opacity: 0.76;
+  transform: rotate(180deg);
+}
+
+#autofill_detail .personal_card_settings .stg_title,
+#autofill_detail .personal_card_settings .stg_language_title {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--jw-settings-ink);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Overview owns the only Settings scrollbar. */
+#autofill_detail .personal_card_settings .stg_body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 8px 12px 16px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+#autofill_detail .personal_card_settings .stg_group,
+#autofill_detail .personal_card_settings .stg_group + .stg_group {
+  margin: 16px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+#autofill_detail .personal_card_settings .stg_group:first-child {
+  margin-top: 4px;
+}
+
+#autofill_detail .personal_card_settings .stg_group_label {
+  margin: 0 8px 4px;
+  color: var(--jw-settings-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+#autofill_detail .personal_card_settings .stg_language_summary,
+#autofill_detail .personal_card_settings .stg_preference_trigger {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--jw-settings-ink);
+  text-align: left;
+  cursor: pointer;
+  transform: none;
+  transition: background-color 160ms ease;
+}
+
+#autofill_detail .personal_card_settings .stg_language_summary:hover,
+#autofill_detail .personal_card_settings .stg_preference_trigger:hover {
+  border-color: transparent;
+  background: var(--jw-settings-hover);
+}
+
+#autofill_detail .personal_card_settings .stg_language_summary:active,
+#autofill_detail .personal_card_settings .stg_preference_trigger:active,
+#autofill_detail .personal_card_settings .stg_preference_trigger[aria-expanded="true"] {
+  background: var(--jw-settings-pressed);
+  transform: none;
+}
+
+#autofill_detail .personal_card_settings .stg_language_summary_title,
+#autofill_detail .personal_card_settings .stg_row_label {
+  min-width: 0;
+  color: var(--jw-settings-ink);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+#autofill_detail .personal_card_settings .stg_row_side {
+  min-width: 0;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  color: var(--jw-settings-secondary);
+}
+
+#autofill_detail .personal_card_settings .stg_language_summary_value,
+#autofill_detail .personal_card_settings .stg_preference_value {
+  min-width: 0;
+  max-width: 128px;
+  overflow: hidden;
+  color: var(--jw-settings-secondary);
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#autofill_detail .personal_card_settings .stg_language_summary_chevron,
+#autofill_detail .personal_card_settings .stg_preference_chevron {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  margin: 0;
+  border: 0;
+  background: url("../icons/icon_chevron_right.svg") center / 14px 14px no-repeat;
+  opacity: 0.68;
+  transform: none;
+}
+
+#autofill_detail .personal_card_settings .stg_preference_chevron {
+  transform: rotate(90deg);
+}
+
+#autofill_detail .personal_card_settings .stg_language_summary_dot,
+#autofill_detail .personal_card_settings .stg_language_eyebrow,
+#autofill_detail .personal_card_settings .stg_language_divider {
+  display: none;
+}
+
+#autofill_detail .personal_card_settings .stg_inset_divider,
+#autofill_detail .personal_card_settings .stg_sep {
+  height: 1px;
+  margin: 0 8px;
+  background: var(--jw-settings-line);
+}
+
+/* Popovers are card-scoped but sit outside .stg_body, so scrolling cannot clip them. */
+#autofill_detail .personal_card_settings .stg_popover_layer {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  overflow: visible;
+  pointer-events: none;
+}
+
+#autofill_detail .personal_card_settings .stg_preference_popover {
+  position: absolute;
+  top: 48px;
+  right: 12px;
+  box-sizing: border-box;
+  width: min(220px, calc(100% - 24px));
+  padding: 5px;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow:
+    0 12px 30px rgba(15, 23, 42, 0.14),
+    0 1px 2px rgba(15, 23, 42, 0.06);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transform-origin: top right;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease,
+    visibility 160ms;
+}
+
+#autofill_detail .personal_card_settings .stg_preference_popover.is-open,
+#autofill_detail .personal_card_settings .stg_preference_popover[aria-hidden="false"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+#autofill_detail .personal_card_settings .stg_preference_option {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 9px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--jw-settings-ink);
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+
+#autofill_detail .personal_card_settings .stg_preference_option:hover {
+  background: var(--jw-settings-hover);
+}
+
+#autofill_detail .personal_card_settings .stg_preference_option:active {
+  background: var(--jw-settings-pressed);
+}
+
+#autofill_detail .personal_card_settings .stg_preference_option:has(input:checked) {
+  background: var(--jw-settings-selected);
+}
+
+#autofill_detail .personal_card_settings .stg_preference_option::after {
+  content: none;
+}
+
+#autofill_detail .personal_card_settings .stg_preference_option input,
+#autofill_detail .personal_card_settings .stg_language_option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+
+#autofill_detail .personal_card_settings .stg_preference_option
+  > .stg_preference_option_label {
+  min-width: 0;
+  flex: 1;
+  color: var(--jw-settings-ink);
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 18px;
+}
+
+#autofill_detail .personal_card_settings .stg_preference_option:has(input:checked)
+  .stg_preference_option_label {
+  font-weight: 500;
+}
+
+#autofill_detail .personal_card_settings .stg_preference_option_check,
+#autofill_detail .personal_card_settings .stg_language_option_check {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  opacity: 0;
+  background: var(--jw-settings-accent);
+  -webkit-mask: url("../icons/check.svg") center / 16px 16px no-repeat;
+  mask: url("../icons/check.svg") center / 16px 16px no-repeat;
+  transform: none;
+  transition: opacity 160ms ease;
+}
+
+#autofill_detail .personal_card_settings .stg_preference_option
+  > .stg_preference_option_check {
+  min-width: 16px;
+  flex: 0 0 16px;
+}
+
+#autofill_detail .personal_card_settings .stg_preference_option:has(input:checked)
+  .stg_preference_option_check,
+#autofill_detail .personal_card_settings .stg_language_option:has(input:checked)
+  .stg_language_option_check {
+  opacity: 1;
+  transform: none;
+}
+
+/* 32x18 visual switch inside a native 44px button hit target. */
+#autofill_detail .personal_card_settings .stg_toggle_row {
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 8px;
+}
+
+#autofill_detail .personal_card_settings .stg_toggle_row > span,
+#autofill_detail .personal_card_settings .stg_sub_sources .stg_toggle_row > span {
+  min-width: 0;
+  flex: 1;
+  color: var(--jw-settings-ink);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+}
+
+#autofill_detail .personal_card_settings .stg_sub_sources .stg_toggle_row {
+  padding: 0 8px;
+}
+
+#autofill_detail .personal_card_settings .toggle_switch {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  margin-right: -6px;
+  padding: 0;
+  flex: 0 0 44px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: none;
+}
+
+#autofill_detail .personal_card_settings .toggle_switch::before {
+  content: "";
+  position: absolute;
+  top: 13px;
+  left: 6px;
+  box-sizing: border-box;
+  width: 32px;
+  height: 18px;
+  border: 1px solid #888d96;
+  border-radius: 999px;
+  background: #d8dbe1;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+#autofill_detail .personal_card_settings .toggle_switch .toggle_switch_circle {
+  position: absolute;
+  top: 15px;
+  left: 8px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.22);
+  transform: translateX(0);
+  transition: transform 160ms ease;
+}
+
+#autofill_detail .personal_card_settings .toggle_switch.active,
+#autofill_detail .personal_card_settings .toggle_switch[aria-checked="true"] {
+  background: transparent;
+}
+
+#autofill_detail .personal_card_settings .toggle_switch.active::before,
+#autofill_detail .personal_card_settings .toggle_switch[aria-checked="true"]::before {
+  border-color: var(--jw-settings-accent);
+  background: var(--jw-settings-accent);
+}
+
+#autofill_detail .personal_card_settings .toggle_switch.active .toggle_switch_circle,
+#autofill_detail .personal_card_settings .toggle_switch[aria-checked="true"]
+  .toggle_switch_circle {
+  transform: translateX(14px);
+}
+
+#autofill_detail .personal_card_settings .toggle_switch:disabled,
+#autofill_detail .personal_card_settings .toggle_switch[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+#autofill_detail .personal_card_settings .stg_sub_sources {
+  opacity: 1;
+  transition: opacity 160ms ease;
+}
+
+#autofill_detail .personal_card_settings .stg_sub_sources[aria-disabled="true"],
+#autofill_detail .personal_card_settings .stg_sub_sources.is-disabled {
+  opacity: 0.45;
+}
+
+#autofill_detail .personal_card_settings .stg_memory_manage {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  margin: 3px 8px 0;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--jw-settings-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+#autofill_detail .personal_card_settings .stg_memory_manage:hover,
+#autofill_detail .personal_card_settings .stg_memory_manage:focus-visible {
+  color: var(--jw-settings-accent);
+}
+
+/* Language owns the only scrollbar while its panel is visible. */
+#autofill_detail .personal_card_settings .stg_language_options {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0 8px 12px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+#autofill_detail .personal_card_settings .stg_language_intro {
+  margin: 0;
+  padding: 10px 4px 6px;
+  color: var(--jw-settings-secondary);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+}
+
+#autofill_detail .personal_card_settings .stg_language_option {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--jw-settings-ink);
+  cursor: pointer;
+  transform: none;
+  transition: background-color 160ms ease;
+}
+
+#autofill_detail .personal_card_settings .stg_language_option:hover {
+  background: var(--jw-settings-hover);
+}
+
+#autofill_detail .personal_card_settings .stg_language_option:active {
+  background: var(--jw-settings-pressed);
+  transform: none;
+}
+
+#autofill_detail .personal_card_settings .stg_language_option:has(input:checked) {
+  border-color: transparent;
+  background: var(--jw-settings-selected);
+  box-shadow: none;
+}
+
+#autofill_detail .personal_card_settings .stg_language_option_label {
+  min-width: 0;
+  flex: 1;
+  color: var(--jw-settings-ink);
+  font-size: 13.5px;
+  font-weight: 400;
+  line-height: 18px;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+#autofill_detail .personal_card_settings .stg_language_option_label[dir="rtl"] {
+  direction: rtl;
+  unicode-bidi: plaintext;
+}
+
+#autofill_detail .personal_card_settings .stg_language_option:has(input:checked)
+  .stg_language_option_label {
+  font-weight: 500;
+}
+
+#autofill_detail .personal_card_settings .stg_language_save_status {
+  position: static;
+  min-width: 0;
+  min-height: 16px;
+  overflow: hidden;
+  color: var(--jw-settings-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition:
+    color 160ms ease,
+    opacity 160ms ease;
+}
+
+#autofill_detail .personal_card_settings .stg_language_save_status:empty {
+  visibility: hidden;
+}
+
+#autofill_detail .personal_card_settings .stg_language_save_status.is-saving {
+  color: var(--jw-settings-accent);
+}
+
+#autofill_detail .personal_card_settings .stg_language_save_status.is-saved {
+  color: var(--jw-settings-secondary);
+}
+
+#autofill_detail .personal_card_settings .stg_language_save_status.is-error {
+  color: var(--jw-settings-danger);
+}
+
+/* Keyboard focus stays distinct from the neutral selected state. */
+#autofill_detail .personal_card_settings .settings_back:focus-visible,
+#autofill_detail .personal_card_settings .stg_language_back:focus-visible,
+#autofill_detail .personal_card_settings .stg_language_summary:focus-visible,
+#autofill_detail .personal_card_settings .stg_preference_trigger:focus-visible,
+#autofill_detail .personal_card_settings .toggle_switch:focus-visible,
+#autofill_detail .personal_card_settings .stg_preference_option:has(input:focus-visible),
+#autofill_detail .personal_card_settings .stg_language_option:has(input:focus-visible) {
+  outline: 2px solid var(--jw-settings-accent);
+  outline-offset: -2px;
+}
+
+#autofill_detail .personal_card_settings .stg_body:hover,
+#autofill_detail .personal_card_settings .stg_language_options:hover {
+  scrollbar-color: #cfd2d8 transparent;
+}
+
+#autofill_detail .personal_card_settings .stg_body::-webkit-scrollbar,
+#autofill_detail .personal_card_settings .stg_language_options::-webkit-scrollbar {
+  width: 4px;
+}
+
+#autofill_detail .personal_card_settings .stg_body::-webkit-scrollbar-thumb,
+#autofill_detail .personal_card_settings .stg_language_options::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: transparent;
+}
+
+#autofill_detail .personal_card_settings .stg_body:hover::-webkit-scrollbar-thumb,
+#autofill_detail .personal_card_settings .stg_language_options:hover::-webkit-scrollbar-thumb {
+  background: #cfd2d8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #autofill_detail .personal_card_warp .personal_card_settings,
+  #autofill_detail .personal_card_warp.showing-settings .personal_card_main,
+  #autofill_detail .personal_card_settings *,
+  #autofill_detail .personal_card_settings *::before,
+  #autofill_detail .personal_card_settings *::after {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    scroll-behavior: auto;
+    transition-duration: 0.01ms;
+  }
+}
+
+/* ── Resume List Sub-Panel ── */
+
+#autofill_detail .personal_card_warp .personal_card_resume_list {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+  background: #ffffff;
+  border-radius: 12px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(8px);
+  transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
+  overflow: hidden;
+}
+
+#autofill_detail .personal_card_warp.showing-resume-list .personal_card_main {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(-6px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+#autofill_detail .personal_card_warp.showing-resume-list .personal_card_resume_list {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  display: flex;
+}
+
+/* Inner wrapper: matches personal_card_main padding (16px) */
+#autofill_detail .personal_card_resume_list .resume_list_inner {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px 20px;
+  overflow: visible;
+}
+
+/* Header: back + title */
+#autofill_detail .personal_card_resume_list .resume_list_header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 0 16px;
+  flex-shrink: 0;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_back:hover {
+  background: #f5f5f7;
+}
+
+/* Back arrow chevron — shared between resume list and settings panel */
+#autofill_detail .personal_card_resume_list .resume_list_back_arrow {
+  width: 8px;
+  height: 8px;
+  border-left: 1.5px solid #86868b;
+  border-bottom: 1.5px solid #86868b;
+  transform: rotate(45deg);
+  margin-left: 2px;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1d1d1f;
+  font-family: var(--jobwizard-font-family);
+}
+
+/* Config section: sync toggle + tooltip (Apple Settings style) */
+#autofill_detail .personal_card_resume_list .resume_list_config {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 16px 0;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_sync_label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 400;
+  color: #1d1d1f;
+  font-family: var(--jobwizard-font-family);
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_sync_label .resume_list_sync_tooltip {
+  margin-left: 6px;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_sync_tooltip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 500;
+  color: #86868b;
+  background: #e8e8ed;
+  cursor: help;
+  flex-shrink: 0;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_sync_tooltip:hover {
+  color: #1d1d1f;
+  background: #d2d2d7;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_divider {
+  height: 1px;
+  background: #f3f4f6;
+  flex-shrink: 0;
+  margin: 5px 0;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_sync_toggle {
+  display: flex;
+  position: relative;
+  padding: 4px;
+  border-radius: 10px;
+  background: #e8e8ed;
+  width: 34px;
+  height: 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_sync_toggle.active {
+  background: #007aff;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_sync_toggle .toggle_switch_circle {
+  position: absolute;
+  left: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: left 0.2s ease;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_sync_toggle.active .toggle_switch_circle {
+  left: 16px;
+}
+
+/* 列表区域：在卡片高度内滚动 */
+#autofill_detail .personal_card_resume_list .resume_list_list_wrap {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 16px 0;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_pdf_list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#autofill_detail .personal_card_resume_list .pdf_card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  color: #5f6368;
+  font-size: 12px;
+  font-weight: 400;
+  gap: 8px;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+}
+
+#autofill_detail .personal_card_resume_list .pdf_card .pdf_meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#autofill_detail .personal_card_resume_list .pdf_card .pdf_meta .pdf_meta_extra {
+  font-size: 10px;
+}
+
+#autofill_detail .personal_card_resume_list .pdf_card .pdf_card_content {
+  flex: 1;
+  padding: 8px 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  word-break: break-word;
+}
+
+#autofill_detail .personal_card_resume_list .pdf_card.active .pdf_card_content,
+#autofill_detail .personal_card_resume_list .pdf_card.selected .pdf_card_content {
+  border-radius: 8px;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  font-weight: 500;
+}
+
+#autofill_detail .personal_card_resume_list .pdf_card .action_buttons {
+  display: flex;
+  gap: 2px;
+}
+
+#autofill_detail .personal_card_resume_list .pdf_card .check,
+#autofill_detail .personal_card_resume_list .pdf_card .delete,
+#autofill_detail .personal_card_resume_list .pdf_card .download {
+  display: none;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  border-radius: 4px;
+  align-items: center;
+  justify-content: center;
+}
+
+#autofill_detail .personal_card_resume_list .pdf_card:hover .check,
+#autofill_detail .personal_card_resume_list .pdf_card:hover .delete,
+#autofill_detail .personal_card_resume_list .pdf_card:hover .download {
+  display: flex;
+}
+
+#autofill_detail .personal_card_resume_list .pdf_card .check img,
+#autofill_detail .personal_card_resume_list .pdf_card .delete img,
+#autofill_detail .personal_card_resume_list .pdf_card .download img {
+  opacity: 0.5;
+}
+
+/* --- Resume list upload: 简约大气 --- */
+#autofill_detail .personal_card_resume_list .resume_list_upload {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px dashed #d2d2d7;
+  border-radius: 10px;
+  background: #fafafa;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  overflow: hidden;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_upload:hover {
+  border-color: #b8b8bd;
+  background: #f5f5f7;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_upload:active {
+  background: #ebebed;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_upload.uploading {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_upload input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_upload_inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_upload_icon_wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_upload:hover .resume_list_upload_icon_wrap {
+  opacity: 0.85;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_upload .upload_icon {
+  width: 14px;
+  height: 14px;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_upload_label {
+  font-size: 13px;
+  font-weight: 400;
+  color: #86868b;
+  font-family: var(--jobwizard-font-family);
+  transition: color 0.2s ease;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_upload:hover .resume_list_upload_label {
+  color: #1d1d1f;
+}
+
+/* Progress bar */
+#autofill_detail .personal_card_resume_list .resume_list_upload_progress_wrap {
+  flex-shrink: 0;
+  margin-top: 6px;
+  width: 100%;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_upload_progress_track {
+  height: 3px;
+  border-radius: 2px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+#autofill_detail .personal_card_resume_list .resume_list_upload_progress_fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 2px;
+  background: #0066ff;
+  transition: width 0.3s ease;
+}

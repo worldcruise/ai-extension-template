@@ -31,7 +31,7 @@ export async function checkBulkQueue({ cdp, id, workerSession, sourceSession, do
   const originalDocument = await dock('performance.timeOrigin');
   await cdp.send('Page.reload', {}, dockSession);
   await until(() => dock(`performance.timeOrigin !== ${originalDocument} && document.documentElement.dataset.studioReady === "true"`), 'new sidebar without account menu selectors');
-  await click('#studio-tab'); await click('#review-another'); await click('#profile-details');
+  await dock('if (!document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()'); await click('#review-another'); await click('#account-toggle'); await click('#profile-details');
   const profile = { ...exampleProfile, name: 'Synthetic Queue Candidate' };
   await dock(`(() => {
     const transfer=new DataTransfer(); transfer.items.add(new File([${JSON.stringify(JSON.stringify(profile))}], 'Synthetic_Profile.json', {type:'application/json'}));
@@ -117,9 +117,9 @@ export async function checkBulkQueue({ cdp, id, workerSession, sourceSession, do
   assert.equal(await dock('document.getElementById("request-dialog").open'), false, 'Review is separate from Details');
   await click('#resume-queue [data-action="preview"]');
   assert.ok((await dock('document.getElementById("resume-paper").textContent')).includes(profile.name));
-  await click('#chat-tab'); await dock('document.getElementById("chat-toolbar-reveal").focus();document.getElementById("company-chat-search").focus()');
+  await dock('if (document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()'); await dock('document.getElementById("chat-toolbar-reveal").focus();document.getElementById("company-chat-search").focus()');
   assert.equal(await dock('document.querySelectorAll("#company-chat-list button").length'), 2, 'company links are connected automatically');
-  await click('#studio-tab');
+  await dock('if (!document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
   await chat('localStorage.removeItem("fixtureEditorKind")');
   await addJob('Bulk Gamma', 'FIXTURE_LONG. Build TypeScript services.');
   await chat('document.querySelector("form").dataset.loggedOut=""');

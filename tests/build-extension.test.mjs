@@ -34,7 +34,7 @@ test('the unpacked build has every manifest resource and excludes the references
   assert.ok(manifest.permissions.includes('storage'));
   assert.ok(manifest.permissions.includes('activeTab'));
   assert.ok(manifest.permissions.includes('scripting'));
-  assert.ok(!manifest.permissions.includes('tabs'));
+  assert.ok(manifest.permissions.includes('tabs'));
   assert.ok(!manifest.host_permissions.includes('<all_urls>'));
   assert.ok(!Object.hasOwn(manifest, 'key'));
   assert.equal(manifest.commands['read-job-page'].suggested_key.default, 'Ctrl+Shift+F');

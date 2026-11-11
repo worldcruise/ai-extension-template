@@ -12,10 +12,9 @@ export function createWorkspaceShortcuts({ selectView, selectJob, root = documen
     if (!available(action)) return false;
     if (action === 'view.studio' || action === 'view.chat') {
       const view = action === 'view.studio' ? 'studio' : 'chat';
-      if (q(`#${view}-view`).hidden) {
-        selectView(view);
-        q(view === 'chat' ? '#chatgpt-frame' : '#studio-tab').focus({ preventScroll: true });
-      }
+      selectView(view);
+      const target = view === 'chat' ? q('#chat-view .provider-pane:not([hidden]) iframe') : q('#results-tab');
+      target?.focus({ preventScroll: true });
     } else if (action === 'queue.add') {
       if (!q('#add-request').disabled) {
         selectView('studio'); selectJob();

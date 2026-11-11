@@ -26,6 +26,14 @@ export function duplicateJobUrl(value) {
   } catch { return ''; }
 }
 
+// Match the visible candidate list, including examples and failed jobs. Filters
+// and the optional company duplicate check do not change whether a URL is saved.
+export function jobUrlInList(value, candidateId, requests = []) {
+  const url = duplicateJobUrl(value);
+  return Boolean(url && candidateId && requests.some(request => request.state !== 'cancelled' &&
+    request.input?.candidateId === candidateId && duplicateJobUrl(request.input.job?.url) === url));
+}
+
 export function findExistingJob(input, requests = []) {
   if (!input?.candidateId || !input.tailor) return null;
   const company = companyKey(input.job), url = duplicateJobUrl(input.job?.url);

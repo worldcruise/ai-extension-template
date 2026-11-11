@@ -18,7 +18,7 @@ export async function checkManualPromptUI({ cdp, dockSession, evaluate, until, s
   await until(() => chat('Boolean(document.getElementById("prompt-textarea"))'), 'fixture composer ready');
   await chat('document.getElementById("prompt-textarea").value="Synthetic personal draft to preserve";document.getElementById("prompt-textarea").dispatchEvent(new Event("input",{bubbles:true}))');
   const submissions = await chat('JSON.parse(localStorage.getItem("fixtureSubmissionLog")||"[]").length');
-  await click('#studio-tab'); await click('#review-another'); await click('#profile-details');
+  await dock('if (!document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()'); await click('#review-another'); await click('#account-toggle'); await click('#profile-details');
   const profile = { ...exampleProfile, name: 'Manual Copy Candidate' };
   await dock(`(() => {const transfer=new DataTransfer();transfer.items.add(new File([${JSON.stringify(JSON.stringify(profile))}], 'Manual_Profile.json',{type:'application/json'}));
     const field=document.getElementById('profile-file');field.files=transfer.files;field.dispatchEvent(new Event('change',{bubbles:true}));})()`);
@@ -36,11 +36,11 @@ export async function checkManualPromptUI({ cdp, dockSession, evaluate, until, s
   const expected = promptForManualCopy(request);
   const before = await state();
   assert.equal(await dock('manualClipboardWrites.at(-1)'), expected);
-  await click('#studio-tab'); await click('#view-queue');
+  await dock('if (!document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()'); await click('#view-queue');
   const card = `#resume-queue [data-request-id="${request.id}"]`;
   assert.equal(await dock('document.getElementById("start-queue").disabled && document.getElementById("start-queue").hidden'), true);
   assert.equal(await dock('document.getElementById("pause-queue").disabled'), true);
-  assert.equal(await dock('document.getElementById("manual-queue-note").hidden'), false);
+  assert.equal(await dock('document.getElementById("manual-queue-note")'), null);
   await click(`${card} [data-action="copy-prompt"]`);
   assert.equal(await dock('manualClipboardWrites.at(-1)'), expected);
   assert.equal(await dock(`document.querySelector(${JSON.stringify(card + ' [data-action="copy-prompt"]')}).textContent`), 'Copied');

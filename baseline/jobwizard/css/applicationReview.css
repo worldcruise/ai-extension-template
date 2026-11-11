@@ -1,0 +1,190 @@
+/* V4 review presentation. Native page adapters remain the source of answers.
+ * The explicit panel root outranks its global text-align/margin reset. */
+:is(.jw-application-review, #autofill_detail .jw-application-review) { font-family:var(--jobwizard-font-family, 'Inter', system-ui, sans-serif); box-sizing:border-box; width:100%; min-width:0; color:#36465b; background:#fff; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) * { box-sizing:border-box; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__hero { padding:24px 24px 20px; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__heading { display:flex; align-items:flex-start; gap:12px; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__heading-copy { min-width:0; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__heading h2 { margin:0; padding:0; font-size:22px; font-weight:650; letter-spacing:-.55px; line-height:1.25; overflow-wrap:anywhere; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__emblem { width:38px; height:42px; flex-shrink:0; display:grid; place-items:center; color:#3060e0; background:#f3f6fc; border-radius:10px; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__emblem svg { width:28px; height:28px; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__intro { margin:5px 0 0; padding:0; color:#8290a2; font-size:12px; line-height:1.65; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__job { display:flex; align-items:center; gap:16px; text-align:left; margin-top:20px; min-width:0; padding:18px 20px; border:1px solid #e9eef5; border-radius:11px; background:#f7f9fc; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__job-copy { display:flex; flex-direction:column; gap:6px; min-width:0; flex:1; text-align:left; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__job-logo { display:block; width:32px; height:32px; flex:0 0 32px; border-radius:6px; object-fit:contain; background:#fff; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__job-primary { font-size:13px; font-weight:590; line-height:1.6; color:#43536a; overflow-wrap:anywhere; text-wrap:pretty; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__job-secondary { font-size:12px; font-weight:400; color:#8591a0; line-height:1.6; overflow-wrap:anywhere; text-wrap:pretty; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__job-primary > span, :is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__job-secondary > span { display:inline; font:inherit; color:inherit; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__job-separator { opacity:.65; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__sections { padding:0 24px; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__section { border-top:1px solid #e9edf1; padding:17px 0 18px; min-width:0; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__section-header { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:8px 12px; margin-bottom:13px; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__section-header h3 { margin:0; padding:0; font-size:13px; font-weight:610; color:#4e5e72; line-height:1.5; letter-spacing:-.1px; overflow-wrap:anywhere; min-width:0; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__edit { background:none; border:0; padding:3px 0; color:#7889a0; font:500 11px/1.5 var(--jobwizard-font-family, 'Inter', system-ui, sans-serif); cursor:pointer; white-space:nowrap; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__edit:hover { color:#2165ed; text-decoration:underline; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__earlier { color:#78869b; border:1px solid #e0e6ee; border-radius:4px; font-size:10px; padding:3px 6px; line-height:1.3; white-space:nowrap; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__history-note { margin:-4px 0 13px; font-size:11px; color:#7b889b; line-height:1.5; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__field + .jw-application-review__field { margin-top:12px; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__field { min-width:0; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__label { font-size:11px; color:#8791a0; line-height:1.6; margin-bottom:4px; white-space:pre-wrap; overflow-wrap:anywhere; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__value { font-size:13px; font-weight:500; line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word; max-width:100%; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__value.is-empty { color:#8792a2; font-style:italic; font-weight:400; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__value.is-file { display:flex; align-items:center; gap:12px; padding:12px; background:#fcfdfe; border:1px solid #e5eaf0; border-radius:8px; font-size:13px; font-weight:550; color:#46566b; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__filename { min-width:0; overflow-wrap:anywhere; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__file-icon { display:flex; flex-direction:column; gap:3px; width:28px; height:35px; flex-shrink:0; background:#fff; border:1px solid #dce2ea; border-radius:3px; padding:8px 5px; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__file-icon i { width:15px; height:2px; background:#dde5ed; display:block; border-radius:1px; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__file-icon i:first-child { width:10px; background:#a4b5c7; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__empty { margin:0; padding:12px 0; color:#7b8799; font-size:12px; line-height:1.6; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__warning { margin:13px 0 0; padding:11px 12px; background:#fff7ed; border:1px solid #ffdfb5; border-radius:8px; color:#a85c16; font-size:12px; line-height:1.55; overflow-wrap:anywhere; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__follow { border-top:1px solid #e9edf1; padding:18px 0 21px; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__follow-row { display:flex; align-items:center; justify-content:space-between; gap:12px; min-width:0; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__follow-label { font-size:13px; font-weight:500; color:#506076; line-height:1.6; overflow-wrap:anywhere; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__follow-switch { position:relative; width:32px; height:19px; min-width:32px; border:0; border-radius:12px; padding:0; background:#cbd3df; cursor:pointer; transition:background 150ms ease-out; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__follow-switch::after { content:''; position:absolute; top:3px; left:3px; width:13px; height:13px; border-radius:50%; background:#fff; transform:translateX(0); transition:transform 150ms ease-out; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__follow-switch[aria-checked=true] { background:#5784c3; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__follow-switch[aria-checked=true]::after { transform:translateX(13px); }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__remember-row { display:flex; align-items:center; gap:8px; min-width:0; margin-top:11px; color:#8290a2; font-size:11px; line-height:1.6; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__remember { display:flex; align-items:center; gap:7px; min-width:0; margin:0; color:inherit; font-size:11px; line-height:1.6; cursor:pointer; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__remember input { appearance:auto; position:static; opacity:1; width:13px; height:13px; margin:0; padding:0; accent-color:#5784c3; flex-shrink:0; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__follow-error { margin:9px 0 0; color:#8c6a40; font-size:11px; line-height:1.5; overflow-wrap:anywhere; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__follow-error:empty { display:none; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__footer { border-top:1px solid #e5eaf0; padding:12px 14px; background:#fff; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__hint, :is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__status { margin:0 0 9px; padding:0; text-align:center; font-size:10px; line-height:1.6; color:#8b96a5; overflow-wrap:anywhere; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__status:empty { display:none; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__status { font-size:11px; color:#506681; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__submit { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; height:50px; min-height:50px; border:0; border-radius:999px; padding:12px 18px; text-align:center; background:#1769f6; color:#fff; font:700 15px/1.2 var(--jobwizard-font-family, 'Inter', system-ui, sans-serif); cursor:pointer; transition:background 100ms ease; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__submit:hover:not(:disabled) { background:rgb(52,131,250); }
+:is(.jw-application-review, #autofill_detail .jw-application-review) button:disabled { opacity:.55; cursor:default; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) button:focus-visible, :is(.jw-application-review, #autofill_detail .jw-application-review) a:focus-visible, :is(.jw-application-review, #autofill_detail .jw-application-review) input:focus-visible { outline:3px solid #9dbdff; outline-offset:3px; }
+:is(.jw-application-review--success, #autofill_detail .jw-application-review--success) { position:relative; overflow:hidden; padding:28px 26px; display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1 1 auto; }
+:is(.jw-application-review--success, #autofill_detail .jw-application-review--success) .jw-application-review__success-emoji { font-size:49px; display:block; line-height:1.2; margin-bottom:20px; transform-origin:50% 80%; }
+:is(.jw-application-review--success, #autofill_detail .jw-application-review--success) .jw-application-review__success-emoji.is-celebrating { animation:jw-review-celebrate 680ms cubic-bezier(.22,1,.36,1) 1 both; }
+:is(.jw-application-review--success, #autofill_detail .jw-application-review--success) .jw-application-review__success-title { margin:0; padding:0; text-align:center; font-size:25px; font-weight:650; letter-spacing:-.7px; line-height:1.35; }
+:is(.jw-application-review--success, #autofill_detail .jw-application-review--success) .jw-application-review__success-copy { margin:12px 0 0; padding:0; font-size:13px; color:#7d8c9e; line-height:1.65; max-width:280px; text-align:center; }
+:is(.jw-application-review--success, #autofill_detail .jw-application-review--success) .jw-application-review__job { width:100%; margin-top:24px; }
+:is(.jw-application-review--success, #autofill_detail .jw-application-review--success) .jw-application-review__job-primary { text-align:left; }
+:is(.jw-application-review--success, #autofill_detail .jw-application-review--success) .jw-application-review__job-secondary { text-align:left; }
+:is(.jw-application-review--success, #autofill_detail .jw-application-review--success) .jw-application-review__applications-link { display:flex; gap:10px; align-items:center; justify-content:center; width:100%; min-height:44px; margin-top:26px; padding:10px 14px; border-radius:24px; background:#1e65f5; color:white; text-decoration:none; text-align:center; font-size:13px; font-weight:600; line-height:1.5; transition:background .18s ease, box-shadow .22s ease, transform .12s ease; }
+:is(.jw-application-review--success, #autofill_detail .jw-application-review--success) .jw-application-review__applications-link:hover { background:#185adf; box-shadow:0 12px 28px -2px rgba(30,101,245,.28); transform:translateY(-1px); }
+:is(.jw-application-review--success, #autofill_detail .jw-application-review--success) .jw-application-review__applications-link:active { transform:scale(.99); }
+:is(.jw-application-review--success, #autofill_detail .jw-application-review--success) .jw-application-review__applications-link .jw-arrow { display:block; margin:0; color:inherit; font:inherit; transition:transform .18s ease; }
+:is(.jw-application-review--success, #autofill_detail .jw-application-review--success) .jw-application-review__applications-link:hover .jw-arrow { transform:translateX(3px); }
+:is(.jw-application-review--success, #autofill_detail .jw-application-review--success) .jw-application-review__confetti { position:absolute; top:22%; left:55%; width:0; height:0; overflow:visible; pointer-events:none; }
+:is(.jw-application-review--success, #autofill_detail .jw-application-review--success) .jw-application-review__confetti-piece { position:absolute; top:0; left:0; height:calc(var(--jw-confetti-size,5px) * 1.4); width:var(--jw-confetti-size,5px); border-radius:1px; background:var(--jw-confetti-color); opacity:0; animation:jw-review-confetti var(--jw-confetti-duration,2600ms) cubic-bezier(.16,.7,.3,1) var(--jw-confetti-delay) 1 both; }
+@keyframes jw-review-celebrate { 0%{opacity:0;transform:translateY(8px) rotate(-12deg) scale(.85)}50%{opacity:1;transform:translateY(-3px) rotate(6deg) scale(1.06)}100%{opacity:1;transform:none} }
+@keyframes jw-review-confetti { 0%{opacity:0;transform:translate(0,0) rotate(0) scale(.65)}8%{opacity:1}35%{opacity:.85}65%{opacity:.3}100%{opacity:0;transform:translate(var(--jw-confetti-x),var(--jw-confetti-y)) rotate(var(--jw-confetti-rotation)) scale(.7)} }
+@media(max-width:350px) { :is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__hero{padding:20px 17px} :is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__sections{padding:0 17px} :is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__heading{gap:10px} :is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__heading h2{font-size:20px} :is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__emblem{width:30px;height:36px;border-radius:8px} :is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__emblem svg{width:24px;height:24px} :is(.jw-application-review--success, #autofill_detail .jw-application-review--success){padding:50px 18px 24px} }
+@media(prefers-reduced-motion:reduce) { :is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__follow-switch,:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__follow-switch::after{transition:none} :is(.jw-application-review--success, #autofill_detail .jw-application-review--success) .jw-application-review__success-emoji{animation:none!important} :is(.jw-application-review--success, #autofill_detail .jw-application-review--success) .jw-application-review__confetti{display:none} }
+
+.jw-application-progress { font-family:var(--jobwizard-font-family, Inter, system-ui, sans-serif); width:100%; min-width:0; box-sizing:border-box; color:#25344a; }
+
+:is(.jw-application-progress, #autofill_detail .jw-application-progress) { display:flex; flex-direction:column; gap:12px; padding:12px 14px; background:#fff; border-top:1px solid #e5eaf0; }
+:is(.jw-application-progress, #autofill_detail .jw-application-progress).is-active { flex-direction:row; align-items:center; gap:12px; }
+.jw-application-progress__copy { min-width:0; width:100%; flex:1; text-align:left; }
+.jw-application-progress__copy strong { display: block; font-size: 13px; line-height: 1.5; }
+.jw-application-progress__copy p { color: #77859a; font-size: 11px; line-height: 1.5; margin: 4px 0 0; overflow-wrap: anywhere; }
+.jw-application-progress__action:not(.jw-application-review__submit) { flex:0 0 auto; border: 1px solid #bdcfea; border-radius: 18px; background: white; color: #356299; padding: 7px 13px; font: 600 12px/1.4 var(--jobwizard-font-family, 'Inter', system-ui, sans-serif); cursor: pointer; }
+.jw-application-progress__action:disabled { opacity: .55; cursor: default; }
+
+/* Native confirmation replaces the form body; its wrapper must not retain the
+   question list's reserved 160px footer space. */
+#autofill_detail .question_list_wrapper:is([data-jw-application-stage="submitting"], [data-jw-application-stage="success"]) { display:flex; flex:1 1 auto; height:auto; min-height:0; padding:0; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__send-icon { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; flex:0 0 22px; color:inherit; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__send-icon svg { display:block; width:100%; height:100%; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__submit-label { font:inherit; color:inherit; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__terminal-content { position:relative; display:flex; flex-direction:column; align-items:center; width:100%; max-width:330px; min-width:0; }
+:is(.jw-application-review--submitting, #autofill_detail .jw-application-review--submitting) { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1 1 auto; padding:28px 26px; }
+:is(.jw-application-review--submitting, #autofill_detail .jw-application-review--submitting) .jw-application-review__submitting-emblem { display:grid; place-items:center; width:58px; height:58px; overflow:hidden; margin-bottom:22px; border-radius:18px; color:#3974d8; background:#f0f5fd; }
+:is(.jw-application-review--submitting, #autofill_detail .jw-application-review--submitting) .jw-application-review__submitting-emblem .jw-application-review__send-icon { width:29px; height:29px; animation:jw-review-submit-flight 2200ms ease-in-out infinite; }
+:is(.jw-application-review--submitting, #autofill_detail .jw-application-review--submitting) .jw-application-review__terminal-title { margin:0; padding:0; font-size:22px; font-weight:650; line-height:1.35; letter-spacing:-.45px; text-align:center; }
+:is(.jw-application-review--submitting, #autofill_detail .jw-application-review--submitting) .jw-application-review__terminal-copy { margin:12px 0 0; padding:0; max-width:270px; font-size:13px; line-height:1.65; color:#7d8c9e; text-align:center; }
+:is(.jw-application-review--submitting, #autofill_detail .jw-application-review--submitting) .jw-application-review__job { width:100%; margin-top:24px; text-align:left; }
+:is(.jw-application-review--submitting, #autofill_detail .jw-application-review--submitting).is-awaiting-confirmation .jw-application-review__send-icon { animation:none; }
+@keyframes jw-review-submit-flight {
+  0%{opacity:0;transform:translate(-22px,22px) scale(.85)}
+  22%,42%{opacity:1;transform:translate(0,0) scale(1)}
+  68%{opacity:0;transform:translate(28px,-28px) scale(.9)}
+  69%{opacity:0;transform:translate(-22px,22px) scale(.85)}
+  100%{opacity:0;transform:translate(-22px,22px) scale(.85)}
+}
+@media(prefers-reduced-motion:reduce) { :is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__submit{transition:none} :is(.jw-application-review--submitting, #autofill_detail .jw-application-review--submitting) .jw-application-review__submitting-emblem .jw-application-review__send-icon{animation:none} }
+@media(prefers-reduced-motion:reduce) { #autofill_detail .jw-application-review__applications-link, #autofill_detail .jw-application-review__applications-link .jw-arrow { transition:none !important; } }
+
+/* The owning panel mounts this outside its scrolling answer body. */
+#autofill_detail .jw-application-action-dock.jw-application-review { flex:0 0 auto; min-width:0; width:100%; padding:0; }
+#autofill_detail .page_content.jw-application-has-actions { overflow:hidden; }
+#autofill_detail .page_content.jw-application-has-actions > .main_symbol { flex:0 0 auto; }
+#autofill_detail .page_content.jw-application-has-actions > #apply_content { flex:1 1 auto; min-height:0; overflow:auto; }
+#autofill_detail .page_content.jw-application-has-actions .question_list_wrapper { height:auto; padding-bottom:24px; }
+#autofill_detail .page_content.jw-application-has-actions .question_list_wrapper[data-jw-application-review="true"] { padding-bottom:0; }
+
+/* One action surface: the banner summarizes fields, the footer owns navigation. */
+#autofill_detail .jw-application-flow-active .fill_status_result,
+#autofill_detail .jw-application-flow-active #jw_banner_v2 { display:none!important; }
+#autofill_detail .jw-application-flow-jump #jw_banner_v2_cta { display:none!important; }
+:is(.jw-application-progress, #autofill_detail .jw-application-progress).is-active { flex-direction:column; }
+:is(.jw-application-progress, #autofill_detail .jw-application-progress) .jw-application-progress__action { position:relative; isolation:isolate; overflow:hidden; gap:10px; }
+:is(.jw-application-progress, #autofill_detail .jw-application-progress).is-active .jw-application-progress__action { background:linear-gradient(110deg,#2464ed,#6359ed); }
+.jw-application-progress__label { position:relative; z-index:1; font:inherit; color:inherit; }
+.jw-application-progress__spark { position:relative; z-index:1; font-size:20px; line-height:1; }
+.jw-application-progress__stop { position:absolute; right:13px; top:50%; transform:translateY(-50%); display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,.2); color:#fff; font-size:10px; }
+.jw-application-progress__particles { position:absolute; inset:0; pointer-events:none; z-index:0; }
+.jw-application-progress__particle { position:absolute; top:var(--jw-particle-y); left:0; width:3px; height:3px; border-radius:50%; background:#fff; opacity:0; animation:jw-flow-particle var(--jw-particle-duration) linear var(--jw-particle-delay) infinite; }
+.jw-application-progress__error { margin:0; font-size:12px; color:#aa3544; line-height:1.5; }
+@keyframes jw-flow-particle { 0%{opacity:0;transform:translateX(-8px)}15%{opacity:.5}75%{opacity:.35}100%{opacity:0;transform:translateX(360px)} }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__celebration { position:relative; display:inline-flex; flex:0 0 auto; }
+@media(prefers-reduced-motion:reduce) { .jw-application-progress__particle { animation:none!important; } }
+
+:is(.jw-application-review--success, #autofill_detail .jw-application-review--success) .jw-application-review__celebration { margin-bottom:20px; }
+:is(.jw-application-review--success, #autofill_detail .jw-application-review--success) .jw-application-review__celebration .jw-application-review__success-emoji { margin-bottom:0; }
+:is(.jw-application-progress, #autofill_detail .jw-application-progress).is-active .jw-application-progress__action { padding-inline:48px; }
+.jw-application-progress__label { min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+
+
+/* All workflow actions share the existing Start Super Apply Aurora language. */
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__submit,
+:is(.jw-application-progress, #autofill_detail .jw-application-progress).is-active .jw-application-progress__action {
+  position:relative; isolation:isolate; overflow:hidden;
+  background:linear-gradient(110deg,#0a66c2,#4f46e5,#7a5af5,#0a66c2);
+  background-size:280% 100%; animation:jw-review-aurora 5s ease infinite;
+  box-shadow:0 5px 15px -5px rgba(79,70,229,.3);
+  transition:box-shadow 180ms ease,transform 140ms ease;
+}
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__submit:hover:not(:disabled) { background:linear-gradient(110deg,#0a66c2,#4f46e5,#7a5af5,#0a66c2); background-size:280% 100%; box-shadow:0 7px 20px -4px rgba(79,70,229,.4); }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__submit:active:not(:disabled) { transform:scale(.99); }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__submit:disabled { animation-play-state:paused; }
+/* A fast local preference write keeps its lock without flashing the CTA. */
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__submit[data-jw-preference-pending="true"]:disabled {
+  opacity:1;
+  animation-play-state:running;
+}
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__follow[data-jw-preference-pending="true"] .jw-application-review__follow-switch:disabled { opacity:1; }
+
+@keyframes jw-review-aurora { 0%,100%{background-position:0% 50%}50%{background-position:100% 50%} }
+:is(.jw-application-progress, #autofill_detail .jw-application-progress).needs-answer .jw-application-progress__action { padding-inline:42px; }
+.jw-application-progress__attention { position:absolute; left:14px; top:50%; transform:translateY(-50%); display:grid; place-items:center; width:22px; height:22px; border-radius:50%; background:#ffdc91; color:#724713; font:700 13px/1 system-ui; box-shadow:0 0 0 4px rgba(255,220,145,.15); }
+.jw-application-progress.needs-answer .jw-application-progress__spark { transition:transform 180ms ease-out; }
+.jw-application-progress.needs-answer .jw-application-progress__action:hover .jw-application-progress__spark { transform:translateX(3px); }
+.jw-application-progress__label.is-changing, .jw-application-review__submit-label.is-changing { animation:jw-action-label-in 260ms cubic-bezier(.22,1,.36,1) both; }
+@keyframes jw-action-label-in { from{opacity:.6;transform:translateY(5px)}to{opacity:1;transform:translateY(0)} }
+@media(prefers-reduced-motion:reduce) { :is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__submit, .jw-application-progress__label.is-changing, .jw-application-review__submit-label.is-changing { animation:none!important; transition:none; } .jw-application-progress.needs-answer .jw-application-progress__spark { transition:none; } }
+
+/* A paused field correction is a navigation prompt, not active AI work. */
+:is(.jw-application-progress, #autofill_detail .jw-application-progress).needs-answer .jw-application-progress__action,
+#autofill_detail .autofill_footer .jw-ordinary-footer-button[data-jw-ordinary-kind="jump"] {
+  animation:none; background:#fff7eb; color:#995314; border:1px solid #efd2a9;
+  box-shadow:none;
+}
+:is(.jw-application-progress, #autofill_detail .jw-application-progress).needs-answer .jw-application-progress__action:hover:not(:disabled),
+#autofill_detail .autofill_footer .jw-ordinary-footer-button[data-jw-ordinary-kind="jump"]:hover:not([aria-disabled="true"]) {
+  background:#ffefd8; box-shadow:0 3px 10px rgba(153,83,20,.08);
+}
+.jw-application-progress.needs-answer .jw-application-progress__attention {
+  background:transparent; color:inherit; box-shadow:none; border:1.5px solid currentColor;
+  width:20px; height:20px; font-size:12px;
+}
+.jw-application-progress__hover-label { position:absolute; inset:0 48px; display:flex; align-items:center; justify-content:center; opacity:0; transform:translateY(7px); pointer-events:none; font:inherit; transition:opacity 160ms ease,transform 160ms ease; }
+.jw-application-progress.is-active .jw-application-progress__label { transition:opacity 160ms ease; }
+.jw-application-progress.is-active .jw-application-progress__action:is(:hover,:focus-visible) .jw-application-progress__label { opacity:0!important; }
+.jw-application-progress.is-active .jw-application-progress__action:is(:hover,:focus-visible) .jw-application-progress__hover-label { opacity:1; transform:translateY(0); }
+@media(prefers-reduced-motion:reduce) { .jw-application-progress__hover-label,.jw-application-progress.is-active .jw-application-progress__label { transition:none; } }

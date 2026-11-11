@@ -1,5 +1,6 @@
 const paths = {
   plus: 'M12 5v14M5 12h14',
+  sparkles: 'm12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3ZM20 2v4M18 4h4M4 18v4M2 20h4',
   pin: 'M9 3h6M10 3v7l-3 3v4h10v-4l-3-3V3M12 17v5',
   'pin-off': 'M2 2l20 20M9 3h6M14 3v7l3 3v4M10 10l-3 3v4h10M12 17v5',
   keyboard: 'M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1ZM7 9h.01M12 9h.01M17 9h.01M7 12h.01M12 12h.01M17 12h.01M7 15h10',

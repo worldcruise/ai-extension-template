@@ -1,0 +1,2098 @@
+#autofill_detail .referrer_wrap {
+  padding: 0 20px;
+}
+#autofill_detail .referrer_wrap .referrers {
+  margin-bottom: 64px;
+}
+#autofill_detail .jw-ra-control_wrap {
+  margin: 14px 0 16px;
+}
+#autofill_detail .jw-ra-job_context {
+  display: none;
+  margin-bottom: 10px;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.35;
+}
+#autofill_detail .jw-ra-job_context.active {
+  display: block;
+}
+#autofill_detail .jw-ra-job_context b {
+  color: #0f172a;
+}
+#autofill_detail .jw-ra-filter_bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 0;
+  overflow: visible;
+}
+#autofill_detail .jw-ra-filter_bar:empty {
+  display: none;
+}
+#autofill_detail .jw-ra-filter-chip {
+  flex: 0 1 auto;
+  min-height: 32px;
+  padding: 0 11px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  color: #475569;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+#autofill_detail .jw-ra-filter-chip:hover {
+  background: #f8fbff;
+}
+#autofill_detail .jw-ra-filter-chip.active {
+  border-color: rgba(0, 102, 255, 0.22);
+  background: #eef5ff;
+  color: #0066ff;
+}
+#autofill_detail .jw-ra-filter-chip strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 10px;
+  font-weight: 900;
+}
+#autofill_detail .jw-ra-filter-chip.active strong {
+  background: #0066ff;
+  color: #fff;
+}
+#autofill_detail .generateReferrers_success_tip {
+  padding: 12px 12px;
+  display: none;
+  align-items: self-start;
+  justify-content: space-between;
+  gap: 10px;
+  align-self: stretch;
+  border-radius: 14px;
+  background: rgba(0, 102, 255, 0.03);
+  color: #08449e;
+  text-align: center;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  margin-bottom: 16px;
+  margin-top: 32px;
+}
+
+#autofill_detail .generateReferrers_success_tip img {
+  width: 24px;
+  height: 24px;
+}
+#autofill_detail .generateReferrers_loading_tip {
+  display: none;
+  gap: 8px;
+  font-size: 14px;
+  color: #06f;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  margin-bottom: 6px;
+  margin-top: 32px;
+}
+#autofill_detail .generateReferrers_loading_tip.active{
+  display: flex;
+}
+#autofill_detail .generateReferrers_loading_tip img{
+  width: 20px;
+  height: 20px;
+}
+/* #autofill_detail .generateReferrers_loading_tip .countdown-timer {
+  color: #FF6B6B;
+  font-weight: 600;
+  font-size: 16px;
+} */
+
+#autofill_detail  .no_referrers {
+  display: flex;
+  padding: 12px 14px;
+  align-items: center;
+  gap: 10px;
+  border-radius: 14px;
+  background: rgba(200, 0, 0, 0.03);
+  color: #c80000;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  margin-top: 32px;
+}
+
+#autofill_detail .timeout_error {
+  display: flex;
+  padding: 12px 14px;
+  align-items: center;
+  gap: 10px;
+  border-radius: 14px;
+  background: rgba(255, 107, 107, 0.05);
+  color: #ff6b6b;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  margin-top: 32px;
+  border: 1px solid rgba(255, 107, 107, 0.1);
+}
+
+#autofill_detail .jw-ra-progress,
+#autofill_detail .jw-ra-preflight,
+#autofill_detail .jw-ra-empty,
+#autofill_detail .jw-ra-judgment,
+#autofill_detail .jw-ra-section,
+#autofill_detail .jw-ra-card,
+#autofill_detail .jw-ra-filtered {
+  list-style: none;
+}
+
+#autofill_detail .jw-ra-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  padding: 16px 14px;
+  margin-top: 14px;
+  border: 1px solid rgba(0, 102, 255, 0.1);
+  border-radius: 8px;
+  background: #f7fbff;
+}
+
+#autofill_detail .jw-ra-preflight {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 14px;
+  margin-top: 14px;
+  border: 1px solid rgba(0, 102, 255, 0.12);
+  border-radius: 8px;
+  background: #f8fbff;
+  color: #0f172a;
+}
+
+#autofill_detail .jw-ra-preflight.full {
+  border-color: rgba(239, 68, 68, 0.16);
+  background: #fff8f8;
+}
+
+#autofill_detail .jw-ra-preflight.loading {
+  color: #475569;
+}
+
+#autofill_detail .jw-ra-preflight-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+}
+
+#autofill_detail .jw-ra-preflight-title {
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 850;
+  line-height: 1.3;
+}
+
+#autofill_detail .jw-ra-preflight p {
+  margin: 5px 0 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.42;
+}
+
+#autofill_detail .jw-ra-quota-pill {
+  min-width: 72px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #eaf3ff;
+  color: #0066ff;
+  text-align: center;
+}
+
+#autofill_detail .jw-ra-quota-pill.danger {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+#autofill_detail .jw-ra-quota-pill strong {
+  display: block;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+#autofill_detail .jw-ra-quota-pill span {
+  display: block;
+  margin-top: 3px;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+#autofill_detail .jw-ra-preflight-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+#autofill_detail .jw-ra-preflight-list li {
+  position: relative;
+  padding-left: 14px;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+#autofill_detail .jw-ra-preflight-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #0066ff;
+}
+
+#autofill_detail .jw-ra-start-search {
+  width: 100%;
+  min-height: 38px;
+  border: 0;
+  border-radius: 8px;
+  background: #0066ff;
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 850;
+  text-align: center;
+}
+
+#autofill_detail .jw-ra-start-search:hover {
+  background: #075fe4;
+}
+
+#autofill_detail .jw-ra-preflight-note {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+#autofill_detail .generateReferrers_success_tip .jw-ra-success-quota {
+  display: block;
+  margin-top: 4px;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.3;
+  text-align: left;
+}
+
+#autofill_detail .jw-ra-progress-head {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+#autofill_detail .jw-ra-spinner {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 102, 255, 0.18);
+  border-top-color: #0066ff;
+  animation: jw-ra-spin 0.8s linear infinite;
+}
+
+@keyframes jw-ra-spin {
+  to { transform: rotate(360deg); }
+}
+
+#autofill_detail .jw-ra-progress-title {
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+#autofill_detail .jw-ra-progress-sub {
+  grid-column: 2;
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+#autofill_detail .jw-ra-progress-timeline,
+#autofill_detail .jw-ra-preview-block {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+#autofill_detail .jw-ra-progress-step {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 8px;
+  align-items: start;
+}
+
+#autofill_detail .jw-ra-progress-step > span {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #dbeafe;
+  color: #0066ff;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+#autofill_detail .jw-ra-progress-step strong,
+#autofill_detail .jw-ra-preview-title {
+  display: block;
+  color: #1e293b;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+#autofill_detail .jw-ra-progress-step p {
+  margin: 2px 0 0;
+  color: #64748b;
+  font-size: 10.5px;
+  line-height: 1.35;
+}
+
+#autofill_detail .jw-ra-preview-block {
+  padding: 10px;
+  border: 1px solid rgba(0, 102, 255, 0.1);
+  border-radius: 8px;
+  background: #fff;
+}
+
+#autofill_detail .jw-ra-preview-block.scored {
+  border-color: rgba(16, 185, 129, 0.16);
+  background: #f6fefb;
+}
+
+#autofill_detail .jw-ra-preview-person {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+#autofill_detail .jw-ra-preview-person > div {
+  min-width: 0;
+}
+
+#autofill_detail .jw-ra-preview-person strong,
+#autofill_detail .jw-ra-preview-person span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#autofill_detail .jw-ra-preview-person strong {
+  color: #0f172a;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+#autofill_detail .jw-ra-preview-person span {
+  margin-top: 1px;
+  color: #64748b;
+  font-size: 10.5px;
+}
+
+#autofill_detail .jw-ra-empty {
+  padding: 18px 16px;
+  margin-top: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 8px;
+  background: #fff;
+}
+
+#autofill_detail .jw-ra-empty-title {
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+#autofill_detail .jw-ra-empty-sub {
+  margin-top: 6px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+#autofill_detail .jw-ra-maintenance {
+  text-align: center;
+}
+
+#autofill_detail .jw-ra-maintenance .es-emblem {
+  margin-bottom: 14px;
+}
+
+#autofill_detail .jw-ra-judgment {
+  margin: 14px 0 6px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fffbeb;
+  color: #92400e;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+#autofill_detail .jw-ra-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 18px 0 8px;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+#autofill_detail .jw-ra-section strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 18px;
+  border-radius: 9px;
+  background: #eaf2ff;
+  color: #0066ff;
+  font-size: 11px;
+}
+
+#autofill_detail .jw-ra-section.filtered strong {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+#autofill_detail .jw-ra-card {
+  display: block;
+  padding: 12px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  animation: jw-ra-card-in 0.22s ease both;
+}
+
+@keyframes jw-ra-card-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#autofill_detail .jw-ra-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+
+#autofill_detail .jw-ra-avatar {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0ea5e9, #0066ff);
+}
+
+#autofill_detail .jw-ra-avatar-link,
+#autofill_detail .jw-ra-name-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+#autofill_detail .jw-ra-avatar-link {
+  flex: 0 0 auto;
+  border-radius: 50%;
+}
+
+#autofill_detail .jw-ra-avatar-link:hover .jw-ra-avatar {
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.16);
+}
+
+#autofill_detail .jw-ra-avatar.small {
+  width: 28px;
+  height: 28px;
+  flex-basis: 28px;
+}
+
+#autofill_detail .jw-ra-avatar.alumni {
+  box-shadow: 0 0 0 2px #fbbf24;
+}
+
+#autofill_detail .jw-ra-avatar-img,
+#autofill_detail .jw-ra-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+#autofill_detail .jw-ra-avatar-img {
+  display: block;
+  object-fit: cover;
+}
+
+#autofill_detail .jw-ra-avatar-fallback {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+#autofill_detail .jw-ra-avatar.small .jw-ra-avatar-fallback {
+  font-size: 10px;
+}
+
+#autofill_detail .jw-ra-avatar-fallback.visible {
+  display: flex;
+}
+
+#autofill_detail .jw-ra-main {
+  min-width: 0;
+  flex: 1;
+}
+
+#autofill_detail .jw-ra-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+#autofill_detail .jw-ra-name-link {
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+#autofill_detail .jw-ra-name-link:hover {
+  color: #0066ff;
+  text-decoration: underline;
+}
+
+#autofill_detail .jw-ra-channel-row {
+  display: none;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+#autofill_detail .jw-ra-channel {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+#autofill_detail .jw-ra-channel.primary.linkedin,
+#autofill_detail .jw-ra-mini-btn.linkedin {
+  background: #eef6ff;
+  color: #0066ff;
+}
+
+#autofill_detail .jw-ra-channel.github,
+#autofill_detail .jw-ra-mini-btn.github {
+  background: #f8fafc;
+  color: #111827;
+}
+
+#autofill_detail .jw-ra-channel.x,
+#autofill_detail .jw-ra-mini-btn.x {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+#autofill_detail .jw-ra-channel.email,
+#autofill_detail .jw-ra-mini-btn.email {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+#autofill_detail .jw-ra-badge {
+  flex: 0 0 auto;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: #fff7ed;
+  color: #92400e;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+#autofill_detail .jw-ra-badge.recruiter {
+  background: #ecfeff;
+  color: #0e7490;
+}
+
+#autofill_detail .jw-ra-title,
+#autofill_detail .jw-ra-primary,
+#autofill_detail .jw-ra-path,
+#autofill_detail .jw-ra-outreach,
+#autofill_detail .jw-ra-filtered p {
+  overflow-wrap: anywhere;
+}
+
+#autofill_detail .jw-ra-title {
+  margin-top: 3px;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+#autofill_detail .jw-ra-primary {
+  margin-top: 5px;
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+#autofill_detail .jw-ra-score {
+  flex: 0 0 42px;
+  text-align: center;
+  line-height: 1;
+}
+
+#autofill_detail .jw-ra-score strong {
+  display: block;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+#autofill_detail .jw-ra-score span {
+  display: block;
+  margin-top: 2px;
+  color: #94a3b8;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+#autofill_detail .jw-ra-detail {
+  margin-top: 10px;
+  padding-left: 46px;
+}
+
+#autofill_detail .jw-ra-verified {
+  margin-bottom: 6px;
+  color: #059669;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+#autofill_detail .jw-ra-email {
+  margin-bottom: 6px;
+  color: #047857;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+#autofill_detail .jw-ra-email span {
+  font-weight: 850;
+}
+
+#autofill_detail .jw-ra-evidence {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding-left: 15px;
+  color: #334155;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+#autofill_detail .jw-ra-path {
+  margin-top: 6px;
+  padding-left: 8px;
+  border-left: 2px solid #dbeafe;
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+#autofill_detail .jw-ra-outreach {
+  margin-top: 8px;
+  padding: 9px 10px;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  background: #f8fbff;
+  color: #1e3a8a;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+#autofill_detail .jw-ra-outreach span {
+  display: block;
+  margin-bottom: 4px;
+  color: #0066ff;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+#autofill_detail .jw-ra-outreach-text {
+  color: #1e3a8a;
+}
+
+#autofill_detail .jw-ra-outreach em {
+  display: block;
+  margin-top: 5px;
+  color: #64748b;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 750;
+}
+
+#autofill_detail .jw-ra-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+#autofill_detail .jw-ra-mini-btn {
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid rgba(0, 102, 255, 0.16);
+  border-radius: 6px;
+  background: #fff;
+  color: #0066ff;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+#autofill_detail .jw-ra-mini-btn:hover {
+  background: #f3f8ff;
+}
+
+#autofill_detail .jw-ra-mini-btn.copied {
+  border-color: rgba(16, 185, 129, 0.24);
+  color: #059669;
+  background: #ecfdf5;
+}
+
+#autofill_detail .jw-ra-filtered {
+  padding: 9px 12px;
+  margin-bottom: 6px;
+  border: 1px solid rgba(245, 158, 11, 0.16);
+  border-radius: 8px;
+  background: #fffbeb;
+}
+
+#autofill_detail .jw-ra-filtered span {
+  display: block;
+  color: #78350f;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+#autofill_detail .jw-ra-filtered p {
+  margin: 3px 0 0;
+  color: #92400e;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+#autofill_detail .jw-ra-search-summary {
+  margin-bottom: 8px;
+  padding: 9px 12px;
+  border: 1px solid rgba(0, 102, 255, 0.12);
+  border-radius: 8px;
+  background: #f8fbff;
+}
+
+#autofill_detail .jw-ra-search-summary-title {
+  color: #0f172a;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+#autofill_detail .jw-ra-search-summary p {
+  margin: 3px 0 0;
+  color: #475569;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+#autofill_detail .jw-ra-search-summary-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 7px;
+}
+
+#autofill_detail .jw-ra-search-summary-steps span {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: #eef6ff;
+  color: #0066ff;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+/* ============================================
+   Maintenance Mode - Base Styles
+   ============================================ */
+#autofill_detail .maintenance_overlay_wrapper {
+  position: relative;
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin-top: 32px;
+  min-height: 300px;
+}
+
+/* ============================================
+   Style 0: OpenAI-style Maintenance Mode (Enhanced)
+   ============================================ */
+#autofill_detail .maintenance_simple {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  position: relative;
+  min-height: 400px;
+  padding: 80px 20px;
+  overflow: hidden;
+}
+
+/* Subtle background particles for AI feel - monochrome */
+#autofill_detail .maintenance_simple_background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+#autofill_detail .maintenance_particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  opacity: 0;
+}
+
+#autofill_detail .maintenance_particle_1 {
+  top: 20%;
+  left: 15%;
+  animation: maintenance_particle_float 12s ease-in-out infinite;
+}
+
+#autofill_detail .maintenance_particle_2 {
+  top: 60%;
+  right: 20%;
+  animation: maintenance_particle_float 14s ease-in-out infinite;
+  animation-delay: 3s;
+}
+
+#autofill_detail .maintenance_particle_3 {
+  bottom: 25%;
+  left: 25%;
+  animation: maintenance_particle_float 13s ease-in-out infinite;
+  animation-delay: 6s;
+}
+
+#autofill_detail .maintenance_particle_4 {
+  top: 40%;
+  right: 15%;
+  animation: maintenance_particle_float 15s ease-in-out infinite;
+  animation-delay: 1.5s;
+}
+
+@keyframes maintenance_particle_float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(25px, -35px) scale(1.3);
+    opacity: 0.4;
+  }
+}
+
+/* Main content - OpenAI style, perfectly centered */
+#autofill_detail .maintenance_simple_content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+  animation: maintenance_simple_content_fade 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Icon wrapper with subtle glow */
+#autofill_detail .maintenance_simple_icon_wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 40px;
+  position: relative;
+}
+
+#autofill_detail .maintenance_simple_icon {
+  font-size: 56px;
+  line-height: 1;
+  display: inline-block;
+  animation: maintenance_icon_gentle 3s ease-in-out infinite;
+  filter: grayscale(0.2);
+  transform-origin: center;
+}
+
+@keyframes maintenance_icon_gentle {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  25% {
+    transform: rotate(-8deg) scale(1.05);
+    opacity: 0.95;
+  }
+  50% {
+    transform: rotate(0deg) scale(1.08);
+    opacity: 1;
+  }
+  75% {
+    transform: rotate(8deg) scale(1.05);
+    opacity: 0.95;
+  }
+}
+
+/* Title - perfectly centered */
+#autofill_detail .maintenance_title_simple {
+  font-size: 22px;
+  font-weight: 600;
+  color: #202123;
+  margin: 0 auto 20px;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  text-align: center;
+  animation: maintenance_text_fade_up 0.8s ease-out 0.2s both;
+}
+
+/* Message - perfectly centered */
+#autofill_detail .maintenance_message_simple {
+  font-size: 15px;
+  font-weight: 400;
+  color: #8e8ea0;
+  margin: 0 auto 48px;
+  line-height: 1.6;
+  text-align: center;
+  max-width: 420px;
+  animation: maintenance_text_fade_up 0.8s ease-out 0.4s both;
+}
+
+@keyframes maintenance_text_fade_up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Feedback button - OpenAI style, centered */
+#autofill_detail .maintenance_feedback_btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 24px;
+  background: #202123;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 180px;
+  height: 42px;
+  margin: 16px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  animation: maintenance_button_fade_in 0.8s ease-out 0.6s both;
+  position: relative;
+  overflow: hidden;
+}
+
+#autofill_detail .maintenance_feedback_btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+#autofill_detail .maintenance_feedback_btn:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+@keyframes maintenance_button_fade_in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+#autofill_detail .maintenance_feedback_btn:hover:not(:disabled) {
+  background: #343541;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+#autofill_detail .maintenance_feedback_btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 1px 3px rgba(16, 163, 127, 0.15);
+}
+
+#autofill_detail .maintenance_feedback_btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+#autofill_detail .maintenance_feedback_btn .btn_text {
+  display: inline-block;
+  text-align: center;
+}
+
+#autofill_detail .maintenance_feedback_btn .btn_loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+}
+
+/* Loading spinner - refined */
+#autofill_detail .maintenance_feedback_btn .btn_spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: maintenance_spin 0.75s linear infinite;
+}
+
+@keyframes maintenance_spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Content fade animation */
+@keyframes maintenance_simple_content_fade {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   Common Styles (Shared across all styles)
+   ============================================ */
+/* Beta badge removed per user request */
+
+#autofill_detail .maintenance_content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 5;
+}
+
+#autofill_detail .maintenance_title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+}
+
+#autofill_detail .maintenance_message {
+  font-size: 14px;
+  font-weight: 400;
+  color: #666;
+  margin: 0;
+  line-height: 1.6;
+  max-width: 400px;
+}
+ 
+#autofill_detail .skeleton_referrer_card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+  padding: 10px 0;
+  border-bottom: 1px solid #E0E0E0;
+}
+#autofill_detail .skeleton_referrer_card:last-child{
+  border-bottom: none
+}
+
+#autofill_detail .skeleton_referrer_info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+#autofill_detail .skeleton_referrer_card .skeleton_circle_big {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  animation: skeleton-animation 1s infinite;
+}
+
+#autofill_detail .skeleton_referrer_card .skeleon_wrap {
+  flex: 1;
+  gap: 6px;
+  display: flex;
+  flex-direction: column;
+}
+
+#autofill_detail .skeleton_referrer_card .skeleon_wrap .skeleton_title_thin {
+  width: 70px;
+  height: 12px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: #e6e6e6;
+  animation: skeleton-animation 1s infinite;
+}
+#autofill_detail .skeleton_referrer_card .skeleon_wrap .skeleton_line_thin {
+  height: 9px;
+  border-radius: 5px;
+  background: #e6e6e6;
+  animation: skeleton-animation 1s infinite;
+}
+#autofill_detail
+  .skeleton_referrer_card
+  .skeleon_wrap
+  .skeleton_line_thin:nth-child(2) {
+  width: 138px;
+}
+#autofill_detail
+  .skeleton_referrer_card
+  .skeleon_wrap
+  .skeleton_line_thin:nth-child(3) {
+  width: 189px;
+}
+#autofill_detail
+  .skeleton_referrer_card
+  .skeleon_wrap
+  .skeleton_line_thin:nth-child(4) {
+  width: 94px;
+}
+#autofill_detail .referrer_card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  cursor: pointer;
+  transition: 0.2s;
+  position: relative;
+}
+#autofill_detail .referrer_card:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+}
+#autofill_detail .referrer_card:hover .cover {
+  opacity: 0.8;
+  border-radius: 6px;
+  background: rgba(5, 105, 255);
+  margin: -10px 0;
+}
+#autofill_detail .referrer_card .cover {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: 0.2s;
+}
+#autofill_detail .referrer_card .cover {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+#autofill_detail .referrer_card .cover span {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+}
+#autofill_detail .referrer_card .cover img {
+  width: 16px;
+  height: 16px;
+}
+#autofill_detail .line {
+  width: 100%;
+  height: 0.8px;
+  background-color: #e0e0e0;
+  margin: 10px 0;
+}
+#autofill_detail .line:last-child{
+  display: none;
+}
+
+#autofill_detail .referrer_card .referrer_info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#autofill_detail .referrer_card .referrer_info .avator {
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+#autofill_detail .referrer_card .referrer_meta {
+  gap: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+#autofill_detail .referrer_card .referrer_meta .name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#autofill_detail .referrer_card .referrer_meta .name p {
+  color: #000;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+#autofill_detail .referrer_card .referrer_meta .name .tag {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: #edf4ff;
+  color: #06f;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+#autofill_detail .referrer_card .referrer_meta .des {
+  display: flex;
+  align-items: baseline;
+}
+
+#autofill_detail .referrer_card .referrer_meta .des span {
+  color: #5f6368;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  /* 指定最多显示的行数 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#autofill_detail .referrer_card .referrer_meta .des img {
+  width: 10px;
+  height: 12px;
+  margin-right: 4px;
+  margin-top: 1px;
+}
+
+/* Referrer action icons */
+#autofill_detail .referrer_card .referrer_actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+#autofill_detail .referrer_card .action_icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: rgba(0, 102, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#autofill_detail .referrer_card .action_icon:hover {
+  background: rgba(0, 102, 255, 0.2);
+  transform: scale(1.05);
+}
+
+#autofill_detail .referrer_card .action_icon img {
+  width: 16px;
+  height: 16px;
+}
+
+#autofill_detail .referrer_card .linkedin_icon {
+  background: rgba(0, 119, 181, 0.1);
+}
+
+#autofill_detail .referrer_card .linkedin_icon:hover {
+  background: rgba(0, 119, 181, 0.2);
+}
+
+#autofill_detail .referrer_card .email_icon {
+  background: rgba(0, 119, 181, 0.1);
+}
+
+#autofill_detail .referrer_card .email_icon:hover {
+  background: rgba(0, 119, 181, 0.2);
+}
+
+/* ============================================
+   referral_modal v2 — Archetype B (Conversation), P1·a (2026-05-19)
+   Streaming greeting / email modal. Pure CSS rewrite — 0 JS, 0 HTML
+   structure change. All handler-bound selectors preserved verbatim:
+   .referral_modal[.show via jQuery] / .mask (click→close) / .referral_modal_body
+   / .referral_modal_close / .referral_header img+span (dynamic header) /
+   .referral_modal_content .referral_text (streaming target) /
+   .referral_footer[.active] / .refresh_referral / .copy_referral /
+   .improve_referral .improve_referral_options .option / .keyboard_referral /
+   .go_contact[.copy|.send_email|.disable] — see main.js:6516-7000+.
+   ============================================ */
+#autofill_detail .referral_modal {
+  width: 100%;
+  height: 100%;
+  display: none;
+  position: absolute;
+}
+#autofill_detail .referral_modal .mask {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(8, 10, 14, 0.42);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 99999;
+}
+#autofill_detail .referral_modal .referral_modal_body {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+  width: calc(100% - 40px);
+  max-width: 360px;
+  padding: 22px 22px 18px;
+  background: #ffffff;
+  border-radius: 16px;
+  max-height: min(85vh, 700px);
+  /* overflow stays visible so the improve dropdown escapes the card edge. */
+  overflow: visible;
+  z-index: 999999;
+  box-shadow:
+    0 24px 60px rgba(8, 10, 14, 0.18),
+    0 4px 12px rgba(8, 10, 14, 0.08);
+  animation: jw-referral-wrap-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes jw-referral-wrap-in {
+  from { opacity: 0; transform: translate(-50%, calc(-50% + 8px)) scale(0.97); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Hero header. JS rewrites both img.src and span.innerHTML on state
+   change ("Generating greeting…" → "Here's your draft." etc.), so we
+   style the existing img+span pair as a B-style anchor + title. */
+#autofill_detail .referral_modal .referral_header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* leave room for the round close button at top-right. */
+  padding-right: 36px;
+  color: #0b0d10;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+#autofill_detail .referral_modal .referral_header img {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  filter: drop-shadow(0 2px 6px rgba(15, 17, 21, 0.10));
+  animation: jw-referral-icon-in 0.5s cubic-bezier(0.22, 1.4, 0.4, 1) both;
+}
+@keyframes jw-referral-icon-in {
+  from { opacity: 0; transform: scale(0.6) translateY(4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+#autofill_detail .referral_modal .referral_header span {
+  /* Override the inherited blue — header reads as a card title now,
+     not a status chip. JS-supplied copy slots in naturally. */
+  color: #0b0d10;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+#autofill_detail .referral_modal .referral_modal_content {
+  margin-top: 14px;
+  /* modal max-height (min(85vh, 700px)) minus padding (40px) minus
+     header (~36px) minus footer row (~32px) minus go_contact (~52px). */
+  max-height: calc(min(85vh, 700px) - 40px - 36px - 32px - 52px);
+  overflow-y: auto;
+}
+
+/* go_contact: B primary CTA — gradient, full-width, hover lift, with the
+   three JS class states (.copy / .send_email plain primary; .disable mutes). */
+#autofill_detail .referral_modal .go_contact {
+  display: flex;
+  width: 100%;
+  height: 42px;
+  padding: 0 16px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  box-shadow:
+    0 4px 14px rgba(0, 102, 255, 0.22),
+    0 1px 2px rgba(0, 102, 255, 0.18);
+  transition: filter .22s ease, box-shadow .22s ease, transform .12s ease,
+              background .22s ease, color .22s ease;
+}
+#autofill_detail .referral_modal .go_contact:hover {
+  filter: brightness(1.05);
+  box-shadow:
+    0 6px 18px rgba(0, 102, 255, 0.28),
+    0 2px 4px rgba(0, 102, 255, 0.20);
+}
+#autofill_detail .referral_modal .go_contact:active {
+  transform: scale(0.985);
+}
+#autofill_detail .referral_modal .go_contact img {
+  width: 16px;
+  height: 16px;
+}
+#autofill_detail .referral_modal .go_contact.disable {
+  background: rgba(15, 17, 21, 0.08);
+  color: rgba(75, 85, 99, 0.7);
+  cursor: not-allowed;
+  filter: none;
+  box-shadow: none;
+}
+#autofill_detail .referral_modal .go_contact.disable img {
+  filter: grayscale(100%) opacity(0.55);
+}
+
+/* Improve dropdown — B chip pattern. Higher specificity than content.css's
+   shared .improve_*_options rules, so coverletter's dropdown is untouched. */
+#autofill_detail .referral_modal .improve_referral_options {
+  padding: 8px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 17, 21, 0.08);
+  box-shadow:
+    0 12px 32px rgba(8, 10, 14, 0.14),
+    0 2px 6px rgba(8, 10, 14, 0.06);
+  gap: 4px;
+}
+#autofill_detail .referral_modal .improve_referral_options .option {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(0, 102, 255, 0.04);
+  color: #0066ff;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  transition: background .15s ease;
+}
+#autofill_detail .referral_modal .improve_referral_options .option:hover {
+  background: rgba(0, 102, 255, 0.1);
+}
+/* Kill the inherited radial glow ::before — too gimmicky for B archetype. */
+#autofill_detail .referral_modal .improve_referral_options .option::before {
+  display: none;
+}
+ /* referral msg modal end*/
+
+/* Email display component — only injected inside .referral_modal_content
+   (main.js:6694 inserts before .referral_text). Scoping to the modal
+   keeps the 14px margin-top on .referral_modal_content from compounding
+   with email_display's own margin (was 16px all-sides, now bottom-only). */
+#autofill_detail .referral_modal_content .email_display {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 0 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+#autofill_detail .email_display .email_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+#autofill_detail .email_display .email_meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#autofill_detail .email_display .email_type {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#autofill_detail .email_display .email_type.professional {
+  background: rgba(0, 102, 255, 0.1);
+  color: #0077fa;
+}
+
+#autofill_detail .email_display .email_type.personal {
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+}
+
+#autofill_detail .email_display .email_status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#autofill_detail .email_display .email_status.valid {
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+}
+
+#autofill_detail .email_display .email_status.invalid {
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+}
+
+#autofill_detail .email_display .email_header .email_label {
+  font-weight: 600;
+  color: #495057;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#autofill_detail .email_display .copy_email_btn {
+  background: rgba(0, 102, 255, 0.1);
+  color: #0077fa;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#autofill_detail .email_display .copy_email_btn:hover {
+  background: rgba(0, 102, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+#autofill_detail .email_display .copy_email_btn.copied {
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+}
+
+#autofill_detail .email_display .email_address {
+  font-family: var(--jobwizard-font-family);
+  background: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+  word-break: break-all;
+  color: #495057;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+#autofill_detail .email_display .email_disclaimer {
+  font-size: 12px;
+  color: #6c757d;
+  line-height: 1.3;
+  font-style: italic;
+}
+
+#autofill_detail .email_display .email_section {
+  margin-bottom: 16px;
+}
+
+#autofill_detail .email_display .email_section:last-child {
+  margin-bottom: 0;
+}
+
+#autofill_detail .email_display .section_label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#autofill_detail .email_display .section_label::before {
+  font-size: 10px;
+}
+
+#autofill_detail .email_display .section_label.subject::before {
+  content: '📝';
+}
+
+#autofill_detail .email_display .section_label.content::before {
+  content: '✉️';
+}
+
+#autofill_detail .email_display .section_content {
+  font-family: var(--jobwizard-font-family);
+  background: white;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+  word-break: break-all;
+  color: #495057;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  min-height: 20px;
+}
+
+#autofill_detail .email_sections {
+  margin-top: 20px;
+}
+
+#autofill_detail .email_sections .email_section {
+  margin-bottom: 16px;
+}
+
+#autofill_detail .email_sections .email_section:last-child {
+  margin-bottom: 0;
+}
+
+#autofill_detail .email_sections .section_label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#autofill_detail .email_sections .section_label::before {
+  font-size: 10px;
+}
+
+#autofill_detail .email_sections .section_label.subject::before {
+  content: '📝';
+}
+
+#autofill_detail .email_sections .section_label.content::before {
+  content: '✉️';
+}
+
+#autofill_detail .email_sections .section_content {
+  font-family: var(--jobwizard-font-family);
+  background: white;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+  word-break: break-all;
+  color: #495057;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  min-height: 20px;
+}
+
+#autofill_detail .email_sections .section_content:empty::before {
+  content: attr(placeholder);
+  color: #adb5bd;
+  font-style: italic;
+}
+
+/* Email subject area - matches referral text styling */
+#autofill_detail .email_subject_wrap {
+  margin-bottom: 16px;
+}
+
+#autofill_detail .email_subject_wrap .section_label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#autofill_detail .email_subject_wrap .section_label span {
+  font-size: 10px;
+}
+
+#autofill_detail .email_subject_wrap .email_subject {
+  min-height: 40px;
+  padding: 12px;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  background: white;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #495057;
+  font-family: inherit;
+  word-break: break-word;
+  outline: none;
+}
+
+#autofill_detail .email_subject_wrap .email_subject:empty::before {
+  content: attr(placeholder);
+  color: #adb5bd;
+  font-style: italic;
+}
+
+#autofill_detail .email_subject_wrap .email_subject:focus {
+  border-color: #0077fa;
+  box-shadow: 0 0 0 2px rgba(0, 119, 250, 0.1);
+}
+
+/* Email address wrapper for inline layout with copy button */
+#autofill_detail .email_display .email_address_wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* Email meta information styles */
+#autofill_detail .email_display .email_meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#autofill_detail .email_display .email_type {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#autofill_detail .email_display .email_type.professional {
+  background: rgba(0, 102, 255, 0.1);
+  color: #0077fa;
+}
+
+#autofill_detail .email_display .email_type.personal {
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+}
+
+#autofill_detail .email_display .email_status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#autofill_detail .email_display .email_status.valid {
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+}
+
+#autofill_detail .email_display .email_status.invalid {
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+}
+
+/* Email details section */
+#autofill_detail .email_display .email_details {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 8px;
+  border: 1px solid #e9ecef;
+}
+
+#autofill_detail .email_display .email_detail_item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+#autofill_detail .email_display .email_detail_item:last-child {
+  margin-bottom: 0;
+}
+
+#autofill_detail .email_display .email_detail_item .detail_label {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+#autofill_detail .email_display .email_detail_item .detail_value {
+  color: #495057;
+  font-weight: 600;
+}
+
+#autofill_detail .email_display .email_detail_item .detail_value.valid {
+  color: #28a745;
+}
+
+#autofill_detail .email_display .email_detail_item .detail_value.invalid {
+  color: #dc3545;
+}
+
+/* Referral modal close button — B-archetype circular close (matches B1/B2). */
+#autofill_detail .referral_modal .referral_modal_close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 17, 21, 0.04);
+  color: rgba(75, 85, 99, 0.85);
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 1;
+  border: 1px solid rgba(15, 17, 21, 0.06);
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  transition: background .18s ease, color .18s ease, transform .22s ease;
+}
+
+#autofill_detail .referral_modal .referral_modal_close:hover {
+  background: rgba(15, 17, 21, 0.08);
+  color: #0b0d10;
+  transform: rotate(90deg);
+}
+
+#autofill_detail .referral_modal .referral_modal_close:active {
+  transform: scale(0.95) rotate(90deg);
+}
+
+/* Custom dropdown styles */
+#autofill_detail .email_subject_selector_wrap {
+  margin-bottom: 16px;
+}
+
+#autofill_detail .email_subject_selector {
+  position: relative;
+}
+
+#autofill_detail .custom_dropdown {
+  position: relative;
+  width: 100%;
+}
+
+#autofill_detail .dropdown_trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#autofill_detail .dropdown_trigger:hover {
+  border-color: #0077fa;
+  box-shadow: 0 0 0 2px rgba(0, 119, 250, 0.1);
+}
+
+#autofill_detail .dropdown_placeholder {
+  color: #495057;
+  font-size: 14px;
+  /* font-style: italic; */
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#autofill_detail .dropdown_placeholder .option_icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
+#autofill_detail .dropdown_placeholder .option_text {
+  font-size: 14px;
+  color: #495057;
+  font-weight: 500;
+  font-style: normal;
+}
+
+#autofill_detail .dropdown_arrow {
+  color: #6c757d;
+  transition: transform 0.2s ease;
+}
+
+#autofill_detail .custom_dropdown.open .dropdown_arrow {
+  transform: rotate(180deg);
+}
+
+#autofill_detail .dropdown_options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+}
+
+#autofill_detail .custom_dropdown.open .dropdown_options {
+  max-height: 300px;
+  opacity: 1;
+  visibility: visible;
+}
+
+#autofill_detail .dropdown_option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+#autofill_detail .dropdown_option:last-child {
+  border-bottom: none;
+}
+
+#autofill_detail .dropdown_option:hover {
+  background-color: #f8f9fa;
+}
+
+#autofill_detail .dropdown_option:active {
+  background-color: #e9ecef;
+}
+
+#autofill_detail .option_icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
+#autofill_detail .option_text {
+  font-size: 14px;
+  color: #495057;
+  font-weight: 500;
+}

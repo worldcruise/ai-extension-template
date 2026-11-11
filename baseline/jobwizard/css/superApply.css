@@ -1,0 +1,455 @@
+.jw-super-apply-surface {
+  width: auto;
+  margin: 0;
+  padding: 0;
+}
+:is(
+    .jw-application-review,
+    #autofill_detail .jw-application-review
+  ).jw-super-apply-surface
+  .jw-super-apply-button {
+  height: var(--jw-super-apply-height, 40px);
+  min-height: var(--jw-super-apply-height, 40px);
+  border-radius: var(--jw-super-apply-radius, 999px);
+  box-sizing: border-box;
+  width: auto;
+  padding: 8px 18px 8px 13px;
+  font-size: 14px;
+  line-height: 1;
+  gap: 7px;
+  white-space: nowrap;
+}
+/* A platform capability opts this host into motion; other entry points keep
+   their existing presentation. Transform affects paint, never card layout. */
+:host([data-jw-super-apply-motion="spring"]) .jw-super-apply-surface,
+:host([data-jw-super-apply-status="applied"]) .jw-super-apply-surface {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+:host([data-jw-super-apply-status="applied"]) .jw-super-apply-button--applied:disabled {
+  background: #eef1f0 !important;
+  color: #617168 !important;
+  border: 1px solid #d8dfda !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  cursor: default !important;
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+  filter: none !important;
+}
+:host([data-jw-super-apply-motion="spring"]) .jw-super-apply-button {
+  transform-origin: center;
+  transform: scale(1) !important;
+  transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 150ms ease, filter 150ms ease !important;
+}
+:host([data-jw-super-apply-motion="spring"]) .jw-super-apply-button:hover:not(:disabled) {
+  transform: scale(1.02) !important;
+  transition-timing-function: cubic-bezier(0.34, 1.36, 0.64, 1), ease, ease !important;
+  box-shadow: 0 4px 12px rgba(73, 66, 161, 0.24), 0 0 0 1px rgba(255, 255, 255, 0.65) !important;
+  filter: brightness(1.04);
+}
+:host([data-jw-super-apply-motion="spring"]) .jw-super-apply-button:active:not(:disabled) {
+  transform: scale(0.99) !important;
+  transition-duration: 80ms, 150ms, 150ms !important;
+  box-shadow: 0 2px 5px rgba(73, 66, 161, 0.18) !important;
+  filter: brightness(0.98);
+}
+:host([data-jw-super-apply-motion="spring"]) .jw-super-apply-button:focus-visible {
+  outline: 3px solid #786bdd !important;
+  outline-offset: 3px !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  :host([data-jw-super-apply-motion="spring"]) .jw-super-apply-button,
+  :host([data-jw-super-apply-motion="spring"]) .jw-super-apply-button:is(:hover, :active, :focus-visible):not(:disabled) {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+.jw-super-apply-logo {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  position: relative;
+  z-index: 1;
+}
+.jw-super-apply-button--applied .jw-super-apply-logo {
+  filter: brightness(0);
+  opacity: 0.5;
+}
+.jw-super-apply-label {
+  position: relative;
+  z-index: 1;
+  color: inherit;
+  font: inherit;
+}
+.jw-super-intro {
+  pointer-events: auto;
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(22, 35, 58, 0.25);
+  font: 14px/1.6 var(--jobwizard-font-family, Inter, system-ui, sans-serif);
+}
+.jw-super-intro__card {
+  position: relative;
+  width: 100%;
+  max-width: 350px;
+  box-sizing: border-box;
+  border: 1px solid #e4eaf4;
+  border-radius: 20px;
+  background: white;
+  padding: 26px;
+  color: #2d3d55;
+  box-shadow: 0 18px 65px rgba(16, 34, 67, 0.16);
+}
+.jw-super-intro__platform {
+  position: absolute;
+  top: 9px;
+  left: 26px;
+  padding: 1px 7px;
+  border-radius: 5px;
+  background: #edf2ff;
+  color: #4964a8;
+  font: 600 10px/16px var(--jobwizard-font-family, Inter, system-ui, sans-serif);
+}
+.jw-super-intro__close {
+  position: absolute;
+  right: 12px;
+  top: 9px;
+  border: 0;
+  background: none;
+  color: #7d8999;
+  font-size: 24px;
+  cursor: pointer;
+}
+.jw-super-intro__card h2 {
+  margin: 21px 0 9px;
+  font: 650 24px/1.3 var(--jobwizard-font-family, Inter, system-ui, sans-serif);
+  letter-spacing: -0.5px;
+}
+.jw-super-intro__card p {
+  margin: 0 0 16px;
+  color: #6b7d94;
+  font: 400 13px/1.7 var(--jobwizard-font-family, Inter, system-ui, sans-serif);
+}
+.jw-super-intro__card .jw-super-intro__assurance {
+  color: #3a506f;
+  font-weight: 550;
+  margin-bottom: 23px;
+}
+.jw-super-intro__settings { margin-bottom:12px; }
+.jw-super-intro__demo { position:relative; height:210px; margin-top:7px; border:1px solid #e0e7f4; border-radius:12px; background:#f7f9fe; overflow:hidden; }
+.jw-super-demo__page { position:absolute; inset:16px; display:flex; flex-direction:column; gap:10px; opacity:0; animation:jw-demo-first 12s linear infinite; }
+.jw-super-demo__heading { display:flex; align-items:center; justify-content:space-between; color:#52657e; font-size:12px; line-height:18px; }
+.jw-super-demo__heading span { font-size:10px; color:#8290a4; }
+.jw-super-demo__field label { display:block; font-size:10px; line-height:16px; color:#79889c; }
+.jw-super-demo__field>div { height:28px; border:1px solid #dce4f0; border-radius:5px; background:white; padding:3px 8px; box-sizing:border-box; }
+.jw-super-demo__value { display:block; font:500 11px/20px system-ui,sans-serif; color:#344d73; clip-path:inset(0 100% 0 0); animation:jw-demo-value 12s linear infinite; }
+.jw-super-demo__value--later { animation-delay:.5s; }
+.jw-super-demo__footer { display:flex; align-items:center; justify-content:space-between; gap:5px; margin-top:auto; font-size:10px; }
+.jw-super-demo__status { display:grid; color:#647da7; }
+.jw-super-demo__status>span { grid-area:1/1; white-space:nowrap; opacity:0; }
+.jw-super-demo__reading { animation:jw-demo-reading 12s linear infinite; }
+.jw-super-demo__filling { animation:jw-demo-filling 12s linear infinite; }
+.jw-super-demo__next { animation:jw-demo-next 12s linear infinite; }
+.jw-super-demo__next-button { padding:4px 7px; border-radius:5px; color:#4263d7; background:#e7ecff; white-space:nowrap; animation:jw-demo-button 12s linear infinite; }
+.jw-super-demo__page--second { animation-name:jw-demo-second; }
+.jw-super-demo__page--second .jw-super-demo__value,.jw-super-demo__page--second .jw-super-demo__reading,.jw-super-demo__page--second .jw-super-demo__filling,.jw-super-demo__page--second .jw-super-demo__next,.jw-super-demo__page--second .jw-super-demo__next-button { animation-delay:5s; }
+.jw-super-demo__page--second .jw-super-demo__value--later { animation-delay:5.5s; }
+.jw-super-demo__page--review { align-items:center; justify-content:center; text-align:center; animation-name:jw-demo-review; font-size:12px; color:#3b506e; }
+.jw-super-demo__page--review>span { font-size:10px; color:#7b8ba1; }
+.jw-super-demo__check { display:grid; place-items:center; width:34px; height:34px; background:#e7f5ef; color:#26956b; border-radius:50%; font-size:19px; }
+@keyframes jw-demo-first { 0%,37%{opacity:1;transform:translateY(0)}41%,98%{opacity:0;transform:translateY(-8px)}100%{opacity:1;transform:translateY(0)} }
+@keyframes jw-demo-second { 0%,40%{opacity:0;transform:translateY(8px)}44%,78%{opacity:1;transform:translateY(0)}82%,100%{opacity:0;transform:translateY(-8px)} }
+@keyframes jw-demo-review { 0%,81%{opacity:0;transform:translateY(8px)}85%,96%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-8px)} }
+@keyframes jw-demo-value { 0%,11%{clip-path:inset(0 100% 0 0)}19%,96%{clip-path:inset(0)}100%{clip-path:inset(0 100% 0 0)} }
+@keyframes jw-demo-reading { 0%,10%{opacity:1}12%,100%{opacity:0} }
+@keyframes jw-demo-filling { 0%,11%{opacity:0}13%,28%{opacity:1}30%,100%{opacity:0} }
+@keyframes jw-demo-next { 0%,29%{opacity:0}31%,40%{opacity:1}42%,100%{opacity:0} }
+@keyframes jw-demo-button { 0%,28%,42%,100%{background:#e7ecff;color:#4263d7}31%,39%{background:#4965df;color:white} }
+@media(prefers-reduced-motion:reduce) { .jw-super-intro__demo *{animation:none!important} .jw-super-demo__page--first{opacity:1} .jw-super-demo__value{clip-path:none} .jw-super-demo__next{opacity:1} }
+
+:is(.jw_start_easy_apply, .jw_start_application_automation) { position:relative; isolation:isolate; overflow:hidden; }
+:is(.jw_start_easy_apply, .jw_start_application_automation) .jw-super-apply-label, :is(.jw_start_easy_apply, .jw_start_application_automation) .jw-arrow { position:relative; z-index:1; }
+
+/* Empty-state prose rules also target spans. Keep the CTA's complete internal
+   layout scoped so decorative layers cannot inherit prose margins or color. */
+#autofill_detail .jw-apply-state.form_empty.error_page_style.error_page .error_wrap :is(.jw_start_easy_apply, .jw_start_application_automation) { display:flex; align-items:center; justify-content:center; gap:8px; min-height:50px; box-sizing:border-box; }
+#autofill_detail .jw-apply-state.form_empty.error_page_style.error_page .error_wrap :is(.jw_start_easy_apply, .jw_start_application_automation)>span { margin:0; font:inherit; color:inherit; line-height:1; }
+#autofill_detail .jw-apply-state.form_empty.error_page_style.error_page .error_wrap :is(.jw_start_easy_apply, .jw_start_application_automation)>.jw-super-apply-label { display:block; white-space:nowrap; }
+#autofill_detail .jw-apply-state.form_empty.error_page_style.error_page .error_wrap :is(.jw_start_easy_apply, .jw_start_application_automation)>.jw-arrow { display:block; flex:none; }
+
+/* Opening is accepted work, not an unavailable CTA. Preserve its live surface. */
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-super-apply-button[aria-busy="true"],
+#autofill_detail .jw-apply-state .error_actions .jw-cta.jw-aurora.jw-super-apply-opening:disabled {
+  opacity: 1;
+  cursor: progress;
+  animation-play-state: running;
+}
+
+/* Missing-answer handoff. A single browser frame shows the native form on the
+   left and JobWizard on the right; all miniature controls are decorative. */
+.jw-super-input-guide { --jw-input-guide-close-ms:150; }
+.jw-super-input-guide__card { animation:jw-input-guide-open 250ms cubic-bezier(.22,1,.36,1) both; }
+.jw-super-input-guide.is-closing { pointer-events:none; }
+.jw-super-input-guide.is-closing .jw-super-input-guide__card { animation:jw-input-guide-close 150ms cubic-bezier(.22,1,.36,1) both; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-super-input-guide__complete { position:relative; justify-content:center; font-size:13px; padding-inline:32px; }
+.jw-super-input-guide__label { position:relative; z-index:1; text-align:center; }
+.jw-super-input-guide__arrow { position:absolute; right:17px; top:50%; transform:translateY(-50%); z-index:1; }
+.jw-input-guide-demo { position:relative; height:218px; margin-top:7px; border:1px solid #e0e7f4; border-radius:12px; background:#f7f9fe; overflow:hidden; color:#536884; box-sizing:border-box; }
+.jw-input-guide-demo * { box-sizing:border-box; }
+.jw-input-guide-demo__chrome { height:23px; display:flex; align-items:center; gap:3px; padding:0 10px; background:#eef2f9; border-bottom:1px solid #e0e7f4; }
+.jw-input-guide-demo__chrome i { width:4px; height:4px; border-radius:50%; background:#c6d1e2; }
+.jw-input-guide-demo__chrome span { margin-left:6px; font-size:8px; color:#8290a4; }
+.jw-input-guide-demo__browser { display:grid; grid-template-columns:minmax(0,1.12fr) minmax(0,1fr); height:165px; }
+.jw-input-guide-demo__native, .jw-input-guide-demo__plugin { min-width:0; padding:12px 9px; }
+.jw-input-guide-demo__native { position:relative; }
+.jw-input-guide-demo__plugin { border-left:1px solid #e0e7f4; display:flex; flex-direction:column; background:rgba(255,255,255,.5); }
+.jw-input-guide-demo__heading { display:block; margin:0 0 12px; font-size:8px; font-weight:600; line-height:12px; }
+.jw-input-guide-demo__heading>span { color:#1769f6; }
+.jw-input-guide-demo__jump { position:absolute; right:9px; top:28px; font-size:6px; color:#4965df; opacity:0; animation:jw-input-guide-jump 12s linear infinite; }
+.jw-input-guide-demo__viewport { position:relative; height:73px; overflow:hidden; border-radius:5px; }
+.jw-input-guide-demo__track { animation:jw-input-guide-scroll 12s cubic-bezier(.22,1,.36,1) infinite; }
+.jw-input-guide-demo__question { height:73px; padding:3px 3px 5px; }
+.jw-input-guide-demo label { display:block; font-size:8px; margin:0 0 7px; color:#708097; line-height:12px; }
+.jw-input-guide-demo__input { position:relative; height:27px; border:1px solid #dce4f0; border-radius:4px; background:white; padding:4px 6px; color:#344d73; font:400 9px/17px system-ui,sans-serif; }
+.jw-input-guide-demo__target { border-radius:5px; animation:jw-input-guide-highlight 12s linear infinite; }
+.jw-input-guide-demo__target .jw-input-guide-demo__input { animation:jw-input-guide-focus 12s linear infinite; }
+.jw-input-guide-demo__typed { display:block; white-space:nowrap; clip-path:inset(0 100% 0 0); animation:jw-input-guide-type 12s linear infinite; }
+.jw-input-guide-demo__next-question, .jw-input-guide-demo__review { position:absolute; inset:0; padding:3px; background:#f7f9fe; opacity:0; animation:jw-input-guide-new-question 12s linear infinite; }
+.jw-input-guide-demo__autofill, .jw-input-guide-demo__check { opacity:0; animation:jw-input-guide-autofill 12s linear infinite; }
+.jw-input-guide-demo__check { float:right; color:#29956b; }
+.jw-input-guide-demo__review { display:none; flex-direction:column; align-items:center; justify-content:center; gap:3px; text-align:center; }
+.jw-input-guide-demo__review>span { color:#26956b; font-size:17px; line-height:20px; }
+.jw-input-guide-demo__review b { font-size:9px; line-height:13px; color:#3b506e; }
+.jw-input-guide-demo__review small { font-size:7px; line-height:11px; color:#7b8ba1; }
+.jw-input-guide-demo.is-final-step .jw-input-guide-demo__next-question { display:none; }
+.jw-input-guide-demo.is-final-step .jw-input-guide-demo__review { display:flex; }
+.jw-input-guide-demo__summary { display:grid; font-size:8px; line-height:13px; }
+.jw-input-guide-demo__summary>span { grid-area:2/1; font-size:7px; }
+.jw-input-guide-demo__missing { color:#bd8134; animation:jw-input-guide-missing 12s linear infinite; }
+.jw-input-guide-demo__answered { color:#29956b; opacity:0; animation:jw-input-guide-answered 12s linear infinite; }
+.jw-input-guide-demo__action { position:relative; display:grid; align-items:center; flex-shrink:0; height:32px; margin-top:auto; border-radius:18px; font-size:7.3px; font-weight:650; text-align:center; }
+.jw-input-guide-demo__complete, .jw-input-guide-demo__continue { display:grid; place-items:center; grid-area:1/1; height:32px; border-radius:18px; white-space:nowrap; }
+.jw-input-guide-demo__complete { border:1px solid #f0d1a3; background:#fff0dc; color:#a05a14; animation:jw-input-guide-complete 12s linear infinite; }
+.jw-input-guide-demo__continue { background:#1769f6; color:white; opacity:0; animation:jw-input-guide-continue 12s linear infinite; }
+.jw-input-guide-demo__pointer { position:absolute; right:17px; bottom:-12px; z-index:3; width:14px; height:18px; opacity:0; filter:drop-shadow(0 1px 1px #0003); animation:jw-input-guide-pointer 12s linear infinite; }
+/* Reuse the active production workflow surface and its existing Aurora and
+   particle keyframes. The stage scales the 360px particle path proportionally. */
+:is(.jw-application-progress, #autofill_detail .jw-application-progress).jw-input-guide-demo__working { position:absolute; inset:0; display:block; padding:0; border:0; gap:0; background:transparent; opacity:0; pointer-events:none; animation:jw-input-guide-work 12s linear infinite; }
+.jw-input-guide-demo :is(.jw-application-progress, #autofill_detail .jw-application-progress).jw-input-guide-demo__working .jw-application-progress__action { display:grid; align-items:center; width:100%; height:32px; padding:0 17px 0 5px; border:0; border-radius:18px; color:white; font-size:8px; }
+.jw-input-guide-demo__working .jw-application-progress__particles { width:360px; height:calc(100% / var(--jw-guide-particle-scale,.3)); transform:scale(var(--jw-guide-particle-scale,.3)); transform-origin:top left; }
+.jw-input-guide-demo__stop { position:absolute; right:5px; top:50%; transform:translateY(-50%); width:13px; height:13px; border-radius:50%; background:rgba(255,255,255,.2); color:white; font-size:6px; line-height:13px; z-index:1; }
+/* Five quiet segments follow the same phases as the miniature walkthrough. */
+.jw-input-guide-demo__progress { display:flex; height:28px; align-items:center; justify-content:center; gap:5px; }
+.jw-input-guide-demo__progress>span { position:relative; width:17px; height:3px; border-radius:3px; background:#dfe6f2; overflow:hidden; }
+.jw-input-guide-demo__progress>span::after { content:""; position:absolute; inset:0; border-radius:inherit; background:#6585d8; opacity:0; animation:jw-input-guide-progress-one 12s linear infinite; }
+.jw-input-guide-demo__progress>span:nth-child(2)::after { animation-name:jw-input-guide-progress-two; }
+.jw-input-guide-demo__progress>span:nth-child(3)::after { animation-name:jw-input-guide-progress-three; }
+.jw-input-guide-demo__progress>span:nth-child(4)::after { animation-name:jw-input-guide-progress-four; }
+.jw-input-guide-demo__progress>span:nth-child(5)::after { animation-name:jw-input-guide-progress-five; }
+@keyframes jw-input-guide-open { from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)} }
+@keyframes jw-input-guide-close { from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.96)} }
+@keyframes jw-input-guide-scroll { 0%,12%,100%{transform:translateY(0)}17%,97%{transform:translateY(-73px)} }
+@keyframes jw-input-guide-jump { 0%,12%,25%,100%{opacity:0}16%,23%{opacity:1} }
+@keyframes jw-input-guide-highlight { 0%,12%,46%,100%{background:transparent}17%,42%{background:#fff4d9} }
+@keyframes jw-input-guide-focus { 0%,12%,46%,100%{border-color:#dce4f0;box-shadow:none}17%,42%{border-color:#7397e9;box-shadow:0 0 0 1px #b6cafa} }
+@keyframes jw-input-guide-type { 0%,25%,100%{clip-path:inset(0 100% 0 0)}43%,97%{clip-path:inset(0)} }
+@keyframes jw-input-guide-missing { 0%,44%,100%{opacity:1}45%,98%{opacity:0} }
+@keyframes jw-input-guide-answered { 0%,44%,100%{opacity:0}45%,98%{opacity:1} }
+@keyframes jw-input-guide-complete { 0%,6%,10%,44%,100%{opacity:1;transform:scale(1)}7%,9%{opacity:1;transform:scale(.97)}45%,98%{opacity:0;transform:scale(1)} }
+@keyframes jw-input-guide-continue { 0%,44%,68%,100%{opacity:0;transform:scale(1)}45%,60%,66%{opacity:1;transform:scale(1)}62%,64%{opacity:1;transform:scale(.97)} }
+@keyframes jw-input-guide-pointer { 0%,2%,12%,57%,68%,100%{opacity:0;transform:translate(10px,8px)}5%,10%,60%,65%{opacity:1;transform:translate(0,0)}7%,9%,62%,64%{opacity:1;transform:translate(0,0) scale(.9)} }
+@keyframes jw-input-guide-work { 0%,67%,100%{opacity:0}68%,97%{opacity:1} }
+@keyframes jw-input-guide-new-question { 0%,72%,100%{opacity:0}75%,97%{opacity:1} }
+@keyframes jw-input-guide-autofill { 0%,78%,100%{opacity:0}84%,97%{opacity:1} }
+@keyframes jw-input-guide-progress-one { 0%,11%,100%{opacity:1}12%,99%{opacity:0} }
+@keyframes jw-input-guide-progress-two { 0%,11%,25%,100%{opacity:0}12%,24%{opacity:1} }
+@keyframes jw-input-guide-progress-three { 0%,24%,45%,100%{opacity:0}25%,44%{opacity:1} }
+@keyframes jw-input-guide-progress-four { 0%,44%,58%,100%{opacity:0}45%,57%{opacity:1} }
+@keyframes jw-input-guide-progress-five { 0%,57%,100%{opacity:0}58%,97%{opacity:1} }
+@media(prefers-reduced-motion:reduce) {
+  .jw-super-input-guide__card, .jw-super-input-guide.is-closing .jw-super-input-guide__card, .jw-super-input-guide__complete, .jw-input-guide-demo *, .jw-input-guide-demo *::after { animation:none!important; }
+  .jw-input-guide-demo__track { transform:translateY(-73px); }
+  .jw-input-guide-demo__typed { clip-path:none; }
+  .jw-input-guide-demo__complete, .jw-input-guide-demo__missing { opacity:0; }
+  .jw-input-guide-demo__continue, .jw-input-guide-demo__answered, .jw-input-guide-demo__progress>span:nth-child(4)::after { opacity:1; }
+}
+
+/* A controller projection in the existing action row; no error-state card. */
+.jw-manual-pause-hidden { display:none!important; }
+.jw-manual-paused { display:flex; align-items:center; gap:8px; }
+.jw-manual-pause-resume { flex:1; min-height:44px; padding:0 16px; border:0; border-radius:999px; font:600 16px/20px var(--jobwizard-font-family,Inter,system-ui,sans-serif); cursor:pointer; }
+#autofill_detail .autofill_footer.jw-manual-paused { flex-wrap:nowrap; }
+/* Match the existing Autofill hover Stop surface in apply.css, keeping the
+   Resume action explicit instead of inheriting Stop's loading pseudo-label. */
+#autofill_detail .autofill_footer .autofill_button.jw-manual-pause-button,
+.jw-manual-pause-resume { display:flex; align-items:center; justify-content:center; gap:8px; min-width:0; min-height:44px; border:0; color:#fff; background:#d94f4f; font-size:16px; font-weight:600; letter-spacing:.02em; transition:background .1s ease; }
+#autofill_detail .autofill_footer .autofill_button.jw-manual-pause-button:hover,
+.jw-manual-pause-resume:hover { background:#e17272; }
+#autofill_detail .autofill_footer .autofill_button.jw-manual-pause-button:focus-visible,
+#autofill_detail .jw-application-action-dock .jw-manual-pause-resume:focus-visible { outline:2px solid #9f3434; outline-offset:3px; }
+#autofill_detail .autofill_footer .autofill_button.jw-manual-pause-button:active,
+.jw-manual-pause-resume:active { background:#c44040; }
+.jw-manual-resume-icon { display:block; flex:0 0 16px; width:16px; height:16px; color:inherit; }
+.jw-manual-pause-button>span,.jw-manual-pause-resume>span { white-space:nowrap; }
+.jw-manual-pause-guide button:focus-visible { outline:2px solid #1769f6; outline-offset:2px; }
+/* The same webpage-level surface as Super Apply. Only the card owns pointer
+   events; outside clicks pass through to the form and the sidebar actions. */
+.jw-super-intro.jw-manual-pause-guide { position:fixed; inset:0; padding:18px; pointer-events:none; background:rgba(22,35,58,.12); z-index:2147483647; box-sizing:border-box; }
+.jw-manual-pause-guide .jw-manual-pause-guide__card { pointer-events:auto; max-height:100%; min-height:0; display:flex; flex-direction:column; padding:42px 22px 20px; overflow:hidden; }
+.jw-manual-pause-guide__body { min-height:0; overflow:auto; }
+.jw-manual-pause-guide .jw-manual-pause-guide__card h2 { margin:18px 0 9px; font-size:22px; line-height:1.25; }
+.jw-manual-pause-guide .jw-manual-pause-guide__card p { margin:0 0 10px; font-size:13px; line-height:1.55; color:#62718a; }
+.jw-manual-pause-guide__close { z-index:1; width:28px; height:28px; line-height:24px; padding:0; }
+.jw-manual-pause-guide .jw-manual-pause-guide__got-it { display:flex; align-items:center; justify-content:center; text-align:center; flex:none; width:100%; min-height:42px; margin-top:10px; border:0; border-radius:999px; background:#1769f6; color:white; font:600 14px/20px var(--jobwizard-font-family,Inter,system-ui,sans-serif); cursor:pointer; }
+.jw-manual-pause-demo { border:1px solid #dfe7f4; border-radius:12px; background:#f7f9fe; overflow:hidden; }
+.jw-manual-pause-demo__stage { height:154px; }
+.jw-manual-pause-demo__sidebar { display:flex; flex-direction:column; height:100%; padding:8px 12px; min-width:0; background:#fff; }
+.jw-manual-pause-demo__heading { font-size:11px; line-height:16px; font-weight:650; color:#364c6d; margin-bottom:6px; white-space:nowrap; }
+.jw-manual-pause-demo__columns { display:flex; justify-content:space-between; font-size:7px; line-height:11px; color:#8896ab; border-bottom:1px solid #e8edf5; }
+.jw-manual-pause-demo__row { display:flex; justify-content:space-between; align-items:center; min-height:25px; border-bottom:1px solid #e8edf5; color:#3c506f; font-size:9px; line-height:11px; }
+.jw-manual-pause-demo__row small { display:block; font-size:7px; line-height:9px; color:#7b8ca4; }
+.jw-manual-pause-demo__row img { display:block; width:14px; height:14px; flex:none; }
+.jw-manual-pause-demo__states { display:grid; width:14px; height:14px; }
+.jw-manual-pause-demo__states>* { grid-area:1/1; font-weight:600; text-align:center; }
+.jw-manual-pause-demo__states .is-paused { animation:jw-manual-demo-paused 6s linear infinite; }
+.jw-manual-pause-demo__states .is-filling { opacity:0; animation:jw-manual-demo-filling 6s linear infinite; }
+.jw-manual-pause-demo__states .is-done { opacity:0; animation:jw-manual-demo-done 6s linear infinite; }
+.jw-manual-pause-demo__action { position:relative; height:26px; min-height:26px; margin-top:auto; }
+.jw-manual-pause-guide .jw-manual-pause-demo__resume,.jw-manual-pause-demo__working,.jw-manual-pause-demo__complete { position:absolute; inset:0; display:grid; place-items:center; border-radius:18px; text-align:center; white-space:nowrap; font-size:10px; font-weight:600; color:white; }
+.jw-manual-pause-guide .jw-manual-pause-demo__resume { background:#d94f4f; animation:jw-manual-demo-resume 6s linear infinite; }
+.jw-manual-pause-demo__working { background:#1769f6; opacity:0; animation:jw-manual-demo-filling 6s linear infinite; }
+.jw-manual-pause-demo__complete { background:#e1f1eb; color:#268565; opacity:0; animation:jw-manual-demo-done 6s linear infinite; }
+.jw-manual-pause-demo__pointer { position:absolute; width:14px; height:18px; right:10px; bottom:-5px; z-index:1; opacity:0; filter:drop-shadow(0 1px 1px #0002); animation:jw-manual-demo-pointer 6s cubic-bezier(.22,1,.36,1) infinite; }
+.jw-manual-pause-demo__pointer>svg { position:absolute; inset:0; width:100%; height:100%; }
+.jw-manual-pause-demo__arrow { animation:jw-manual-demo-arrow 6s linear infinite; }
+.jw-manual-pause-demo__hand { opacity:0; transform:translateX(-4px); animation:jw-manual-demo-hand 6s linear infinite; }
+.jw-manual-pause-demo__phases { display:grid; align-items:center; height:27px; text-align:center; font-size:9px; color:#6c7e98; }
+.jw-manual-pause-demo__phases>span { grid-area:1/1; opacity:0; }
+.jw-manual-pause-demo__phases .is-pause { animation:jw-manual-demo-pause-label 6s linear infinite; }
+.jw-manual-pause-demo__phases .is-resume { animation:jw-manual-demo-resume-label 6s linear infinite; }
+.jw-manual-pause-demo__phases .is-continue { animation:jw-manual-demo-continue-label 6s linear infinite; }
+.jw-manual-pause-demo__phases .is-finished { animation:jw-manual-demo-done 6s linear infinite; }
+.jw-manual-pause-demo__static { display:none; padding:7px 5px; text-align:center; font-size:9px; color:#62718a; }
+@keyframes jw-manual-demo-paused { 0%,26%,100%{opacity:1}29%,96%{opacity:0} }
+@keyframes jw-manual-demo-filling { 0%,27%,64%,100%{opacity:0}30%,61%{opacity:1} }
+@keyframes jw-manual-demo-done { 0%,63%,100%{opacity:0}66%,96%{opacity:1} }
+@keyframes jw-manual-demo-resume { 0%,18%,25%,100%{opacity:1;transform:scale(1)}20%,22%{opacity:1;transform:scale(.97)}29%,96%{opacity:0;transform:scale(1)} }
+/* Hold the paused state briefly, approach after 480ms, and click at 1.2s.
+   The hand's fingertip shares the arrow hotspot to avoid a visual jump. */
+@keyframes jw-manual-demo-arrow { 0%,14%,100%{opacity:1}15%,96%{opacity:0} }
+@keyframes jw-manual-demo-hand { 0%,14%,100%{opacity:0}15%,96%{opacity:1} }
+@keyframes jw-manual-demo-pointer { 0%,8%,34%,100%{opacity:0;transform:translate(12px,8px)}15%,18%,25%{opacity:1;transform:translate(0,0)}20%,22%{opacity:1;transform:translate(0,0) scale(.86)} }
+@keyframes jw-manual-demo-pause-label { 0%,9%,100%{opacity:1}12%,96%{opacity:0} }
+@keyframes jw-manual-demo-resume-label { 0%,9%,30%,100%{opacity:0}12%,27%{opacity:1} }
+@keyframes jw-manual-demo-continue-label { 0%,27%,64%,100%{opacity:0}30%,61%{opacity:1} }
+@media(prefers-reduced-motion:reduce) {
+  .jw-manual-pause-guide__card,.jw-manual-pause-demo * { animation:none!important; }
+  #autofill_detail .autofill_footer .autofill_button.jw-manual-pause-button,.jw-manual-pause-resume { transition:none; }
+  .jw-manual-pause-demo__pointer,.jw-manual-pause-demo__phases { display:none; }
+  .jw-manual-pause-demo__states .is-filling { display:none; }
+  .jw-manual-pause-demo__static { display:block; }
+}
+
+/* Reserve footer space in the same flex column as the scrolling inventory.
+   Its intrinsic minimum used to push the taller pause controls below the
+   viewport; only the question body should scroll while editing is paused. */
+#autofill_detail .main_content_warp .page_content.jw-manual-pause-page { overflow:hidden; }
+#autofill_detail .page_content.jw-manual-pause-page > .main_symbol { flex:0 0 auto; }
+#autofill_detail .page_content.jw-manual-pause-page > #apply_content { flex:1 1 auto; min-height:0; overflow:auto; }
+#autofill_detail .page_content.jw-manual-pause-page .question_list_wrapper { height:auto; padding-bottom:24px; }
+#autofill_detail .page_content.jw-manual-pause-page > .autofill_footer,
+#autofill_detail .page_content.jw-manual-pause-page > .jw-application-action-dock { flex:0 0 auto; }
+/* The controller-owned Paused surface replaces contradictory busy guidance. */
+#autofill_detail .page_content.jw-manual-pause-page .fill_status_result { display:none!important; }
+#autofill_detail .page_content.jw-manual-pause-page .autofill_setting { display:none; }
+
+/* Compact shared preference row. Its internal divs do not inherit the empty
+   page's high-specificity prose-span margins, alignment, or font sizes. */
+.jw-super-settings {
+  --toggle-dur:350ms; --toggle-travel:16px; --toggle-ov1:1px;
+  --toggle-ov2:0px; --toggle-track:150ms;
+  --toggle-ease:cubic-bezier(.34,1.35,.64,1);
+  width:100%; min-width:0; max-width:100%; margin-top:9px;
+  font:400 12px/1.4 var(--jobwizard-font-family,Inter,system-ui,sans-serif);
+  color:#53647e; box-sizing:border-box; text-align:left;
+}
+.jw-super-settings * { box-sizing:border-box; }
+.jw-super-settings__control {
+  position:relative; isolation:isolate; overflow:hidden; display:flex;
+  flex-direction:row; align-items:center; gap:10px; width:100%; min-height:62px;
+  margin:0; padding:10px 12px; border:1px solid #e5e9f0; border-radius:12px;
+  background:#fff; color:inherit; font:inherit; text-align:left; cursor:pointer;
+  transition:border-color 150ms ease,background-color 150ms ease,box-shadow 150ms ease;
+}
+.jw-super-settings__control:hover:not([aria-disabled="true"]) { border-color:#cdd2ec; background:#fafbff; }
+.jw-super-settings__control:focus-visible { outline:2px solid #6359ed; outline-offset:3px; }
+.jw-super-settings__control[aria-disabled="true"] { cursor:default; opacity:1; }
+.jw-super-settings__icon {
+  position:relative; z-index:1; display:grid; place-items:center; flex:0 0 30px;
+  width:30px; height:30px; border-radius:9px; color:#6964cc; background:#f0effc;
+}
+.jw-super-settings__icon svg { display:block; width:16px; height:16px; }
+.jw-super-settings__copy { position:relative; z-index:1; display:flex; flex:1; min-width:0; flex-direction:column; gap:3px; text-align:left; }
+.jw-super-settings__title { margin:0; font-size:12px; font-weight:650; line-height:17px; color:#35425b; text-align:left; }
+.jw-super-settings__hint { margin:0; font-size:11px; font-weight:400; line-height:15px; color:#8190a5; text-align:left; overflow-wrap:anywhere; }
+.jw-super-settings__track { position:relative; z-index:1; display:block; flex:0 0 36px; width:36px; height:20px; padding:3px; border-radius:20px; background:#d1d8e4; }
+.jw-super-settings__thumb { display:block; width:14px; height:14px; border-radius:50%; background:#fff; box-shadow:0 1px 3px #22345426; }
+.jw-super-settings[data-enabled="true"] .jw-super-settings__control { border-color:#dedbf3; background:#faf9ff; }
+.jw-super-settings[data-enabled="true"] .jw-super-settings__icon { background:#eeebff; color:#6354d3; }
+.jw-super-settings[data-enabled="true"] .jw-super-settings__track { background:linear-gradient(110deg,#377bdb,#7960e7); }
+.jw-super-settings__control::before {
+  content:""; position:absolute; inset:0; width:50%; opacity:0; pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.65),transparent);
+  transform:translateX(-120%) skewX(-15deg);
+}
+.jw-super-settings[data-enabled="true"] .jw-super-settings__control::before { animation:jw-settings-flow 6s ease-in-out infinite; }
+@keyframes jw-settings-flow { 0%,35%{opacity:0;transform:translateX(-120%) skewX(-15deg)} 45%{opacity:.65} 70%,100%{opacity:0;transform:translateX(320%) skewX(-15deg)} }
+.jw-super-settings__error { margin:5px 2px 0; font:400 10px/1.4 var(--jobwizard-font-family,Inter,system-ui,sans-serif); color:#a94351; text-align:left; }
+.jw-super-settings__error[hidden] { display:none; }
+
+/* transitions-dev toggle; semantic variables are local to our Shadow UI. */
+.t-toggle { transition: background var(--toggle-track) var(--toggle-ease); }
+.t-toggle-thumb { translate: 0 0; will-change: translate; }
+.t-toggle[data-on="true"] .t-toggle-thumb { translate: var(--toggle-travel) 0; }
+.t-toggle.is-init[data-on="true"] .t-toggle-thumb { animation: t-toggle-on var(--toggle-dur) var(--toggle-ease) both; }
+.t-toggle.is-init[data-on="false"] .t-toggle-thumb { animation: t-toggle-off var(--toggle-dur) var(--toggle-ease) both; }
+@keyframes t-toggle-on {
+  0% { translate: 0 0; }
+  55% { translate: calc(var(--toggle-travel) + var(--toggle-ov1)) 0; }
+  80% { translate: calc(var(--toggle-travel) - var(--toggle-ov2)) 0; }
+  100% { translate: var(--toggle-travel) 0; }
+}
+@keyframes t-toggle-off {
+  0% { translate: var(--toggle-travel) 0; }
+  55% { translate: calc(0px - var(--toggle-ov1)) 0; }
+  80% { translate: var(--toggle-ov2) 0; }
+  100% { translate: 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .t-toggle-thumb { animation: none !important; }
+  .jw-super-settings__control::before { animation:none!important; }
+  .jw-super-settings__control,.jw-super-settings__track { transition:none!important; }
+}
+/* The form keeps the same settings control as preparation and Review, with a
+   compact row above its question list. */
+.jw-super-settings[data-placement="form_inline"] { margin:0 0 20px; flex:0 0 auto; }
+.jw-super-settings[hidden] { display:none!important; }
+
+/* Inline settings are siblings of the content, so they need the same gutters. */
+#autofill_detail .jw-application-submit-settings-inline { box-sizing:border-box; width:100%; flex:0 0 auto; padding-inline:16px; }
+#autofill_detail .page_content:has(.jw-application-review) > .jw-application-submit-settings-inline { padding-inline:24px; }
+
+/* Native application settings stay separate from the answer summary. */
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__options { border-top:1px solid #e9edf1; padding:18px 0 21px; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__options[hidden] { display:none; }
+:is(.jw-application-review, #autofill_detail .jw-application-review) .jw-application-review__option + .jw-application-review__option { margin-top:14px; }
+
+/* Indeed native controls share the Auto submit setting presentation. */
+.jw-indeed-native-setting { margin-top: 8px; }

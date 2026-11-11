@@ -19,6 +19,7 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
   let initialized = false;
   let starting = false;
   let awaitingFrameLoad = false;
+  let chatEstablished = false;
   let frameEpoch = 0, closed = false;
   const readyWaiters = new Set();
   const wakeReadyWaiters = () => { for (const check of [...readyWaiters]) check(); };
@@ -77,7 +78,7 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
       if (epoch !== historyEpoch) return;
       historyState = state;
       if (state.currentUrl !== original || state.hasDraft || state.busy || !state.ready) return;
-      const target = selectedUrl === null ? globalThis.AiAgentChatHistory.target(state.urls, state.currentUrl, direction)
+      const target = selectedUrl === null ? globalThis.AiAgentChatHistory.target(state.urls, state.currentUrl, direction, state.pinnedUrls)
         : globalThis.AiAgentChatHistory.conversation(selectedUrl);
       if (!target || !state.urls.includes(target) || target === state.currentUrl) return;
       const result = await historyCommand('open', {target,currentUrl:state.currentUrl,
@@ -139,9 +140,9 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
   }
 
   function showState(state, text) {
+    connection.hidden = state === 'ready' || state === 'connected';
     if (connection.dataset.state === state && status.textContent === text) { wakeReadyWaiters(); return; }
     connection.dataset.state = state;
-    connection.hidden = state === 'ready';
     status.textContent = text;
     recovery.hidden = !['guest', 'slow', 'error'].includes(state);
     signIn.textContent = state === 'guest' ? 'Sign in to ChatGPT' : 'Open ChatGPT';
@@ -150,7 +151,8 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
 
   function probe() {
     if (!initialized || !nonce || awaitingFrameLoad) return;
-    frame.contentWindow?.postMessage({ channel: FRAME_CHANNEL, type: 'probe', nonce, fontScale: zoomPercent }, CHATGPT_ORIGIN);
+    const interactive = !document.getElementById('chat-view').hidden && !document.getElementById('chatgpt-pane').hidden;
+    frame.contentWindow?.postMessage({ channel: FRAME_CHANNEL, type: 'probe', nonce, fontScale: zoomPercent, interactive }, CHATGPT_ORIGIN);
   }
 
   function setZoom(percent) {
@@ -168,6 +170,7 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
     if (!target) return;
     rejectQueue('The ChatGPT frame navigated. Recover the recorded request before sending it again.');
     currentUrl = target;
+    chatEstablished = false;
     nonce = crypto.randomUUID();
     awaitingFrameLoad = true;
     frameEpoch++;
@@ -240,11 +243,14 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
           if (message.ok) {
             if (message.value.authState === 'signed-in') sessionConfirmed = true;
             if (message.value.authState === 'signed-out') {
+              chatEstablished = false;
               sessionConfirmed = false;
-              showState('guest', 'Sign in to ChatGPT in a tab, then reload the sidebar.');
-            } else if (message.value.authState && (message.value.composerPresent || message.value.authenticated)) {
               clearTimeout(watchdog);
-              showState('ready', 'ChatGPT is ready.');
+              showState('guest', 'Sign in to ChatGPT in a tab, then reload the sidebar.');
+            } else if (message.value.authState && (message.value.composerPresent || message.value.authenticated || message.value.authState === 'signed-in')) {
+              chatEstablished = true;
+              clearTimeout(watchdog);
+              showState(message.value.composerPresent ? 'ready' : 'connected', message.value.composerPresent ? 'ChatGPT is ready.' : 'ChatGPT is connected.');
             }
             if (['inspect', 'preflight'].includes(request.action)) {
               document.getElementById('runtime-adapter-build').textContent = message.value.buildId || 'Unknown';
@@ -269,17 +275,29 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
     if (message.guest || message.authState === 'signed-out') sessionConfirmed = false;
     else if (message.authState === 'signed-in') sessionConfirmed = true;
     toolbar.updateCurrent();
-    if (message.ready) {
+    if (message.guest || message.authState === 'signed-out') {
+      chatEstablished = false;
       clearTimeout(watchdog);
-      showState(message.guest ? 'guest' : 'ready', message.guest
-        ? 'Sign in to ChatGPT in a tab, then reload the sidebar.' : 'ChatGPT is ready.');
+      showState('guest', 'Sign in to ChatGPT in a tab, then reload the sidebar.');
+    } else if (message.ready) {
+      chatEstablished = true;
+      clearTimeout(watchdog);
+      showState('ready', 'ChatGPT is ready.');
+    } else if (message.authState === 'signed-in' || chatEstablished) {
+      // The current page can stay connected while its composer is temporarily
+      // absent or hidden. Do not turn a dock expansion into a new load notice.
+      chatEstablished = true;
+      clearTimeout(watchdog);
+      showState('connected', 'ChatGPT is connected.');
+    } else if (connection.dataset.state === 'loading') {
+      showState('loading', 'Waiting for ChatGPT’s message box…');
     }
     renderHistory();
     if (toolbar.isOpen()) void refreshHistory();
   });
 
   frame.addEventListener('load', () => {
-    if (!awaitingFrameLoad) frameEpoch++;
+    if (!awaitingFrameLoad) { frameEpoch++; chatEstablished = false; }
     rejectQueue('The ChatGPT page reloaded. Start the queue to reconcile the interrupted request.');
     awaitingFrameLoad = false;
     nonce = crypto.randomUUID();

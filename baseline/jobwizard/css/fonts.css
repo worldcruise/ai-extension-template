@@ -1,0 +1,113 @@
+/* 
+ * Font Loading for JobWizard Extension
+ * Using Inter (primary) and Geist (fallback) Variable Fonts
+ * License: SIL Open Font License (OFL) - Free for commercial use
+ * 
+ * Format: WOFF2 (Variable Font)
+ * 
+ * This file should be loaded FIRST before all other CSS files to ensure fonts are available.
+ * Fonts are loaded from local files (not URLs) to ensure consistent display across all users.
+ */
+
+/* ============================================
+   Inter - Primary Font (Variable Font)
+   ============================================
+   Modern, screen-optimized. Great for headings and UI text.
+   Used by GitHub, Figma, etc.
+   Weight range: 100-900
+   */
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('chrome-extension://__MSG_@@extension_id__/fonts/InterVariable.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('chrome-extension://__MSG_@@extension_id__/fonts/InterVariable-Italic.woff2') format('woff2');
+}
+
+/* ============================================
+   Geist - Fallback Font (Variable Font)
+   ============================================
+   Modern, clean, widely used in AI products (Vercel, OpenAI, etc.)
+   Weight range: 100-900
+   */
+
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('chrome-extension://__MSG_@@extension_id__/fonts/Geist[wght].woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('chrome-extension://__MSG_@@extension_id__/fonts/Geist-Italic[wght].woff2') format('woff2');
+}
+
+/* 
+ * Unified Font Family Variables
+ * 
+ * Font priority: Inter (primary) -> Geist (fallback) -> System fonts
+ * 
+ * Fallback chain explanation:
+ *   - 'Inter' - Primary font (loaded from extension)
+ *   - 'Geist' - Secondary font (fallback if Inter fails)
+ *   - system-ui - System's default UI font (macOS: SF Pro, Windows: Segoe UI, Android: Roboto)
+ *   - -apple-system, BlinkMacSystemFont - macOS/iOS system fonts
+ *   - 'Segoe UI' - Windows system font
+ *   - Roboto - Android/Chrome OS system font
+ *   - 'Helvetica Neue', Arial - Universal fallbacks
+ *   - sans-serif - Generic fallback (any sans-serif font)
+ * 
+ * These variables are defined in both :root (for page elements) and :host (for Shadow DOM)
+ * to ensure consistent font display across all contexts.
+ * 
+ * Usage in CSS:
+ *   font-family: var(--jobwizard-font-family);        // For UI and text
+ *   font-family: var(--jobwizard-font-mono);          // For code blocks
+ */
+:root {
+  --jobwizard-font-family: 'Inter', 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --jobwizard-font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+/* Shadow DOM support - :host selector for custom elements */
+:host {
+  --jobwizard-font-family: 'Inter', 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --jobwizard-font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+/* Apply to all JobWizard elements in Shadow DOM */
+#jobwizard-copilot-extension,
+#autofill_detail,
+.jobwizard-container,
+[class*="JobWizard_"] {
+  font-family: var(--jobwizard-font-family);
+}
+
+/* Apply to page elements (e.g., Answer it buttons, dropdowns) */
+.generate_setting-default,
+.generate_setting-hover,
+.generate_action,
+[class*="JobWizard_"] {
+  font-family: var(--jobwizard-font-family) !important;
+}
+
+/* Code blocks - Use system monospace fonts */
+#autofill_detail code,
+#autofill_detail pre,
+.chatbox_chatbot_answer code {
+  font-family: var(--jobwizard-font-mono);
+}

@@ -48,6 +48,47 @@ const input = () => ({ candidateId: 'morgan', profile: normalizeProfile(exampleP
   job: { company: 'Northstar', role: 'Platform Engineer', url: 'https://jobs.example.test/42', description: 'Build APIs using TypeScript and SQL.' },
   tailor: true, resumeTemplate: 'kakuna', promptTemplate: 'focused', prompt: 'Use supported profile facts.' });
 const expected = prompt => JSON.parse(prompt.split('\n\n').find(part => part.startsWith('{"schemaVersion":1,"requestId":')));
+test('a queued job can retain either provider conversation without sending or mixing runner URLs', async () => {
+  const fixture = setup({ manualOnly: true });
+  const { queue, sent } = fixture;
+  try {
+    await queue.ready;
+    const id = await queue.add(input());
+    await queue.connect(id, 'https://chatgpt.com/c/saved-job');
+    const deepseek = 'https://chat.deepseek.com/a/chat/s/11111111-1111-4111-8111-111111111111';
+    await queue.connect(id, deepseek + '?tracking=remove');
+    const request = queue.snapshot().requests.find(item => item.id === id);
+    assert.equal(request.manualChatUrl, deepseek);
+    assert.equal(request.sourceChatUrl, 'https://chatgpt.com/c/saved-job');
+    assert.equal(request.state, 'queued');
+    assert.deepEqual(sent, []);
+    await assert.rejects(queue.connect(id, 'https://unrelated.test/c/job'));
+    assert.equal((await fixture.store.read()).requests.find(item => item.id === id).manualChatUrl, deepseek);
+  } finally { queue.dispose(); }
+});
+
+test('manual documents complete a queued job without sending and reject stale, cancelled or invalid edits', async () => {
+  const { queue, store, sent } = setup({ manualOnly: true });
+  try {
+    await queue.ready;
+    const id = await queue.add(input());
+    const request = queue.snapshot().requests.find(item => item.id === id);
+    const resume = JSON.stringify(expected(buildResumePrompt(request, 'manual')).resume);
+    const fields = { resume, coverLetter: 'My reviewed cover letter.', coverLetterEnabled: true, expectedUpdatedAt: request.updatedAt };
+    await assert.rejects(queue.saveDocuments(id, { ...fields, resume: '{}' }));
+    assert.equal(queue.snapshot().requests.find(item => item.id === id).state, 'queued');
+    await queue.saveDocuments(id, fields);
+    const saved = (await store.read()).requests.find(item => item.id === id);
+    assert.equal(saved.state, 'ready'); assert.equal(saved.resume.company, 'Northstar');
+    assert.equal(saved.coverLetter, fields.coverLetter); assert.equal(saved.coverLetterEnabled, true);
+    assert.deepEqual(sent, []); assert.deepEqual(saved.attempts, request.attempts);
+    await store.change(state => { state.requests[0] = { ...state.requests[0], updatedAt: saved.updatedAt + 10 }; });
+    await assert.rejects(queue.saveDocuments(id, { ...fields, expectedUpdatedAt: saved.updatedAt }), /changed in another view/);
+    await queue.cancel(id);
+    await assert.rejects(queue.saveDocuments(id, fields), /no longer in the queue/);
+  } finally { queue.dispose(); }
+});
+
 function setup(options = {}) {
   const store = options.store || new MemoryStore(), locks = options.locks || new Locks(), journal = options.journal || new Journal();
   const sent = [], recovered = [];
@@ -148,6 +189,24 @@ test('duplicate checking rejects before creating a request, copying or granting 
   await fixture.queue.add(duplicate, { checkExisting: false });
   assert.equal(fixture.store.state.requests.length, 2, 'the explicit option can be turned off');
   fixture.queue.dispose();
+});
+
+test('one-click URL checks stay atomic even when optional company checking is off', async () => {
+  const store = new SerializedStore(), locks = new Locks();
+  const first = setup({ store, locks, manualOnly: true }), other = setup({ store, locks, manualOnly: true });
+  await Promise.all([first.queue.ready, other.queue.ready]);
+  try {
+    const tracked = input(); tracked.job.url += '/?utm_source=mail';
+    const outcomes = await Promise.allSettled([
+      first.queue.add(input(), { checkExistingUrl: true }),
+      other.queue.add(tracked, { checkExistingUrl: true })
+    ]);
+    assert.equal(outcomes.filter(item => item.status === 'fulfilled').length, 1);
+    assert.deepEqual(outcomes.find(item => item.status === 'rejected').reason.duplicate.matchedBy, ['url']);
+    assert.equal(store.state.requests.length, 1);
+    assert.equal(first.sent.length + other.sent.length, 0);
+    assert.deepEqual(store.state.requests[0].attempts, []);
+  } finally { first.queue.dispose(); other.queue.dispose(); }
 });
 
 test('duplicate checking uses the latest transactional records across panels and concurrent Adds', async () => {

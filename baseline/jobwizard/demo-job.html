@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>demo-job - JobWizard</title>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Merriweather:300,300italic,400,400italic,700,700italic,900,900italic%7CInter:100,200,300,regular,500,600,700,800,900,100italic,200italic,300italic,italic,500italic,600italic,700italic,800italic,900italic">
+    
+    <!-- Extension fonts CSS (will be loaded dynamically) -->
+    <style>
+      * {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+      }
+    </style>
+    
+    <!-- DemoHighlight.js styles (extracted from saved page) -->
+    <style>
+      .jw-demo-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(2px);
+        z-index: 2147483650;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 200ms ease-in-out;
+        font-family: "Helvetica Neue", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .jw-demo-overlay.jw-demo-show {
+        opacity: 1;
+      }
+
+      .jw-demo-overlay.jw-hide {
+        opacity: 0;
+      }
+
+      .jw-demo-modal {
+        width: 100%;
+        max-width: 750px;
+        width: min(750px, 92vw);
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
+      }
+
+      .jw-demo-modal-body {
+        display: flex;
+        gap: 40px;
+        align-items: center;
+      }
+
+      .jw-demo-overlay.jw-demo-show .jw-demo-modal {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .jw-demo-close {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        transition: background-color 150ms;
+        color: #64748b;
+        font-size: 20px;
+        line-height: 1;
+      }
+
+      .jw-demo-close:hover {
+        background-color: #f1f5f9;
+      }
+
+      .jw-demo-content {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .jw-demo-eyebrow {
+        font-size: 14px;
+        font-weight: 600;
+        color: #3b82f6;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 12px;
+      }
+
+      .jw-demo-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #0f172a;
+        line-height: 1.3;
+        margin-bottom: 16px;
+      }
+
+      .jw-demo-body {
+        font-size: 16px;
+        color: #475569;
+        line-height: 1.6;
+        margin-bottom: 24px;
+      }
+
+      .jw-demo-body p {
+        margin: 0 0 12px 0;
+      }
+
+      .jw-demo-body p:last-child {
+        margin-bottom: 0;
+      }
+
+      .jw-demo-illustration {
+        width: 380px;
+        flex-shrink: 0;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+      }
+
+      .jw-demo-illustration img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .jw-demo-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid #e2e8f0;
+      }
+
+      .jw-demo-step {
+        font-size: 14px;
+        color: #64748b;
+      }
+
+      .jw-demo-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .jw-demo-btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 150ms;
+        border: none;
+        font-family: inherit;
+      }
+
+      .jw-demo-btn-primary {
+        background: #0f172a;
+        color: white;
+      }
+
+      .jw-demo-btn-primary:hover {
+        background: #1e293b;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+      }
+
+      .jw-demo-btn-ghost {
+        background: transparent;
+        color: #64748b;
+      }
+
+      .jw-demo-btn-ghost:hover {
+        color: #0f172a;
+        background: #f1f5f9;
+      }
+
+      @media (max-width: 768px) {
+        .jw-demo-modal {
+          flex-direction: column;
+          padding: 32px 24px;
+          gap: 24px;
+        }
+
+        .jw-demo-illustration {
+          width: 100%;
+          max-width: 320px;
+        }
+
+        .jw-demo-title {
+          font-size: 24px;
+        }
+
+        .jw-demo-footer {
+          flex-direction: column;
+          gap: 16px;
+          align-items: flex-start;
+        }
+
+        .jw-demo-actions {
+          width: 100%;
+          flex-direction: column-reverse;
+        }
+
+        .jw-demo-btn {
+          width: 100%;
+        }
+      }
+    </style>
+    
+    <!-- Additional styles from original page -->
+    <style>.wf-force-outline-none[tabindex="-1"]:focus{outline:none;}</style>
+    <style>[data-ms-content='!members'],[data-ms-content='free-plans'],[data-ms-content='paid-plans'],[data-ms-content='!no-plans'],[data-ms-content='is-trialing'],[data-ms-content='has-failed-payment'],[data-ms-content='verified'],[data-ms-content='!has-password'],[data-ms-action='customer-portal'],[data-ms-action='return-to-checkout'] {display: none !important;}</style>
+
+    <!-- Persistent "sign up directly" banner (replaces the old "install" tip) -->
+    <style>
+      .jw-signup-banner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 16px 14px 18px;
+        margin-bottom: 20px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-left: 4px solid #3563c2;
+        border-radius: 12px;
+        box-shadow: 0 3px 12px rgba(15, 23, 42, 0.05);
+      }
+      .jw-signup-banner__left {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        min-width: 0;
+      }
+      .jw-signup-banner__icon {
+        flex-shrink: 0;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        background: #e8f0ff;
+      }
+      .jw-signup-banner__text h4 {
+        margin: 0 0 2px;
+        font-size: 15px;
+        font-weight: 700;
+        color: #0f172a;
+      }
+      .jw-signup-banner__text p {
+        margin: 0;
+        font-size: 12.5px;
+        color: #64748b;
+        line-height: 1.45;
+      }
+      .jw-signup-banner__cta {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        white-space: nowrap;
+        padding: 10px 20px;
+        border-radius: 9px;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+        text-decoration: none;
+        background: #3563c2;
+        transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+      }
+      .jw-signup-banner__cta .jw-arr {
+        transition: transform 0.18s ease;
+      }
+      .jw-signup-banner__cta:hover {
+        transform: translateY(-1px);
+        background: #2b53a8;
+        box-shadow: 0 5px 14px rgba(53, 99, 194, 0.3);
+      }
+      .jw-signup-banner__cta:hover .jw-arr {
+        transform: translateX(3px);
+      }
+      @media (max-width: 600px) {
+        .jw-signup-banner {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 12px;
+        }
+        .jw-signup-banner__cta {
+          justify-content: center;
+        }
+      }
+    </style>
+</head>
+<body>
+<section>
+  <div class="div-block-201">
+    <div class="w-embed">
+      <div class="jw-signup-banner">
+        <div class="jw-signup-banner__left">
+          <div class="jw-signup-banner__icon">🚀</div>
+          <div class="jw-signup-banner__text">
+            <h4>Want to skip the walkthrough? Sign up directly</h4>
+            <p>Create your free account anytime — you'll set up your profile in a quick onboarding right after.</p>
+          </div>
+        </div>
+        <a class="jw-signup-banner__cta" href="https://www.jobwizard.ai/signup" target="_blank" rel="noopener noreferrer">
+          Sign up free <span class="jw-arr">→</span>
+        </a>
+      </div>
+
+      <div style="max-width:720px;margin:40px auto 80px;padding:0 24px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#222;border:0;">
+
+        <!-- Brand Header (JobWizard) -->
+        <div style="display:flex;align-items:center;margin:0 0 20px;">
+          <img src="icons/logo.svg" alt="JobWizard" style="height:48px;width:auto;display:block;">
+        </div>
+
+        <!-- 顶部 Job 信息 -->
+        <h1 style="font-size:28px;font-weight:400;color:#3563c2;margin:0 0 4px;">
+          AI Product Manager (Demo Only)
+        </h1>
+        <div style="font-size:13px;color:#777;margin-bottom:18px;">
+          San Diego, CA
+        </div>
+
+        <p style="margin:0 0 10px;">
+          <strong>This is not a real job — it's a safe demo page for testing JobWizard 🚀.</strong>
+        </p>
+
+        <p style="margin:0 0 10px;">
+          Feel free to try autofill, long-answer generation, and insights. Nothing will be sent to any company.
+          JobWizard is your job-hunting buddy 🤝 — always ready to pop up when you need help.
+        </p>
+
+        <!-- JD 内容 -->
+        <h2 style="font-size:16px;font-weight:600;margin:20px 0 6px;color:#222;">
+          About the (Demo) Role
+        </h2>
+        <p style="margin:0 0 10px;">
+          We're "hiring" an AI Product Manager to help shape the future of JobWizard — purely for testing purposes 😉.
+          Use this section to explore how JobWizard reads job descriptions and assists your application flow.
+        </p>
+
+        <h2 style="font-size:16px;font-weight:600;margin:20px 0 6px;color:#222;">
+          What You'll Work On
+        </h2>
+        <ul style="margin:4px 0 14px 18px;padding:0;">
+          <li>Define product requirements and help shape the AI job-search experience</li>
+          <li>Collaborate with design, engineering, and users to refine features</li>
+          <li>Analyze user behavior and propose improvements to our workflow</li>
+          <li>Experiment with new AI-powered capabilities to improve job-seeking efficiency</li>
+        </ul>
+
+        <h2 style="font-size:16px;font-weight:600;margin:20px 0 6px;color:#222;">
+          What We're Looking For
+        </h2>
+        <ul style="margin:4px 0 14px 18px;padding:0;">
+          <li>Experience in product management or interest in building AI products</li>
+          <li>Strong problem-solving and user-centric thinking</li>
+          <li>Ability to break down workflows and define clear product requirements</li>
+          <li>Curiosity about job-search tooling, automation, and user experience</li>
+        </ul>
+
+        <p style="margin:0 0 10px;">
+          Again, this is <strong>not a real role</strong> — just a sandbox to help you practice using JobWizard's features.
+          Try anything you want. Nothing you enter here will go anywhere. 🎯
+        </p>
+
+        <hr style="border:none;border-top:1px solid #e0e0e0;margin:24px 0;">
+
+        <!-- Apply 表单 -->
+        <h2 style="font-size:20px;font-weight:400;color:#3563c2;margin:0 0 4px;">
+          Apply for this job
+        </h2>
+        <div style="font-size:13px;color:#777;margin-bottom:18px;">
+          <span style="color:#e53935;">*</span> indicates a required field
+        </div>
+
+        <form id="application-form">
+
+          <div class="jw-objective-question-container">
+            <div style="margin-bottom:16px;">
+              <label for="first_name" style="display:block;font-size:13px;font-weight:600;margin:0 0 4px;">
+                First Name <span style="color:#e53935;">*</span>
+              </label>
+              <input type="text" name="first_name" id="first_name" required style="width:100%;box-sizing:border-box;padding:9px 10px;border-radius:3px;border:1px solid #d0d0d0;font-size:14px;font-family:inherit;">
+            </div>
+
+            <div style="margin-bottom:16px;">
+              <label for="last_name" style="display:block;font-size:13px;font-weight:600;margin:0 0 4px;">
+                Last Name <span style="color:#e53935;">*</span>
+              </label>
+              <input type="text" name="last_name" id="last_name" required style="width:100%;box-sizing:border-box;padding:9px 10px;border-radius:3px;border:1px solid #d0d0d0;font-size:14px;font-family:inherit;">
+            </div>
+
+            <div style="margin-bottom:16px;">
+              <label for="email" style="display:block;font-size:13px;font-weight:600;margin:0 0 4px;">
+                Email <span style="color:#e53935;">*</span>
+              </label>
+              <input type="email" name="email" id="email" required style="width:100%;box-sizing:border-box;padding:9px 10px;border-radius:3px;border:1px solid #d0d0d0;font-size:14px;font-family:inherit;">
+            </div>
+
+            <div style="margin-bottom:16px;">
+              <label for="phone" style="display:block;font-size:13px;font-weight:600;margin:0 0 4px;">
+                Phone
+              </label>
+              <input type="tel" name="phone" id="phone" style="width:100%;box-sizing:border-box;padding:9px 10px;border-radius:3px;border:1px solid #d0d0d0;font-size:14px;font-family:inherit;">
+            </div>
+
+            <div style="margin-bottom:16px;">
+              <label for="linkedin" style="display:block;font-size:13px;font-weight:600;margin:0 0 4px;">
+                LinkedIn Profile
+              </label>
+              <input type="url" name="linkedin" id="linkedin" style="width:100%;box-sizing:border-box;padding:9px 10px;border-radius:3px;border:1px solid #d0d0d0;font-size:14px;font-family:inherit;">
+            </div>
+          </div>
+
+          <div class="jw-question-container" style="margin-bottom: 16px; position: relative;">
+            <label for="why_good_fit" style="display:block;font-size:13px;font-weight:600;margin:0 0 4px;">
+              Why are you a good fit for this role?
+            </label>
+            <textarea name="why_good_fit" id="why_good_fit" style="width:100%;box-sizing:border-box;padding:9px 10px;border-radius:3px;border:1px solid #d0d0d0;font-size:14px;font-family:inherit;min-height:110px;resize:vertical;"></textarea>
+          </div>
+
+          <div style="margin-top:20px;text-align:right;">
+            <button type="submit" style="border:none;border-radius:20px;padding:9px 22px;font-size:14px;font-weight:500;background-color:#3563c2;color:#ffffff;cursor:pointer;">
+              Submit application
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Load all extension scripts via loader -->
+<!-- Using relative path since we're in chrome-extension:// context -->
+<script src="js/demo-job-loader.js"></script>
+</body>
+</html>

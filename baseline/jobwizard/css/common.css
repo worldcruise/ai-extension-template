@@ -1,0 +1,4904 @@
+careerdog-autofiller {
+  visibility: visible !important;
+}
+
+/* Customized elements we added into the page - START */
+
+/* For boards.greenhouse */
+.JobWizard_quickApplytoboardslistpage {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  /* Adapt to this case: https://boards.greenhouse.io/embed/job_board?for=databricks
+     Maybe we need to make this container a block element
+  */
+}
+
+.JobWizard_quickApplyButton_boardslistpage {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 4px;
+  border: none;
+  background: #06f;
+  color: #fff;
+  gap: 8px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.JobWizard_quickApplyButton_boardslistpage img {
+  width: 12px;
+  height: 12px;
+}
+
+.JobWizard_quickApplyButton_boardslistpage:hover {
+  background-color: #0056b3;
+  transition: background-color 0.2s ease;
+}
+
+.JobWizard_quickApplytojobboardslistpage {
+  position: relative;
+}
+
+.JobWizard_quickApplytojobboardslistpage .JobWizard_quickApplyButton_jobboardslistpage {
+  position: absolute;
+  left: calc(100% + 30px);
+  top: 50%;
+  width: fit-content;
+  transform: translateY(-50%);
+}
+
+@keyframes highlightFade {
+  0% {
+    background-color: rgba(255, 255, 0, 0.5);
+  }
+
+  25% {
+    background-color: rgba(255, 255, 0, 0.4);
+  }
+
+  50% {
+    background-color: rgba(255, 255, 0, 0.25);
+  }
+
+  75% {
+    background-color: rgba(255, 255, 0, 0.1);
+  }
+
+  100% {
+    background-color: transparent;
+  }
+}
+
+.JobWizard_jobPublishInfo {
+  display: inline-block;
+  /* animation: highlightFade 2.5s ease-out; */
+  padding: 0 2px;
+  border-radius: 6px;
+  background: rgba(243, 243, 243, 0.849);
+}
+
+.JobWizard_jobPublishInfo--very-recent {
+  color: #08863c;
+  /* Darker green for very recent posts */
+  color: rgb(9, 76, 177);
+  /* Darker green for very recent posts */
+  font-weight: 650;
+}
+
+.JobWizard_jobPublishInfo--recent {
+  color: #1b9d51;
+  /* Original green for recent posts */
+  color: #0059de;
+  font-weight: 550;
+}
+
+.JobWizard_jobPublishInfo--old {
+  /* TODO: Uncomment when ready to implement old post styling
+  color: #e74c3c; /* Red for old posts */
+  font-weight: 600;
+}
+
+/* Ensure the container maintains full width */
+.JobWizard_quickApplytojobboardslistpage {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* Ensure table cell maintains full width */
+.job-post .cell {
+  width: 100%;
+}
+
+.JobWizard_quickApplyButton_jobboardslistpage {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 4px;
+  border: none;
+  background: #06f;
+  color: #fff;
+  gap: 8px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.JobWizard_quickApplyButton_jobboardslistpage img {
+  width: 12px;
+  height: 12px;
+}
+
+.JobWizard_quickApplyButton_jobboardslistpage:hover {
+  background-color: #0056b3;
+  transition: background-color 0.2s ease;
+}
+
+/* For LinkedIn */
+.JobWizard_quickApply {
+  /* Hide for now */
+  display: none;
+  /* display: flex; */
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: var(--jobwizard-font-family);
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin-left: 8px;
+  border-radius: 30px;
+  background: #06f;
+  color: #fff;
+  cursor: pointer;
+}
+
+.JobWizard_quickApply:hover {
+  background-color: #0056b3;
+}
+
+.JobWizard_LinkedIn_quickActions_container {
+  display: flex;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--jobwizard-font-family);
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  border-radius: 30px;
+  background: linear-gradient(145deg, rgb(51 147 255), rgb(0 68 174));
+  color: #fff;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 102, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 102, 255, 0.5);
+  transition: all 0.3s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.JobWizard_LinkedIn_quickActions_container:hover {
+  background: linear-gradient(145deg, #0088ff, #0066ff);
+  box-shadow: 0 4px 15px rgba(0, 102, 255, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.JobWizard_LinkedIn_quickActions_container:active {
+  background: linear-gradient(145deg, #0066ff, #0055e6);
+  box-shadow: 0 1px 5px rgba(0, 102, 255, 0.2),
+    inset 0 1px 3px rgba(0, 0, 0, 0.2);
+  transform: translateY(1px);
+}
+
+.JobWizard_LinkedIn_quickActions_container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.6) 50%,
+      rgba(255, 255, 255, 0) 100%);
+  transform: skewX(30deg);
+  animation: shineEffect 3s infinite;
+}
+.easy_apply_link.JobWizard_LinkedIn_quickActions_container{
+  text-decoration: none;
+  color: #fff;
+  cursor: pointer;
+  margin-left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.easy_apply_link.JobWizard_LinkedIn_quickActions_container:hover{
+  text-decoration: none;
+  color: #fff;
+  cursor: pointer;
+}
+.easy_apply_link.JobWizard_LinkedIn_quickActions_container img{
+  width: 22px;
+  height: 22px;
+}
+.easy_apply_link.JobWizard_LinkedIn_quickActions_container span{
+  text-wrap: nowrap;
+}
+/* Customized elements we added into the page - END */
+
+#autofill_detail {
+  line-height: normal;
+}
+
+#autofill_detail .main_symbol {
+  padding: 24px 20px;
+  position: sticky;
+  top: 0;
+  background-color: rgb(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 999;
+  /* margin-bottom: 6px; */
+  /* border-bottom: 1px solid #f8f8f8; */
+}
+
+#autofill_detail .main_symbol img {
+  width: 36px;
+  height: 36px;
+  user-select: none;
+}
+
+#autofill_detail .main_symbol_title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #202223;
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  line-height: 28px;
+}
+
+#autofill_detail .main_symbol_title i {
+  background: url("../icons/dropDown.svg") no-repeat;
+  width: 18px;
+  height: 18px;
+  transition: 0.5s;
+}
+
+#autofill_detail .main_symbol_title .main_symbol_heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+#autofill_detail .main_symbol_title .main_symbol_actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+#autofill_detail .main_symbol_title .main_symbol_logo {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+#autofill_detail .main_symbol_title .main_symbol_text {
+  display: inline-block;
+}
+
+#autofill_detail .main_symbol_title i.active {
+  transform: rotate(180deg);
+}
+
+#autofill_detail .main_symbol .des {
+  padding: 14px;
+  border-radius: 11px;
+  background: #f6f6f6;
+  color: #bababa;
+  font-size: 13px;
+  font-weight: 400;
+  margin-top: 16px;
+  display: none;
+}
+
+#autofill_detail .beta_tag {
+  font-size: 12px;
+  color: #0066ff;
+  background-color: #0066ff1a;
+  padding: 2px 10px;
+  line-height: 16px;
+  border-radius: 4px;
+}
+
+#autofill_detail h3.title {
+  color: #000;
+  font-size: 18px;
+  font-weight: 700;
+  position: relative;
+  padding-left: 10px;
+  /* 在https://jobs.unops.org/Pages/ViewVacancy/VADetails.aspx?id=29180 发现了r和q的显示问题，错误地居中了，所以这里需要flex进行尝试修复 */
+  display: flex;
+  text-align: left;
+}
+
+#autofill_detail h3.title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 14px;
+  background: #06f;
+}
+
+/* error page */
+/* error_page 在所有 main page 中需要占满整个 page_content（减去 header 76px） */
+#autofill_detail .main_content_warp .page_content .error_page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 76px;
+  height: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 20px;
+}
+
+#autofill_detail .error_page.hide {
+  display: none !important;
+}
+
+#autofill_detail .error_page .error_wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#autofill_detail .error_page .error_wrap img {
+  width: 256px;
+  height: 288px;
+}
+
+#autofill_detail .error_page .error_wrap h1 {
+  margin-top: 36px;
+  margin-bottom: 12px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+#autofill_detail .error_page .error_wrap span {
+  color: #a8a8a8;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+/* 统一 error_page 按钮容器样式 - 纵向排列 */
+#autofill_detail .error_page .error_wrap .error_actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+  width: 100%;
+}
+
+/* 主按钮 - 蓝色 */
+#autofill_detail .error_page .error_wrap .manuallyJD {
+  display: flex;
+  min-width: 140px;
+  width: auto;
+  padding: 10px 20px;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  border-radius: 6px;
+  border: 0.782px solid rgba(0, 0, 0, 0.12);
+  background: #06f;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  margin: 0;
+}
+
+#autofill_detail .error_page .error_wrap .manuallyJD:hover {
+  background: #1d4ed8;
+}
+
+/* 次要按钮 - 白色 */
+#autofill_detail .error_page .error_wrap .retryCurrentPage {
+  display: flex;
+  min-width: 140px;
+  width: auto;
+  padding: 10px 20px;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  border-radius: 6px;
+  border: 1px solid #e4e4e7;
+  background: #fff;
+  color: #09090b;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  margin: 0;
+}
+
+#autofill_detail .error_page .error_wrap .retryCurrentPage img{
+  width: 16px;
+  height: 16px;
+}
+
+#autofill_detail .error_page .error_wrap .retryCurrentPage:hover {
+  background: #f4f4f5;
+}
+
+/* 最弱按钮 - 纯文本 */
+#autofill_detail .error_page .error_wrap .analyzeCurrentPage {
+  cursor: pointer;
+  color: #a8a8a8;
+  text-align: center;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+  margin: 0;
+}
+
+#autofill_detail .error_page .error_wrap .analyzeCurrentPage:hover {
+  color: #7b7b7c;
+}
+
+#autofill_detail #toast_alert {
+  position: absolute;
+  width: 100%;
+  z-index: 9999;
+  bottom: 50px;
+  display: flex;
+  justify-content: center;
+}
+
+#autofill_detail #toast_alert .msg {
+  background-color: #00000096;
+  color: white;
+  text-align: center;
+  padding: 5px 10px 5px 10px;
+  max-width: 80%;
+  font-size: 14px;
+  border-radius: 5px;
+  line-height: 26px;
+  opacity: 0;
+  display: none;
+}
+
+/* manually jd modal */
+/* ============================================
+   jd_manually_modal — Archetype B (Conversation), P0-5
+   (2026-05-19) Single emoji anchor + action-verb hero + soft textarea
+   + single primary CTA gated on 150 words. Preserves JS contract:
+   .jd_manually_modal.show / .mask / .jd_manually_header .close /
+   .jd_manually_content textarea / .jd_manually_content .word_count /
+   .jd_manually_footer .analyze.active — all handlers in main.js:9574-9668
+   unchanged.
+   ============================================ */
+#autofill_detail .jd_manually_modal {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  display: none;
+}
+#autofill_detail .jd_manually_modal.show {
+  display: flex;
+  animation: jd-manually-modal-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes jd-manually-modal-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+#autofill_detail .jd_manually_modal .mask {
+  position: absolute;
+  top: 0; left: 0;
+  z-index: 9;
+  width: 100%; height: 100%;
+  background: rgba(8, 10, 14, 0.42);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+#autofill_detail .jd_manually_modal .jd_manually_wrap {
+  position: relative;
+  z-index: 999;
+  box-sizing: border-box;
+  width: 340px;
+  max-width: calc(100vw - 24px);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #ffffff;
+  padding: 22px 22px 18px;
+  border-radius: 16px;
+  box-shadow:
+    0 24px 60px rgba(8, 10, 14, 0.18),
+    0 4px 12px rgba(8, 10, 14, 0.08);
+  animation: jd-manually-wrap-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes jd-manually-wrap-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Header: hero block on the left, soft close button top-right. */
+#autofill_detail .jd_manually_modal .jd_manually_header {
+  position: relative;
+}
+#autofill_detail .jd_manually_modal .jd_manually_header .jd_manually_hero {
+  display: block;
+  padding-right: 28px;
+}
+#autofill_detail .jd_manually_modal .jd_manually_header .jd_manually_hero_emoji {
+  display: block;
+  width: fit-content;
+  font-size: 30px;
+  line-height: 1;
+  margin: 2px 0 10px;
+  filter: drop-shadow(0 2px 6px rgba(15, 17, 21, 0.08));
+  /* High-frequency modal; match the wrap fade-in curve instead of overshoot bounce. */
+  animation: jd-manually-emoji-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: center bottom;
+}
+@keyframes jd-manually-emoji-in {
+  from { opacity: 0; transform: scale(0.85) translateY(4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+#autofill_detail .jd_manually_modal .jd_manually_header h1 {
+  margin: 0 0 6px;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  color: #0b0d10;
+}
+#autofill_detail .jd_manually_modal .jd_manually_header span {
+  display: block;
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.55;
+  color: rgba(75, 85, 99, 0.92);
+}
+/* Soft circular close button. JS still binds on `.close` so class is preserved.
+   <button.close>×</button> replaces the old <i.close> background-image element. */
+#autofill_detail .jd_manually_modal .jd_manually_header button.close {
+  position: absolute;
+  top: -4px; right: -4px;
+  width: 26px; height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: rgba(15, 17, 21, 0.04);
+  color: rgba(75, 85, 99, 0.85);
+  font-size: 20px;
+  line-height: 1;
+  border: 1px solid rgba(15, 17, 21, 0.06);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease, transform .22s ease;
+}
+#autofill_detail .jd_manually_modal .jd_manually_header button.close:hover {
+  background: rgba(15, 17, 21, 0.08);
+  color: #0b0d10;
+  transform: rotate(90deg);
+}
+/* SHIM: remove after 2026-06-15 once all extension instances have updated.
+   Legacy <i.close> background-image — superseded by <button.close> above. */
+#autofill_detail .jd_manually_modal .jd_manually_header i.close {
+  width: 24px; height: 24px;
+  background: url(../icons/close_icon.svg) no-repeat center/24px;
+  cursor: pointer;
+  display: inline-block;
+  position: absolute;
+  right: 0; top: 0;
+}
+
+#autofill_detail .jd_manually_modal .jd_manually_content {
+  position: relative;
+  margin: 16px 0 6px;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+}
+#autofill_detail .jd_manually_modal .jd_manually_content textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 150px;
+  max-height: 280px;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #0b0d10;
+  background: #ffffff;
+  border: 1px solid rgba(15, 17, 21, 0.14);
+  border-radius: 10px;
+  resize: vertical;
+  outline: none;
+  transition: border-color .22s ease, box-shadow .22s ease;
+}
+#autofill_detail .jd_manually_modal .jd_manually_content textarea:focus {
+  border-color: #0066ff;
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.10);
+}
+#autofill_detail .jd_manually_modal .jd_manually_content textarea::placeholder {
+  color: #9aa3af;
+}
+#autofill_detail .jd_manually_modal .jd_manually_content .word_count {
+  display: block;
+  width: fit-content;
+  margin: 8px 2px 0 auto;
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.005em;
+  color: rgba(107, 114, 128, 0.85);
+  position: static;
+  left: auto;
+  bottom: auto;
+}
+
+#autofill_detail .jd_manually_modal .jd_manually_footer {
+  margin-top: 14px;
+}
+#autofill_detail .jd_manually_modal .jd_manually_footer .analyze {
+  display: flex;
+  width: 100%;
+  height: 42px;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  background: rgba(15, 17, 21, 0.08);
+  color: rgba(75, 85, 99, 0.7);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  cursor: not-allowed;
+  transition: background .22s ease, color .22s ease,
+              box-shadow .22s ease, transform .12s ease, filter .22s ease;
+}
+#autofill_detail .jd_manually_modal .jd_manually_footer .analyze.active {
+  background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 102, 255, 0.22),
+              0 1px 2px rgba(0, 102, 255, 0.18);
+}
+#autofill_detail .jd_manually_modal .jd_manually_footer .analyze.active:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 6px 18px rgba(0, 102, 255, 0.28),
+              0 2px 4px rgba(0, 102, 255, 0.20);
+}
+#autofill_detail .jd_manually_modal .jd_manually_footer .analyze.active:active {
+  transform: scale(0.985);
+}
+
+#autofill_detail .coverletter_aciton_wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Common Modal CSS - START */
+/* #autofill_detail .confirm-modal {
+  position: absolute;
+  z-index: 99999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}   */
+
+#autofill_detail .common-modal {
+  position: absolute;
+  z-index: 99999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#autofill_detail .modal-content {
+  position: relative;
+  background-color: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  max-width: 320px;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+}
+
+#autofill_detail .modal-content .modal-img {
+  font-size: 32px;
+}
+
+#autofill_detail .modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  color: #a6a6a6;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  outline: none;
+  transition: color 0.2s, background-color 0.2s, box-shadow 0.2s;
+  position: absolute;
+  top: 6px;
+  right: 12px;
+}
+
+#autofill_detail .modal-close:hover {
+  color: #333;
+  background-color: rgba(15, 23, 42, 0.06);
+}
+
+#autofill_detail .modal-close:focus-visible {
+  color: #334155;
+  background-color: rgba(15, 23, 42, 0.08);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+}
+
+#autofill_detail .modal-header {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+  font-family: var(--jobwizard-font-family);
+}
+
+
+#autofill_detail .modal-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #202223;
+}
+
+#autofill_detail .modal-body {
+  font-size: 14px;
+  color: #4b5563;
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+
+#autofill_detail .modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 6px;
+}
+
+#autofill_detail .modal-actions .modal-button {
+  font-size: 14px;
+  padding: 10px 15px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+#autofill_detail .modal-actions .cancel {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+#autofill_detail .modal-actions .cancel:hover {
+  background-color: #f0f0f0;
+  color: #000;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+#autofill_detail .modal-actions .confirm {
+  background-color: #0066ff;
+  color: #fff;
+  cursor: pointer;
+}
+
+#autofill_detail .modal-actions .confirm:hover {
+  background-color: #0048b5;
+  color: #fff;
+  cursor: pointer;
+}
+
+#autofill_detail .modal-actions .confirm.danger {
+  background-color: #dc2626;
+  color: #fff;
+}
+
+#autofill_detail .modal-actions .confirm.danger:hover {
+  background-color: #b91c1c;
+  color: #fff;
+}
+
+#autofill_detail .modal-actions .second {
+  background-color: #fff;
+  border: 1px solid #06f;
+  color: #06f;
+  cursor: pointer;
+}
+
+#autofill_detail .modal-actions .second:hover {
+  background-color: rgba(0, 102, 255, 0.1);
+  color: #06f;
+  cursor: pointer;
+}
+
+#autofill_detail .feedback-modal-description {
+  font-size: 12px;
+  color: #4b5563;
+  text-align: center;
+}
+
+/* 反馈选项按钮 */
+#autofill_detail .feedback-options-header {
+  font-size: 12px;
+  color: #374151;
+  font-weight: 500;
+  margin-top: 14px;
+}
+
+#autofill_detail .feedback-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 8px;
+  justify-content: flex-start;
+  margin: 12px 0 16px;
+}
+
+#autofill_detail .feedback-option-btn {
+  background: #f3f4f6;
+  color: #374151;
+  border-radius: 20px;
+  padding: 5px 15px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  outline: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid #e5e7eb;
+}
+
+#autofill_detail .feedback-option-btn:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+#autofill_detail .feedback-option-btn.selected {
+  background: #e6f0ff;
+  color: #1d4ed8;
+  font-weight: 500;
+  border: 1px solid #93c5fd;
+}
+
+#autofill_detail .feedback-option-icon {
+  display: none;
+  width: 12px;
+  height: 12px;
+}
+
+#autofill_detail .feedback-option-btn.selected .feedback-option-icon {
+  display: block;
+}
+
+/* 媒体文件上传区 - 支持图片和视频 */
+#autofill_detail .feedback-media {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+#autofill_detail .feedback-media-wrap {
+  position: relative;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+#autofill_detail .feedback-media-wrap img,
+#autofill_detail .feedback-media-wrap video {
+  width: 42px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+
+/* 视频特殊样式 */
+#autofill_detail .feedback-media-wrap video {
+  background: #000;
+}
+
+#autofill_detail .feedback-media-remove {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  color: #888;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 0.2s, color 0.2s;
+}
+
+#autofill_detail .feedback-media-remove:hover {
+  background: #f5f5f5;
+  color: #d32f2f;
+}
+
+#autofill_detail .feedback-media-add {
+  display: inline-block;
+  cursor: pointer;
+}
+
+#autofill_detail .feedback-media-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #fafbfc;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+#autofill_detail .feedback-media-wrapper:hover {
+  background: #f3f4f6;
+}
+
+#autofill_detail .feedback-media-icon {
+  width: 16px;
+  height: 16px;
+}
+
+#autofill_detail .feedback-media-text {
+  font-size: 14px;
+  color: #374151;
+}
+
+/* 保持向后兼容 - 图片上传区 */
+#autofill_detail .feedback-images {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+#autofill_detail .feedback-image-wrap {
+  position: relative;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+#autofill_detail .feedback-image-wrap img {
+  width: 42px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+
+#autofill_detail .feedback-image-remove {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  color: #888;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 0.2s, color 0.2s;
+}
+
+#autofill_detail .feedback-image-remove:hover {
+  background: #f5f5f5;
+  color: #d32f2f;
+}
+
+#autofill_detail .feedback-image-add {
+  display: inline-block;
+  cursor: pointer;
+}
+
+#autofill_detail .feedback-image-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #fafbfc;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+#autofill_detail .feedback-image-wrapper:hover {
+  background: #f3f4f6;
+}
+
+#autofill_detail .feedback-image-icon {
+  width: 16px;
+  height: 16px;
+}
+
+#autofill_detail .feedback-image-text {
+  font-size: 14px;
+  color: #374151;
+}
+
+/* 其他问题输入框 */
+#autofill_detail #report-note {
+  width: 100%;
+  font-size: 12px;
+  line-height: 1.4;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  resize: vertical;
+  min-height: 60px;
+  box-sizing: border-box;
+}
+
+#autofill_detail .feedback-unvalid-content {
+  display: none;
+  font-size: 12px;
+  color: #d32f2f;
+  margin-top: 6px;
+}
+
+/* Common Modal CSS - END */
+
+/* loader  */
+#autofill_detail .loader {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 80%;
+  align-items: center;
+  justify-content: center;
+}
+
+#autofill_detail .loader.hide {
+  display: none;
+}
+
+#autofill_detail .loader .line-scale div {
+  background-color: #06f;
+  width: 4px;
+  height: 35px;
+  border-radius: 2px;
+  margin: 2px;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+  display: inline-block;
+}
+
+#autofill_detail .loader .line-scale div:nth-child(1) {
+  -webkit-animation: line-scale 1s -0.4s infinite cubic-bezier(0.2, 0.68, 0.18, 1.08);
+  animation: line-scale 1s -0.4s infinite cubic-bezier(0.2, 0.68, 0.18, 1.08);
+}
+
+#autofill_detail .loader .line-scale div:nth-child(2) {
+  -webkit-animation: line-scale 1s -0.3s infinite cubic-bezier(0.2, 0.68, 0.18, 1.08);
+  animation: line-scale 1s -0.3s infinite cubic-bezier(0.2, 0.68, 0.18, 1.08);
+}
+
+#autofill_detail .loader .line-scale div:nth-child(3) {
+  -webkit-animation: line-scale 1s -0.2s infinite cubic-bezier(0.2, 0.68, 0.18, 1.08);
+  animation: line-scale 1s -0.2s infinite cubic-bezier(0.2, 0.68, 0.18, 1.08);
+}
+
+#autofill_detail .loader .line-scale div:nth-child(4) {
+  -webkit-animation: line-scale 1s -0.1s infinite cubic-bezier(0.2, 0.68, 0.18, 1.08);
+  animation: line-scale 1s -0.1s infinite cubic-bezier(0.2, 0.68, 0.18, 1.08);
+}
+
+#autofill_detail .loader .line-scale div:nth-child(5) {
+  -webkit-animation: line-scale 1s 0s infinite cubic-bezier(0.2, 0.68, 0.18, 1.08);
+  animation: line-scale 1s 0s infinite cubic-bezier(0.2, 0.68, 0.18, 1.08);
+}
+
+#autofill_detail .keywords_detail_copy.hide {
+  display: none;
+}
+
+#autofill_detail .copy.hide {
+  display: none;
+}
+
+@keyframes line-scale {
+  0% {
+    -webkit-transform: scaley(1);
+    transform: scaley(1);
+  }
+
+  50% {
+    -webkit-transform: scaley(0.4);
+    transform: scaley(0.4);
+  }
+
+  100% {
+    -webkit-transform: scaley(1);
+    transform: scaley(1);
+  }
+}
+
+/* Start Mini Popup Modal CSS */
+.mini_plugin_warp {
+  z-index: 99999;
+  position: fixed;
+  height: 52px;
+  right: -20px;
+  bottom: 350px;
+  transition: right 0.2s;
+  display: none;
+  box-shadow: 0px 2px 11px rgba(0, 0, 0, 0.12);
+  border-radius: 8px 0px 0px 8px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* Elastic pop when the squeezed panel snaps into the bubble. Uses the
+   individual `scale` property so it composes with .disabled's
+   transform: scale(0.8) instead of overriding it. */
+.mini_plugin_warp.jw_mini_bubble_pop {
+  transform-origin: right center;
+  animation: jw_mini_bubble_pop 0.42s ease-out;
+}
+
+@keyframes jw_mini_bubble_pop {
+  0% {
+    scale: 0.5;
+    opacity: 0.5;
+  }
+  55% {
+    scale: 1.06;
+    opacity: 1;
+  }
+  78% {
+    scale: 0.98;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mini_plugin_warp.jw_mini_bubble_pop {
+    animation: none;
+  }
+}
+
+.mini_plugin_warp.disabled {
+  transform: scale(0.8);
+  right: -24px;
+  /* transform: scale(1); */
+}
+
+.mini_plugin_warp.disabled img {
+  filter: gray;
+  filter: grayscale(100%);
+}
+
+.mini_plugin_warp:hover:not(:has(.mini_popup_tip:hover)) {
+  right: 0px !important;
+}
+
+.mini_plugin_warp.disabled:hover:not(:has(.mini_popup_tip:hover)) {
+  right: -7px !important;
+}
+
+.mini_plugin_warp.disabled .close_mini_plugin_btn {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.mini_plugin_warp:hover:not(:has(.mini_popup_tip:hover)) .close_mini_plugin_btn {
+  display: flex;
+}
+
+.mini_plugin_warp .close_mini_plugin_btn {
+  position: absolute;
+  top: -8px;
+  left: -6px;
+  z-index: 10;
+  width: 16px;
+  height: 16px;
+  background: #a8a8a880;
+  border-radius: 50%;
+  display: none;
+  -webkit-box-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mini_plugin_warp:hover:not(:has(.mini_popup_tip:hover)) .close_mini_plugin_btn:hover {
+  background: #a8a8a8;
+}
+
+.mini_plugin_warp .close_mini_plugin_btn img {
+  width: 80%;
+}
+
+/* Mini Popup Tip CSS Start */
+.mini_popup_tip {
+  position: absolute;
+  right: calc(100% + 15px);
+  top: 50%;
+  width: max-content;
+  max-width: 360px;
+  transform: translateY(-50%) scale(0.8) translateX(80px);  /* 初始缩放更小，位移更大 */
+  background: #000000d9;
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+  font-family: var(--jobwizard-font-family);
+  font-size: 12px;
+  line-height: 18px;
+  cursor: auto;
+  transition: all 0.4s cubic-bezier(0.15, 1.8, 0.3, 1); /* 调整动画曲线使弹性更强 */
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mini_popup_tip.show {
+  transform: translateY(-50%) scale(1) translateX(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.mini_popup_tip::after {
+  content: '';
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 6px 0 6px 6px;
+  border-style: solid;
+  border-color: transparent transparent transparent #000000d9;
+  transition: all 0.4s cubic-bezier(0.15, 1.8, 0.3, 1);
+}
+
+.mini_popup_tip .close_tip_btn {
+  position: absolute;
+  top: -7px;
+  left: -7px;
+  width: 16px;
+  height: 16px;
+  background: #a8a8a8;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.mini_popup_tip .close_tip_btn:hover {
+  background: #888888;
+}
+
+/* Mini Popup Tip CSS End */
+
+.mini_plugin_warp .extension_close_dropdown {
+  position: absolute;
+  top: 66%; /* Position below the button */
+  right: 10px;
+  background-color: white;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+  z-index: 1000; /* Ensure it appears above other elements */
+  display: none; /* Initially hidden */
+  width: 200px; /* Adjust width as needed */
+  flex-direction: column; /* Arrange items in a column */
+  border-radius: 8px;
+  gap: 6px;
+  font-size: 14px;
+  font-family: var(--jobwizard-font-family);
+  color: #202223;
+}
+
+.mini_plugin_warp .extension_close_dropdown.show {
+  display: flex;
+}
+
+.mini_plugin_warp .extension_close_dropdown ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 12px;
+}
+
+.mini_plugin_warp .extension_close_dropdown li {
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.mini_plugin_warp .extension_close_dropdown li:hover {
+  background-color: #f0f0f0; /* Highlight on hover */
+}
+
+.mini_plugin_warp .mini_plugin_logo {
+  position: relative;
+  overflow: hidden;
+  background: #ffffff;
+  border-radius: 8px 0px 0px 8px;
+  width: 52px;
+  height: 52px;
+  display: flex !important;
+  -webkit-box-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  align-items: center;
+  padding: 10px;
+  box-sizing: border-box;
+  transition: box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.mini_plugin_warp img {
+  height: 100% !important;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+@keyframes autofill-ball-bounce-once {
+  0%   { transform: translateY(0); }
+  20%  { transform: translateY(-8px); }   /* 上升到最高点 */
+  40%  { transform: translateY(0); }       /* 下落到地面 */
+  60%  { transform: translateY(-2px); }    /* 小回弹 */
+  80%  { transform: translateY(0); }       /* 回到地面 */
+  100% { transform: translateY(0); }       /* 静止等待 */
+}
+.mini_plugin_logo img.autofill-animating {
+  animation: autofill-ball-bounce-once 1.5s cubic-bezier(.4,0,.6,1) infinite;
+  will-change: transform;
+}
+
+
+/* ============================================
+   disable_confirmation_modal v2 — Archetype B2 "Going somewhere?"
+   (Phase 2 P0-3, 2026-05-19)
+   Single emoji anchor + churn-reason chips + optional textarea +
+   two-action row (Just disable | Send & disable). Preserves
+   .disable_confirmation_modal / _content / _button class names so
+   existing main.js handler at :9856-9888 keeps working; new sibling
+   selectors (_close, _chip, _textarea, _button_skip) are added.
+   ============================================ */
+.mini_plugin_warp .disable_confirmation_modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(8, 10, 14, 0.32);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  font-family: var(--jobwizard-font-family);
+  cursor: auto;
+}
+
+.mini_plugin_warp .disable_confirmation_content {
+  position: relative;
+  width: 320px;
+  box-sizing: border-box;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #ffffff;
+  padding: 22px 22px 18px;
+  border-radius: 16px;
+  text-align: left;
+  box-shadow: 0 32px 90px -24px rgba(15, 17, 21, 0.32),
+              0 8px 24px -8px rgba(15, 17, 21, 0.12);
+  animation: jw-b2-in .45s cubic-bezier(.34, 1.56, .64, 1) both;
+}
+@keyframes jw-b2-in {
+  from { opacity: 0; transform: translateY(12px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.mini_plugin_warp .disable_confirmation_close {
+  position: absolute;
+  top: 12px; right: 12px;
+  width: 24px; height: 24px;
+  border: 1px solid rgba(15, 17, 21, 0.12);
+  background: #ffffff;
+  color: #6b7280;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  cursor: pointer;
+  font-size: 14px; line-height: 1;
+  font-weight: 400; padding: 0;
+  transition: background .2s ease, color .2s ease, transform .25s ease;
+}
+.mini_plugin_warp .disable_confirmation_close:hover {
+  background: #fafbfc;
+  color: #0b0d10;
+  transform: rotate(90deg);
+}
+
+.mini_plugin_warp .disable_confirmation_emoji {
+  display: block;
+  font-size: 32px;
+  line-height: 1;
+  margin: 4px 0 12px;
+  filter: drop-shadow(0 2px 6px rgba(15, 17, 21, 0.08));
+  animation: jw-b2-emoji-in .55s cubic-bezier(.34, 1.56, .64, 1) both;
+  transform-origin: center bottom;
+}
+@keyframes jw-b2-emoji-in {
+  from { opacity: 0; transform: scale(.5) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.mini_plugin_warp .disable_confirmation_title {
+  font-size: 17px; font-weight: 700;
+  letter-spacing: -0.015em; line-height: 1.25;
+  color: #0b0d10;
+  margin: 0 0 6px;
+  padding: 0;     /* override legacy */
+}
+
+.mini_plugin_warp .disable_confirmation_sub {
+  font-size: 12.5px;
+  color: #6b7280;
+  line-height: 1.55;
+  margin: 0 0 16px;
+  font-weight: 400;
+}
+
+.mini_plugin_warp .disable_confirmation_chips {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-bottom: 14px;
+}
+
+.mini_plugin_warp .disable_confirmation_chip {
+  display: inline-flex; align-items: center;
+  padding: 7px 12px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 17, 21, 0.12);
+  border-radius: 999px;
+  font-size: 12px; font-weight: 500;
+  color: #0b0d10;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .22s ease, border-color .22s ease, color .22s ease, transform .12s ease;
+}
+.mini_plugin_warp .disable_confirmation_chip:hover {
+  background: #fafbfc;
+}
+.mini_plugin_warp .disable_confirmation_chip.on,
+.mini_plugin_warp .disable_confirmation_chip[aria-checked="true"] {
+  background: rgba(0, 102, 255, 0.08);
+  border-color: #0066ff;
+  color: #0052cc;
+}
+.mini_plugin_warp .disable_confirmation_chip:active {
+  transform: scale(.97);
+}
+
+.mini_plugin_warp .disable_confirmation_textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  font: inherit; font-size: 13px;
+  color: #0b0d10;
+  background: #ffffff;
+  border: 1px solid rgba(15, 17, 21, 0.12);
+  border-radius: 8px;
+  resize: vertical;
+  min-height: 50px;
+  font-family: inherit;
+  margin-bottom: 14px;
+  transition: border-color .22s ease, box-shadow .22s ease;
+}
+.mini_plugin_warp .disable_confirmation_textarea:focus {
+  outline: none;
+  border-color: #0066ff;
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.08);
+}
+.mini_plugin_warp .disable_confirmation_textarea::placeholder {
+  color: #9aa3af;
+}
+
+.mini_plugin_warp .disable_confirmation_actions {
+  display: flex; gap: 8px;
+  align-items: stretch;
+  margin-bottom: 12px;
+}
+
+.mini_plugin_warp .disable_confirmation_button_skip {
+  flex: 0 0 auto;
+  padding: 11px 14px;
+  background: transparent;
+  color: #6b7280;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px; font-weight: 600;
+  font-family: inherit;
+  transition: color .22s ease, background .22s ease, transform .12s ease;
+}
+.mini_plugin_warp .disable_confirmation_button_skip:hover {
+  color: #0b0d10;
+  background: #fafbfc;
+}
+.mini_plugin_warp .disable_confirmation_button_skip:active {
+  transform: scale(.98);
+}
+
+/* Primary (preserved class name from v1 — main.js binds via .disable_confirmation_button) */
+.mini_plugin_warp .disable_confirmation_button {
+  flex: 1;
+  padding: 11px 16px;
+  background: linear-gradient(135deg, #0066ff, #0052cc);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px; font-weight: 600;
+  letter-spacing: -0.005em;
+  font-family: inherit;
+  box-shadow: 0 6px 14px -4px rgba(0, 102, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition: filter .22s ease, box-shadow .22s ease, transform .12s ease;
+}
+.mini_plugin_warp .disable_confirmation_button:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 10px 22px -4px rgba(0, 102, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  background: linear-gradient(135deg, #0066ff, #0052cc); /* preserve gradient on hover */
+  color: #ffffff;
+}
+.mini_plugin_warp .disable_confirmation_button:active {
+  transform: scale(.98);
+}
+.mini_plugin_warp .disable_confirmation_button[disabled] {
+  opacity: .6; cursor: not-allowed; filter: none;
+}
+
+/* ── Disable modal CTA priority flip (2026-05-27) ─────────────────────
+   Original styling shipped "Send & disable" (POST feedback path) as the
+   primary blue CTA and "Just disable" (no-feedback path) as the gray
+   secondary. That visual hierarchy nudged users who just wanted to turn
+   the extension off — chiefly Pro users frustrated by autofill misfires
+   on SuccessFactors / Oracle Cloud ATSes — into emitting empty or
+   reason-only feedback they never meant to send. New priority:
+     ✓ Primary  = "Disable JobWizard"  (no feedback)
+     ✓ Secondary = "Send feedback first" (POSTs reason + note)
+   Class names left untouched so main.js handler bindings stay stable;
+   .is-primary / .is-secondary modifiers do the visual override. */
+.mini_plugin_warp .disable_confirmation_button.is-secondary {
+  flex: 0 0 auto;
+  background: transparent;
+  color: #6b7280;
+  box-shadow: none;
+}
+.mini_plugin_warp .disable_confirmation_button.is-secondary:hover {
+  background: #fafbfc;
+  color: #0b0d10;
+  box-shadow: none;
+  filter: none;
+}
+.mini_plugin_warp .disable_confirmation_button_skip.is-primary {
+  flex: 1;
+  padding: 11px 16px;
+  background: linear-gradient(135deg, #0066ff, #0052cc);
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 13px; font-weight: 600;
+  box-shadow: 0 6px 14px -4px rgba(0, 102, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition: filter .22s ease, box-shadow .22s ease, transform .12s ease;
+}
+.mini_plugin_warp .disable_confirmation_button_skip.is-primary:hover {
+  background: linear-gradient(135deg, #0066ff, #0052cc);
+  color: #ffffff;
+  filter: brightness(1.05);
+  box-shadow: 0 10px 22px -4px rgba(0, 102, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.mini_plugin_warp .disable_confirmation_footer {
+  font-size: 11px;
+  color: #9aa3af;
+  margin: 8px 0 0;
+  text-align: center;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+/* ============================================
+   badge_popup v2 — Archetype C (Empty/Notice), P1·c (2026-05-19)
+   Replaces the legacy 192px illustration banner + flat #0075ff button.
+   New shell: 320px popup, top-right anchored (preserves the corner-
+   notification mental model). Inside: emblem with halo + title + sub
+   + brand-gradient CTA. Two view variants reuse the same shell.
+   ============================================ */
+.badge_popup_bg {
+  box-sizing: border-box;
+  display: none;
+  /* The viewport-sized main ShadowRoot host is intentionally pass-through.
+     This fixed sign-in/permission surface is one of the explicit interactive
+     islands that must opt back into physical hit testing. */
+  pointer-events: auto;
+}
+
+.badge_popup_bg .badge_popup {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  box-sizing: border-box;
+  width: 320px;
+  max-width: calc(100vw - 36px);
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow:
+    0 24px 60px rgba(8, 10, 14, 0.18),
+    0 4px 12px rgba(8, 10, 14, 0.08);
+  z-index: 9999999999;
+  overflow: hidden;
+  font-family: var(--jobwizard-font-family);
+  animation: jw-badge-popup-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes jw-badge-popup-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Header: just the close affordance. No illustration banner. */
+.badge_popup .badge_header {
+  position: absolute;
+  top: 10px; right: 10px;
+  z-index: 2;
+}
+.badge_popup .badge_close {
+  width: 26px; height: 26px;
+  padding: 5px;
+  background: rgba(15, 17, 21, 0.04);
+  border: 1px solid rgba(15, 17, 21, 0.06);
+  border-radius: 50%;
+  cursor: pointer;
+  opacity: 1;
+  margin: 0;
+  transition: background .18s ease, transform .22s ease;
+}
+.badge_popup .badge_close:hover {
+  background: rgba(15, 17, 21, 0.08);
+  transform: rotate(90deg);
+}
+
+.badge_popup .badge_footer {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 28px 22px 24px;
+  font-family: var(--jobwizard-font-family);
+}
+.badge_popup_login_view,
+.badge_popup_permission_view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+.badge_popup_permission_view {
+  /* permission view shows steps list — needs a bit more rhythm */
+  gap: 0;
+}
+
+/* Emblem — 56×56 rounded square with colored halo. Login=blue, Permission=amber. */
+.badge_popup .badge_emblem {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  margin: 0 0 14px;
+  display: grid;
+  place-items: center;
+  background: #fafbfc;
+  border: 1px solid rgba(15, 17, 21, 0.07);
+  border-radius: 16px;
+  font-size: 24px;
+  line-height: 1;
+  animation: jw-badge-emblem-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s both;
+  transform-origin: center;
+}
+@keyframes jw-badge-emblem-in {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.badge_popup .badge_emblem::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 22px;
+  z-index: -1;
+  background: radial-gradient(60% 60% at 50% 50%, var(--jw-halo, rgba(0, 102, 255, 0.20)) 0%, transparent 70%);
+  opacity: .65;
+}
+.badge_popup .badge_popup_login_view .badge_emblem { --jw-halo: rgba(0, 102, 255, 0.20); }
+.badge_popup .badge_popup_permission_view .badge_emblem { --jw-halo: rgba(217, 119, 6, 0.22); }
+
+/* Title — action-verb, C archetype 15px/600. */
+.badge_popup .badge_title {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: #0b0d10;
+}
+.badge_popup .badge_desc {
+  margin: 0 0 18px;
+  padding: 0;
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #6b7280;
+  text-align: center;
+}
+
+/* Permission-view step list — small ordered list, indented. */
+.badge_popup .badge_popup_permission_view .badge_permission_steps {
+  margin: 0 0 16px;
+  padding-left: 22px;
+  text-align: left;
+  width: 100%;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(75, 85, 99, 0.92);
+  font-weight: 400;
+  list-style: decimal;
+}
+.badge_popup .badge_popup_permission_view .badge_permission_steps li {
+  margin-bottom: 4px;
+}
+.badge_popup .badge_popup_permission_view .badge_permission_steps strong {
+  color: #0b0d10;
+  font-weight: 600;
+}
+
+/* Action row + primary CTA — brand gradient (matches B1/B2/D primary). */
+.badge_popup .badge_action {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 4px;
+}
+.badge_popup .badge_button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 18px;
+  min-width: 0;
+  width: 100%;
+  background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  box-shadow:
+    0 4px 14px rgba(0, 102, 255, 0.22),
+    0 1px 2px rgba(0, 102, 255, 0.18);
+  transition: filter .22s ease, box-shadow .22s ease, transform .12s ease;
+}
+.badge_popup .badge_button:hover {
+  filter: brightness(1.05);
+  box-shadow:
+    0 6px 18px rgba(0, 102, 255, 0.28),
+    0 2px 4px rgba(0, 102, 255, 0.20);
+}
+.badge_popup .badge_button:active {
+  transform: scale(0.985);
+}
+
+/* Reminder footnote — small muted line below the login CTA. */
+.badge_popup .badge_reminder {
+  margin-top: 12px;
+  padding: 0;
+  font-size: 11.5px;
+  color: rgba(148, 163, 184, 0.95);
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: center;
+}
+.badge_popup .badge_reminder_discord_link {
+  color: #0066ff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.badge_popup .badge_reminder_discord_link:hover {
+  color: #0052cc;
+}
+
+/* Legacy createBadgeDiscord injection target — restyled inline. */
+.badge_popup .badge_discord {
+  position: static;
+  margin-top: 12px;
+  padding: 0;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: rgba(148, 163, 184, 0.95);
+  text-align: center;
+}
+.badge_popup .badge_discord_link {
+  color: #0066ff;
+  font-size: 11.5px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ============================================
+   End badge_popup v2
+   ============================================ */
+
+/* Start Resize Line CSS */
+#autofill_detail .resize_handle {
+  position: absolute;
+  top: 0px;
+  left: -5px;
+  width: 16px;
+  height: 100vh;
+  cursor: ew-resize;
+  z-index: 999;
+}
+
+/* End Resize Line CSS */
+
+#autofill_detail .toolTip {
+  position: relative;
+  overflow: visible;
+}
+
+#autofill_detail .toolTip:before {
+  max-width: 200px;
+  content: attr(data-tip);
+  line-height: 120%;
+  position: absolute;
+  background-color: rgb(89, 92, 95);
+  border-radius: 4px;
+  padding: 7px 12px;
+  transform: translate(-50%, calc(-100% + -6px));
+  font-size: 12px;
+  color: #ffffff;
+  left: 50%;
+  top: 0px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  display: none;
+  z-index: 999;
+  /* Please keep below. This will make sure all tooltip show correctly */
+  text-wrap: nowrap;
+  /* width: 100%; */
+}
+
+#autofill_detail .toolTip:after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translate(-50%, -6px);
+  border-width: 6px;
+  border-style: solid;
+  border-color: rgb(89, 92, 95) transparent transparent;
+  display: none;
+  z-index: 999;
+}
+
+#autofill_detail .toolTip:hover:before {
+  display: block;
+}
+
+#autofill_detail .toolTip:hover:after {
+  display: block;
+}
+
+/* 统一用 __content_handler.tooltip 显示，不再用伪元素，避免 overflow 裁剪且一处维护 */
+#autofill_detail [data-tip]:hover:before,
+#autofill_detail [data-tip]:hover:after {
+  display: none !important;
+}
+
+#autofill_detail .toolTip_right {
+  position: relative;
+  overflow: visible;
+  /* z-index: 999; */
+}
+
+#autofill_detail .toolTip_right::after {
+  content: attr(data-tip);
+  display: none;
+  padding: 8px 12px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 6px;
+  background: #383838;
+  position: absolute;
+  left: 0%;
+  top: 0;
+  white-space: nowrap;
+  color: #fff;
+  font-size: 12px;
+  transform: translate(-8px, calc(-100% - 0px));
+  z-index: 999;
+}
+
+#autofill_detail .toolTip_right::before {
+  content: "";
+  display: none;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #383838;
+  position: absolute;
+  left: 20%;
+  top: 0;
+  z-index: 999;
+}
+
+#autofill_detail .toolTip_right:hover::after,
+#autofill_detail .toolTip_right:hover::before {
+  display: inline-flex;
+}
+
+#autofill_detail .toolTip_left {
+  position: relative;
+  overflow: visible;
+  z-index: 9999;
+}
+
+#autofill_detail .toolTip_left::after {
+  content: attr(data-tip);
+  display: none;
+  padding: 8px 12px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 6px;
+  background: #383838;
+  position: absolute;
+  right: 93%;
+  top: 50%;
+  /* [Regression fix 2026-05-19] white-space:nowrap alone wasn't
+     enough — pseudo-element inside a narrow flex LI was sizing to
+     parent (~24px icon). Force content-driven width so "Update log"
+     stays on one line. max-width keeps a sane bound. */
+  white-space: nowrap;
+  width: max-content;
+  max-width: 220px;
+  color: #fff;
+  font-size: 12px;
+  transform: translate(-8px, -50%);
+  font-style: normal;
+  z-index: 9999;
+}
+
+#autofill_detail .toolTip_left::before {
+  content: "";
+  display: none;
+  width: 0;
+  height: 0;
+  border-left: 5px solid #383838;
+  border-right: 5px solid transparent;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  position: absolute;
+  right: 90%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#autofill_detail .toolTip_left:hover::after,
+#autofill_detail .toolTip_left:hover::before {
+  display: inline-flex;
+}
+
+#autofill_detail .toolTip_middle {
+  position: relative;
+  overflow: visible;
+}
+
+#autofill_detail .toolTip_middle::after {
+  content: attr(data-tip);
+  width: 100%;
+  word-break: break-word;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  display: none;
+  padding: 8px 12px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 6px;
+  background: #383838;
+  position: absolute;
+  left: 50%;
+  top: -5px;
+  color: #fff;
+  font-size: 12px;
+  transform: translate(-50%, calc(-100% - 0px));
+}
+
+#autofill_detail .toolTip_middle::before {
+  content: "";
+  display: none;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #383838;
+  position: absolute;
+  left: 50%;
+  top: -5px;
+  transform: translateX(-50%);
+}
+
+#autofill_detail .toolTip_middle:hover::after,
+#autofill_detail .toolTip_middle:hover::before {
+  display: inline-flex;
+}
+
+/*choose resume  */
+#autofill_detail .select_pdf_wrap {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  top: 5px;
+}
+
+#autofill_detail .select_pdf_wrap .select_pdf {
+  display: flex;
+  padding: 10px;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 5px;
+  background: #f8f8f8;
+  max-width: 300px;
+  min-width: 240px;
+  cursor: pointer;
+  box-sizing: border-box;
+  user-select: none;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+#autofill_detail .select_pdf_wrap .select_pdf:hover {
+  background: #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+#autofill_detail .select_pdf_wrap .select_pdf:hover .pfd_meta {
+  color: #202223;
+}
+
+#autofill_detail .select_pdf_wrap .select_pdf:hover .arrow {
+  opacity: 0.8;
+}
+
+#autofill_detail .select_pdf_wrap .select_pdf .arrow {
+  transition: all 0.3s ease;
+  transform: rotate(0deg);
+  opacity: 0.5;
+}
+
+#autofill_detail .select_pdf_wrap .select_pdf.active .arrow {
+  transform: rotate(180deg);
+  opacity: 0.8;
+}
+
+#autofill_detail .select_pdf_wrap .select_pdf .pfd_meta {
+  color: #5f6368;
+  font-size: 14px;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.3s ease;
+}
+
+#autofill_detail .select_pdf_wrap .select_pdf.not_autofill_resume .pfd_meta img {
+  display: none;
+}
+
+#autofill_detail .select_pdf_wrap .select_pdf .pfd_meta img {
+  width: 16px;
+  height: 16px;
+}
+
+#autofill_detail .select_pdf_wrap .select_pdf.not_autofill_resume+.close_autofill_resume {
+  display: none;
+  white-space: nowrap;
+  width: 100%;
+}
+
+/* 简历管理弹窗 */
+#autofill_detail .select_pdf_wrap .resumes_popup {
+  /* position: absolute; */
+  position: fixed; /* set it to fixed so that z-index can be set to 999 so that it can be above the sidebar */
+  top: 240px;
+  z-index: 99999;
+  display: none;
+}
+
+#autofill_detail .select_pdf_wrap .resumes_popup {
+  width: 380px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0px 4px 30px 0px rgba(0, 0, 0, 0.12);
+  padding: 16px 16px 14px 16px;
+  box-sizing: border-box;
+}
+
+#autofill_detail .select_pdf_wrap .resumes_popup .header {
+  display: flex;
+  justify-content: space-between;
+  color: #000;
+  font-family: var(--jobwizard-font-family);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+#autofill_detail .select_pdf_wrap .resumes_popup .header img {
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  opacity: 0.5;
+}
+#autofill_detail .select_pdf_wrap .resumes_popup .header img:hover {
+  opacity: 1;
+}
+
+#autofill_detail .select_pdf_wrap .pdf_list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  color: #5f6368;
+  font-size: 14px;
+  font-weight: 400;
+  gap: 8px;
+  position: relative;
+  /* Add this */
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card .check {
+  display: none;
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card .pdf_meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card .pdf_meta .time {
+  color: #a8a8a8;
+  font-size: 12px;
+  font-weight: 400;
+  display: inline-block;
+}
+ 
+
+#autofill_detail .select_pdf_wrap .pdf_card .pdf_meta .pdf_meta_extra {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card .pdf_card_content {
+  flex: 1;
+  padding: 12px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-wrap: wrap;
+  word-break: break-word;
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card.active .pdf_card_content {
+  border-radius: 6px;
+  background: #f2f2f2;
+  color: #202223;
+  font-weight: 500;
+}
+
+/* 简历管理弹窗 */
+#autofill_detail #resume_manage_modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+#autofill_detail #resume_manage_modal[style*="display: block"],
+#autofill_detail #resume_manage_modal[style*="display: flex"] {
+  display: flex !important;
+}
+
+#autofill_detail #resume_manage_modal .resume_manage_modal_mask {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+
+#autofill_detail #resume_manage_modal .resume_manage_modal_content {
+  position: relative;
+  z-index: 1;
+  width: 340px;
+  max-height: min(560px, 85vh);
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  padding: 0 16px 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+#autofill_detail #resume_manage_modal .resume_modal_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  flex-shrink: 0;
+}
+
+#autofill_detail #resume_manage_modal .resume_modal_header .resume_list_title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1d1d1f;
+  font-family: var(--jobwizard-font-family);
+}
+
+#autofill_detail #resume_manage_modal .resume_modal_close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+#autofill_detail #resume_manage_modal .resume_modal_close:hover {
+  background: #f5f5f7;
+}
+
+#autofill_detail #resume_manage_modal .resume_modal_close img {
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+}
+
+#autofill_detail #resume_manage_modal .resume_modal_close:hover img {
+  opacity: 1;
+}
+
+#autofill_detail #resume_manage_modal .resume_list_divider {
+  height: 1px;
+  background: #f3f4f6;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+#autofill_detail #resume_manage_modal .resume_list_list_wrap {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 16px 0;
+}
+
+#autofill_detail #resume_manage_modal .pdf_list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#autofill_detail #resume_manage_modal .pdf_card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  color: #5f6368;
+  font-size: 12px;
+  font-weight: 400;
+  gap: 8px;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+}
+
+#autofill_detail #resume_manage_modal .pdf_card .check {
+  display: none;
+}
+
+#autofill_detail #resume_manage_modal .pdf_card .pdf_meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#autofill_detail #resume_manage_modal .pdf_card .pdf_meta .pdf_meta_extra {
+  font-size: 10px;
+}
+
+#autofill_detail #resume_manage_modal .pdf_card .pdf_card_content {
+  flex: 1;
+  padding: 8px 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  word-break: break-word;
+}
+
+#autofill_detail #resume_manage_modal .pdf_card.active .pdf_card_content,
+#autofill_detail #resume_manage_modal .pdf_card.selected .pdf_card_content {
+  border-radius: 8px;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  font-weight: 500;
+}
+
+#autofill_detail #resume_manage_modal .pdf_card .action_buttons {
+  display: flex;
+  gap: 2px;
+}
+
+#autofill_detail #resume_manage_modal .pdf_card .check,
+#autofill_detail #resume_manage_modal .pdf_card .delete,
+#autofill_detail #resume_manage_modal .pdf_card .download {
+  display: none;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  border-radius: 4px;
+  align-items: center;
+  justify-content: center;
+}
+
+#autofill_detail #resume_manage_modal .pdf_card:hover .check,
+#autofill_detail #resume_manage_modal .pdf_card:hover .delete,
+#autofill_detail #resume_manage_modal .pdf_card:hover .download {
+  display: flex;
+}
+
+#autofill_detail #resume_manage_modal .pdf_card .check img,
+#autofill_detail #resume_manage_modal .pdf_card .delete img,
+#autofill_detail #resume_manage_modal .pdf_card .download img {
+  opacity: 0.5;
+}
+
+#autofill_detail #resume_manage_modal .pdf_card .check:hover,
+#autofill_detail #resume_manage_modal .pdf_card .delete:hover,
+#autofill_detail #resume_manage_modal .pdf_card .download:hover {
+  display: flex;
+  background: #e8e8ed;
+}
+
+#autofill_detail #resume_manage_modal .pdf_card .check:hover img,
+#autofill_detail #resume_manage_modal .pdf_card .delete:hover img,
+#autofill_detail #resume_manage_modal .pdf_card .download:hover img {
+  opacity: 1;
+}
+
+#autofill_detail #resume_manage_modal .pdf_card .pdf_card_content:hover {
+  border-radius: 8px;
+  background: #f5f5f7;
+}
+
+#autofill_detail #resume_manage_modal .pdf_card_content:hover .check {
+  display: flex;
+}
+
+#autofill_detail #resume_manage_modal .pdf_card.active:hover .check {
+  display: none;
+}
+
+#autofill_detail #resume_manage_modal .pdf_card .pdf_icon {
+  width: 20px;
+  height: 20px;
+}
+
+#autofill_detail #resume_manage_modal .pdf_card .download.loading {
+  display: block;
+  background: url("../icons/loading_without_bg.svg") center/24px no-repeat;
+}
+
+#autofill_detail #resume_manage_modal .resume_list_upload {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px dashed #d2d2d7;
+  border-radius: 10px;
+  background: #fafafa;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  overflow: hidden;
+}
+
+#autofill_detail #resume_manage_modal .resume_list_upload:hover {
+  border-color: #b8b8bd;
+  background: #f5f5f7;
+}
+
+#autofill_detail #resume_manage_modal .resume_list_upload:active {
+  background: #ebebed;
+}
+
+#autofill_detail #resume_manage_modal .resume_list_upload.uploading {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+#autofill_detail #resume_manage_modal .resume_list_upload input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+#autofill_detail #resume_manage_modal .resume_list_upload_inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+#autofill_detail #resume_manage_modal .resume_list_upload_icon_wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+#autofill_detail #resume_manage_modal .resume_list_upload:hover .resume_list_upload_icon_wrap {
+  opacity: 0.85;
+}
+
+#autofill_detail #resume_manage_modal .resume_list_upload .upload_icon {
+  width: 14px;
+  height: 14px;
+}
+
+#autofill_detail #resume_manage_modal .resume_list_upload_label {
+  font-size: 13px;
+  font-weight: 400;
+  color: #86868b;
+  font-family: var(--jobwizard-font-family);
+  transition: color 0.2s ease;
+}
+
+#autofill_detail #resume_manage_modal .resume_list_upload:hover .resume_list_upload_label {
+  color: #1d1d1f;
+}
+
+#autofill_detail #resume_manage_modal .resume_list_upload_progress_wrap {
+  flex-shrink: 0;
+  margin-top: 6px;
+  width: 100%;
+}
+
+#autofill_detail #resume_manage_modal .resume_list_upload_progress_track {
+  height: 3px;
+  border-radius: 2px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+#autofill_detail #resume_manage_modal .resume_list_upload_progress_fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 2px;
+  background: #0066ff;
+  transition: width 0.3s ease;
+} 
+
+
+/* track 中使用 */
+
+#autofill_detail .select_pdf_wrap .pdf_card .action_buttons {
+  display: flex;
+  gap: 4px;
+}
+
+ 
+#autofill_detail .select_pdf_wrap .pdf_card:hover .check,
+#autofill_detail .select_pdf_wrap .pdf_card:hover .delete,
+#autofill_detail .select_pdf_wrap .pdf_card:hover .download {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card:hover .check img,
+#autofill_detail .select_pdf_wrap .pdf_card:hover .delete img,
+#autofill_detail .select_pdf_wrap .pdf_card:hover .download img {
+  opacity: 0.4;
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card .check,
+#autofill_detail .select_pdf_wrap .pdf_card .delete,
+#autofill_detail .select_pdf_wrap .pdf_card .download {
+  display: none;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  border-radius: 4px;
+  align-items: center;
+  justify-content: center;
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card .check:hover,
+#autofill_detail .select_pdf_wrap .pdf_card .delete:hover,
+#autofill_detail .select_pdf_wrap .pdf_card .download:hover {
+  display: flex;
+  background: #e5e5e5;
+  align-items: center;
+  justify-content: center;
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card .check:hover img,
+#autofill_detail .select_pdf_wrap .pdf_card .delete:hover img,
+#autofill_detail .select_pdf_wrap .pdf_card .download:hover img {
+  opacity: 1;
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card.active .pdf_meta .tip {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  line-height: 16px;
+  gap: 6px;
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card .pdf_card_content:hover {
+  border-radius: 6px;
+  background: #f2f2f2;
+  
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card_content:hover .check {
+  display: flex;
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card.active:hover .check {
+  display: none;
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card .pdf_icon {
+  width: 20px;
+  height: 20px;
+}
+
+#autofill_detail .select_pdf_wrap .resumes_popup .upload {
+  display: flex;
+  align-items: center;
+  padding: 12px 8px;
+  color: #5f6368;
+  font-family: var(--jobwizard-font-family);
+  font-size: 14px;
+  font-weight: 400;
+  gap: 8px;
+  margin-top: 6px;
+  cursor: pointer;
+  position: relative;
+}
+
+#autofill_detail .select_pdf_wrap .resumes_popup .upload:hover {
+  border-radius: 6px;
+  background: #f2f2f2;
+}
+
+ 
+#autofill_detail .select_pdf_wrap .pdf_card .download.loading {
+  display: block;
+ 
+  background: url("../icons/loading_without_bg.svg") center/24px no-repeat;
+  
+}
+
+#autofill_detail .select_pdf_wrap .resumes_popup .upload_progress {
+  display: none;
+  width: 100%;
+  margin-top: 10px;
+}
+
+#autofill_detail .select_pdf_wrap .resumes_popup .upload input {
+  opacity: 0;
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 3;
+  cursor: pointer;
+}
+
+#autofill_detail .select_pdf_wrap .resumes_popup .upload input:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  z-index: 2;
+  cursor: pointer;
+}
+
+#autofill_detail .select_pdf_wrap .resumes_popup .upload .upload_icon {
+  width: 14px;
+  height: 14px;
+}  
+
+
+/* Animations start */
+/* Shine effect for quick apply button */
+@keyframes shineEffect {
+  0% {
+    left: -100%;
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 0.5;
+  }
+
+  30% {
+    opacity: 1;
+  }
+
+  80% {
+    opacity: 1;
+  }
+
+  100% {
+    left: 150%;
+    opacity: 0;
+  }
+}
+
+/* Shake effect for the highlight question element */
+@keyframes highlight-shake {
+  0% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(10px);
+  }
+
+  40% {
+    transform: translateX(-8px);
+  }
+
+  60% {
+    transform: translateX(6px);
+  }
+
+  80% {
+    transform: translateX(-4px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.highlight-shake {
+  animation: highlight-shake 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1;
+}
+
+@keyframes highlightFade {
+  0% {
+    background-color: rgba(255, 255, 0, 0.5);
+    /* Start with semi-transparent yellow */
+  }
+
+  100% {
+    background-color: transparent;
+  }
+}
+
+/* Ensure the container maintains full width */
+.JobWizard_quickApplytojobboardslistpage {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* Ensure table cell maintains full width */
+.job-post .cell {
+  width: 100%;
+}
+
+@keyframes loadingDots {
+
+  0%,
+  20% {
+    content: "·";
+  }
+
+  40% {
+    content: "··";
+  }
+
+  60% {
+    content: "···";
+  }
+
+  80%,
+  100% {
+    content: "";
+  }
+}
+
+.JobWizard_jobPublishInfo--loading {
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+.JobWizard_jobPublishInfo--loading::after {
+  content: "";
+  animation: loadingDots 1.5s infinite;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0.5;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.JobWizard_jobPublishInfo--show {
+  animation:
+    highlightFade 1.5s ease-out,
+    fadeInOut 0.5s ease-out;
+}
+
+/* Add styles for delete confirmation popup */
+#autofill_detail .select_pdf_wrap .pdf_card .delete_confirm {
+  display: none;
+  position: absolute;
+  right: 40px;
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card .delete_confirm p {
+  margin: 0 0 12px 0;
+  color: #202223;
+  font-size: 14px;
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card .delete_confirm .buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card .delete_confirm button {
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card .delete_confirm .cancel {
+  background: #f5f5f5;
+  color: #202223;
+}
+
+#autofill_detail .select_pdf_wrap .pdf_card .delete_confirm .confirm {
+  background: #dc3545;
+  color: white;
+}
+
+
+/* ============================================
+   What's New / Changelog modal (v2 redesign)
+   - 320px wide, fixed height min(85vh, 600px) so expandable rows don't reflow modal
+   - Dark gradient hero with sheen, glass promo CTA, color-coded inline tags
+   - JS sets .updatelog_modal { display: flex } to show
+   Shared with .resolved_report_modal which reuses .updatelog_modal_content
+   ============================================ */
+
+/* Backdrop */
+#autofill_detail .updatelog_modal,
+#autofill_detail .resolved_report_modal {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  inset: 0;
+  background: rgba(8, 10, 14, 0.32);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  /* JS sets display:flex to show — flex centers modal_content */
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal box */
+#autofill_detail .updatelog_modal_content {
+  position: relative;
+  width: 320px;
+  height: min(85vh, 600px);
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 32px 90px -24px rgba(15, 17, 21, 0.32),
+              0 8px 24px -8px rgba(15, 17, 21, 0.12);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: var(--jobwizard-font-family);
+  animation: jw-changelog-in .45s cubic-bezier(.34, 1.56, .64, 1) both;
+}
+@keyframes jw-changelog-in {
+  from { opacity: 0; transform: translateY(14px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+/* Scroll progress bar at top edge of modal */
+#autofill_detail .updatelog_modal_content .updatelog_progress {
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, #0066ff 0%, #6effb8 100%);
+  transform-origin: 0 0;
+  transform: scaleX(0);
+  transition: transform .1s linear, opacity .25s ease;
+  z-index: 6;
+  opacity: 0;
+  pointer-events: none;
+}
+#autofill_detail .updatelog_modal_content.scrolled .updatelog_progress { opacity: 1; }
+
+/* Close button (sits over dark hero by default) */
+#autofill_detail .updatelog_modal_content .close {
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 24px; height: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.10);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  z-index: 5;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+  padding: 0;
+  transition: background .2s ease, color .2s ease, transform .25s ease;
+}
+#autofill_detail .updatelog_modal_content .close:hover,
+#autofill_detail .updatelog_modal_content .close:focus {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  text-decoration: none;
+  transform: rotate(90deg);
+}
+
+/* ---- HERO header ---- */
+#autofill_detail .updatelog_hero {
+  position: relative;
+  padding: 18px 18px 16px;
+  color: #ffffff;
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgba(120, 180, 255, 0.38) 0%, transparent 55%),
+    radial-gradient(110% 90% at 100% 100%, rgba(255, 120, 200, 0.25) 0%, transparent 55%),
+    linear-gradient(135deg, #1a2540 0%, #0a0d1a 100%);
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+#autofill_detail .updatelog_hero::before {
+  content: "";
+  position: absolute;
+  top: 0; left: -120%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.10), transparent);
+  animation: jw-changelog-sheen 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes jw-changelog-sheen {
+  0%      { left: -120%; }
+  70%,
+  100%    { left: 200%; }
+}
+
+#autofill_detail .updatelog_pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 10px;
+}
+#autofill_detail .updatelog_pill::before {
+  content: "";
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #6effb8;
+  box-shadow: 0 0 6px #6effb8;
+  animation: jw-changelog-blink 1.6s ease-in-out infinite;
+}
+@keyframes jw-changelog-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+
+#autofill_detail .updatelog_hero h1 {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: #ffffff;
+  line-height: 1.22;
+  margin: 0 30px 4px 0;
+  font-family: inherit;
+}
+#autofill_detail .updatelog_hero .updatelog_sub {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.45;
+  margin: 0 0 14px;
+}
+
+/* Promo CTA (gift card) */
+#autofill_detail .updatelog_promo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+  transition: background .25s ease, transform .2s ease, border-color .25s ease;
+}
+#autofill_detail .updatelog_promo:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+#autofill_detail .updatelog_promo:active { transform: scale(.985); }
+
+#autofill_detail .updatelog_promo .promo_icon {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, #ff9a3c 0%, #ff5e7b 100%);
+  border-radius: 9px;
+  display: grid; place-items: center;
+  font-size: 16px;
+  line-height: 1;
+  box-shadow: 0 4px 10px rgba(255, 90, 123, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: transform .35s cubic-bezier(.34, 1.56, .64, 1);
+  flex: 0 0 auto;
+}
+#autofill_detail .updatelog_promo:hover .promo_icon { transform: rotate(-10deg) scale(1.08); }
+
+#autofill_detail .updatelog_promo .promo_text { line-height: 1.3; flex: 1; min-width: 0; }
+#autofill_detail .updatelog_promo .promo_title { font-size: 12.5px; font-weight: 600; color: #ffffff; }
+#autofill_detail .updatelog_promo .promo_sub   { font-size: 11px;   color: rgba(255, 255, 255, 0.6); margin-top: 1px; }
+#autofill_detail .updatelog_promo .promo_arrow {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  line-height: 1;
+  transition: transform .25s ease, color .25s ease;
+  flex: 0 0 auto;
+}
+#autofill_detail .updatelog_promo:hover .promo_arrow {
+  transform: translateX(2px);
+  color: #ffffff;
+}
+
+/* ---- LIST (compact expandable rows) ---- */
+#autofill_detail .updatelog_modal_content .feature-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 14px 18px 8px;
+  margin: 0;
+  display: block;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.18) transparent;
+}
+#autofill_detail .updatelog_modal_content .feature-list::-webkit-scrollbar       { width: 5px; }
+#autofill_detail .updatelog_modal_content .feature-list::-webkit-scrollbar-track { background: transparent; }
+#autofill_detail .updatelog_modal_content .feature-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.14);
+  border-radius: 999px;
+}
+#autofill_detail .updatelog_modal_content .feature-list::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.28); }
+
+#autofill_detail .updatelog_modal_content .feature-item {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 10px;
+  margin: 0 -6px;
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  border-bottom: none;
+  background: transparent;
+  opacity: 0;
+  transform: translateY(6px);
+  animation: jw-changelog-row-in .42s cubic-bezier(.22, .61, .36, 1) forwards;
+  transition: background .25s ease, padding .25s ease;
+}
+#autofill_detail .updatelog_modal_content .feature-item:hover { background: #fafbfc; }
+#autofill_detail .updatelog_modal_content .feature-item.active { background: transparent; } /* override legacy */
+#autofill_detail .updatelog_modal_content .feature-item.open {
+  background: linear-gradient(180deg, #f7f9fd 0%, #f3f6fc 100%);
+  padding: 12px 10px 14px;
+}
+#autofill_detail .updatelog_modal_content .feature-item:nth-child(1) { animation-delay: .02s; }
+#autofill_detail .updatelog_modal_content .feature-item:nth-child(2) { animation-delay: .08s; }
+#autofill_detail .updatelog_modal_content .feature-item:nth-child(3) { animation-delay: .14s; }
+#autofill_detail .updatelog_modal_content .feature-item:nth-child(4) { animation-delay: .20s; }
+#autofill_detail .updatelog_modal_content .feature-item:nth-child(5) { animation-delay: .26s; }
+#autofill_detail .updatelog_modal_content .feature-item:nth-child(6) { animation-delay: .32s; }
+#autofill_detail .updatelog_modal_content .feature-item:nth-child(7) { animation-delay: .38s; }
+#autofill_detail .updatelog_modal_content .feature-item:nth-child(8) { animation-delay: .44s; }
+@keyframes jw-changelog-row-in { to { opacity: 1; transform: translateY(0); } }
+
+#autofill_detail .updatelog_modal_content .feature-item-icon {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: grid; place-items: center;
+  font-size: 14px;
+  line-height: 1;
+  background: linear-gradient(135deg, #eef2ff 0%, #e5ecff 100%);
+  border: 1px solid rgba(0, 102, 255, 0.08);
+  flex: 0 0 auto;
+  margin-top: 1px;
+  transition: transform .3s cubic-bezier(.34, 1.56, .64, 1),
+              background .25s ease,
+              border-color .25s ease;
+}
+#autofill_detail .updatelog_modal_content .feature-item:hover .feature-item-icon { transform: scale(1.08) rotate(-4deg); }
+#autofill_detail .updatelog_modal_content .feature-item.open  .feature-item-icon {
+  background: linear-gradient(135deg, #dde7ff 0%, #cfdbff 100%);
+  border-color: rgba(0, 102, 255, 0.18);
+}
+
+#autofill_detail .updatelog_modal_content .feature-item-body { flex: 1; min-width: 0; }
+
+#autofill_detail .updatelog_modal_content .feature-item-title {
+  display: block;            /* tag flows inline with title text */
+  margin-bottom: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  color: #0b0d10;
+}
+#autofill_detail .updatelog_modal_content .feature-item-title-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: #0b0d10;
+  letter-spacing: -0.005em;
+  line-height: 1.45;
+}
+
+#autofill_detail .updatelog_modal_content .feature-tag {
+  display: inline-block;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1.4;
+  margin-right: 7px;
+  vertical-align: 2px;
+}
+#autofill_detail .updatelog_modal_content .feature-tag.fix      { color: #b45309; background: rgba(217, 119, 6, 0.10); }
+#autofill_detail .updatelog_modal_content .feature-tag.new      { color: #0f7a4f; background: rgba(16, 134, 86, 0.10); }
+#autofill_detail .updatelog_modal_content .feature-tag.polish   { color: #6b21a8; background: rgba(126, 34, 206, 0.10); }
+#autofill_detail .updatelog_modal_content .feature-tag.improved { color: #1d4ed8; background: rgba(37, 99, 235, 0.10); }
+
+#autofill_detail .updatelog_modal_content .feature-item-desc {
+  font-size: 12.5px;
+  color: #6b7280;
+  line-height: 1.6;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+  transition: max-height .4s cubic-bezier(.22, .61, .36, 1),
+              opacity .3s ease,
+              margin-top .25s ease,
+              padding-top .25s ease;
+}
+#autofill_detail .updatelog_modal_content .feature-item.open .feature-item-desc {
+  max-height: 240px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(15, 17, 21, 0.10);
+  opacity: 1;
+}
+
+#autofill_detail .updatelog_modal_content .feature-chev {
+  width: 14px; height: 14px;
+  color: #6b7280;
+  flex: 0 0 auto;
+  margin-top: 7px;
+  opacity: 0.55;
+  transition: transform .3s cubic-bezier(.34, 1.56, .64, 1),
+              color .22s ease,
+              opacity .22s ease;
+}
+#autofill_detail .updatelog_modal_content .feature-item:hover .feature-chev { opacity: 1; color: #0b0d10; }
+#autofill_detail .updatelog_modal_content .feature-item.open .feature-chev  { transform: rotate(90deg); color: #0066ff; opacity: 1; }
+
+/* ---- FOOTER ---- */
+#autofill_detail .updatelog_foot {
+  flex: 0 0 auto;
+  padding: 14px 22px 18px;
+  background: #ffffff;
+  border-top: 1px solid rgba(15, 17, 21, 0.07);
+  position: relative;
+}
+#autofill_detail .updatelog_foot::before {
+  /* Fade mask above the footer so list content visually dissolves into it */
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 100%;
+  height: 28px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), #ffffff);
+  pointer-events: none;
+}
+
+#autofill_detail .updatelog_modal_content .updatelog_mention,
+#autofill_detail .updatelog_modal_content .update_log_mention {
+  font-size: 11.5px;
+  color: #6b7280;
+  margin: 0 0 12px;
+  text-align: center;
+  line-height: 1.5;
+  flex: 0 0 auto;
+}
+#autofill_detail .updatelog_modal_content .updatelog_mention a,
+#autofill_detail .updatelog_modal_content .update_log_mention a {
+  color: #0066ff;
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(0, 102, 255, 0.3);
+  padding-bottom: 1px;
+  transition: border-color .2s ease;
+}
+#autofill_detail .updatelog_modal_content .updatelog_mention a:hover,
+#autofill_detail .updatelog_modal_content .update_log_mention a:hover { border-color: #0066ff; }
+
+#autofill_detail .updatelog_modal_content #gotItButton,
+#autofill_detail .updatelog_modal_content #resolvedGotItButton {
+  width: 100%;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #0066ff 0%, #0044cc 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 6px 14px -4px rgba(0, 102, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition: transform .12s ease, box-shadow .25s ease, filter .2s ease;
+  flex: 0 0 auto;
+}
+#autofill_detail .updatelog_modal_content #gotItButton:hover,
+#autofill_detail .updatelog_modal_content #resolvedGotItButton:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 10px 22px -4px rgba(0, 102, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  background: linear-gradient(135deg, #0066ff 0%, #0044cc 100%);
+  color: #ffffff;
+}
+#autofill_detail .updatelog_modal_content #gotItButton:active,
+#autofill_detail .updatelog_modal_content #resolvedGotItButton:active { transform: scale(.98); }
+
+/* ---- Resolved-report modal v2: Archetype A2 "We Heard You" ---- */
+/* Rose-gold hero replaces the old grey title strip. */
+
+#autofill_detail .resolved_report_modal .resolved_hero {
+  position: relative;
+  padding: 22px 20px 18px;
+  color: #ffffff;
+  background:
+    radial-gradient(110% 80% at 100% 0%, rgba(255, 180, 100, 0.30) 0%, transparent 55%),
+    radial-gradient(120% 90% at 0% 100%, rgba(190, 24, 93, 0.32) 0%, transparent 55%),
+    linear-gradient(135deg, #2a1626 0%, #0d0a14 100%);
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+#autofill_detail .resolved_report_modal .resolved_hero::before {
+  /* sheen sweep, matches changelog v2 cadence */
+  content: ""; position: absolute; top: 0; left: -120%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.10), transparent);
+  animation: jw-changelog-sheen 5.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+#autofill_detail .resolved_report_modal .resolved_hero_mark {
+  font-size: 26px;
+  line-height: 1;
+  margin: 0 0 8px;
+  filter: drop-shadow(0 4px 12px rgba(255, 200, 150, 0.25));
+}
+#autofill_detail .resolved_report_modal .resolved_pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 9.5px; font-weight: 600; letter-spacing: 0.4px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 10px;
+}
+#autofill_detail .resolved_report_modal .resolved_pill::before {
+  content: ""; width: 5px; height: 5px; border-radius: 50%;
+  background: #ffb454; box-shadow: 0 0 6px #ffb454;
+  animation: jw-changelog-blink 1.6s ease-in-out infinite;
+}
+#autofill_detail .resolved_report_modal .resolved_hero_title {
+  font-size: 18px; font-weight: 700; letter-spacing: -0.015em;
+  color: #ffffff;
+  line-height: 1.22;
+  margin: 0 30px 6px 0;   /* right room for close */
+  font-family: inherit;
+}
+#autofill_detail .resolved_report_modal .resolved_hero_sub {
+  font-size: 11.5px; font-weight: 400;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.45;
+  margin: 0 0 14px;
+}
+
+/* Stat row inside hero — single Fixed-count cell. Compact enough that adding
+   more stats (e.g. avg turnaround) later is just appending children. */
+#autofill_detail .resolved_report_modal .resolved_stats {
+  display: flex; gap: 8px;
+}
+#autofill_detail .resolved_report_modal .resolved_stat {
+  flex: 0 0 auto;
+  min-width: 64px;
+  padding: 9px 14px 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 10px;
+}
+#autofill_detail .resolved_report_modal .resolved_stat_num {
+  font-size: 20px; font-weight: 700;
+  color: #ffffff; line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+#autofill_detail .resolved_report_modal .resolved_stat_lbl {
+  font-size: 9.5px; font-weight: 600;
+  letter-spacing: 0.5px; text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 4px;
+}
+
+/* Close button — repositioned to overlay the hero like changelog v2.
+   Style matches the changelog .close (glass-on-dark, rotates on hover). */
+#autofill_detail .resolved_report_modal .resolved_report_close {
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 24px; height: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.10);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  z-index: 5;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+  padding: 0;
+  transition: background .2s ease, color .2s ease, transform .25s ease;
+}
+#autofill_detail .resolved_report_modal .resolved_report_close:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  transform: rotate(90deg);
+}
+
+/* Legacy nodes (old grey title + subtitle). Kept hidden so any leftover
+   serialised HTML / older injected DOM doesn't visually conflict. */
+#autofill_detail .resolved_report_modal .updatelog_modal_title { display: none; }
+#autofill_detail .resolved_report_subtitle { display: none; }
+
+/* Resolved-report rows are simpler (title + desc only, no icon/tag/chev).
+   Override the v2 flex-row layout to stack them vertically and always show the desc. */
+#autofill_detail .resolved_report_modal .feature-list {
+  padding: 4px 18px 8px;
+}
+#autofill_detail .resolved_report_modal .feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  cursor: default;
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+#autofill_detail .resolved_report_modal .feature-item:hover,
+#autofill_detail .resolved_report_modal .feature-item.open {
+  background: transparent;
+}
+#autofill_detail .resolved_report_modal .feature-item .feature-item-title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0b0d10;
+}
+#autofill_detail .resolved_report_modal .feature-item .feature-item-desc {
+  max-height: none;
+  opacity: 1;
+  margin: 0;
+  padding: 0;
+  border-top: none;
+  font-size: 12.5px;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+/* Update resume styles End */
+
+
+/* Profile Modal Start */
+
+/* Profile Modal Base */
+#autofill_detail .profile_modal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#autofill_detail .profile_modal_content {
+  background: #FFFFFF;
+  width: 100%;
+  max-width: 100%;
+  height: 88vh;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  overflow-y: auto;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+/* Show/Hide Animation */
+#autofill_detail.show {
+  visibility: visible;
+}
+
+#autofill_detail.show .profile_modal {
+  opacity: 1;
+}
+
+#autofill_detail.show .profile_modal_content {
+  transform: translateY(12vh);
+}
+
+/* Modal Header */
+/* Modal Header */
+#autofill_detail .profile_modal_header {
+  padding: 24px 24px;
+  border-bottom: 1px solid #f1f1f1;
+  position: sticky;
+  top: 0;
+  background: #FFFFFF;
+  z-index: 1;
+}
+
+#autofill_detail .title_wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#autofill_detail .profile_modal_header h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+#autofill_detail .edit_profile_link {
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+#autofill_detail .edit_profile_link img {
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+}
+
+#autofill_detail .edit_profile_link:hover {
+  background-color: #F3F4F6;
+}
+
+#autofill_detail .edit_profile_link:hover img {
+  opacity: 0.8;
+}
+
+#autofill_detail .profile_modal_subtitle {
+  font-size: 14px;
+  color: rgb(0, 0, 0, 0.5);
+  margin-top: 8px;
+}
+
+#autofill_detail .profile_modal_close {
+  position: absolute;
+  right: 24px;
+  top: 20px;
+  font-size: 24px;
+  color: rgb(0, 0, 0, 0.5);
+  cursor: pointer;
+  line-height: 1;
+}
+
+#autofill_detail .profile_modal_close:hover {
+  color: #111827;
+}
+
+/* ============================================
+   profile_modal section headers — Archetype D (Inline Product UI),
+   P1·e (2026-05-19). Tightened section header typography + subtle
+   inter-section hairline + hover affordance to match the D pattern.
+   JS contract preserved: .profile_section_header click handler in
+   html.js:778, .profile_section.expanded toggle, .section_edit /
+   .profile_section_toggle untouched.
+   ============================================ */
+#autofill_detail .profile_section {
+  padding: 0;
+  border-bottom: 1px solid rgba(15, 17, 21, 0.05);
+}
+
+#autofill_detail .profile_section:last-child {
+  border-bottom: none;
+  margin-bottom: 156px;
+}
+
+#autofill_detail .profile_section_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 22px;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+#autofill_detail .profile_section_header:hover {
+  background: rgba(15, 17, 21, 0.025);
+}
+
+#autofill_detail .manage_resume_section {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  cursor: pointer;
+  padding: 14px 22px;
+  transition: background .15s ease;
+}
+#autofill_detail .manage_resume_section:hover {
+  background: rgba(15, 17, 21, 0.025);
+}
+#autofill_detail .manage_resume_section img{
+  width: 16px;
+  height: 16px;
+  opacity: 0.78;
+}
+#autofill_detail .header_left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#autofill_detail .header_right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#autofill_detail .profile_section_icon {
+  font-size: 15px;
+  opacity: 0.85;
+}
+
+#autofill_detail .profile_section_title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: #0b0d10;
+}
+
+#autofill_detail .section_edit {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+#autofill_detail .section_edit:hover {
+  opacity: 1;
+  background-color: #F3F4F6;
+}
+
+#autofill_detail .profile_section_toggle {
+  width: 20px;
+  height: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%236B7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+#autofill_detail .profile_section.expanded .profile_section_toggle {
+  transform: rotate(180deg);
+}
+
+/* Section Content */
+#autofill_detail .profile_section_content {
+  height: 0;
+  overflow: hidden;
+  padding: 0 40px;
+  transition: height 0.2s ease;
+}
+
+#autofill_detail .profile_section.expanded .profile_section_content {
+  height: auto;
+  padding: 6px 40px;
+}
+
+/* Add Section Button */
+#autofill_detail .add_section_button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #F6F6F6;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 3px;
+  margin-top: 8px;
+  cursor: pointer;
+  color: #666666;
+  transition: background-color 0.2s;
+  justify-content: center;
+}
+
+#autofill_detail .add_section_button:hover {
+  background-color: #EBEBEB;
+}
+
+#autofill_detail .add_section_button img {
+  width: 16px;
+  height: 16px;
+}
+
+#autofill_detail .profile_field.new_item {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Field Styling */
+#autofill_detail .profile_field {
+  margin-bottom: 12px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+#autofill_detail .profile_field:hover {
+  background-color: #f6f6f6;
+}
+
+#autofill_detail .profile_field:active {
+  background-color: #E5E7EB;
+}
+
+#autofill_detail .field_label {
+  font-size: 12px;
+  color: rgb(0, 0, 0, 0.5);
+  margin-bottom: 6px;
+}
+
+#autofill_detail .field_value {
+  font-size: 14px;
+  color: #111827;
+  word-break: break-word;
+}
+
+#autofill_detail .field_value.placeholder_value:empty::before {
+  content: attr(data-placeholder);
+  color: rgba(0, 0, 0, 0.35);
+}
+
+/* Edit Mode Styles */
+#autofill_detail .profile_section.editing .profile_field {
+  background-color: #F9FAFB;
+  cursor: default;
+  margin-bottom: 12px;
+  padding: 12px 12px;
+}
+
+#autofill_detail .profile_section.editing .profile_field:hover {
+  background-color: #F9FAFB;
+}
+
+#autofill_detail .field_input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #111827;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+#autofill_detail .field_input:focus {
+  outline: none;
+  border-color: #0066ff;
+  box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.1);
+}
+
+/* Edit Buttons */
+#autofill_detail .section_edit_buttons {
+  display: none;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 0 0 12px 2px;
+}
+
+#autofill_detail .section_edit_buttons button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  margin-right: 2px;
+  transition: all 0.2s ease;
+}
+
+#autofill_detail .cancel_edit {
+  background: white;
+  color: rgb(0, 0, 0, 0.5);
+  border: 1px solid #E5E7EB;
+}
+
+#autofill_detail .cancel_edit:hover {
+  background: #F9FAFB;
+}
+
+#autofill_detail .save_edit {
+  background: #0066ff;
+  color: white;
+  border: 1px solid #0066ff;
+}
+
+#autofill_detail .save_edit:hover {
+  background: #0052cc;
+  border: 1px solid #0052cc;
+}
+
+/* Divider */
+#autofill_detail .section_divider {
+  margin: 16px 0;
+  border: none;
+  height: 0.5px;
+  background-color: #E5E7EB;
+}
+
+#autofill_detail .profile_fields_container .section_divider:last-child {
+  display: none;
+}
+
+/* Custom Fields Styles */
+#autofill_detail .custom_field_inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+#autofill_detail .custom_field_key {
+  flex: 1;
+  min-width: 0;
+}
+
+#autofill_detail .custom_field_value {
+  flex: 2;
+  min-width: 0;
+}
+
+#autofill_detail .delete_custom_field {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+#autofill_detail .delete_custom_field:hover {
+  opacity: 1;
+}
+
+#autofill_detail .empty_custom_fields {
+  padding: 24px 12px;
+  text-align: center;
+  color: #6B7280;
+  font-size: 14px;
+  font-style: italic;
+}
+
+/* Profile Loading State */
+#autofill_detail .profile_loading_container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  min-height: 120px;
+}
+
+#autofill_detail .profile_loading_spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #E5E7EB;
+  border-top: 3px solid #0066ff;
+  border-radius: 50%;
+  animation: profile_spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+#autofill_detail .profile_loading_text {
+  color: #6B7280;
+  font-size: 14px;
+}
+
+@keyframes profile_spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Save button loading state */
+#autofill_detail .save_edit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Toast Message */
+#autofill_detail .copied_toast {
+  position: fixed;
+  bottom: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 10000;
+  max-width: 90%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  animation: toastIn 0.3s ease forwards, 
+             toastOut 0.3s ease forwards 1.7s;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes toastOut {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+}
+
+/* Scrollbar Styling */
+#autofill_detail .profile_modal_content::-webkit-scrollbar {
+  width: 8px;
+}
+
+#autofill_detail .profile_modal_content::-webkit-scrollbar-track {
+  background: #F3F4F6;
+}
+
+#autofill_detail .profile_modal_content::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 4px;
+}
+
+#autofill_detail .profile_modal_content::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
+
+/* Profile Modal End */
+
+#autofill_detail .job_resume {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #34495e;
+  margin-top: 4px;
+  font-weight: 500;
+  padding: 8px;
+  background: #f8fafc;
+  border-radius: 8px;
+  width: fit-content;
+}
+
+#autofill_detail .job_resume img {
+  width: 16px;
+  height: 16px;
+}
+
+#autofill_detail .job_resume .resume_download {
+  color: #475569;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90%;
+}
+
+#autofill_detail .job_resume .resume_download:hover {
+  text-decoration: underline;
+}
+
+#autofill_detail .resume_container {
+  margin-top: 4px;
+  padding: 4px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  position: relative; /* Add this */
+  display: none;
+}
+
+#autofill_detail .job_details_button.add_resume {
+  /* background: #f8f9fa;
+  color: #64748b; */
+}
+
+#autofill_detail .job_details_button.add_resume:hover {
+  /* background: #f1f5f9;
+  color: #0f172a; */
+}
+
+/* Update resumes popup positioning */
+#autofill_detail .resume_container .resumes_popup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000; /* Ensure it appears above other content */
+  max-height: 400px; /* Add max height */
+  overflow-y: auto; /* Allow scrolling if content is too long */
+}
+
+/* Ensure job_item_details doesn't clip its children */
+#autofill_detail .job_item_details {
+  overflow: visible !important; /* Override any existing overflow settings */
+  position: relative; /* Ensure proper stacking context */
+}
+
+
+/* The virtual keyboard - START */
+.chatbox_virtual_keyboard {
+  position: relative;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.virtual-keyboard {
+  position: fixed;
+  background: #ffffff;  /* 改为白色背景 */
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);  /* 更柔和的阴影 */
+  z-index: 10000;
+  user-select: none;
+  display: block;
+  font-family: var(--jobwizard-font-family);
+  border: 1px solid #e0e0e0;  /* 添加边框 */
+  font-family: var(--jobwizard-font-family);
+}
+
+.virtual-keyboard .keyboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.virtual-keyboard .keyboard-header .keyboard-logo {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.virtual-keyboard .keyboard-header .keyboard-handle {
+  width: 100%;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;  /* 浅灰色背景 */
+  border-radius: 4px;
+  margin: 0 12px;
+  cursor: move;
+  border: 1px solid #e0e0e0;  /* 添加边框 */
+}
+
+.virtual-keyboard .keyboard-header .keyboard-handle img {
+  width: 128px !important;
+  height: 20px !important;
+}
+
+.virtual-keyboard .keyboard-close {
+  background: none;
+  border: none;
+  color: #666;  /* 深灰色文字 */
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 5px;
+}
+
+.virtual-keyboard .keyboard-close:hover {
+  color: #333;  /* 悬停时更深的颜色 */
+}
+
+.virtual-keyboard .keyboard-row {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 5px;
+}
+
+.virtual-keyboard .keyboard-key {
+  padding: 10px;
+  border: 1px solid #e5e7eb;  /* 添加边框 */
+  border-radius: 4px;
+  background: #f8f9fa;  /* 浅色背景 */
+  color: #333;  /* 深灰色文字 */
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 12px;
+  min-width: 30px;
+  text-align: center !important;
+}
+
+.virtual-keyboard .keyboard-key:hover {
+  background: rgba(0, 102, 255, 0.12);  /* 悬停时的背景色 */
+  border-color: #dee2e6;
+}
+
+.virtual-keyboard .keyboard-key:active {
+  background: rgba(0, 102, 255, 0.6);  /* 按下时的背景色 */
+  transform: translateY(0.5px);  /* 轻微下沉效果 */
+}
+
+.virtual-keyboard-trigger {
+  position: relative;
+  cursor: pointer;
+}
+/* The virtual keyboard - END */
+
+
+
+/* resume selector - START */
+#autofill_detail .resume_selector {
+  position: relative;
+}
+
+#autofill_detail .resume_selector__dropdown_card {
+  position: absolute;
+  right: -20px;
+  width: 300px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+  z-index: 10;
+  padding: 12px 20px;
+  font-family: inherit;
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#autofill_detail .resume_selector__dropdown_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+#autofill_detail .resume_selector__dropdown_title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+#autofill_detail .resume_selector__dropdown_list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#autofill_detail .resume_selector__dropdown_item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #f3f4f6;
+  transition: background 0.2s, border 0.2s;
+  position: relative;
+  cursor: pointer;
+}
+
+/* 选中项：蓝色背景和边框 */
+#autofill_detail .resume_selector__dropdown_item--active {
+  background: #f5faff;
+  border: 1px solid #338AFF;
+}
+
+/* 非选中项 hover：灰色背景和深灰边框 */
+#autofill_detail .resume_selector__dropdown_item:not(.resume_selector__dropdown_item--active):hover {
+  background: #f5f7fa;
+  border: 1px solid #bfc8d7;
+}
+
+/* 选中项 hover 依然是蓝色 */
+#autofill_detail .resume_selector__dropdown_item--active:hover {
+  background: #f5faff;
+  border: 1px solid #338AFF;
+}
+
+/* 操作区始终显示（用于按钮合一的场景） */
+#autofill_detail .resume_selector__dropdown_actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+/* -------- Default/Set Default 按钮合一 -------- */
+
+/* 统一按钮基础样式 */
+#autofill_detail .resume_selector__action_btn {
+  width: 64px;
+  padding: 3px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 8px;
+  margin-left: 8px;
+  text-align: center;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  border: 1px solid transparent;
+  cursor: pointer;
+  vertical-align: middle;
+  display: none; /* 常态隐藏 */
+}
+
+/* hover item 时显示所有 action 按钮 */
+#autofill_detail .resume_selector__dropdown_item:hover .resume_selector__action_btn {
+  display: inline-block;
+}
+
+/* Set Default 按钮样式 */
+#autofill_detail .resume_selector__action_btn.set_default {
+  border-color: #338AFF;
+  color: #338AFF;
+  background: #fff;
+}
+#autofill_detail .resume_selector__action_btn.set_default:hover:not(:disabled) {
+  background: #e6f0ff;
+  color: #338AFF;
+  border-color: #338AFF;
+}
+
+/* Set Default active（当前为默认简历，常亮tag） */
+#autofill_detail .resume_selector__action_btn.set_default.active,
+#autofill_detail .resume_selector__dropdown_item--active:hover .resume_selector__action_btn.set_default.active {
+  display: inline-block; /* 选中项hover和常态都显示 */
+  cursor: default;
+  pointer-events: none;
+  background: #338AFF;
+  color: #fff;
+}
+
+/* Delete 按钮样式 */
+#autofill_detail .resume_selector__action_btn.delete {
+  border-color: #ff4d4f;
+  color: #ff4d4f;
+  background: #fff;
+}
+#autofill_detail .resume_selector__action_btn.delete:hover {
+  background: #ff4d4f;
+  color: #fff;
+  border-color: #ff4d4f;
+}
+
+/* -------- 其它样式 -------- */
+
+#autofill_detail .resume_selector__dropdown_info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 2px;
+  max-width: 140px;
+}
+
+#autofill_detail .resume_selector__dropdown_name_container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#autofill_detail .resume_selector__dropdown_name {
+  font-weight: 500;
+  font-size: 14px;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+#autofill_detail .resume_selector__dropdown_score {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+#autofill_detail .resume_selector__score_tag {
+  display: inline-block;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 12px;
+  font-weight: 500;
+}
+#autofill_detail .resume_selector__score_tag--green { background: #e6f9e6; color: #1db954; }
+#autofill_detail .resume_selector__score_tag--blue { background: #e6f0ff; color: #338AFF; }
+#autofill_detail .resume_selector__score_tag--yellow { background: #fffbe6; color: #e6a100; }
+#autofill_detail .resume_selector__score_tag--red { background: #ffeaea; color: #ff4d4f; }
+#autofill_detail .resume_selector__score_tag--gray { background: #f0f0f0; color: #aaa; }
+
+#autofill_detail .resume_selector__main {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 10px;
+  padding: 0 2px 24px;
+  font-size: 14px;
+  position: relative;
+}
+
+#autofill_detail .resume_selector__icon {
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+}
+
+#autofill_detail .resume_selector__current_container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+#autofill_detail .resume_selector__current {
+  font-size: 14px;
+  font-weight: 500;
+  margin-right: 12px;
+  color: #222;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#autofill_detail .resume_selector__label {
+  color: #666;
+  margin-right: 6px;
+  font-size: 12px;
+}
+
+#autofill_detail .resume_selector__switch_dropdown_btn {
+  border-radius: 6px;
+  padding: 6px;
+  cursor: pointer;
+  margin-left: auto;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+}
+
+#autofill_detail .resume_selector__switch_dropdown_btn:hover {
+  background: #e6f0ff;
+}
+
+/* Insight resume list - unified with resume_manage_modal */
+#autofill_detail .resume_selector .resume_list_divider {
+  height: 1px;
+  background: #f3f4f6;
+  margin: 0 0 12px;
+}
+#autofill_detail .resume_selector .resume_list_list_wrap {
+  max-height: 240px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+}
+#autofill_detail .resume_selector .pdf_list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+#autofill_detail .resume_selector .pdf_card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  color: #5f6368;
+  font-size: 12px;
+  font-weight: 400;
+  gap: 8px;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+}
+#autofill_detail .resume_selector .pdf_card .pdf_meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#autofill_detail .resume_selector .pdf_card .pdf_meta .pdf_meta_extra {
+  font-size: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+#autofill_detail .resume_selector .pdf_card .pdf_card_content {
+  flex: 1;
+  padding: 8px 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  word-break: break-word;
+}
+#autofill_detail .resume_selector .pdf_card.active .pdf_card_content,
+#autofill_detail .resume_selector .pdf_card.selected .pdf_card_content {
+  border-radius: 8px;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  font-weight: 500;
+}
+#autofill_detail .resume_selector .pdf_card .action_buttons {
+  display: flex;
+  gap: 2px;
+}
+#autofill_detail .resume_selector .pdf_card .check,
+#autofill_detail .resume_selector .pdf_card .delete,
+#autofill_detail .resume_selector .pdf_card .download {
+  display: none;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  border-radius: 4px;
+  align-items: center;
+  justify-content: center;
+}
+#autofill_detail .resume_selector .pdf_card:hover .check,
+#autofill_detail .resume_selector .pdf_card:hover .delete,
+#autofill_detail .resume_selector .pdf_card:hover .download {
+  display: flex;
+}
+#autofill_detail .resume_selector .pdf_card .check img,
+#autofill_detail .resume_selector .pdf_card .delete img,
+#autofill_detail .resume_selector .pdf_card .download img {
+  opacity: 0.5;
+}
+#autofill_detail .resume_selector .pdf_card .check:hover,
+#autofill_detail .resume_selector .pdf_card .delete:hover,
+#autofill_detail .resume_selector .pdf_card .download:hover {
+  display: flex;
+  background: #e8e8ed;
+}
+#autofill_detail .resume_selector .pdf_card .check:hover img,
+#autofill_detail .resume_selector .pdf_card .delete:hover img,
+#autofill_detail .resume_selector .pdf_card .download:hover img {
+  opacity: 1;
+}
+#autofill_detail .resume_selector .pdf_card .pdf_icon {
+  width: 20px;
+  height: 20px;
+}
+#autofill_detail .resume_selector .pdf_card .download.loading {
+  display: flex !important;
+  background: url("../icons/loading_without_bg.svg") center/24px no-repeat;
+}
+/* Insight score tag */
+#autofill_detail .resume_selector .insight_score_tag {
+  display: inline-block;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 500;
+}
+#autofill_detail .resume_selector .insight_score_tag--green { background: #e6f9e6; color: #1db954; }
+#autofill_detail .resume_selector .insight_score_tag--blue { background: #e6f0ff; color: #338AFF; }
+#autofill_detail .resume_selector .insight_score_tag--yellow { background: #fffbe6; color: #e6a100; }
+#autofill_detail .resume_selector .insight_score_tag--red { background: #ffeaea; color: #ff4d4f; }
+#autofill_detail .resume_selector .insight_score_tag--gray { background: #f0f0f0; color: #aaa; }
+/* Need to parse badge */
+#autofill_detail .resume_selector .need_parse_badge {
+  display: inline-block;
+  font-size: 10px;
+  color: #e6a100;
+  background: #fffbe6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+#autofill_detail .resume_selector__default_tag {
+  font-size: 11px;
+  color: #338AFF;
+  background: #e6f0ff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+  margin-left: 4px;
+}
+/* Insight resume list upload - full styles to match resume_manage_modal */
+#autofill_detail .resume_selector .resume_list_upload {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px dashed #d2d2d7;
+  border-radius: 10px;
+  background: #fafafa;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  overflow: hidden;
+}
+#autofill_detail .resume_selector .resume_list_upload:hover {
+  border-color: #b8b8bd;
+  background: #f5f5f7;
+}
+#autofill_detail .resume_selector .resume_list_upload:active {
+  background: #ebebed;
+}
+#autofill_detail .resume_selector .resume_list_upload.uploading {
+  pointer-events: none;
+  opacity: 0.6;
+}
+#autofill_detail .resume_selector .resume_list_upload input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+#autofill_detail .resume_selector .resume_list_upload_inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+#autofill_detail .resume_selector .resume_list_upload_icon_wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+#autofill_detail .resume_selector .resume_list_upload:hover .resume_list_upload_icon_wrap {
+  opacity: 0.85;
+}
+#autofill_detail .resume_selector .resume_list_upload .upload_icon {
+  width: 14px;
+  height: 14px;
+}
+#autofill_detail .resume_selector .resume_list_upload_label {
+  font-size: 13px;
+  font-weight: 400;
+  color: #86868b;
+  font-family: var(--jobwizard-font-family);
+  transition: color 0.2s ease;
+}
+#autofill_detail .resume_selector .resume_list_upload:hover .resume_list_upload_label {
+  color: #1d1d1f;
+}
+#autofill_detail .resume_selector .resume_list_upload_progress_wrap {
+  flex-shrink: 0;
+  margin-top: 6px;
+  width: 100%;
+}
+#autofill_detail .resume_selector .resume_list_upload_progress_track {
+  height: 3px;
+  border-radius: 2px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+#autofill_detail .resume_selector .resume_list_upload_progress_fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 2px;
+  background: #0066ff;
+  transition: width 0.3s ease;
+}
+/* resume selector - END */
+
+/* No Applications Found Message */
+#autofill_detail .no-applications-message {
+  text-align: center;
+  padding: 0px 20px;
+  color: #666;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#autofill_detail .no-applications-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+#autofill_detail .no-applications-message h3 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+}
+
+#autofill_detail .no-applications-message p {
+  margin: 0 0 20px 0;
+  line-height: 1.5;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  font-size: 14px;
+}
+
+#autofill_detail .no-applications-tip {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 12px;
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+#autofill_detail .no-applications-tip strong {
+  color: #333;
+}
+
+
+
+#autofill_detail .redeem_code_modal {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100% ;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+#autofill_detail .redeem_code_modal.show { display: flex; }
+#autofill_detail .redeem_code_modal .mask {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 1;
+}
+#autofill_detail .redeem_code_modal .modal_content {
+  position: relative;
+  z-index: 999;
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px 24px 24px 24px;
+  min-width: 350px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+#autofill_detail .redeem_code_modal .modal_header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+#autofill_detail .redeem_code_modal .modal_title_emoji {
+  font-size: 20px;
+  cursor: pointer;
+  margin-right: 8px;
+}
+#autofill_detail .redeem_code_modal .modal_title {
+  font-size: 18px;
+  font-weight: 600;
+}
+#autofill_detail .redeem_code_modal .modal_desc {
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+#autofill_detail .redeem_code_modal .redeem_input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+#autofill_detail .redeem_code_modal .redeem_confirm {
+  width: 100%;
+  padding: 14px 0;
+  border: none;
+  border-radius: 10px;
+  background: #06f;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#autofill_detail .redeem_code_modal .redeem_confirm:disabled {
+  background: #bbb;
+  cursor: not-allowed;
+}
+
+/* confirm modal */
+#autofill_detail .confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#autofill_detail .confirm-overlay.show {
+  display: flex;
+  opacity: 1;
+}
+
+#autofill_detail .confirm-modal {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  max-height: 30vh;
+  height: max-content;
+  overflow: hidden;
+  transform: scale(0.7);
+  transition: transform 0.3s ease;
+}
+
+#autofill_detail .confirm-overlay.show .confirm-modal {
+  transform: scale(1);
+}
+
+#autofill_detail .confirm-header {
+  padding: 20px 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#autofill_detail .confirm-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+#autofill_detail .confirm-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+#autofill_detail .confirm-close:hover {
+  background: #f5f5f5;
+  color: #666;
+}
+
+#autofill_detail .confirm-body {
+  padding: 20px;
+}
+
+#autofill_detail .confirm-content {
+  color: #666;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+#autofill_detail .confirm-footer {
+  padding: 0 20px 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+#autofill_detail .confirm-btn {
+  padding: 10px 20px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  min-width: 80px;
+}
+
+#autofill_detail .confirm-cancel {
+  background: white;
+  color: #666;
+}
+
+#autofill_detail .confirm-cancel:hover {
+  background: #f5f5f5;
+  border-color: #ccc;
+}
+
+#autofill_detail .confirm-ok {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+#autofill_detail .confirm-ok:hover {
+  background: #0056b3;
+  border-color: #0056b3;
+}
+
+#autofill_detail .confirm-ok.danger {
+  background: #dc3545;
+  border-color: #dc3545;
+}
+
+#autofill_detail .confirm-ok.danger:hover {
+  background: #c82333;
+  border-color: #c82333;
+}
+/* confirm modal - END */
+
+
+#autofill_detail .job_details_button.add_resume:hover {
+  background: #f8f9fa;
+}

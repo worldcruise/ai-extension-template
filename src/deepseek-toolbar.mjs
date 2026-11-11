@@ -1,5 +1,5 @@
 import { createChatToolbar } from './chat-toolbar.mjs';
-import { DEEPSEEK_ORIGIN, DEEPSEEK_CHANNEL, deepseekRoutes, deepseekState, deepseekRoute } from './deepseek-protocol.mjs';
+import { DEEPSEEK_ORIGIN, DEEPSEEK_CHANNEL, deepseekRoutes, deepseekState, deepseekRoute, createDeepseekTransport } from './deepseek-protocol.mjs';
 
 export function createDeepseekToolbar() {
   const pane = document.getElementById('deepseek-pane'), frame = document.getElementById('deepseek-frame');
@@ -19,45 +19,91 @@ export function createDeepseekToolbar() {
   let state = { loaded: false, ready: false, hasDraft: false, busy: false, urls: [], chats: [] };
   const status = document.getElementById('deepseek-status');
   const searchRequests = new Map();
+  const historyRequests = new Map();
+  const transport = createDeepseekTransport({ frame,
+    onData: data => onMessage({ data, source: frame.contentWindow, origin: DEEPSEEK_ORIGIN }),
+    onConnect: () => { nonce = crypto.randomUUID(); onLoad(); }
+  });
+  let historyAttempted = false, historyPending = false;
+  function historyCommand(action, extra = {}) {
+    return new Promise(resolve => {
+      const operationId = crypto.randomUUID();
+      const timer = setTimeout(() => { historyRequests.delete(operationId); resolve({ reason: 'timeout' }); }, 8000);
+      historyRequests.set(operationId, { resolve, timer });
+      if (!command(action, { operationId, ...extra })) { clearTimeout(timer); historyRequests.delete(operationId); resolve({ reason: 'disconnected' }); }
+    });
+  }
+  async function refreshHistory() {
+    if (!connected || !state.ready || state.hasDraft || state.busy || historyPending || navigating || historyAttempted) return;
+    historyAttempted = true; historyPending = true; render();
+    try { await historyCommand('history.inspect'); }
+    finally { historyPending = false; render(); }
+  }
+  async function moveHistory(direction) {
+    if (![-1, 1].includes(direction) || !connected || !state.ready || state.hasDraft || state.busy || navigating || historyPending) return;
+    const original = currentUrl;
+    navigating = true; render();
+    const notice = q('native-search-status'); notice.hidden = true;
+    const result = await historyCommand('history.move', { direction, currentUrl: original });
+    navigating = false; render();
+    if (currentUrl === original) {
+      const reasons = {
+        draft: 'Finish or clear your DeepSeek draft before switching chats.',
+        generation: 'Wait for the DeepSeek response to finish before switching chats.',
+        loading: 'DeepSeek is still loading its message box. Try again when it is ready.',
+        'current-not-loaded': 'This conversation is not in the loaded DeepSeek history. Open its sidebar and scroll to this chat, then try again.',
+        boundary: direction === 1 ? 'You are at the oldest loaded DeepSeek chat.' : 'You are at the newest loaded DeepSeek chat.',
+        'navigation-unconfirmed': 'DeepSeek did not confirm the chat switch. The page was kept open to preserve your session; use its native history to select the chat.',
+        'conversation-changed': 'The current DeepSeek chat changed. Try the arrow again.'
+      };
+      notice.textContent = reasons[result?.reason] || 'DeepSeek history could not be read. Open its native sidebar once and try the arrow again.';
+      notice.hidden = false;
+    }
+  }
   function command(action, extra = {}) {
-    frame.contentWindow?.postMessage({ channel: DEEPSEEK_CHANNEL, nonce, action, scale, ...extra }, DEEPSEEK_ORIGIN);
+    const interactive = !document.getElementById('chat-view').hidden && !pane.hidden;
+    return transport.send({ channel: DEEPSEEK_CHANNEL, nonce, action, scale, interactive, ...extra });
   }
   const toolbar = createChatToolbar({ root: pane, idPrefix: 'deepseek-', providerName: 'DeepSeek', routes: deepseekRoutes,
     onNativeSearch: query => new Promise(resolve => {
       const operationId = crypto.randomUUID();
       const timer = setTimeout(() => { searchRequests.delete(operationId); resolve(false); }, 5000);
-      searchRequests.set(operationId, { resolve, timer }); command('search', { operationId, query });
+      searchRequests.set(operationId, { resolve, timer });
+      if (!command('search', { operationId, query })) { clearTimeout(timer); searchRequests.delete(operationId); resolve(false); }
     }),
-    currentUrl: () => currentUrl, onHistoryNeeded: () => command('probe'), onChatsRefresh: () => command('probe'),
-    selectConversation: chat => navigate(chat.url), moveHistory: direction => navigate(deepseekRoutes.target(state.urls, currentUrl, direction)) });
+    currentUrl: () => currentUrl, onHistoryNeeded: () => { void refreshHistory(); }, moveHistory: direction => { void moveHistory(direction); } });
   function render() {
-    toolbar.updateHistory({ ...state, enabled: connected, navigating });
+    toolbar.updateHistory({ ...state, enabled: connected, navigating, pending: historyPending });
     q('new-chat').disabled = q('reload').disabled = !connected || !state.ready || state.hasDraft || state.busy || navigating;
     q('zoom-in').disabled = !connected || scale === 150;
     q('zoom-out').disabled = !connected || scale === 50;
     q('chat-zoom-status').textContent = `Chat text size ${scale}%`;
     q('zoom-in').title = `Increase text size (${scale}%)`; q('zoom-out').title = `Decrease text size (${scale}%)`;
     status.hidden = connected && state.ready;
-    status.textContent = connected ? 'Sign in to DeepSeek to use chat controls. If needed, open DeepSeek in a tab.' : 'Connecting to DeepSeek… If chat does not load, use Open in tab.';
-  }
-  function navigate(target) {
-    if (!target || target === currentUrl || !state.urls.includes(target) || !state.ready || state.hasDraft || state.busy || navigating) return;
-    navigating = true; render(); command('open', { target, currentUrl });
-    clearTimeout(navigationTimer);
-    navigationTimer = setTimeout(() => { navigating = false; render(); }, 8000);
+    // A hidden or loading composer is not evidence that the session signed out.
+    status.textContent = connected ? 'Waiting for DeepSeek’s message box… If it does not appear, use Open in tab.' : 'Connecting to DeepSeek… If chat does not load, use Open in tab.';
   }
   let navigationTimer;
   let pendingNavigation;
-  function requestNavigation(action) {
+  function requestNavigation(action, url, resolve) {
     if (!connected || !state.ready || state.hasDraft || state.busy || navigating) return;
     const operationId = crypto.randomUUID();
-    pendingNavigation = { action, operationId }; navigating = true; render();
-    command(action, { operationId });
+    pendingNavigation = { action, operationId, url, resolve }; navigating = true; render();
+    if (!command(action, { operationId, ...(url ? { url } : {}) })) { pendingNavigation = null; navigating = false; render(); resolve?.(false); return; }
     clearTimeout(navigationTimer);
-    navigationTimer = setTimeout(() => { pendingNavigation = null; navigating = false; render(); }, 5000);
+    navigationTimer = setTimeout(() => { pendingNavigation?.resolve?.(false); pendingNavigation = null; navigating = false; render(); }, 5000);
   }
   function onMessage(event) {
     const data = event.data;
+    if (event.source === frame.contentWindow && event.origin === DEEPSEEK_ORIGIN && data?.channel === DEEPSEEK_CHANNEL && data.nonce === nonce && data.type === 'history.reply' && typeof data.dispatched === 'boolean') {
+      const request = historyRequests.get(data.operationId);
+      if (request && (data.target === undefined || deepseekRoutes.conversation(data.target) === data.target)) {
+        clearTimeout(request.timer); historyRequests.delete(data.operationId);
+        const reasons = ['draft', 'generation', 'loading', 'current-not-loaded', 'boundary', 'conversation-changed', 'history-unavailable', 'navigation-unconfirmed'];
+        request.resolve({ target: data.target, reason: reasons.includes(data.reason) ? data.reason : '' });
+      }
+      return;
+    }
     if (event.source === frame.contentWindow && event.origin === DEEPSEEK_ORIGIN && data?.channel === DEEPSEEK_CHANNEL && data.nonce === nonce && data.type === 'search.reply' && typeof data.ok === 'boolean') {
       const request = searchRequests.get(data.operationId);
       if (request) { clearTimeout(request.timer); searchRequests.delete(data.operationId); request.resolve(data.ok); }
@@ -66,18 +112,30 @@ export function createDeepseekToolbar() {
     if (pendingNavigation && event.source === frame.contentWindow && event.origin === DEEPSEEK_ORIGIN &&
         data?.channel === DEEPSEEK_CHANNEL && data.nonce === nonce && data.type === 'navigate' &&
         data.operationId === pendingNavigation.operationId && data.action === pendingNavigation.action &&
-        deepseekRoute(data.url) === data.url && (data.action === 'new' ? data.url === DEEPSEEK_ORIGIN + '/' : data.url === currentUrl)) {
+        deepseekRoute(data.url) === data.url && (data.action === 'new' ? data.url === DEEPSEEK_ORIGIN + '/' : data.action === 'open' ? data.url === pendingNavigation.url : data.url === currentUrl)) {
       // The extension initiates full loads so its scoped embed rule still applies.
-      pendingNavigation = null; clearTimeout(navigationTimer); connected = false; render(); frame.src = data.url;
+      const resolve = pendingNavigation.resolve;
+      pendingNavigation = null; clearTimeout(navigationTimer); connected = false; render(); frame.src = data.url; resolve?.(true);
       return;
     }
     const next = deepseekState(event, frame.contentWindow, nonce);
     if (!next) return;
-    if (currentUrl !== next.currentUrl) { navigating = false; clearTimeout(navigationTimer); }
+    if (currentUrl !== next.currentUrl) {
+      pendingNavigation?.resolve?.(false); pendingNavigation = null;
+      navigating = false; clearTimeout(navigationTimer); q('native-search-status').hidden = true;
+    }
     currentUrl = next.currentUrl; state = next; connected = true; render(); toolbar.updateCurrent();
+    if (shell.dataset.open === 'true') void refreshHistory();
   }
-  function onLoad() { for (const request of searchRequests.values()) { clearTimeout(request.timer); request.resolve(false); } searchRequests.clear(); nonce = crypto.randomUUID(); connected = false; navigating = false; pendingNavigation = null; clearTimeout(navigationTimer); render(); command('probe'); }
-  window.addEventListener('message', onMessage); frame.addEventListener('load', onLoad);
+  function clearRequests() {
+    for (const requests of [searchRequests, historyRequests]) {
+      for (const request of requests.values()) { clearTimeout(request.timer); request.resolve(false); }
+      requests.clear();
+    }
+  }
+  function onLoad() { clearRequests(); historyAttempted = false; historyPending = false; connected = false; navigating = false; pendingNavigation?.resolve?.(false); pendingNavigation = null; clearTimeout(navigationTimer); render(); command('probe'); }
+  const onWindowMessage = event => { transport.accept(event); };
+  window.addEventListener('message', onWindowMessage); frame.addEventListener('load', onLoad);
   q('new-chat').addEventListener('click', () => requestNavigation('new'));
   q('reload').addEventListener('click', () => requestNavigation('reload'));
   q('open-tab').addEventListener('click', () => {
@@ -87,6 +145,20 @@ export function createDeepseekToolbar() {
     scale = Math.max(50, Math.min(150, scale + delta)); command('probe'); render();
   });
   const poll = setInterval(() => { if (!pane.hidden && frame.hasAttribute('src')) command('probe'); }, 1500);
-  window.addEventListener('pagehide', () => { clearInterval(poll); clearTimeout(navigationTimer); window.removeEventListener('message', onMessage); frame.removeEventListener('load', onLoad); }, { once: true });
+  window.addEventListener('pagehide', () => { transport.close(); clearRequests(); clearInterval(poll); clearTimeout(navigationTimer); window.removeEventListener('message', onWindowMessage); frame.removeEventListener('load', onLoad); }, { once: true });
   render();
+  return {
+    probe: () => command('probe'),
+    getCurrentChat: () => connected ? deepseekRoutes.conversation(currentUrl) : null,
+    async openConversation(url) {
+      const target = deepseekRoutes.conversation(url);
+      if (!target) throw new Error('This is not a DeepSeek conversation URL.');
+      const deadline = Date.now() + 6000;
+      while ((!connected || !state.ready) && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 100));
+      if (!connected || !state.ready) throw new Error('Wait for DeepSeek’s message box to load, then open this saved chat again.');
+      if (target === currentUrl) return;
+      if (state.hasDraft || state.busy || navigating) throw new Error('Finish your DeepSeek draft or response before opening a saved chat.');
+      if (!await new Promise(resolve => requestNavigation('open', target, resolve))) throw new Error('DeepSeek did not allow the chat switch. Finish any draft and try again.');
+    }
+  };
 }

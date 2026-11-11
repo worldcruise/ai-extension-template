@@ -1,7 +1,7 @@
 import { icon } from './icons.mjs';
 import { profiles as exampleProfiles, prompts } from './studio-examples.mjs';
 import { exampleProfile } from './resume-data.mjs';
-import { linkedConversationUrl } from './sidebar-protocol.mjs';
+import { savedChatUrl, requestChatUrl } from './saved-chat.mjs';
 import { resumeTemplates, resumeTemplate } from './resume-templates.mjs';
 import { terminalStates, recoverableStates, deliveryEvidence } from './queue-outcomes.mjs';
 import { metadataProvenance, provenanceLabel } from './job-metadata.mjs';
@@ -10,12 +10,17 @@ import { MANUAL_QUEUE_MODE, MANUAL_QUEUE_MESSAGE } from './queue-mode.mjs';
 import { copyRequestPrompt, promptForManualCopy } from './manual-prompt.mjs';
 import { updateReadPageHint } from './shortcut-settings.mjs';
 import { requestJobPageAccess } from './job-page-access.mjs';
-import { duplicateCheckStorageKey } from './job-duplicates.mjs';
+import { duplicateCheckStorageKey, duplicateJobUrl, jobUrlInList } from './job-duplicates.mjs';
+import { createQueueDocuments } from './queue-documents.mjs';
 
 export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
   getCurrentChat = () => null }) {
   const q = selector => document.querySelector(selector);
   let requests = [];
+  const documents = createQueueDocuments({ queue, openDialog,
+    getRequest: id => requests.find(item => item.id === id && item.input.candidateId === candidateId()),
+    onSaved: () => { clearPreview(); showStudio('results'); status('Resume and cover letter saved on this job.'); }
+  });
   let profiles = { ...exampleProfiles };
   let queueState = { control: { paused: true }, requests: [] };
   let initialized = false;
@@ -52,9 +57,11 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
   const manualOnly = () => queueState.manualOnly ?? MANUAL_QUEUE_MODE;
   let selectionLoaded = false;
   let currentTabId = null;
+  let currentTabUrl = '', currentTabBusy = false;
   let previewId = null;
   let detailRequestId = null;
   let paused = true;
+  let queueSearch = '', queueFilter = 'all';
   let reading = null;
   const readFeedback = new Map();
   const jobDrafts = new Map();
@@ -84,7 +91,6 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
   }
   function renderCandidate() {
     const current = profile();
-    q('#candidate-avatar').textContent = current.initials;
     q('#profile-filename').textContent = `${current.filename}${current.isExample !== false ? ' · Example profile' : ''}`;
     q('#profile-name').textContent = current.name;
     q('#profile-role').textContent = current.role;
@@ -141,10 +147,17 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     const all = requests.filter(request => request.input.candidateId === candidateId() && request.state !== 'cancelled');
     const own = all.filter(request => !terminalStates.includes(request.state));
     const failures = all.filter(request => terminalStates.includes(request.state));
+    const matches = request => {
+      const text = `${request.input.job.company} ${request.input.job.role}`.toLocaleLowerCase();
+      return text.includes(queueSearch) && (queueFilter === 'all' || request.state === queueFilter ||
+        queueFilter === 'attention' && [...recoverableStates, ...terminalStates, 'saving'].includes(request.state));
+    };
+    const visible = own.filter(matches), visibleFailures = failures.filter(matches);
+    q('#queue-no-matches').hidden = !all.length || visible.length + visibleFailures.length > 0;
     q('#add-request').disabled = !initialized || pendingActions.has('add');
     q('#review-count').textContent = own.length;
     q('#queue-owner').textContent = profile().name;
-    q('#empty-queue').hidden = own.length > 0;
+    q('#empty-queue').hidden = all.length > 0;
     const renderCard = request => {
       const { input } = request;
       const company = input.tailor ? input.job.company || 'Company not provided' : 'Base resume';
@@ -152,7 +165,11 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
       card.dataset.requestId = String(request.id);
       const top = element('div', 'request-top');
       const title = element('div', 'request-title');
-      title.append(element('strong', '', company), element('p', '', input.job.role));
+      const heading = action('', null, 'details', request.id);
+      heading.className = 'request-title-button';
+      heading.setAttribute('aria-label', `View job details for ${input.job.role} at ${company}`);
+      heading.append(element('strong', '', company), element('p', '', input.job.role));
+      title.append(heading);
       const pill = element('span', 'state-pill');
       pill.dataset.state = request.state;
       const labels = { ready: request.isExample ? 'Ready' : 'Ready for review', saving: 'Save pending', queued: 'Queued', preparing: 'Preparing', sending: 'Sending', generating: 'Generating', validating: 'Validating', attention: 'Needs attention', interrupted: 'Interrupted', unsent: 'Not sent', uncertain: 'Reconcile delivery', 'invalid-output': 'Invalid completed output', 'error-response': 'Completed error response' };
@@ -160,27 +177,40 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
       top.append(element('span', 'company-mark', company[0]), title, pill);
       const number = typeof request.id === 'number' ? String(request.id).padStart(3, '0') : request.id.slice(0, 8);
       const meta = element('div', 'request-meta', `${input.profile.name.split(' ')[0]} · ${resumeTemplate(input.resumeTemplate).name} · #${number}`);
+      if (request.updatedAt) {
+        const date = new Date(request.updatedAt);
+        if (Number.isFinite(date.getTime())) {
+          const stamp = element('time', 'request-updated', date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+          stamp.dateTime = date.toISOString(); stamp.title = `Updated ${date.toLocaleString()}`; meta.append(stamp);
+        }
+      }
       if (request.state === 'ready' && request.isExample) {
         const saved = element('span', 'example-saved');
         saved.append(icon('check'), document.createTextNode('Saved example'));
         meta.append(saved);
       }
       card.append(top, meta);
-      const provenance = metadataProvenance(input.job);
-      card.append(element('p', 'field-hint', `Company: ${provenanceLabel(provenance.company)} · Job title: ${provenanceLabel(provenance.role)}`));
       if (request.state === 'saving') card.append(element('p', 'request-note', request.isExample ? 'Example result retained · Try the save-retry interaction.' : 'Result retained. Retry saving before closing the panel.'));
       if (request.error) card.append(element('p', 'request-note request-error', request.error));
       if (request.isExample) card.append(element('p', 'field-hint', 'Example result · Not sent to ChatGPT'));
       const actions = element('div', 'request-actions');
       actions.append(action(pendingActions.has(`copy-prompt:${request.id}`) ? 'Copying…' : copiedRequestId === request.id ? 'Copied' : 'Copy prompt', 'copy', 'copy-prompt', request.id));
       actions.append(action('Details', 'file', 'details', request.id));
-      if (request.state === 'ready') {
-        const review = action('Review', 'chat', 'review', request.id);
-        review.disabled = !linkedConversationUrl(request.sourceChatUrl);
+      const jobUrl = safeJobUrl(input.job.url);
+      if (jobUrl) {
+        const link = element('a', 'button', 'Go to apply');
+        link.href = jobUrl; link.target = '_blank'; link.rel = 'noopener noreferrer'; actions.append(link);
+      }
+      if (request.state === 'ready' || requestChatUrl(request)) {
+        const review = action('Open chat', 'chat', 'review', request.id);
+        review.disabled = !requestChatUrl(request);
         review.title = review.disabled ? 'No originating conversation is recorded. Open Details to inspect this result.' : 'Open this result’s originating conversation';
         actions.prepend(review);
       }
-      if (request.state === 'ready') actions.append(action('Preview', 'file', 'preview', request.id));
+      if (request.state === 'ready') actions.append(action('View resume', 'file', 'preview', request.id));
+      const editDocuments = action('Documents', 'file-pen', 'documents', request.id);
+      editDocuments.disabled = ['preparing', 'sending', 'generating', 'validating', 'saving'].includes(request.state);
+      actions.append(editDocuments);
       if (request.state === 'saving') actions.append(action('Retry save', 'refresh', 'retry-save', request.id));
       if (recoverableStates.includes(request.state)) {
         const attempt = request.attempts?.at(-1);
@@ -198,12 +228,13 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
       card.append(actions);
       return card;
     };
-    q('#resume-queue').replaceChildren(...own.map(renderCard));
-    q('#failed-queue').replaceChildren(...failures.map(renderCard));
+    q('#resume-queue').replaceChildren(...visible.map(renderCard));
+    q('#failed-queue').replaceChildren(...visibleFailures.map(renderCard));
     const detailCopyPending = Boolean(detailRequestId && pendingActions.has(`copy-prompt:${detailRequestId}`));
     q('#request-copy-prompt').disabled = detailCopyPending;
     q('#request-copy-prompt').textContent = detailCopyPending ? 'Copying…' : detailRequestId && copiedRequestId === detailRequestId ? 'Copied' : 'Copy prompt';
-    q('#failed-results').hidden = failures.length === 0; q('#failed-count').textContent = failures.length;
+    q('#failed-results').hidden = visibleFailures.length === 0; q('#failed-count').textContent = visibleFailures.length;
+    if (queueFilter === 'attention' || queueSearch) q('#failed-results').open = true;
     const counts = own.reduce((total, request) => { total[request.state] = (total[request.state] || 0) + 1; return total; }, {});
     const parts = [];
     if (counts.ready) parts.push(`${counts.ready} ready`);
@@ -224,12 +255,71 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     if (manualOnly() && paused) { pause.title = MANUAL_QUEUE_MESSAGE; pause.setAttribute('aria-label', 'Bulk sending paused'); }
     q('#start-queue').disabled = manualOnly() || !initialized || !eligible || Boolean(queueState.control.ownerId) || queueState.starting;
     q('#start-queue').hidden = manualOnly();
-    q('#manual-queue-note').hidden = !manualOnly();
-    q('#manual-queue-note').textContent = MANUAL_QUEUE_MESSAGE;
     q('#start-queue').textContent = queueState.control.ownerId ? 'Queue running' : 'Start queue';
+    renderCurrentJob();
   }
 
+  function safeJobUrl(value) {
+    try { const url = new URL(value); return ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password ? url.href : null; }
+    catch { return null; }
+  }
+  function renderCurrentJob() {
+    const button = q('#capture-current-job');
+    button.hidden = !canCaptureCurrentJob();
+    const busy = pendingActions.has('add') || Boolean(reading) || currentTabBusy;
+    button.disabled = busy || button.hidden;
+    button.setAttribute('aria-busy', String(busy));
+    q('#capture-current-job-label').textContent = pendingActions.has('add')
+      ? reading?.phase === 'permission' ? 'Allow website access…' : reading ? 'Reading job…' : 'Saving job…'
+      : 'Add This Job in One Click';
+  }
+  function canCaptureCurrentJob() {
+    return initialized && Number.isInteger(currentTabId) && currentTabId >= 0 && Boolean(safeJobUrl(currentTabUrl)) &&
+      !jobUrlInList(currentTabUrl, candidateId(), requests);
+  }
+  q('#queue-search').addEventListener('input', event => { queueSearch = event.target.value.trim().toLocaleLowerCase(); renderQueue(); });
+  q('#queue-filter').addEventListener('change', event => { queueFilter = event.target.value; renderQueue(); });
+  q('#capture-current-job').addEventListener('click', () => {
+    if (!canCaptureCurrentJob() || reading || currentTabBusy || pendingActions.has('add')) return;
+    const tabId = currentTabId, url = currentTabUrl;
+    const input = structuredClone({ candidateId: candidateId(), profile: profile(), tailor: true,
+      resumeTemplate: q('#resume-template').value, promptTemplate: q('#prompt-template').value,
+      prompt: prompts[q('#prompt-template').value].text });
+    const checkExisting = q('#check-existing-jobs').checked;
+    void perform(async () => {
+      // Request site access in this click's gesture, before any other await.
+      const response = await readPage(tabId, { askAccess: true, showErrorDialog: false });
+      if (!response) {
+        showNotice('Job was not added', readFeedback.get(tabId)?.message || 'Try again when the job page is ready.');
+        return;
+      }
+      const latest = await chrome.tabs.get(tabId).catch(() => null);
+      if (tabId !== currentTabId || currentTabUrl !== url || latest?.url !== url || candidateId() !== input.candidateId ||
+          duplicateJobUrl(response.fields?.url) !== duplicateJobUrl(url)) {
+        showNotice('Job was not added', 'The page or selected profile changed. Click Add This Job on the page you want to save.');
+        return;
+      }
+      if (jobUrlInList(url, input.candidateId, queue.snapshot().requests)) return;
+      const fields = response.fields;
+      if (!fields.description?.trim()) {
+        showStudio('job');
+        showNotice('Add the job description', 'This page did not provide a job description. Review the form before saving.');
+        q('#job-description').focus();
+        return;
+      }
+      // Use the freshly read page, never a manually entered URL or another tab's draft.
+      input.job = { company: fields.company?.trim() || '', role: fields.role?.trim() || input.profile.role,
+        url: fields.url, description: fields.description.trim(), tabId, provenance: response.provenance };
+      try { await saveRequest(input, { checkExisting, checkExistingUrl: true }); }
+      catch (error) {
+        if (error.code !== 'already-applied') showNotice('Job was not added', error.message);
+        throw error;
+      }
+    }, 'add');
+  });
+
   function updateTabs({ count, index, tabId, url, busy }) {
+    currentTabUrl = url || ''; currentTabBusy = Boolean(busy);
     if (tabId !== currentTabId) {
       jobDrafts.set(currentTabId, jobDraft());
       currentTabId = tabId;
@@ -243,6 +333,7 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
       jobDrafts.set(currentTabId, jobDraft());
     }
     q('#job-position').textContent = `${index} / ${count}`;
+    renderCurrentJob();
     q('#job-position').title = `${count} open tab${count === 1 ? '' : 's'} in this browser window`;
     q('#previous-job').disabled = q('#next-job').disabled = busy || count < 2;
     renderReadButton();
@@ -256,12 +347,13 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     button.replaceChildren(icon(busy ? 'refresh' : 'scan'),document.createTextNode(permissionPending ? 'Allow access…' : busy ? 'Reading…' : 'Read page'));
     const feedback = readFeedback.get(currentTabId);
     updateReadPageHint(button, feedback?.message || '');
+    renderCurrentJob();
   }
   function readMessage(tabId, state, message) {
     readFeedback.set(tabId, { state, message });
     if (tabId === currentTabId) renderReadButton();
   }
-  async function readPage(tabId = currentTabId, { askAccess = false } = {}) {
+  async function readPage(tabId = currentTabId, { askAccess = false, showErrorDialog = true } = {}) {
     if (!Number.isInteger(tabId) || reading?.tabId === tabId || reading?.phase === 'permission') return;
     const before = tabId === currentTabId ? jobDraft() : jobDrafts.get(tabId) ||
       Object.fromEntries(Object.keys(jobFields).map(key => [key, '']));
@@ -304,18 +396,20 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
         if (key==='url') manualUrls.delete(request.tabId);
       }
       jobDrafts.set(request.tabId,merged);
+      if (active) renderCurrentJob();
       const missing = response.missing?.filter(key=>key!=='url') || [];
       const names = {company:'company name',role:'job title',description:'Job Description'};
       const message = missing.length ? `Read ${filled} fields. Review missing ${missing.map(key=>names[key] || key).join(', ')}.` : 'Job details read. Review the fields before adding to queue.';
       readMessage(request.tabId, missing.length ? 'warning' : 'success', message);
       status(active ? message : 'Job details saved to the source tab’s draft.');
+      return response;
     } catch (error) {
       if (reading===request) {
         const message = error.message;
         readMessage(request.tabId, 'error', message);
         if (currentTabId===request.tabId) {
           status(message);
-          if (error.code !== 'access-denied') {
+          if (showErrorDialog && error.code !== 'access-denied') {
             q('#read-page-error-message').textContent = message;
             if (!q('#read-page-error-dialog').open) openDialog('read-page-error-dialog');
           }
@@ -346,11 +440,11 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     q('#prompt-text').textContent = prompt.text;
   }
   function renderSource(request) {
-    const source = linkedConversationUrl(request.sourceChatUrl);
-    const current = linkedConversationUrl(getCurrentChat());
-    const savedCompany = request.input.tailor && ((request.state === 'ready' && Boolean(request.resume)) || recoverableStates.includes(request.state) || terminalStates.includes(request.state));
+    const source = requestChatUrl(request);
+    const current = savedChatUrl(getCurrentChat());
+    const savedCompany = request.input.tailor && (manualOnly() || (request.state === 'ready' && Boolean(request.resume)) || recoverableStates.includes(request.state) || terminalStates.includes(request.state));
     q('#request-source-note').textContent = source ? `Connected chat · ${request.input.job.company}`
-      : savedCompany ? 'Open this job’s conversation in Chat, then connect it here to recover its result.'
+      : savedCompany ? 'Open this job’s conversation in Chat, then connect it here to reopen it from the queue.'
       : 'A company’s chat can be connected once its resume is saved.';
     q('#request-open-chat').disabled = !source;
     const connect = q('#request-connect-chat');
@@ -376,6 +470,9 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     q('#request-copy-prompt').textContent = copiedRequestId === request.id ? 'Copied' : 'Copy prompt';
     q('#request-copy-status').textContent = '';
     q('#request-job').textContent = input.tailor ? input.job.description : 'No job description attached to this base resume.';
+    const listing = q('#request-job-link'), listingUrl = safeJobUrl(input.job.url);
+    listing.hidden = !listingUrl;
+    if (listingUrl) listing.href = listingUrl; else listing.removeAttribute('href');
     q('#request-output-section').hidden = !request.resume && !request.rawOutput;
     q('#request-output').textContent = request.resume ? JSON.stringify(request.resume, null, 2) : request.rawOutput || '';
     q('#request-diagnostics').textContent = JSON.stringify((request.attempts || []).map(attempt => ({ deliveryId: attempt.deliveryId,
@@ -446,11 +543,12 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     if (manualOnly() && ['continue-send', 'recover', 'regenerate'].includes(button.dataset.action)) { status(MANUAL_QUEUE_MESSAGE); return; }
     if (button.dataset.action === 'details') requestDetails(request);
     if (button.dataset.action === 'review') {
-      const url = linkedConversationUrl(request.sourceChatUrl);
-      if (request.state === 'ready' && url) showChat(url, { connection: request.attempts?.at(-1)?.connection });
+      const url = requestChatUrl(request);
+      if (url) showChat(url, { connection: request.attempts?.at(-1)?.connection });
     }
     if (button.dataset.action === 'connection') q('#account-check').click();
     if (button.dataset.action === 'preview') preview(request);
+    if (button.dataset.action === 'documents') documents.open(request.id);
     if (button.dataset.action === 'retry-save') {
       void perform(async () => { await queue.retrySave(request.id); status(`Save completed · ${request.input.job.company}. No generation was started.`); }, `retry-save:${request.id}`);
     }
@@ -504,6 +602,7 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     if (selector === '#job-url') { manualUrls.add(currentTabId); q(selector).setCustomValidity(''); }
     if (selector === '#job-description') q(selector).setCustomValidity('');
     jobDrafts.set(currentTabId, jobDraft());
+    renderCurrentJob();
   });
   for (const [id, delta] of [['previous-job', -1], ['next-job', 1]]) {
     document.getElementById(id).addEventListener('click', () => { void moveTab(delta); });
@@ -544,9 +643,15 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
       job: { company: tailor ? q('#job-company').value.trim() : 'Base resume',
         role: tailor ? q('#job-title').value.trim() || profile().role : profile().role, url, tabId: currentTabId, description, provenance }, tailor,
       resumeTemplate: q('#resume-template').value, promptTemplate, prompt: prompts[promptTemplate].text });
-    const id = await queue.add(input, { checkExisting: q('#check-existing-jobs').checked });
+    await saveRequest(input, { checkExisting: q('#check-existing-jobs').checked });
+  }, 'add'); });
+
+  async function saveRequest(input, options) {
+    q('#queue-notice').hidden = true; clearTimeout(noticeTimer);
+    const id = await queue.add(input, options);
     const request = queue.snapshot().requests.find(item => item.id === id);
     clearPreview(); renderQueue();
+    if (q('#chat-view').hidden) showStudio('results');
     try { await copyRequestPrompt(request); }
     catch {
       showChat(); requestDetails(request);
@@ -558,7 +663,7 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     copiedRequestId = id;
     showChat();
     status('Job saved and prompt copied. Paste it into your selected chat and send when ready.');
-  }, 'add'); });
+  }
 
   for (const id of ['review-another', 'empty-prepare']) document.getElementById(id).addEventListener('click', () => showStudio('job'));
   for (const id of ['view-queue', 'open-queue']) document.getElementById(id).addEventListener('click', () => showStudio('results'));
@@ -571,13 +676,13 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
   });
   q('#request-open-chat').addEventListener('click', () => {
     const request = requests.find(item => item.id === detailRequestId && item.input.candidateId === candidateId());
-    const url = linkedConversationUrl(request?.sourceChatUrl);
+    const url = requestChatUrl(request);
     if (!url) return;
     q('#request-dialog').close(); showChat(url, { connection: request.attempts?.at(-1)?.connection });
   });
   q('#request-connect-chat').addEventListener('click', () => {
     const request = requests.find(item => item.id === detailRequestId && item.input.candidateId === candidateId());
-    const url = linkedConversationUrl(getCurrentChat());
+    const url = savedChatUrl(getCurrentChat());
     if (!request || !request.input.tailor || !url) return;
     void perform(async () => { await queue.connect(request.id, url); renderSource(requests.find(item => item.id === request.id)); status(`Chat connected · ${request.input.job.company}`); });
   });
@@ -619,5 +724,7 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
   window.addEventListener('pagehide', () => clearTimeout(copyFeedbackTimer), { once: true });
   window.addEventListener('pagehide', () => { clearTimeout(noticeTimer); chrome.storage.onChanged.removeListener(duplicateOptionChanged); }, { once: true });
   renderQueue(); renderTemplate();
-  return { ready, updateTabs, tabError, readPage };
+  return { ready, updateTabs, tabError, readPage,
+    chatError(message) { status(message); showNotice('Chat could not open', message); }
+  };
 }

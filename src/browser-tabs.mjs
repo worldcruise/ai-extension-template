@@ -1,4 +1,4 @@
-// URL metadata is available only for pages Chrome has granted access to.
+// The tabs permission supplies URL metadata; reading page content still needs site access.
 export function createBrowserTabs({ browser = globalThis.chrome, onChange = () => {}, onError = () => {} } = {}) {
   let windowId;
   let ownTabId;

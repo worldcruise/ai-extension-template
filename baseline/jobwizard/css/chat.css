@@ -1,0 +1,2005 @@
+/* Start Chatbox CSS */
+
+#autofill_detail .chatbox_related_container {
+  color: #202223;
+  font-size: 14px;
+  position: sticky;
+  width: 100%;
+  z-index: 1000;
+  top: 0;
+  padding: 12px 0 14px;
+  transition: padding 0.25s ease;
+  background: var(--autofill-detail-bg, #fff);
+}
+
+#autofill_detail .chatbox_related_container.is_collapsed {
+  padding: 8px 0 10px;
+}
+
+#autofill_detail .chatbox_related_row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+#autofill_detail .chatbox_related_row_main {
+  justify-content: space-between;
+  align-items: center;
+  min-height: 48px;
+  gap: 16px;
+  position: relative;
+}
+
+#autofill_detail .chatbox_related_row_extra {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  max-height: 120px;
+  overflow: visible;
+  opacity: 1;
+  transition: max-height 0.3s ease, opacity 0.25s ease, margin 0.25s ease, padding 0.25s ease;
+  position: relative;
+  z-index: 50;
+}
+
+#autofill_detail .chatbox_related_container.is_collapsed .chatbox_related_row_extra {
+  max-height: 0;
+  margin-top: 0;
+  padding-top: 0;
+  border-top-color: transparent;
+  opacity: 0;
+  overflow: hidden;
+}
+
+/* Glass pill: History + New chat + toggle (unified floating style, lighter shadow) */
+#autofill_detail .chatbox_related_actions_glass {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  padding: 4px 4px 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+#autofill_detail .chatbox_related_actions_glass:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+/* Full-width below first row so dropdown can align left */
+#autofill_detail .chat_history_dropdown_wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+#autofill_detail .chat_history_dropdown_wrap .chat_history_dropdown.is_open {
+  pointer-events: auto;
+}
+
+#autofill_detail .chat_related_icon_btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: #374151;
+  cursor: pointer;
+  border-radius: 999px;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  position: relative;
+}
+
+#autofill_detail .chat_related_icon_btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #111827;
+}
+
+#autofill_detail .chat_related_icon_btn:active {
+  transform: scale(0.96);
+}
+
+#autofill_detail .chat_related_icon_btn svg,
+#autofill_detail .chat_related_icon_btn img {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* Tooltip on hover (icon-only) */
+#autofill_detail .chat_related_tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 100;
+}
+
+#autofill_detail .chat_related_icon_btn:hover .chat_related_tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-8px);
+}
+
+#autofill_detail .chat_related_toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  border-radius: 999px;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.25s ease;
+}
+
+#autofill_detail .chat_related_toggle:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #374151;
+}
+
+#autofill_detail .chat_related_toggle_icon {
+  transition: transform 0.25s ease;
+}
+
+#autofill_detail .chatbox_related_container.is_collapsed .chat_related_toggle_icon {
+  transform: rotate(-90deg);
+}
+
+/* History dropdown: bottom-left of header row, left-aligned */
+#autofill_detail .chat_history_dropdown {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  right: auto;
+  min-width: 320px;
+  max-width: min(400px, 85vw);
+  max-height: 420px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+  z-index: 1001;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+#autofill_detail .chat_history_dropdown.is_open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+#autofill_detail .chat_history_dropdown_header {
+  padding: 14px 16px 10px;
+  flex-shrink: 0;
+}
+
+#autofill_detail .chat_history_dropdown_title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+}
+
+#autofill_detail .chat_history_dropdown .chat_history_tabs {
+  padding: 0 16px 10px;
+  gap: 4px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+#autofill_detail .chat_history_dropdown .chat_history_tab {
+  padding: 8px 14px;
+  font-size: 13px;
+  border-radius: 10px;
+}
+
+#autofill_detail .chat_history_dropdown .chat_history_content {
+  flex: 1;
+  min-height: 0;
+}
+
+#autofill_detail .chat_history_dropdown .chat_history_list {
+  padding: 12px 16px 20px;
+  max-height: 320px;
+}
+
+#autofill_detail .chatbox_related {
+  position: relative;
+  display: flex;
+  align-items: center;
+  user-select: none;
+  z-index: 2;
+  width: fit-content;
+}
+
+#autofill_detail .chatbox_related_text {
+  margin-right: 8px;
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Chat mode select: same floating glass style, clickable above dropdown when closed */
+#autofill_detail .chatbox_related_select {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  cursor: pointer;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: background 0.2s, box-shadow 0.2s;
+  position: relative;
+  z-index: 51;
+  pointer-events: auto;
+}
+
+#autofill_detail .chatbox_related_select:hover {
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+#autofill_detail .chatbox_selected_icon {
+  transform: rotate(180deg);
+}
+
+#autofill_detail .chatbox_related_modal {
+  display: none;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  width: 280px;
+  margin-top: 8px;
+  margin-left: 0;
+  top: 100%;
+  left: 0;
+  z-index: 52;
+  position: absolute;
+  gap: 4px;
+  pointer-events: auto;
+}
+
+#autofill_detail .chatbox_related_item {
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: #fff;
+  color: #202223;
+  font-style: normal;
+  line-height: normal;
+  cursor: pointer;
+}
+
+#autofill_detail .chatbox_related_item:hover {
+  background: #f1f1f1;
+}
+#autofill_detail .chatbox_related_item.active .chatbox_related_item_title img {
+  display: block;
+}
+
+#autofill_detail .chatbox_related_item_title {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  font-weight: 700;
+}
+
+#autofill_detail .chatbox_related_item_title img {
+  width: 14px;
+  display: none;
+}
+
+#autofill_detail .chatbox_related_item_desc {
+  font-size: 12px;
+  font-weight: 400;
+  margin-top: 6px;
+  line-height: 14px;
+}
+
+#autofill_detail .chatbox_related_item_desc span {
+  border-bottom: 1px solid #fff;
+  cursor: pointer;
+  pointer-events: all;
+}
+
+#autofill_detail .chatbox_main_container {
+  font-size: 14px;
+  margin-top: 16px;
+  position: relative;
+}
+
+#autofill_detail .chatbox_default_msgbox {
+  max-width: 90%;
+  border-radius: 0 20px 20px 20px;
+  background: #e8f1fff0;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#autofill_detail .chatbox_default_logo_area {
+  display: flex;
+  gap: 5px;
+}
+
+#autofill_detail .chatbox_logo {
+  width: 18px;
+}
+
+#autofill_detail .chatbox_logo_text {
+  color: #202223;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  padding-top: 2px;
+}
+
+#autofill_detail .chatbox_quick_text {
+  color: #202223;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  padding: 0 4px;
+  text-align: left;
+}
+
+#autofill_detail .chatbox_quick_text p {
+  line-height: 24px;
+  margin: 0 0 14px;
+}
+
+#autofill_detail .chatbox_quick_text p:first-child {
+  line-height: 24px;
+  margin-top: 4px;
+  /* margin-bottom: 0 !important; */
+}
+
+#autofill_detail .chatbox_quick_text p:last-child {
+  line-height: 24px;
+  margin-bottom: 6px !important;
+}
+
+/* 当有 active 类时，优化最后一个元素的显示，使光标紧跟在文本后面 */
+/* 让最后一个段落是 inline-block，这样 ::after 光标会紧跟在文本后面 */
+#autofill_detail .chatbox_quick_text.active p:last-child {
+  display: inline-block;
+  margin-bottom: 0;
+  max-width: 100%;
+}
+
+/* 如果最后一个元素不是 p（比如是其他块级元素），也设置为 inline-block */
+/* 但对于列表，我们需要特殊处理：让列表的最后一个 li 是 inline-block，或者让整个列表是 inline-block */
+#autofill_detail .chatbox_quick_text.active > *:last-child:not(.recommended-questions-container):not(.score-improvement-container):not(.chatbox_tools):not(table):not(blockquote):not(pre):not(ul):not(ol) {
+  display: inline-block;
+  max-width: 100%;
+}
+
+/* 当最后一个元素是列表时，让整个列表是 inline-block，使光标紧跟 */
+/* inline-block 列表会根据内容宽度自动调整，不会影响列表显示 */
+#autofill_detail .chatbox_quick_text.active > ul:last-child,
+#autofill_detail .chatbox_quick_text.active > ol:last-child {
+  display: inline-block;
+  margin-bottom: 0;
+  width: 100%;
+  vertical-align: top;
+}
+
+#autofill_detail .chatbox_quick_text ol {
+  display: block;
+  list-style-type: decimal;
+  margin: 0 0 20px;
+  padding-inline-start: 16px;
+  unicode-bidi: isolate;
+}
+#autofill_detail .chatbox_quick_text ul {
+  display: block;
+  list-style-type: disc;
+  margin: 6px 0;
+  padding-inline-start: 16px;
+  unicode-bidi: isolate;
+}
+#autofill_detail .chatbox_quick_text ol > li {
+  display: list-item;
+  text-align: -webkit-match-parent;
+  unicode-bidi: isolate;
+  list-style-type: decimal;
+  line-height: 24px;
+  margin: 6px 0;
+}
+#autofill_detail .chatbox_quick_text ol > li:last-child  {
+  margin-bottom: 16px;
+}
+
+#autofill_detail .chatbox_quick_text ul > li {
+  list-style: disc;
+  line-height: 24px;
+  margin: 6px 0;
+}
+#autofill_detail .chatbox_quick_text ul > li:last-child  {
+  margin-bottom: 16px;
+}
+
+#autofill_detail .chatbox_conversation {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+#autofill_detail #chatbox_response_aborted {
+  height: 0px;
+  padding: 0px;
+}
+
+#autofill_detail .chatbox_no_resume {
+  background: #bdbdbd;
+  color: white;
+  pointer-events: none;
+}
+
+#autofill_detail .chatbox_input_tools {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+#autofill_detail .chatbox_input_tools img {
+  width: 22px;
+  height: 22px;
+}
+
+#autofill_detail .chatbox_virtual_keyboard {
+  cursor: pointer;
+  transition: all 0.2s ease-in;
+}
+
+#autofill_detail .chatbox_virtual_keyboard .keyboard_trigger_icon {  
+  opacity: 0.3;
+}
+
+#autofill_detail .chatbox_virtual_keyboard .keyboard_trigger_icon:hover {
+  opacity: 1;
+}
+
+#autofill_detail .chatbox_sendmsg {
+  display: block;
+  align-self: flex-end;
+  cursor: pointer;
+  opacity: 0.3;
+  transition: opacity 0.2s ease-in;
+}
+#autofill_detail .chatbox_sendmsg:hover {
+  opacity: 1;
+}
+#autofill_detail .chatbox_sendmsg.disable {
+  opacity: 0.3;
+}
+#autofill_detail .chatbox_sendmsg.disable:hover {
+  cursor: not-allowed;
+  opacity: 0.3;
+}
+
+/* 回答快捷操作：放在 recommended-questions-container 上方，极简图标 + hover 提示 */
+#autofill_detail .chatbox_tools {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 10px;
+  padding: 2px 0;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+#autofill_detail .chatbox_chatbot_answer:hover .chatbox_tools,
+#autofill_detail .chatbox_tools:hover {
+  opacity: 1;
+}
+
+#autofill_detail .chatbox_tool_btn {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #8e8ea0;
+  position: relative;
+  transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+#autofill_detail .chatbox_tool_btn:hover {
+  color: #374151;
+  background: rgba(0, 0, 0, 0.06);
+  transform: scale(1.08);
+}
+
+#autofill_detail .chatbox_tool_btn:active {
+  transform: scale(0.96);
+}
+
+#autofill_detail .chatbox_tool_icon {
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+#autofill_detail .chatbox_regenerate_response {
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+}
+
+#autofill_detail .chatbox_regenerate_response:hover {
+  opacity: 0.8;
+  /* transform: rotate(60deg); */
+}
+
+/* #autofill_detail .chatbox_cursor {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  margin-left: 5px;
+  border-radius: 50%;
+  background: #0066ff;
+  animation: breathe 1.5s infinite;
+} */
+
+#autofill_detail .chatbox_selected_text_icon {
+  cursor: pointer;
+  margin-left: 5px !important;
+  background-color: white;
+  border-radius: 5px;
+  padding: 4px;
+  border: 1px solid #0054d3;
+  display: inline-flex;
+  position: absolute;
+}
+
+#autofill_detail .chatbox_selected_text_icon svg:hover {
+  opacity: 0.8;
+}
+
+#autofill_detail .chatbox_header {
+  overflow-y: auto;
+}
+
+#autofill_detail .chatbox_footer {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  padding: 0 20px;
+}
+
+#autofill_detail .chatbox_questions_quick {
+  width: 100%;
+  height: 210px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  /* position: absolute; */
+  /* bottom: 136px; */
+  font-size: 14px;
+}
+
+#autofill_detail .question_quick_item {
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: #202223;
+  background: #f1f1f1;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  cursor: pointer;
+  width: fit-content;
+  transition: all 0.2s ease;
+}
+
+#autofill_detail .question_quick_item:hover {
+  background: #e1e1e1;
+}
+
+#autofill_detail .chatbox_questions_quick_area {
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  width: 100%;
+  gap: 10px;
+  font-size: 15px;
+}
+
+#autofill_detail .chatbox_questions_quick_pagination {
+  display: flex;
+  justify-content: center;
+}
+
+#autofill_detail .chatbox_pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  color: #202223;
+  text-align: center;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: normal;
+  margin-top: 8px;
+}
+
+#autofill_detail .chatbox_pagination_next{
+  cursor: pointer;
+}
+#autofill_detail .chatbox_pagination_next.disable img {
+  opacity: 0.5;
+}
+#autofill_detail .chatbox_pagination_prev{
+  cursor: pointer;
+}
+#autofill_detail .chatbox_pagination_prev.disable img {
+  opacity: 0.5;
+}
+#autofill_detail .chatbox_question_answer {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+#autofill_detail .chatbox_user_question {
+  width: fit-content;
+  max-width: 100%;
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 12px 0 12px 12px;
+  background: #eaeaea;
+  color: #202223;
+  align-self: flex-end;
+  flex-shrink: 0;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  font-family: var(--jobwizard-font-family);
+  margin: 0;
+  text-wrap: wrap;
+  word-break: break-word;
+  position: relative;
+}
+
+#autofill_detail .chatbox_chatbot_answer {
+  width: fit-content;
+  max-width: 100%;
+  /* display: inline-block; */
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  border-radius: 0px 12px 12px 12px;
+  color: #202223;
+  gap: 2px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  position: relative;
+}
+
+#autofill_detail .chatbox_chatbot_answer:last-child {
+  margin-bottom: 20px;
+}
+
+#autofill_detail .chatbox_stop_newchat {
+  display: none;
+  width: 100%;
+  justify-content: center;
+  /* position: absolute; */
+  font-size: 14px;
+}
+
+#autofill_detail .chatbox_stop_response {
+  display: none;
+  cursor: pointer;
+}
+
+#autofill_detail .chatbox_new_chat {
+  display: none;
+  gap: 6px;
+  color: #202223;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  cursor: pointer;
+  opacity: 0.4;
+  padding: 7px 11px;
+  transition: all 0.2s ease-out;
+}
+
+#autofill_detail .chatbox_new_chat img {
+  width: 20px;
+}
+
+#autofill_detail .chatbox_new_chat:hover {
+  border-radius: 5px;
+  background: #e6e6e6;
+  opacity: 1;
+}
+
+#autofill_detail .chatbox_new_chat:active {
+  border-radius: 5px;
+  background: #202223;
+  color: #fff;
+}
+
+#autofill_detail code {
+  text-wrap: wrap;
+}
+
+/* #autofill_detail .chatbox_quick_text * {
+  margin: 0;
+}
+#autofill_detail .chatbox_quick_text>*{
+  display:inline-block
+} */
+
+
+/* 骨架屏效果（非流式响应时使用） */
+#autofill_detail .chatbox_skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+#autofill_detail .chatbox_skeleton_line {
+  height: 16px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+#autofill_detail .chatbox_skeleton_line:nth-child(1) {
+  width: 100%;
+}
+
+#autofill_detail .chatbox_skeleton_line:nth-child(2) {
+  width: 95%;
+}
+
+#autofill_detail .chatbox_skeleton_line:nth-child(3) {
+  width: 88%;
+}
+
+#autofill_detail .chatbox_skeleton_line:nth-child(4) {
+  width: 92%;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes blink_animation {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* 光标呼吸动画：明暗变化 + 大小变化 */
+@keyframes cursor_breathe {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 错误显示样式 */
+#autofill_detail .chatbox_error_container {
+  padding: 16px;
+  background: #fff5f5;
+  border: 1px solid #feb2b2;
+  border-radius: 8px;
+  margin: 8px 0;
+}
+
+#autofill_detail .chatbox_error_title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #c53030;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+#autofill_detail .chatbox_error_message {
+  color: #742a2a;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  word-break: break-word;
+}
+
+#autofill_detail .chatbox_error_actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+#autofill_detail .chatbox_error_button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  font-weight: 400;
+  font-family: var(--jobwizard-font-family);
+}
+
+#autofill_detail .chatbox_error_button.primary {
+  background: #0066ff;
+  color: white;
+}
+
+#autofill_detail .chatbox_error_button.primary:hover {
+  background: #0052cc;
+  opacity: 0.9;
+}
+
+#autofill_detail .chatbox_error_button.secondary {
+  background: #eaeaea;
+  color: #202223;
+  border: 1px solid #d0d0d0;
+}
+
+#autofill_detail .chatbox_error_button.secondary:hover {
+  background: #e0e0e0;
+}
+
+/* 模拟光标样式 */
+/* 原来的逻辑：只在 empty 或最后一个子元素后显示 */
+/* #autofill_detail .chatbox_quick_text.active:empty,
+#autofill_detail .chatbox_quick_text.active>*:last-child:after{
+  content: "";
+  display: inline-block;
+  width: 1.2px;
+  height: 16px;
+  background: #202223;
+  bottom: -4px;
+  position: relative;
+  animation: blink_animation 0.8s infinite;
+} */
+
+/* 呼吸球光标样式 - 紧跟在文本后面，不换行 */
+/* 使用 ::after 伪元素，确保光标紧跟在最后一个元素后面 */
+#autofill_detail .chatbox_quick_text.active::after {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #202223;
+  animation: cursor_breathe 1.4s ease-in-out infinite;
+  margin-left: 6px;
+  vertical-align: middle;
+  line-height: 24px;
+  /* 确保光标在同一行，不单独换行 */
+  flex-shrink: 0;
+}
+
+/* 确保 chatbox_quick_text 本身是 inline-block 或 block，以便 ::after 正确显示 */
+#autofill_detail .chatbox_quick_text {
+  display: block;
+}
+
+/* 当存在 recommended-questions-container 时，不显示光标 */
+#autofill_detail .chatbox_quick_text.active:has(.recommended-questions-container)::after {
+  display: none;
+}
+/* Markdown 链接样式已在下方统一定义 */
+
+/* Markdown 标题样式 */
+#autofill_detail .chatbox_quick_text h1,
+#autofill_detail .chatbox_quick_text h2,
+#autofill_detail .chatbox_quick_text h3,
+#autofill_detail .chatbox_quick_text h4,
+#autofill_detail .chatbox_quick_text h5,
+#autofill_detail .chatbox_quick_text h6 {
+  font-weight: 600;
+  line-height: 1.25;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  color: #202223;
+}
+
+#autofill_detail .chatbox_quick_text h1 {
+  font-size: 2em;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.3em;
+}
+
+#autofill_detail .chatbox_quick_text h2 {
+  font-size: 1.5em;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.3em;
+}
+
+#autofill_detail .chatbox_quick_text h3 {
+  font-size: 1.25em;
+  margin-bottom: 14px;
+}
+
+#autofill_detail .chatbox_quick_text h4 {
+  font-size: 1em;
+}
+
+#autofill_detail .chatbox_quick_text h5 {
+  font-size: 0.875em;
+}
+
+#autofill_detail .chatbox_quick_text h6 {
+  font-size: 0.85em;
+  color: #6b7280;
+}
+
+/* Markdown 加粗和斜体 */
+#autofill_detail .chatbox_quick_text strong {
+  font-weight: 600;
+  color: #202223;
+}
+
+#autofill_detail .chatbox_quick_text em {
+  font-style: italic;
+}
+
+#autofill_detail .chatbox_quick_text strong em,
+#autofill_detail .chatbox_quick_text em strong {
+  font-weight: 600;
+  font-style: italic;
+}
+
+/* Markdown 代码样式 */
+#autofill_detail .chatbox_quick_text code {
+  font-family: var(--jobwizard-font-mono);
+  font-size: 0.9em;
+  background-color: #f3f4f6;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  color: #e83e8c;
+}
+
+#autofill_detail .chatbox_quick_text pre {
+  font-family: var(--jobwizard-font-mono);
+  font-size: 0.9em;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 16px;
+  overflow-x: auto;
+  line-height: 1.45;
+  margin: 16px 0;
+}
+
+#autofill_detail .chatbox_quick_text pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  color: #202223;
+  font-size: inherit;
+  white-space: pre;
+  word-wrap: normal;
+}
+
+/* Markdown 引用块 */
+#autofill_detail .chatbox_quick_text blockquote {
+  margin: 16px 0;
+  padding: 0 16px;
+  color: #6b7280;
+  border-left: 4px solid #d1d5db;
+  background-color: #f9fafb;
+}
+
+#autofill_detail .chatbox_quick_text blockquote > :first-child {
+  margin-top: 0;
+}
+
+#autofill_detail .chatbox_quick_text blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+/* Markdown 表格 */
+#autofill_detail .chatbox_quick_text table {
+  border-collapse: collapse;
+  margin: 16px 0;
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+
+#autofill_detail .chatbox_quick_text table th,
+#autofill_detail .chatbox_quick_text table td {
+  border: 1px solid #e5e7eb;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+#autofill_detail .chatbox_quick_text table th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
+#autofill_detail .chatbox_quick_text table tr:nth-child(2n) {
+  background-color: #f9fafb;
+}
+
+/* Markdown 水平线 */
+#autofill_detail .chatbox_quick_text hr {
+  height: 0.25em;
+  padding: 0;
+  margin: 24px 0;
+  background-color: #e5e7eb;
+  border: 0;
+}
+
+/* Markdown 链接 */
+#autofill_detail .chatbox_quick_text a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+#autofill_detail .chatbox_quick_text a:hover {
+  text-decoration: underline;
+}
+
+/* Markdown 删除线 */
+#autofill_detail .chatbox_quick_text del {
+  text-decoration: line-through;
+  color: #6b7280;
+}
+
+/* Markdown 图片 */
+#autofill_detail .chatbox_quick_text img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin: 16px 0;
+}
+
+#autofill_detail .chatbox_typeinput {
+  display: flex;
+  margin-top: 14px;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  /* padding: 10px 20px; */
+  background-color: #fff;
+  border-radius: 12px;
+  border: 1.5px solid rgba(0, 0, 0, 0.12);
+  transition: border-color 0.3s ease;
+  /* position: absolute; */
+  /* bottom: 20px;
+  left: 0;
+  right: 0; */
+}
+
+#autofill_detail .chatbox_typeinput:hover {
+  border: 1.5px solid #0066FF;
+}
+
+#autofill_detail .chatbox_typeinput:focus-within {
+  border-color: #0066FF;
+}
+
+#autofill_detail .chatbox_typeinput textarea {
+  margin-top: 15px;
+  outline: none;
+  min-height: 72px;
+  max-height: 144px;
+  width: 100%;
+  resize: none;
+  background-color: #fff;
+  border-radius: 12px;
+  border: none;
+  color: #202223;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 400;
+  padding: 0 20px 0 20px;
+  display: inline-block;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  word-wrap: break-word;
+  font-family: var(--jobwizard-font-family);
+  outline: 0px;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  transition: border 0.2s ease-in;
+}
+
+#autofill_detail .chatbox_typeinput textarea::placeholder {
+  color: rgba(0, 0, 0, 0.12);
+}
+
+/* End Chatbox CSS */
+
+#autofill_detail .chatbox_action_button {
+  display: flex;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: var(--jobwizard-font-family);
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, 
+    rgba(0, 102, 255, 0.9) 0%, 
+    rgba(124, 58, 237, 0.9) 100%
+  );
+  color: #fff;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(124, 58, 237, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  transition: all 0.2s ease;
+  margin-top: 12px;
+  align-self: stretch;
+}
+
+#autofill_detail .chatbox_action_button:hover {
+  background: linear-gradient(90deg, 
+    rgba(0, 102, 255, 0.95) 0%, 
+    rgba(124, 58, 237, 0.95) 100%
+  );
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
+  transform: translateY(-1px);
+}
+
+#autofill_detail .chatbox_action_button:active {
+  background: linear-gradient(90deg, 
+    rgba(0, 102, 255, 1) 0%, 
+    rgba(124, 58, 237, 1) 100%
+  );
+  box-shadow: 0 1px 3px rgba(124, 58, 237, 0.15),
+    inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  transform: translateY(0px);
+}
+
+#autofill_detail .chatbox_action_button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0) 100%);
+  transform: skewX(30deg);
+  animation: shineEffect 4s infinite;
+}
+
+#autofill_detail .action_button_icon {
+  width: 16px;
+  height: 16px;
+}
+
+#autofill_detail .chatbox_thinking_section {
+  margin: 2px 0;
+  border-radius: 8px;
+}
+
+#autofill_detail .thinking_header {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 16px;
+  cursor: pointer;
+  background: #f1f3f5;
+  border-radius: 8px;
+  margin: 12px 0;
+  user-select: none;
+}
+
+#autofill_detail .thinking_icon {
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+#autofill_detail .thinking_title {
+  font-size: 14px;
+  color: #495057;
+  font-weight: 500;
+}
+
+#autofill_detail .thinking_toggle {
+  width: 12px;
+  height: 12px;
+  margin-left: 8px;
+  transition: transform 0.3s ease;
+}
+
+#autofill_detail .thinking_toggle.rotate-180 {
+  transform: rotate(180deg);
+}
+
+#autofill_detail .thinking_border {
+  width: 2px;
+  position: absolute;
+  height: calc(100% - 12px);
+  background: #e5e5e5;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0;
+}
+
+#autofill_detail .thinking_content {
+  padding: 2px 16px;
+  position: relative;
+}
+
+/* 保持原有的其他样式不变 */
+#autofill_detail .chatbox_reasoning {
+  font-size: 12px;
+  color: #6c757d;
+  line-height: 1.5;
+}
+
+#autofill_detail .chatbox_reasoning p {
+  line-height: 16px;
+  margin: 0 0 14px;
+}
+
+#autofill_detail .chatbox_reasoning p:first-child {
+  line-height: 16px;
+  margin-top: 4px;
+}
+
+#autofill_detail .chatbox_reasoning p:last-child {
+  line-height: 16px;
+  margin-bottom: 6px !important;
+}
+
+/* 保持列表样式不变 */
+#autofill_detail .chatbox_reasoning ol,
+#autofill_detail .chatbox_reasoning ul {
+  display: block;
+  margin: 6px 0;
+  padding-inline-start: 16px;
+  unicode-bidi: isolate;
+}
+
+#autofill_detail .chatbox_reasoning ol {
+  list-style-type: decimal;
+}
+
+#autofill_detail .chatbox_reasoning ul {
+  list-style-type: disc;
+}
+
+#autofill_detail .chatbox_reasoning ol > li,
+#autofill_detail .chatbox_reasoning ul > li {
+  line-height: 24px;
+  margin: 6px 0;
+  list-style-type: auto;
+}
+
+#autofill_detail .chatbox_reasoning ol > li:last-child,
+#autofill_detail .chatbox_reasoning ul > li:last-child {
+  margin-bottom: 16px;
+}
+
+#autofill_detail .LLM_answer_header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2px;
+  font-family: var(--jobwizard-font-family);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+#autofill_detail .LLM_answer_logo {
+  width: 22px;
+  height: 22px;
+}
+
+#autofill_detail .LLM_answer_model {
+  padding: 1px 12px;
+  background: rgba(0, 102, 255, 0.1);
+  color: #06f;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+#autofill_detail .chatbox_input_footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-family: var(--jobwizard-font-family);
+  font-size: 12px;
+  padding: 10px;
+}
+
+/* Model Selector */
+#autofill_detail .jw-model-selector {
+  position: relative;
+  font-family: var(--jobwizard-font-family);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+#autofill_detail .jw-model-selector .current_model {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #f8f9fa;
+  border: 0;
+  color: #1f2937;
+  font: inherit;
+  min-height: 36px;
+}
+
+#autofill_detail .jw-model-selector .current_model:hover {
+  background: #f1f3f5;
+}
+
+#autofill_detail .jw-model-selector .current_model:focus-visible,
+#autofill_detail .jw-model-selector .model_item:focus-visible {
+  outline: 2px solid #06f;
+  outline-offset: 2px;
+}
+
+#autofill_detail .jw-model-selector .model_logo {
+  width: 20px;
+  height: 20px;
+}
+
+#autofill_detail .jw-model-selector .model_dropdown {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  width: min(300px, calc(100vw - 24px));
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  background: white;
+  border-radius: 12px;
+  border: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+  margin-bottom: 8px;
+  padding: 16px;
+  box-sizing: border-box;
+  z-index: 20;
+}
+
+#autofill_detail .jw-model-selector .dropdown_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+#autofill_detail .jw-model-selector .header_left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #111827;
+}
+
+#autofill_detail .jw-model-selector .header_left > img {
+  width: 16px;
+  height: 16px;
+}
+
+#autofill_detail .jw-model-selector .upgrade_btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(0, 102, 255, 0.1);
+  color: #06f;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  /* Hide for now */
+  display: none;
+}
+
+#autofill_detail .jw-model-selector .dropdown_info {
+  color: #6b7280;
+  margin-bottom: 16px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+#autofill_detail .jw-model-selector .model_category {
+  margin: 0;
+}
+
+#autofill_detail .jw-model-selector .category_title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  color: #374151;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .5px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+#autofill_detail .jw-model-selector .category_title::before,
+#autofill_detail .jw-model-selector .category_title::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: #e5e7eb;
+}
+
+#autofill_detail .jw-model-selector .model_subcategory {
+  margin: 0 0 8px;
+}
+
+#autofill_detail .jw-model-selector .model_subcategory:last-child {
+  margin-bottom: 0;
+}
+
+#autofill_detail .jw-model-selector .subcategory_title {
+  position: relative;
+  margin: 0 0 4px 8px;
+  padding-left: 12px;
+  color: #374151;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .3px;
+  text-transform: uppercase;
+}
+
+#autofill_detail .jw-model-selector .subcategory_title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: #6b7280;
+}
+
+#autofill_detail .jw-model-selector .model_item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  font-size: 12px;
+  line-height: 1.4;
+  box-sizing: border-box;
+}
+
+#autofill_detail .jw-model-selector .model_item:hover {
+  background: #f6f8fb;
+}
+
+#autofill_detail .jw-model-selector .model_item[aria-selected="true"] {
+  background: #f3f4f6;
+  border-color: transparent;
+  color: inherit;
+}
+
+#autofill_detail .jw-model-selector .model_item::after {
+  content: '';
+  display: none;
+}
+
+#autofill_detail .jw-model-selector .model_item[aria-selected="true"]::after {
+  content: '';
+}
+
+#autofill_detail .jw-model-selector .model_item > .model_name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+#autofill_detail .jw-model-selector .jw-bv1-model-tier-pill {
+  flex: 0 0 auto;
+  max-width: 124px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#autofill_detail .jw-model-selector .jw-bv1-model-tier-pill[data-tier="premium"] {
+  color: #7a5d16;
+}
+
+#autofill_detail .jw-model-selector .model_tag {
+  padding: 2px 6px;
+  background: #f3f4f6;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+
+#autofill_detail .recommended-questions-container {
+  margin-top: 10px;
+}
+
+#autofill_detail .recommended-question-title {
+  font-size: 12px;
+  font-family: var(--jobwizard-font-family);
+  color: #6b7280;
+}
+#autofill_detail .recommended-question-list {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#autofill_detail .recommend-question {
+  padding: 8px 12px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#autofill_detail .recommend-question:hover {
+  background: #e8e8e8;
+}
+
+#autofill_detail .recommend-question.placeholder {
+  animation: pulse 1.5s infinite;
+  background: #f0f0f0;
+  color: #666;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.4; }
+}
+
+#autofill_detail .score-improvement-container {
+  margin-top: 16px;
+  padding: 16px 20px;
+  background: linear-gradient(90deg, #0066FF 0%, #7C3AED 100%);
+  border-radius: 16px;
+  color: white;
+  box-shadow: 0 8px 24px rgba(0, 102, 255, 0.12);
+}
+
+#autofill_detail .score-improvement-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#autofill_detail .score-improvement-text-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+#autofill_detail .score-improvement-icon {
+  width: 22px;
+  height: 22px;
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+#autofill_detail .score-text-wrapper {
+  flex: 1;
+}
+
+#autofill_detail .score-improvement-text {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 4px;
+}
+
+#autofill_detail .score-numbers {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#autofill_detail .new-score {
+  font-size: 26px;
+  font-weight: 600;
+}
+
+#autofill_detail .score-increase {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+#autofill_detail .score-progress-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+#autofill_detail .score-progress-fill {
+  height: 100%;
+  background: white;
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+
+.score-increase .increase-icon {
+  width: 12px;
+  height: 12px;
+  animation: bounceUp 2s infinite;
+}
+
+@keyframes bounceUp {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  20% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-15%);
+  }
+  65% {
+    transform: translateY(0);
+  }
+  80% {
+    transform: translateY(-7%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+/* Job title: same floating glass style as actions pill */
+#autofill_detail .chatbox_job_title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 999px;
+  padding: 10px 16px 10px 14px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+#autofill_detail .chatbox_job_title:hover {
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+#autofill_detail .chatbox_job_icon {
+  width: 24px;
+  height: 24px;
+  opacity: 0.85;
+}
+
+#autofill_detail .chatbox_job_text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+}
+
+#autofill_detail .chatbox_header {
+  position: relative;
+}
+
+/* History dropdown tabs (shared) */
+#autofill_detail .chat_history_tabs {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+#autofill_detail .chat_history_tab {
+  padding: 8px 14px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: color 0.2s ease, background 0.2s ease;
+  position: relative;
+}
+
+#autofill_detail .chat_history_tab:hover {
+  color: #374151;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+#autofill_detail .chat_history_tab.active {
+  color: #111827;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+#autofill_detail .chat_history_content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+#autofill_detail .chat_history_list {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+#autofill_detail .chat_history_loading {
+  padding: 24px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+#autofill_detail .chat_history_empty {
+  padding: 24px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* Thread item (under This position) – summary only, no time */
+#autofill_detail .chat_history_thread_item {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+#autofill_detail .chat_history_thread_item:hover {
+  border-color: rgba(59, 130, 246, 0.35);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.12);
+  transform: translateX(2px);
+}
+
+#autofill_detail .chat_history_thread_item:active {
+  transform: translateX(0);
+}
+
+#autofill_detail .chat_history_thread_summary {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Position item (under All positions) – primary line + meta row + tags (job_status_tags style) */
+#autofill_detail .chat_history_position_item {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+#autofill_detail .chat_history_position_item:hover {
+  border-color: rgba(59, 130, 246, 0.35);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.12);
+  transform: translateX(2px);
+}
+
+#autofill_detail .chat_history_position_primary {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#autofill_detail .chat_history_position_meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+#autofill_detail .chat_history_position_score {
+  color: #059669;
+  font-weight: 600;
+}
+
+#autofill_detail .chat_history_position_count {
+  color: #2563eb;
+  font-weight: 500;
+}
+
+/* Tags: reuse job_view_status_tag from jobInfo.css (job_base_info_title / job_status_tags) */
+#autofill_detail .chat_history_position_tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+/* Loading overlay over conversation area (glass) */
+#autofill_detail .chat_history_content_loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+#autofill_detail .chat_history_content_loading.is_visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#autofill_detail .chat_history_content_loading_inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 28px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+#autofill_detail .chat_history_content_loading_spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(59, 130, 246, 0.2);
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: chat_history_spin 0.8s linear infinite;
+}
+
+@keyframes chat_history_spin {
+  to { transform: rotate(360deg); }
+}
+
+#autofill_detail .chat_history_content_loading_text {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}

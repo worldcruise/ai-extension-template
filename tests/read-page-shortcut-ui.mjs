@@ -51,7 +51,7 @@ export async function checkReadPageShortcut({ cdp, id, workerSession, sourceSess
   await worker('chrome.action.onClicked.addListener(globalThis.commandFromActionForTest = tab => readJobCommandForTest("read-job-page", tab))');
   const tab = await worker('chrome.tabs.query({ active: true, lastFocusedWindow: true }).then(tabs => tabs[0])');
   assert.equal(tab.url, url);
-  await evaluate(dockSession, 'document.getElementById("chat-tab").click(); for (const key of ["company","title","description"]) document.getElementById("job-"+key).value=""');
+  await evaluate(dockSession, 'if (document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click(); for (const key of ["company","title","description"]) document.getElementById("job-"+key).value=""');
   await cdp.send('Extensions.triggerAction', { id, targetId: target.targetId });
   const readComplete = current => evaluate(current, 'document.getElementById("job-company").value === "Graph Works" && document.getElementById("read-page").getAttribute("aria-busy") === "false"');
   try { await until(() => readComplete(dockSession), 'warm dock shortcut reads job'); }

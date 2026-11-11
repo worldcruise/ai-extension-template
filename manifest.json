@@ -3,13 +3,14 @@
   "name": "AI Agent Template",
   "short_name": "Sidebar GPT",
   "version": "0.5.0",
-  "description": "ChatGPT and a Resume Studio UI preview together in your browser sidebar.",
+  "description": "A docked job queue and job form with expandable ChatGPT and DeepSeek conversations.",
   "minimum_chrome_version": "116",
   "permissions": [
     "sidePanel",
     "declarativeNetRequestWithHostAccess",
     "storage",
     "activeTab",
+    "tabs",
     "scripting"
   ],
   "host_permissions": [
@@ -61,7 +62,7 @@
   "content_scripts": [
     {
       "matches": ["https://chat.deepseek.com/*"],
-      "js": ["src/native-chat-search.js", "src/deepseek-frame.js"],
+      "js": ["src/native-chat-search.js", "src/sidebar-history.js", "src/deepseek-routes.js", "src/deepseek-consent.js", "src/deepseek-frame.js"],
       "all_frames": true,
       "run_at": "document_start"
     },
@@ -73,6 +74,7 @@
         "src/native-chat-search.js",
         "src/build-info.js",
         "src/workspace-shortcut-keys.js",
+        "src/sidebar-history.js",
         "src/chat-history.js",
         "src/chatgpt-queue.js",
         "src/chatgpt-tab.js",

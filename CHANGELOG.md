@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+- Preserve the loaded chat viewport off-screen while the dock is collapsed instead of removing it from layout. Restore it without replaying an opening animation, and keep the collapsed frame inert and out of keyboard focus.
+
+- Keep ChatGPT's loading notice hidden once the current page is connected, including when its composer is temporarily hidden during dock switches. Preserve input-readiness guards and show actual sign-out independently of composer visibility.
+
+- Skip pinned conversations in both providers' Up/Down history navigation. Down from a new or pinned chat starts at the newest loaded regular conversation; typed native search is unchanged.
+
+- Refresh the selected provider when expanding chat. Report an unavailable DeepSeek composer as loading rather than a sign-in requirement, while preserving the mounted page and drafts.
+
+- Replace the Resume Studio / Chat switcher with a single dock. Matching job and chat headers expand one section at a time, while both provider frames stay mounted. Move candidate profile selection and import into the user menu, which fits the available space.
+- Adapt the queue demo and ApplicationTracker_v2.1's compact cards, grouped job form, and job-description-first details. Add company/role search, status filters, listing links, and shared horizontal gutters.
+- Save manual conversation links for either ChatGPT or DeepSeek on queued jobs and reopen them from the dock with draft and generation guards. Prompt sending remains manual.
+- Add a Documents form for importing or pasting resume JSON and an optional cover letter, validating fixed candidate facts before saving a manually prepared job as Ready.
+
+- Preserve DeepSeek's document and sidebar visibility during chat navigation instead of reloading each conversation; avoid a full-reload fallback.
+- Remember the user's explicit cookie-banner choice and reuse the same recognized action on later loads, without selecting consent defaults or replacing custom preferences.
+
+- Recognize DeepSeek's unlabeled top-left sidebar icon and wait for delayed history; navigate approved native history URLs through the extension instead of synthetic link clicks.
+- Report history-reading or navigation failures instead of leaving clickable DeepSeek arrows silent.
+
+- Correct DeepSeek history URLs to `/a/chat/s/<id>`, share route validation between the frame and toolbar, and test real session paths so the history arrows recognize existing conversations.
+
+- Selecting a provider opens its Chat view and dismisses the user popup automatically; remove the redundant Open chat button and restore focus to the user icon.
+
+- Fix provider switching origin errors by accepting a DeepSeek-origin MessagePort handshake before dispatching commands; retire old ports after navigation.
+
+- Make history arrows reveal hidden or unmounted provider history briefly, restore the previous sidebar visibility, and retain loaded DeepSeek history after closure.
+- Serialize native history reads/navigation and recheck drafts, generation and the current route before clicking a fresh link.
+
 - Restore direct query entry in the toolbar: Enter or the arrow fills the provider's native search input, preserving message drafts and keeping results native.
 - Recognize attached shortcut labels, add a verified ChatGPT Ctrl/Cmd+K fallback, and confirm the actual input accepts the query before reporting success.
 

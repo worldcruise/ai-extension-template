@@ -1,0 +1,635 @@
+/*
+ * referrer-agent.css  (v2 — VA Polish, Film-Strip C, compact panel)
+ * Standalone extension page: Find Referrers — Referral Agent
+ *
+ * Design: matches VA-polish reference (360×~520 shell, single morph card,
+ * Film-Strip C ranking reveal, VA compact expand list).
+ *
+ * JobWizard brand tokens mirror banner-tokens.css and common.css palette.
+ */
+
+/* ─── Reset ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ─── Design tokens ──────────────────────────────────────────────── */
+:root {
+  --bl:   #0066ff;
+  --bld:  #1a3ed4;
+  --blt:  rgba(0,102,255,.07);
+  --blb:  rgba(0,102,255,.20);
+  --gr:   #10b981;
+  --grd:  #059669;
+  --grt:  rgba(16,185,129,.08);
+  --am:   #f59e0b;
+  --re:   #ef4444;
+  --th:   #0f172a;
+  --tb:   #334155;
+  --tm:   #64748b;
+  --tf:   #94a3b8;
+  --su:   #ffffff;
+  --bg:   #f8fafc;
+  --bo:   rgba(15,23,42,.07);
+  --ease: cubic-bezier(.22,.61,.36,1);
+  --spring: cubic-bezier(.34,1.56,.64,1);
+  --mono: 'SF Mono','Fira Code',Consolas,monospace;
+  --font: 'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+}
+
+/* ─── Base ───────────────────────────────────────────────────────── */
+html { font-size: 15px; }
+body {
+  font-family: var(--font);
+  background: #d5dce6;
+  min-height: 100vh;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Utility ────────────────────────────────────────────────────── */
+.ra-hidden { display: none !important; }
+
+/* ─── Shell: compact extension panel ────────────────────────────── */
+.ra-shell {
+  width: 360px;
+  min-height: 520px;
+  max-height: 100vh;
+  background: var(--bg);
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+@media screen and (min-width: 400px) {
+  body { padding: 24px 16px 60px; }
+  .ra-shell {
+    border-radius: 12px;
+    box-shadow: 0 6px 28px rgba(15,23,42,.15), 0 2px 6px rgba(15,23,42,.06);
+    border: 1px solid rgba(15,23,42,.09);
+  }
+}
+
+/* ─── Mini header ────────────────────────────────────────────────── */
+.ra-mh {
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 11px;
+  background: rgba(248,250,252,.97);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--bo);
+}
+.ra-mh-logo {
+  width: 18px; height: 18px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #3393ff, #0044ae);
+  color: #fff; font-size: 10px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.ra-mh-name  { font-size: 11.5px; font-weight: 700; color: var(--th); flex-shrink: 0; }
+.ra-mh-job   { flex: 1; font-size: 10.5px; color: var(--tm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ra-mh-job b { color: var(--tb); font-weight: 600; }
+
+/* ─── Morph body ─────────────────────────────────────────────────── */
+.ra-body       { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+.ra-morph-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+.ra-morph-card {
+  position: absolute; inset: 0;
+  background: var(--su);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  transition: opacity .18s var(--ease), transform .18s var(--ease);
+}
+.ra-morph-card.ra-out { opacity: 0; transform: scale(.97) translateY(3px); pointer-events: none; }
+.ra-morph-card.ra-in  { animation: raFsu .22s var(--ease) both; }
+
+/* ─── Base animations ────────────────────────────────────────────── */
+@keyframes raSpin   { to { transform: rotate(360deg); } }
+@keyframes raBlink  { 0%,100% { opacity:1; } 50% { opacity:.25; } }
+@keyframes raFsu    { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+@keyframes raFadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes raScaleIn{ from { transform:scale(.55);opacity:0; } 65% { transform:scale(1.08); } to { transform:scale(1);opacity:1; } }
+
+/* Film-Strip C */
+@keyframes raCStrip {
+  0%   { clip-path: inset(0 100% 0 0); }
+  100% { clip-path: inset(0 0% 0 0); }
+}
+@keyframes raCScore {
+  0%   { opacity:0; transform:translateY(4px) scale(.85); }
+  100% { opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* ─── Shared atoms ───────────────────────────────────────────────── */
+.ra-spinner {
+  width: 11px; height: 11px; border-radius: 50%;
+  border: 2px solid rgba(0,102,255,.16); border-top-color: var(--bl);
+  animation: raSpin .6s linear infinite; flex-shrink: 0;
+}
+.ra-big-sp {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 2px solid rgba(0,102,255,.14); border-top-color: var(--bl);
+  animation: raSpin .7s linear infinite;
+}
+.ra-ph-hdr {
+  padding: 0 11px 6px;
+  font-size: 9.5px; font-weight: 600; color: var(--bl);
+  letter-spacing: .02em;
+  flex-shrink: 0; display: flex; align-items: center; gap: 6px;
+}
+
+/* ─── Phase: center (loading / error / quota) ────────────────────── */
+.ra-phase-center {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 9px; text-align: center; padding: 20px;
+}
+.ra-phase-center--compact {
+  flex: 0 0 auto;
+  min-height: 118px;
+  padding: 14px 18px 10px;
+}
+.ra-ph-icon  { font-size: 26px; }
+.ra-ph-title { font-size: 13px; font-weight: 700; color: var(--th); }
+.ra-ph-sub   { font-size: 10.5px; color: var(--tm); line-height: 1.5; max-width: 240px; }
+.ra-ph-cta {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 6px 16px; border-radius: 999px;
+  background: linear-gradient(135deg, #3393ff, #0044ae);
+  color: #fff; font-size: 11.5px; font-weight: 600;
+  font-family: var(--font); border: none; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,102,255,.24); text-decoration: none;
+  transition: filter .15s, transform .15s;
+}
+.ra-ph-cta:hover { filter: brightness(1.06); transform: translateY(-1px); }
+
+/* ─── Phase: planning ────────────────────────────────────────────── */
+.ra-phase-plan {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 8px; padding: 16px; text-align: center;
+}
+.ra-phase-plan h3 { font-size: 12.5px; font-weight: 700; color: var(--th); }
+.ra-phase-plan p  { font-size: 10.5px; color: var(--tm); line-height: 1.5; max-width: 230px; }
+
+/* ─── Phase: angles ──────────────────────────────────────────────── */
+.ra-phase-angles {
+  display: flex; flex-direction: column;
+  padding: 10px 11px; flex: 1; overflow: hidden; gap: 5px;
+}
+.ra-plan-intro {
+  font-size: 10.5px; color: var(--tb); line-height: 1.45; flex-shrink: 0;
+  background: var(--blt); border-left: 2px solid var(--bl);
+  border-radius: 3px; padding: 5px 8px;
+}
+.ra-angle-row {
+  display: flex; align-items: flex-start; gap: 7px; flex-shrink: 0;
+  background: var(--bg); border: 1px solid var(--bo);
+  border-radius: 5px; padding: 5px 8px;
+  animation: raFsu .2s var(--ease) both;
+}
+.ra-angle-num {
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--bl); color: #fff; font-size: 8.5px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+.ra-angle-purpose { font-size: 10.5px; font-weight: 600; color: var(--th); }
+.ra-angle-query   { font-size: 9px; color: var(--tm); font-family: var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ─── Phase: search ──────────────────────────────────────────────── */
+.ra-phase-search {
+  display: flex; flex-direction: column;
+  padding: 10px 11px; flex: 1; overflow: hidden; gap: 0;
+}
+.ra-srch-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 0; border-bottom: 1px solid var(--bo);
+  animation: raFsu .18s var(--ease) both;
+}
+.ra-srch-row:last-of-type { border-bottom: none; }
+.ra-sdot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  background: var(--bl); animation: raBlink .9s ease-in-out infinite;
+}
+.ra-sdot.done { background: var(--gr); animation: none; }
+.ra-sdot.zero { background: var(--tf); animation: none; }
+.ra-srch-lbl { flex: 1; font-size: 10.5px; color: var(--tb); line-height: 1.3; }
+.ra-srch-ct  { font-size: 9.5px; color: var(--tm); font-family: var(--mono); white-space: nowrap; }
+.ra-rank-row {
+  margin-top: auto; display: flex; align-items: center; gap: 7px;
+  font-size: 10.5px; color: var(--tm); padding-top: 8px; flex-shrink: 0;
+}
+
+/* ─── Phase: Film-Strip C ranking ───────────────────────────────── */
+.ra-rk-c       { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 8px 0; }
+.ra-rk-c-rows  { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.ra-rk-c-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 11px; border-bottom: 1px solid var(--bo);
+  animation: raCStrip .38s cubic-bezier(.4,0,.2,1) both;
+  overflow: hidden;
+}
+.ra-rk-c-row:last-child { border-bottom: none; }
+.ra-rk-c-info  { flex: 1; min-width: 0; }
+.ra-rk-c-name  { font-size: 11px; font-weight: 700; color: var(--th); display: flex; align-items: center; gap: 4px; flex-wrap: wrap; line-height: 1.2; }
+.ra-rk-c-ev    { font-size: 9px; color: var(--tm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 1px; }
+.ra-rk-c-score { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 0; min-width: 36px; }
+.ra-rk-c-num   { font-size: 14px; font-weight: 800; font-family: var(--mono); line-height: 1; animation: raCScore .4s var(--spring) both; }
+.ra-rk-c-lbl   { font-size: 8px; color: var(--tf); letter-spacing: .02em; }
+
+/* ─── Avatar ─────────────────────────────────────────────────────── */
+.ra-av         { flex-shrink: 0; position: relative; width: 28px; height: 28px; }
+.ra-av-img {
+  width: 28px; height: 28px; border-radius: 50%; object-fit: cover;
+  border: 2px solid rgba(255,255,255,.9); box-shadow: 0 0 0 1.5px var(--bo);
+  display: block; animation: raFadeIn .3s var(--ease) both;
+}
+.ra-av-fb {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--bl), var(--bld));
+  color: #fff; font-size: 9.5px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid rgba(255,255,255,.9); box-shadow: 0 0 0 1.5px var(--bo);
+  animation: raFadeIn .3s var(--ease) both;
+}
+.ra-av.alumni .ra-av-img,
+.ra-av.alumni .ra-av-fb { box-shadow: 0 0 0 2px rgba(245,158,11,.7); }
+
+/* ─── Alumni badge ───────────────────────────────────────────────── */
+.ra-alumni {
+  display: inline-flex; align-items: center; gap: 2px;
+  padding: 1px 5px; border-radius: 999px;
+  background: linear-gradient(135deg,rgba(245,158,11,.14),rgba(245,158,11,.06));
+  border: 1px solid rgba(245,158,11,.28); color: #92400e;
+  font-size: 9px; font-weight: 600; white-space: nowrap; flex-shrink: 0;
+  animation: raScaleIn .3s var(--spring) both;
+}
+
+/* ─── Platform badge ─────────────────────────────────────────────── */
+.ra-platform      { display: inline-flex; align-items: center; gap: 2px; padding: 1px 5px; border-radius: 999px; font-size: 9px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+.ra-platform--li  { background: rgba(10,102,194,.10); color: #0a66c2; }
+.ra-platform--x   { background: rgba(15,23,42,.08);   color: #0f172a; }
+.ra-platform--gh  { background: rgba(36,41,47,.10);   color: #24292f; }
+
+/* ─── Mini buttons ───────────────────────────────────────────────── */
+.ra-mini-btn { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 999px; font-size: 8.5px; font-weight: 600; font-family: var(--font); cursor: pointer; text-decoration: none; border: none; transition: filter .15s, background .15s; }
+.ra-btn-li   { background: #0a66c2; color: #fff; }
+.ra-btn-li:hover { filter: brightness(1.1); }
+.ra-btn-cp   { background: transparent; color: var(--bl); border: 1px solid var(--blb); }
+.ra-btn-cp:hover { background: var(--blt); }
+.ra-btn-cp.ra-copied { color: var(--grd); border-color: var(--gr); }
+
+/* ─── Notice / honest state bar ─────────────────────────────────── */
+.ra-notice         { flex-shrink: 0; padding: 5px 11px; font-size: 9.5px; border-bottom: 1px solid; display: flex; align-items: center; gap: 5px; line-height: 1.4; }
+.ra-notice--warn   { color: #92400e; border-color: rgba(245,158,11,.17); background: rgba(245,158,11,.07); }
+.ra-notice--info   { color: var(--tm); border-color: var(--bo); background: var(--bg); }
+.ra-notice--honest { flex-direction: column; align-items: flex-start; padding: 8px 11px; color: var(--tb); border-color: rgba(245,158,11,.17); background: rgba(245,158,11,.04); }
+.ra-notice-title   { font-weight: 700; color: var(--th); font-size: 10px; }
+
+/* ─── VA final list ──────────────────────────────────────────────── */
+.ra-va-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; scrollbar-width: thin; scrollbar-color: var(--bo) transparent; }
+.ra-va-list::-webkit-scrollbar { width: 3px; }
+.ra-va-list::-webkit-scrollbar-thumb { background: var(--bo); border-radius: 2px; }
+.ra-zero-reviewed { border-top: 1px solid rgba(245,158,11,.15); }
+
+.ra-va-row { display: flex; flex-direction: column; border-bottom: 1px solid var(--bo); cursor: pointer; transition: background .13s; animation: raFsu .22s var(--ease) both; }
+.ra-va-row:last-child { border-bottom: none; }
+.ra-va-row:hover { background: rgba(0,102,255,.028); }
+.ra-va-row.open  { background: rgba(0,102,255,.022); }
+
+.ra-va-main  { display: flex; align-items: center; gap: 8px; padding: 6px 11px; }
+.ra-va-info  { flex: 1; min-width: 0; }
+.ra-va-name  { font-size: 11px; font-weight: 700; color: var(--th); display: flex; align-items: center; gap: 4px; flex-wrap: wrap; line-height: 1.2; }
+.ra-va-ev1   { font-size: 9.5px; color: var(--tm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 1px; }
+.ra-va-right { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 0; min-width: 36px; }
+.ra-va-snum  { font-size: 13px; font-weight: 800; font-family: var(--mono); color: var(--th); line-height: 1; }
+.ra-va-slbl  { font-size: 8px; color: var(--tf); letter-spacing: .02em; }
+
+.ra-va-expand {
+  padding: 6px 11px 7px 47px; display: flex; flex-direction: column; gap: 5px;
+  border-top: 1px solid var(--bo); background: rgba(0,102,255,.022);
+  animation: raFsu .16s var(--ease) both;
+}
+.ra-va-bullets { display: flex; flex-direction: column; gap: 2px; }
+.ra-va-b       { display: flex; gap: 5px; font-size: 9.5px; color: var(--tb); line-height: 1.4; }
+.ra-va-bdot    { width: 3px; height: 3px; border-radius: 50%; background: var(--bl); flex-shrink: 0; margin-top: 4.5px; }
+.ra-va-path    { font-size: 9px; color: var(--tm); background: var(--bg); border-left: 2px solid var(--blb); border-radius: 3px; padding: 4px 7px; line-height: 1.4; }
+.ra-va-outreach{ font-size: 9.5px; color: var(--tb); line-height: 1.45; background: rgba(0,102,255,.04); border: 1px solid var(--blb); border-radius: 4px; padding: 5px 7px; }
+.ra-va-outreach-lbl{ font-size: 8.5px; font-weight: 600; color: var(--bl); margin-bottom: 3px; }
+.ra-va-foot    { display: flex; gap: 4px; flex-wrap: wrap; }
+
+/* ─── Recruiter badge ────────────────────────────────────────────── */
+.ra-recruiter {
+  display: inline-flex; align-items: center; gap: 2px;
+  padding: 1px 5px; border-radius: 999px;
+  background: rgba(100,116,139,.10); border: 1px solid rgba(100,116,139,.22);
+  color: var(--tm); font-size: 9px; font-weight: 600;
+  white-space: nowrap; flex-shrink: 0;
+}
+
+/* ─── Strength banner ────────────────────────────────────────────── */
+.ra-strength {
+  flex-shrink: 0; display: flex; align-items: center; gap: 6px;
+  padding: 5px 11px; font-size: 10px; font-weight: 600;
+  border-bottom: 1px solid;
+}
+.ra-strength--strong { color: var(--grd); border-color: var(--grt); background: var(--grt); }
+/* Weak: muted slate — "limited leads" is informational, not alarming */
+.ra-strength--weak   { color: var(--tb);  border-color: rgba(100,116,139,.18); background: rgba(100,116,139,.05); }
+.ra-strength--none   { color: var(--tm);  border-color: var(--bo); background: var(--bg); }
+.ra-strength-dot     { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.ra-strength--strong .ra-strength-dot { background: var(--gr); }
+.ra-strength--weak   .ra-strength-dot { background: var(--tf); }
+.ra-strength--none   .ra-strength-dot { background: var(--tf); }
+.ra-strength-reason  {
+  flex: 1; font-size: 9px; font-weight: 400; color: inherit; opacity: .8;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* ─── Section header (IC / Recruiter / Filtered) ─────────────────── */
+.ra-sec-hdr {
+  flex-shrink: 0; display: flex; align-items: center; gap: 5px;
+  padding: 5px 11px 4px;
+  font-size: 9.5px; font-weight: 600; color: var(--tm);
+  letter-spacing: .01em;
+  border-bottom: 1px solid var(--bo);
+  background: var(--bg);
+  position: sticky; top: 0; z-index: 2;
+}
+.ra-sec-hdr--rec      { color: #64748b; }
+/* Filtered: slate, not amber — "screened out" is neutral, not a warning */
+.ra-sec-hdr--filtered { color: var(--tm); background: var(--bg); border-color: var(--bo); }
+.ra-sec-ct {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px;
+  background: var(--bl); color: #fff; font-size: 8px; font-weight: 700;
+}
+.ra-sec-hdr--rec      .ra-sec-ct { background: #64748b; }
+.ra-sec-hdr--filtered .ra-sec-ct { background: var(--tf); }
+
+/* ─── Recruiter row (compact, no score) ──────────────────────────── */
+.ra-rec-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 11px; border-bottom: 1px solid var(--bo);
+  animation: raFsu .2s var(--ease) both;
+}
+.ra-rec-row:last-child { border-bottom: none; }
+.ra-rec-info { flex: 1; min-width: 0; }
+.ra-rec-name { font-size: 10.5px; font-weight: 700; color: var(--th); display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.ra-rec-oc   { font-size: 9px; color: var(--tm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 1px; }
+
+/* ─── Screened-out section ───────────────────────────────────────── */
+.ra-filt-row {
+  display: flex; align-items: flex-start; gap: 7px;
+  padding: 5px 11px; border-bottom: 1px solid var(--bo);
+  animation: raFsu .2s var(--ease) both;
+}
+.ra-filt-row:last-child { border-bottom: none; }
+.ra-filt-info  { flex: 1; min-width: 0; }
+.ra-filt-name  { font-size: 10px; font-weight: 600; color: var(--tm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ra-filt-why   { font-size: 9px; color: var(--tf); margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ra-filt-x     { font-size: 10px; color: var(--tf); flex-shrink: 0; margin-top: 1px; }
+
+/* ─── Verified badge ─────────────────────────────────────────────── */
+.ra-verified   { font-size: 8.5px; color: var(--grd); font-weight: 600; display: flex; align-items: center; gap: 3px; }
+
+/* ─── GitHub Unverified section (variant D) ──────────────────────── */
+.ra-sec-hdr--gh-unv {
+  color: #64748b;
+  background: rgba(148,163,184,.04);
+}
+.ra-sec-hdr--gh-unv .ra-sec-ct {
+  background: #94a3b8;
+}
+.ra-sec-hdr--gh-unv:hover {
+  background: rgba(148,163,184,.09);
+}
+.ra-gh-unv-note {
+  font-size: 9px; color: var(--tm); padding: 4px 12px 2px;
+  font-style: italic; opacity: .8;
+}
+.ra-gh-unv-row {
+  display: flex; flex-direction: column;
+  padding: 0; border-bottom: 1px solid var(--bo);
+  animation: raFsu .2s var(--ease) both;
+  background: rgba(148,163,184,.025);
+}
+.ra-gh-unv-row:last-child { border-bottom: none; }
+.ra-gh-unv-row .ra-va-main {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 12px 4px;
+}
+.ra-gh-unv-row .ra-rec-info { flex: 1; min-width: 0; }
+/* Unverified inline tag: grey, non-alarming */
+.ra-gh-unv-tag {
+  display: inline-flex; align-items: center;
+  padding: 0px 4px; border-radius: 999px;
+  background: rgba(148,163,184,.15); border: 1px solid rgba(148,163,184,.25);
+  color: #94a3b8; font-size: 8px; font-weight: 600;
+  white-space: nowrap; flex-shrink: 0; vertical-align: middle;
+  margin-left: 3px;
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   v4 additions — Agentic Loop UI, Streaming Ranking, Summary Footer
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── Planning phase: thinking + checklist ───────────────────────── */
+.ra-plan-thinking {
+  display: flex; align-items: center; gap: 12px;
+}
+.ra-plan-thinking-title {
+  font-size: 12.5px; font-weight: 700; color: var(--th);
+}
+.ra-plan-thinking-sub {
+  font-size: 10.5px; color: var(--tm); margin-top: 2px;
+  max-width: 220px; line-height: 1.4;
+}
+
+/* ─── Plan step rows (checklist after agent_plan) ────────────────── */
+.ra-plan-step {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 5px 0; flex-shrink: 0;
+  animation: raFsu .22s var(--ease) both;
+}
+.ra-plan-step-purpose {
+  font-size: 11px; font-weight: 600; color: var(--th);
+}
+.ra-plan-step-query {
+  font-size: 9px; color: var(--tm); font-family: var(--mono);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 230px; margin-top: 1px;
+}
+
+/* Plan checkbox — states: pending, searching, done */
+.ra-plan-check {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 1.5px solid rgba(0,102,255,.3); background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px; transition: background .2s, border-color .2s;
+}
+.ra-plan-check.searching {
+  border-color: var(--bl); background: rgba(0,102,255,.08);
+  animation: raBlink .9s ease-in-out infinite;
+}
+.ra-plan-check.done {
+  background: var(--gr); border-color: var(--grd);
+  animation: none;
+}
+.ra-check-icon {
+  width: 10px; height: 10px; display: none; color: #fff;
+}
+.ra-plan-check.done .ra-check-icon { display: block; }
+
+/* ─── Profile factors section (profile_considered event) ─────────── */
+.ra-pf-section {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--bo);
+  display: flex; flex-direction: column; gap: 4px;
+  animation: raFsu .22s var(--ease) both;
+}
+.ra-pf-hdr {
+  font-size: 9px; font-weight: 700; color: var(--bl);
+  letter-spacing: .055em; text-transform: uppercase;
+  padding: 0 0 2px;
+  flex-shrink: 0;
+}
+.ra-pf-row {
+  display: flex; align-items: flex-start; gap: 7px;
+  padding: 3px 0;
+  flex-shrink: 0;
+  animation: raFsu .18s var(--ease) both;
+}
+.ra-pf-text {
+  display: flex; flex-direction: column; gap: 1px;
+  min-width: 0;
+}
+.ra-pf-label {
+  font-size: 10.5px; font-weight: 600; color: var(--th);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ra-pf-detail {
+  font-size: 9px; color: var(--tm);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ─── Search dot: searching state (blinking blue) ────────────────── */
+.ra-sdot.searching {
+  background: var(--bl);
+  animation: raBlink .7s ease-in-out infinite;
+}
+
+/* ─── Streaming ranking phase ────────────────────────────────────── */
+.ra-phase-ranking {
+  flex: 1; display: flex; flex-direction: column; overflow: hidden;
+}
+.ra-rk-live-rows {
+  flex: 1; overflow-y: auto; display: flex; flex-direction: column;
+  scrollbar-width: thin; scrollbar-color: var(--bo) transparent;
+  padding: 0;
+}
+.ra-rk-live-rows::-webkit-scrollbar { width: 3px; }
+.ra-rk-live-rows::-webkit-scrollbar-thumb { background: var(--bo); border-radius: 2px; }
+
+/* Individual live candidate row — enter from bottom, slide up */
+.ra-rk-live-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 11px; border-bottom: 1px solid var(--bo);
+  will-change: transform, opacity;
+  /* ensure score column is always visible */
+  min-width: 0; overflow: visible;
+}
+.ra-rk-live-row:last-child { border-bottom: none; }
+/* Score column in live row */
+.ra-rk-live-row .ra-rk-c-score { flex-shrink: 0; min-width: 50px; display: flex; flex-direction: column; align-items: flex-end; gap: 0; }
+.ra-rk-live-row .ra-rk-c-info  { flex: 1; min-width: 0; overflow: hidden; }
+.ra-rk-live-entering {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.ra-rk-live-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity .28s var(--ease), transform .28s var(--ease);
+}
+
+/* Score number that animates via animateNumber() */
+.ra-rk-score-num {
+  font-size: 14px; font-weight: 800; font-family: var(--mono);
+  line-height: 1; min-width: 20px; text-align: right;
+}
+
+/* ─── Live filtered-out section (during ranking) ─────────────────── */
+.ra-rk-filtered-live {
+  flex-shrink: 0; border-top: 1px solid var(--bo);
+  max-height: 90px; overflow-y: auto;
+  scrollbar-width: thin; scrollbar-color: var(--bo) transparent;
+}
+.ra-rk-filtered-live:empty { display: none; }
+.ra-rk-filt-hdr {
+  padding: 4px 11px 2px;
+  font-size: 8.5px; font-weight: 600; color: var(--tf);
+  letter-spacing: .01em;
+  background: var(--bg);
+  position: sticky; top: 0;
+}
+.ra-rk-filt-live-row {
+  display: flex; align-items: baseline; gap: 5px;
+  padding: 3px 11px; font-size: 9.5px;
+  border-top: 1px solid var(--bo);
+  opacity: 0; transform: translateX(-6px);
+}
+.ra-rk-filt-live-row.ra-rk-filt-live-visible {
+  opacity: 1; transform: translateX(0);
+  transition: opacity .22s var(--ease), transform .22s var(--ease);
+}
+.ra-rk-filt-x { color: var(--tf); font-size: 9px; flex-shrink: 0; }
+.ra-rk-filt-name { font-weight: 600; color: var(--tm); flex-shrink: 0; }
+.ra-rk-filt-reason { color: var(--tf); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ─── Summary footer ─────────────────────────────────────────────── */
+.ra-summary-footer {
+  flex-shrink: 0;
+  padding: 5px 11px;
+  font-size: 9px; color: var(--tf);
+  text-align: center;
+  border-top: 1px solid var(--bo);
+  background: var(--bg);
+  letter-spacing: .02em;
+}
+
+/* ─── Alt-profile platform icons ─────────────────────────────────── */
+/* Small icon links (GitHub / X) that appear inline after the name    */
+.ra-alt-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 5px;
+  vertical-align: middle;
+  line-height: 1;
+}
+.ra-alt-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  color: var(--tm);
+  opacity: .55;
+  transition: opacity .15s ease, background .15s ease;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.ra-alt-icon:hover {
+  opacity: 1;
+  background: rgba(0,0,0,.07);
+}
+.ra-alt-icon svg { display: block; }

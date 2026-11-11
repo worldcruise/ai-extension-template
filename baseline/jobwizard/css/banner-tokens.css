@@ -1,0 +1,614 @@
+/* banner-tokens.css — Phase D chunks D3+D4: design tokens + new banner DOM styles
+ *
+ * Spec §19.3 — declares CSS custom properties for radius / shadow / state colors
+ * / typography / motion. Values live in this single file so D5 (animations) and
+ * D6 (icon morph) can reference them without duplicating literals.
+ *
+ * Loaded by apply.css via @import. Scoped to `:host, #autofill_detail` so
+ * tokens apply inside ShadowRoot (where banner lives) and to the legacy
+ * `#autofill_detail` selector (some sites style outside :host).
+ *
+ * Note: D3+D4 ship STATIC visuals only. Animations/keyframes from spec §19.4
+ * are deliberately omitted — D5 chunk owns those. We do, however, define the
+ * easing/duration tokens here so D5 can drop in keyframes without touching
+ * this file.
+ */
+
+:host,
+#autofill_detail {
+  /* ─── Phase D banner tokens ─── */
+  --jw-banner-radius: 10px;
+  --jw-banner-padding: 14px 16px;
+  --jw-banner-margin-y: 8px;
+  /* Horizontal inset keeping the banner an inset card. V3.1 made the list
+     full-bleed by zeroing .fill_status padding, which this must not follow:
+     16px matches the question rows' own start inset. */
+  --jw-banner-margin-x: 16px;
+  --jw-banner-shadow-resting:
+    0 1px 3px rgba(15, 23, 42, 0.08),
+    0 4px 12px rgba(15, 23, 42, 0.04);
+  --jw-banner-shadow-hover:
+    0 2px 6px rgba(15, 23, 42, 0.12),
+    0 8px 20px rgba(15, 23, 42, 0.06);
+
+  /* state colors — ready (green) */
+  --jw-color-ready-from: #10b981;
+  --jw-color-ready-to: #059669;
+  --jw-color-ready-text: #065f46;
+  --jw-color-ready-tint: rgba(16, 185, 129, 0.10);
+  --jw-color-ready-border: rgba(16, 185, 129, 0.30);
+
+  /* state colors — loading (blue) */
+  --jw-color-loading-from: #3b82f6;
+  --jw-color-loading-to: #60a5fa;
+  --jw-color-loading-text: #1e3a8a;
+  --jw-color-loading-tint: rgba(59, 130, 246, 0.08);
+  --jw-color-loading-border: rgba(59, 130, 246, 0.28);
+
+  /* state colors — partial (amber, softened in D2-C6 for less aggressive tint) */
+  --jw-color-partial: #f59e0b;
+  --jw-color-partial-text: #b45309;
+  --jw-color-partial-tint: rgba(245, 158, 11, 0.05);
+  --jw-color-partial-border: rgba(245, 158, 11, 0.18);
+
+  /* state colors — failed (soft red, deliberately gentle) */
+  --jw-color-failed: #ef4444;
+  --jw-color-failed-text: #991b1b;
+  --jw-color-failed-tint: rgba(239, 68, 68, 0.06);
+  --jw-color-failed-border: rgba(239, 68, 68, 0.25);
+
+  /* state colors — awaiting_input (indigo, neutral attention) */
+  --jw-color-awaiting: #6366f1;
+  --jw-color-awaiting-text: #312e81;
+  --jw-color-awaiting-tint: rgba(99, 102, 241, 0.08);
+  --jw-color-awaiting-border: rgba(99, 102, 241, 0.28);
+
+  /* typography */
+  --jw-banner-font-primary:
+    600 15px/1.3 var(--jobwizard-font-family, 'Inter', -apple-system, 'SF Pro Display', sans-serif);
+  --jw-banner-font-secondary:
+    400 12px/1.4 var(--jobwizard-font-family, 'Inter', -apple-system, sans-serif);
+  --jw-banner-font-meta:
+    500 11px/1.4 var(--jobwizard-font-family, 'Inter', -apple-system, sans-serif);
+
+  /* motion (used by D5 — declared here so tokens are co-located) */
+  --jw-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --jw-ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --jw-ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+  --jw-dur-fast: 160ms;
+  --jw-dur-base: 240ms;
+  --jw-dur-slow: 360ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host,
+  #autofill_detail {
+    --jw-dur-fast: 0ms;
+    --jw-dur-base: 0ms;
+    --jw-dur-slow: 0ms;
+  }
+}
+
+/* ─── new banner v2 — base structure ─────────────────────────────────────── */
+
+#autofill_detail .jw-banner {
+  position: relative; /* containing block for the info tooltip */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: var(--jw-banner-padding);
+  margin: var(--jw-banner-margin-y) var(--jw-banner-margin-x);
+  border-radius: var(--jw-banner-radius);
+  box-shadow: var(--jw-banner-shadow-resting);
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  transition:
+    background-color var(--jw-dur-base) var(--jw-ease-soft),
+    border-color var(--jw-dur-base) var(--jw-ease-soft),
+    box-shadow var(--jw-dur-fast) var(--jw-ease-out);
+}
+
+#autofill_detail .jw-banner[hidden] {
+  display: none;
+}
+
+#autofill_detail .jw-banner:hover {
+  box-shadow: var(--jw-banner-shadow-hover);
+}
+
+/* D2-C6: refined icon container — subtle circular pill behind the glyph so
+   the icon reads as a finished "badge" instead of a bare character. Background
+   tint is currentColor at 12% opacity, inheriting the per-state color. */
+#autofill_detail .jw-banner-icon {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.05);
+  color: inherit;
+  transition: background-color var(--jw-dur-base) var(--jw-ease-soft);
+}
+
+/* Per-state icon background tints — pulled from the state palette tokens */
+#autofill_detail .jw-banner[data-state="loading"] .jw-banner-icon {
+  background: rgba(59, 130, 246, 0.14);
+}
+#autofill_detail .jw-banner[data-state="ready"] .jw-banner-icon {
+  background: rgba(16, 185, 129, 0.16);
+}
+
+/* ─── [Autofill A celebration, 2026-05-19] ───
+   When the banner enters data-state="ready" (autofill completion),
+   add a Hero Moment treatment:
+   • banner itself gently scales 0.97→1 (entrance pop, 280ms ease-spring)
+   • icon scales 0.5→1 + rotates -10°→0° (lands with intent)
+   • expanding green ring pulses out from the icon (one-shot, .8s)
+   • banner background tints warm-green (subtle)
+   No JS changes — bannerRenderer.js already sets data-state. CSS
+   animation triggers on state change because [data-state] selector
+   reapplies the animation property when the attr changes. */
+#autofill_detail .jw-banner[data-state="ready"] {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(255, 255, 255, 0) 60%), #ffffff;
+  /* fill-mode is `backwards`, NOT `both`: `both` keeps the final keyframe's
+     transform: scale(1) as a computed transform forever, which silently turns
+     the banner into a stacking context and traps the info tooltip's z-index
+     inside it (tooltip then paints *under* the question rows). `backwards`
+     still applies the 0% frame before the animation starts, and leaves
+     transform: none once it ends. */
+  animation: jw-banner-ready-pop 0.32s cubic-bezier(0.34, 1.4, 0.5, 1) backwards;
+}
+@keyframes jw-banner-ready-pop {
+  0%   { transform: scale(0.97); }
+  60%  { transform: scale(1.012); }
+  100% { transform: scale(1); }
+}
+/* Icon: scale-in with slight rotation — feels like landing. */
+#autofill_detail .jw-banner[data-state="ready"] .jw-banner-icon {
+  position: relative;
+  color: #10b981;
+  animation: jw-banner-ready-icon 0.55s cubic-bezier(0.34, 1.6, 0.5, 1) both;
+}
+@keyframes jw-banner-ready-icon {
+  0%   { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+  60%  { transform: scale(1.10) rotate(2deg);   opacity: 1; }
+  100% { transform: scale(1)    rotate(0);     opacity: 1; }
+}
+/* Expanding green ring — one-shot pulse from the icon center. */
+#autofill_detail .jw-banner[data-state="ready"] .jw-banner-icon::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid rgba(16, 185, 129, 0.45);
+  opacity: 0;
+  animation: jw-banner-ready-ring 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+  pointer-events: none;
+}
+@keyframes jw-banner-ready-ring {
+  0%   { transform: scale(0.8); opacity: 0.8; }
+  100% { transform: scale(2.2); opacity: 0;   }
+}
+#autofill_detail .jw-banner[data-state="partial"] .jw-banner-icon {
+  background: rgba(245, 158, 11, 0.16);
+}
+#autofill_detail .jw-banner[data-state="failed"] .jw-banner-icon {
+  background: rgba(239, 68, 68, 0.14);
+}
+#autofill_detail .jw-banner[data-state="awaiting_input"] .jw-banner-icon {
+  background: rgba(99, 102, 241, 0.14);
+}
+
+/* CSS-drawn icons replace plain glyphs for partial + spinner — pure
+   geometry, no asset dependency, scales cleanly with the badge. */
+#autofill_detail .jw-banner-icon[data-icon="warn"],
+#autofill_detail .jw-banner-icon[data-icon="spinner"] {
+  position: relative;
+}
+/* warn: caution mark stem */
+#autofill_detail .jw-banner-icon[data-icon="warn"]::before {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 8px;
+  border-radius: 1px;
+  background: currentColor;
+  top: 7px;
+}
+/* warn: caution mark dot */
+#autofill_detail .jw-banner-icon[data-icon="warn"]::after {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  bottom: 6px;
+}
+/* spinner: rotating ring */
+#autofill_detail .jw-banner-icon[data-icon="spinner"]::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: JWBannerSpin 0.8s linear infinite;
+}
+@keyframes JWBannerSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* D2-C7-fix4: text container is column again (primary needs its own line so
+   it doesn't truncate). Secondary + info button share a sub-row so the hint
+   icon sits next to its target text. Meta is the third child, on its own row. */
+#autofill_detail .jw-banner-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+#autofill_detail .jw-banner-secondary-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* Phase D2 v2 micro-anim: text fade-in on copy change.
+   Applied via .jw-banner-flash class re-trigger from bannerRenderer's paintDom.
+   200ms ease-out, opacity + 2px slide so the eye notices a transition without
+   feeling jumpy. Identical-text renders skip retrigger so the animation only
+   runs on real copy changes. */
+.jw-banner-flash {
+  animation: JWBannerFlash 0.2s var(--jw-ease-out, cubic-bezier(0.4, 0, 0.2, 1)) both;
+}
+@keyframes JWBannerFlash {
+  0%   { opacity: 0.4; transform: translateY(2px); }
+  100% { opacity: 1;   transform: translateY(0); }
+}
+
+/* Phase D2 C5: Detailed mode meta line. Hidden by default; opt-in via the
+   gear → Display → Detailed metrics toggle. Compact mode keeps banner clean
+   ("All set / Submit when you're ready"); Detailed mode appends raw counts
+   for power users without polluting the default experience. */
+#autofill_detail .jw-banner-meta {
+  font: var(--jw-banner-font-meta);
+  color: #94a3b8;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 4px;
+}
+#autofill_detail .jw-banner[data-detailed="0"] .jw-banner-meta,
+#autofill_detail .jw-banner-meta:empty {
+  display: none;
+}
+
+#autofill_detail .jw-banner-primary {
+  font: var(--jw-banner-font-primary);
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* leave a tiny breathing room before the bullet to its right */
+  margin-right: 0;
+}
+
+#autofill_detail .jw-banner-secondary {
+  font: var(--jw-banner-font-secondary);
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+#autofill_detail .jw-banner-cta {
+  flex: 0 0 auto;
+  font: var(--jw-banner-font-meta);
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--jw-dur-fast) var(--jw-ease-out);
+}
+
+#autofill_detail .jw-banner-cta[hidden] {
+  display: none;
+}
+
+#autofill_detail .jw-banner-cta:hover {
+  background: rgba(15, 23, 42, 0.05);
+}
+
+/* D2-C7-fix4/5: info button is a 14x14 italic "i" pill next to secondary
+   text. position: static so the tooltip uses .jw-banner as its containing
+   block (right-aligned to banner edge to prevent left-overflow on small
+   panels). Hidden when detailed mode is already on. */
+#autofill_detail .jw-banner-info {
+  position: static;
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: 1px solid rgba(15, 23, 42, 0.20);
+  border-radius: 50%;
+  background: transparent;
+  color: rgba(15, 23, 42, 0.45);
+  font: 600 9px/1 var(--jobwizard-font-family, 'Inter', -apple-system, sans-serif);
+  cursor: help;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    color var(--jw-dur-fast) var(--jw-ease-out),
+    border-color var(--jw-dur-fast) var(--jw-ease-out),
+    background-color var(--jw-dur-fast) var(--jw-ease-out);
+}
+#autofill_detail .jw-banner-info::before {
+  content: 'i';
+  font-style: italic;
+}
+#autofill_detail .jw-banner-info:hover {
+  color: rgba(15, 23, 42, 0.85);
+  border-color: rgba(15, 23, 42, 0.40);
+  background: rgba(15, 23, 42, 0.05);
+}
+/* Hide info icon entirely when detailed mode is already on */
+#autofill_detail .jw-banner[data-detailed="1"] .jw-banner-info {
+  display: none;
+}
+/* Also hide when there is no secondary text at all (avoids stranded ⓘ
+   floating where there's nothing to explain). */
+#autofill_detail .jw-banner-secondary:empty + .jw-banner-info {
+  display: none;
+}
+
+/* D2-C7-fix5: tooltip is anchored to .jw-banner (info button is static now)
+   and right-aligned so it always fits within the panel regardless of where
+   the info button ends up horizontally. Width is bounded; will not overflow
+   either edge of a 320px+ panel. */
+#autofill_detail .jw-banner-info-tip {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 8px;
+  left: 8px;
+  max-width: 280px;
+  margin-left: auto; /* right-align within left/right=8px slot */
+  padding: 10px 12px;
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 8px;
+  box-shadow:
+    0 4px 12px rgba(15, 23, 42, 0.08),
+    0 1px 3px rgba(15, 23, 42, 0.04);
+  font: 400 12px/1.5 var(--jobwizard-font-family, 'Inter', -apple-system, sans-serif);
+  text-align: left;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity var(--jw-dur-fast) var(--jw-ease-out),
+    transform var(--jw-dur-fast) var(--jw-ease-out);
+  z-index: 100;
+}
+#autofill_detail .jw-banner-info:hover .jw-banner-info-tip,
+#autofill_detail .jw-banner-info:focus .jw-banner-info-tip {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+/* The tooltip overhangs the question rows below the banner, and those rows are
+   position: relative with an opaque white background. State the layering
+   intent explicitly instead of relying on the banner never becoming a stacking
+   context (a per-state animation already broke that assumption once). Lifted
+   only while the tip is open so the row-level status popovers, which can open
+   upward into the banner's band, keep winning the rest of the time. Stays
+   below the sticky footer (z-index: 10). */
+#autofill_detail .jw-banner:has(.jw-banner-info:hover),
+#autofill_detail .jw-banner:has(.jw-banner-info:focus) {
+  z-index: 5;
+}
+#autofill_detail .jw-banner-info-tip-title {
+  display: block;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+#autofill_detail .jw-banner-info-tip-body {
+  display: block;
+  margin-bottom: 6px;
+}
+#autofill_detail .jw-banner-info-tip-example {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(15, 23, 42, 0.04);
+  color: #475569;
+  font: 500 11px/1.4 var(--jobwizard-font-family, 'Inter', -apple-system, monospace);
+  letter-spacing: 0.01em;
+}
+
+/* ─── per-state visuals via [data-state] ────────────────────────────────── */
+
+#autofill_detail .jw-banner[data-state="loading"] {
+  background: var(--jw-color-loading-tint);
+  border-color: var(--jw-color-loading-border);
+}
+#autofill_detail .jw-banner[data-state="loading"] .jw-banner-primary,
+#autofill_detail .jw-banner[data-state="loading"] .jw-banner-icon {
+  color: var(--jw-color-loading-text);
+}
+
+#autofill_detail .jw-banner[data-state="ready"] {
+  background: var(--jw-color-ready-tint);
+  border-color: var(--jw-color-ready-border);
+}
+/* D2-C7 fix: icon must inherit the per-state color too — without this rule
+   the check glyph fell back to default text color (slate near-black), looking
+   detached from the green ready chip. */
+#autofill_detail .jw-banner[data-state="ready"] .jw-banner-primary,
+#autofill_detail .jw-banner[data-state="ready"] .jw-banner-icon {
+  color: var(--jw-color-ready-text);
+}
+
+#autofill_detail .jw-banner[data-state="partial"] {
+  background: var(--jw-color-partial-tint);
+  border-color: var(--jw-color-partial-border);
+}
+#autofill_detail .jw-banner[data-state="partial"] .jw-banner-primary,
+#autofill_detail .jw-banner[data-state="partial"] .jw-banner-icon {
+  color: var(--jw-color-partial-text);
+}
+
+#autofill_detail .jw-banner[data-state="failed"] {
+  background: var(--jw-color-failed-tint);
+  border-color: var(--jw-color-failed-border);
+}
+#autofill_detail .jw-banner[data-state="failed"] .jw-banner-primary,
+#autofill_detail .jw-banner[data-state="failed"] .jw-banner-icon {
+  color: var(--jw-color-failed-text);
+}
+
+#autofill_detail .jw-banner[data-state="awaiting_input"] {
+  background: var(--jw-color-awaiting-tint);
+  border-color: var(--jw-color-awaiting-border);
+}
+#autofill_detail .jw-banner[data-state="awaiting_input"] .jw-banner-primary,
+#autofill_detail .jw-banner[data-state="awaiting_input"] .jw-banner-icon {
+  color: var(--jw-color-awaiting-text);
+}
+
+#autofill_detail .jw-banner[data-state="idle"] {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* ─── D2-C7 delight micro-animations ─────────────────────────────────────── */
+
+/* D2-C7-fix2: dropped JWBannerKindShift (whole-banner scale) and
+   JWReadyTextRise (primary text opacity rise). Both were stacking with the
+   existing JWBannerFlash text fade + JWIconCelebrate icon pop, producing 4
+   overlapping animations on the same card → emoji glyphs ended up rasterized
+   at sub-pixel offsets mid-tween, reading as a "flash". Now only the icon
+   does the celebration pop; text fades in via the existing 200ms flash. */
+
+/* Ready-state celebration: only fires when banner FIRST enters ready (not on
+   every re-render). Icon does a confident pop and confetti specks burst from
+   behind the badge. Text is left alone — its existing fade-in already sells
+   the transition without fighting the emoji renderer. */
+.jw-banner-celebrate .jw-banner-icon {
+  animation: JWIconCelebrate 0.6s var(--jw-ease-spring) both;
+  position: relative;
+}
+.jw-banner-celebrate .jw-banner-icon::before {
+  /* Override the static warn glyph during celebration — confetti speck #1 */
+  animation: JWConfetti1 0.9s var(--jw-ease-out) both !important;
+}
+.jw-banner-celebrate .jw-banner-icon::after {
+  /* Confetti speck #2 (the warn dot becomes a celebration dot) */
+  animation: JWConfetti2 0.9s var(--jw-ease-out) both !important;
+}
+@keyframes JWIconCelebrate {
+  0%   { transform: scale(1) rotate(0deg); }
+  35%  { transform: scale(1.25) rotate(-8deg); }
+  60%  { transform: scale(0.95) rotate(6deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+@keyframes JWConfetti1 {
+  0%   { transform: translate(0, 0) scale(0.6); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translate(-14px, -16px) scale(1.2); opacity: 0; }
+}
+@keyframes JWConfetti2 {
+  0%   { transform: translate(0, 0) scale(0.6); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translate(14px, -14px) scale(1.2); opacity: 0; }
+}
+/* CTA Submit button: delightful gradient + lift on hover when in ready state.
+   Reuses the ready palette — visually says "this button is the celebration
+   action," not just any button. */
+#autofill_detail .jw-banner[data-state="ready"] .jw-banner-cta {
+  background: linear-gradient(
+    135deg,
+    var(--jw-color-ready-from) 0%,
+    var(--jw-color-ready-to) 100%
+  );
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 1px 2px rgba(5, 150, 105, 0.18);
+  transition:
+    transform var(--jw-dur-fast) var(--jw-ease-spring),
+    box-shadow var(--jw-dur-fast) var(--jw-ease-out),
+    filter var(--jw-dur-fast) var(--jw-ease-out);
+}
+#autofill_detail .jw-banner[data-state="ready"] .jw-banner-cta:hover {
+  background: linear-gradient(
+    135deg,
+    var(--jw-color-ready-from) 0%,
+    var(--jw-color-ready-to) 100%
+  );
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.28);
+  filter: brightness(1.05);
+}
+#autofill_detail .jw-banner[data-state="ready"] .jw-banner-cta:active {
+  transform: translateY(0) scale(0.97);
+  box-shadow: 0 1px 2px rgba(5, 150, 105, 0.18);
+}
+
+/* Partial state Jump CTA — subtler hint of action without competing with
+   the ready Submit button visually. */
+#autofill_detail .jw-banner[data-state="partial"] .jw-banner-cta {
+  border-color: var(--jw-color-partial-border);
+  color: var(--jw-color-partial-text);
+  transition: transform var(--jw-dur-fast) var(--jw-ease-spring),
+    background-color var(--jw-dur-fast) var(--jw-ease-out);
+}
+#autofill_detail .jw-banner[data-state="partial"] .jw-banner-cta:hover {
+  background: rgba(245, 158, 11, 0.10);
+  transform: translateY(-1px);
+}
+#autofill_detail .jw-banner[data-state="partial"] .jw-banner-cta:active {
+  transform: scale(0.97);
+}
+
+/* Icon morph: when data-icon flips to "check" (ready), gently re-enter so the
+   change feels physical, not just instant. Triggered automatically by attribute
+   selector + key animation; no JS needed. */
+#autofill_detail .jw-banner-icon {
+  transition: background-color var(--jw-dur-base) var(--jw-ease-soft);
+}
+#autofill_detail .jw-banner-icon[data-icon="check"] {
+  animation: JWIconCheckIn 0.34s var(--jw-ease-spring) both;
+}
+@keyframes JWIconCheckIn {
+  0%   { transform: scale(0.6); opacity: 0; }
+  60%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Reduced motion override: keep the celebrations quiet for users who asked. */
+@media (prefers-reduced-motion: reduce) {
+  .jw-banner-celebrate .jw-banner-icon,
+  #autofill_detail .jw-banner-icon[data-icon="check"] {
+    animation: none !important;
+  }
+}

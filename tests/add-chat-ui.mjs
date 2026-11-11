@@ -21,7 +21,7 @@ export async function checkAddChatUI({ cdp, dockSession, evaluate, until, sessio
   await chat('document.getElementById("prompt-textarea").value="";document.getElementById("prompt-textarea").dispatchEvent(new Event("input",{bubbles:true}))');
   const beforeLog = await chat('JSON.parse(localStorage.getItem("fixtureSubmissionLog")||"[]").length');
   const originalChatDocument = await chat('performance.timeOrigin');
-  await click('#studio-tab'); await click('#review-another'); await click('#profile-details');
+  await dock('if (!document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()'); await click('#review-another'); await click('#account-toggle'); await click('#profile-details');
   const profile = { ...exampleProfile, name: 'Add Handoff Candidate' };
   await dock(`(() => {const transfer=new DataTransfer();transfer.items.add(new File([${JSON.stringify(JSON.stringify(profile))}], 'Add_Profile.json',{type:'application/json'}));
     const field=document.getElementById('profile-file');field.files=transfer.files;field.dispatchEvent(new Event('change',{bubbles:true}));})()`);
@@ -34,7 +34,7 @@ export async function checkAddChatUI({ cdp, dockSession, evaluate, until, sessio
   await until(() => dock('chrome.storage.local.get("resumeQueueConnection").then(value=>value.resumeQueueConnection==="tab")'), 'retained connection selection saved');
   const jobs = async () => (await state()).requests.filter(item => item.input.candidateId === candidateId);
   async function addJob(company, description) {
-    await click('#studio-tab'); await click('#review-another');
+    await dock('if (!document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()'); await click('#review-another');
     await dock(`for(const [key,value] of Object.entries(${JSON.stringify({ company, title: 'Platform Engineer', url: 'https://jobs.example.test/add/' + company, description })})){
       const field=document.getElementById('job-'+key);field.value=value;field.dispatchEvent(new Event('input',{bubbles:true}));}`);
     await dock('document.getElementById("add-request").click();document.getElementById("add-request").click()');

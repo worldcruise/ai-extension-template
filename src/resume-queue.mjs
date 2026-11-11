@@ -2,11 +2,13 @@ import { createQueueStore, QUEUE_LOCK } from './queue-store.mjs';
 import { normalizeProfile, parseProfile, parseResume, buildResumePrompt } from './resume-data.mjs';
 import { profiles as examples, createExamples } from './studio-examples.mjs';
 import { linkedConversationUrl } from './sidebar-protocol.mjs';
+import { savedChatUrl } from './saved-chat.mjs';
+import { parseManualResume } from './manual-documents.mjs';
 import { compatibleRequest, deliveryEvidence, hasSubmissionEvidence, recoverableStates, terminalStates } from './queue-outcomes.mjs';
 import { metadataProvenance } from './job-metadata.mjs';
 import { redactedDiagnostic } from './queue-diagnostics.mjs';
 import { MANUAL_QUEUE_MODE, MANUAL_QUEUE_MESSAGE } from './queue-mode.mjs';
-import { findExistingJob } from './job-duplicates.mjs';
+import { findExistingJob, jobUrlInList } from './job-duplicates.mjs';
 
 const runningStates = ['preparing', 'sending', 'generating', 'validating'];
 export const activeStates = [...runningStates, 'saving'];
@@ -153,7 +155,7 @@ export function createResumeQueue({ store = createQueueStore(), locks = globalTh
     });
     return id;
   }
-  async function add(input, { sendOnAdd = false, checkExisting = false } = {}) {
+  async function add(input, { sendOnAdd = false, checkExisting = false, checkExistingUrl = false } = {}) {
     const permissionEpoch = addEpoch;
     await ready;
     const copy = structuredClone(input); copy.profile = normalizeProfile(copy.profile);
@@ -171,6 +173,9 @@ export function createResumeQueue({ store = createQueueStore(), locks = globalTh
     const pauseRevision = await edit(draft => {
       if (!draft.profiles.some(profile => profile.id === copy.candidateId)) throw new Error('Import or select a candidate first.');
       // Check inside the write transaction, not a possibly stale panel snapshot.
+      if (checkExistingUrl && jobUrlInList(copy.job.url, copy.candidateId, draft.requests)) {
+        throw Object.assign(new Error('Already applied'), { code: 'already-applied', duplicate: { matchedBy: ['url'], location: 'job list' } });
+      }
       const duplicate = checkExisting && findExistingJob(copy, draft.requests);
       if (duplicate) throw Object.assign(new Error('Already applied'), { code: 'already-applied', duplicate });
       draft.requests.push({ ...request, sequence: Math.max(0, ...draft.requests.map(item => item.sequence || 0)) + 1 });
@@ -427,9 +432,25 @@ export function createResumeQueue({ store = createQueueStore(), locks = globalTh
     else await finalize(id);
   }
   async function connect(id, url) {
-    const sourceChatUrl = linkedConversationUrl(url);
-    if (!sourceChatUrl) throw new Error('Open the job conversation in Chat first.');
-    await patch(id, { sourceChatUrl });
+    const manualChatUrl = savedChatUrl(url);
+    if (!manualChatUrl) throw new Error('Open the job conversation in Chat first.');
+    // Manual links may point to either provider. The retained ChatGPT runner
+    // only receives ChatGPT URLs in its sourceChatUrl field.
+    const sourceChatUrl = linkedConversationUrl(manualChatUrl);
+    await patch(id, { manualChatUrl, ...(sourceChatUrl ? { sourceChatUrl } : {}) });
+  }
+  async function saveDocuments(id, { resume: raw, coverLetter = '', coverLetterEnabled = false, expectedUpdatedAt }) {
+    await ready;
+    if (typeof coverLetter !== 'string' || coverLetter.length > 50000 || coverLetterEnabled && !coverLetter.trim()) throw new Error('Add a cover letter under 50,000 characters or turn it off.');
+    await edit(draft => {
+      const current = draft.requests.find(request => request.id === id);
+      if (!current || current.state === 'cancelled') throw new Error('This job is no longer in the queue.');
+      if (draft.control.activeId === id && draft.control.ownerId || activeStates.includes(current.state) || captures.has(id)) throw new Error('Wait for the current job operation to finish before saving documents.');
+      if (current.updatedAt !== expectedUpdatedAt) throw new Error('This job changed in another view. Reopen its document form before saving.');
+      const resume = parseManualResume(raw, current);
+      replace(draft, id, { resume, coverLetter: coverLetter.trim(), coverLetterEnabled: Boolean(coverLetterEnabled),
+        state: 'ready', error: '', manualDocumentUpdatedAt: now(), completedAt: now() });
+    });
   }
   async function loadExamples() {
     await ready;
@@ -442,6 +463,6 @@ export function createResumeQueue({ store = createQueueStore(), locks = globalTh
   }
   function dispose() { disposed = true; addEpoch++; addedRequests.length = 0; addPermissions.clear(); clearInterval(ownerWatcher); channel?.close(); listeners.clear(); }
   return { ready, snapshot, refresh, subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); },
-    add, sendAddedRequest, importProfile, selectCandidate, start, pause, generateAgain, retry: generateAgain, recover, continueRequest, retryConnectionBlocked, cancel, retrySave, connect, loadExamples, dispose,
+    add, sendAddedRequest, importProfile, selectCandidate, start, pause, generateAgain, retry: generateAgain, recover, continueRequest, retryConnectionBlocked, cancel, retrySave, connect, saveDocuments, loadExamples, dispose,
     profileOptions: () => state.profiles.map(record => ({ ...record.data, id: record.id, filename: record.filename, isExample: record.isExample, initials: initials(record.data.name) })) };
 }

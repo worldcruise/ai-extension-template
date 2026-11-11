@@ -1,0 +1,52 @@
+{
+   "action": {
+      "default_popup": "popup.html",
+      "default_title": "SpeedyApply: Job Application Autofill Tool"
+   },
+   "author": "kirk@speedyapply.com",
+   "background": {
+      "service_worker": "background.js"
+   },
+   "content_scripts": [ {
+      "all_frames": true,
+      "js": [ "content-scripts/content.js" ],
+      "matches": [ "*://*/*" ],
+      "run_at": "document_idle"
+   } ],
+   "description": "Applying to jobs just got easier. Automate job applications with a single click and track your progress over time.",
+   "homepage_url": "https://speedyapply.com",
+   "host_permissions": [ "*://*/*" ],
+   "icons": {
+      "128": "icon/128.png",
+      "16": "icon/16.png",
+      "32": "icon/32.png",
+      "48": "icon/48.png",
+      "96": "icon/96.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlcGrEhb20+Zo1vrslurXRqYEVk7IH6cV30Xge/gi5WwaIqLgB235A7lMTYRRV+pROtbsutie3mbB6YHsQT3OF/N94fdA7EkEfvaELnsMYS8G7stqdQq9i8iIACrHlwvqn8jI3G5KlRFH1zqWU/ihRbg+WdAYK1zR9lX6VqBpJplsYaPYmtGdfMpfWz1tSd+cQlpm3ffHOPUt7j8DWY3sLME/C4HMqPf+++yVWMsw/gaYYhPo/6vaRSpvT73OfMK2MlxXRf+NYh5x8NKO7B1hE4KAXlbBwyBKbAdO+rOFl1rAKPiwhApDw3bjVVc1HJMLXXB190xPFWbl+UVYZvvuWQIDAQAB",
+   "manifest_version": 3,
+   "name": "SpeedyApply: Job Application Autofill Tool",
+   "options_ui": {
+      "open_in_tab": true,
+      "page": "options.html"
+   },
+   "permissions": [ "storage", "unlimitedStorage", "tabs", "contextMenus", "cookies", "sidePanel" ],
+   "short_name": "SpeedyApply",
+   "side_panel": {
+      "default_path": "sidepanel.html"
+   },
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "2.28.2",
+   "web_accessible_resources": [ {
+      "matches": [ "\u003Call_urls>" ],
+      "resources": [ "images/icon-pattern.svg" ]
+   }, {
+      "extension_ids": [ "mbgjopdedgonlbpikjfibkccpmhjbnag" ],
+      "matches": [ "\u003Call_urls>" ],
+      "resources": [ "options.html" ]
+   }, {
+      "matches": [ "*://*/*" ],
+      "resources": [ "content-scripts/content.css" ],
+      "use_dynamic_url": true
+   } ]
+}

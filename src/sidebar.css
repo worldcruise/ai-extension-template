@@ -4,6 +4,10 @@
   --background: #ffffff; --surface: #f5f7f8; --text: #20292d; --muted: #748086;
   --line: #e5e9eb; --accent: #157d6a; --accent-text: #ffffff; --tint: #eaf5f1;
   --header: #222b2d; --amber: #956b24; --amber-bg: #fff6e4; --shadow: #18362a12;
+  --dock-surface: #e1e7e9; --dock-hover: #d5dee1; --dock-selected: #ceddd9; --dock-grip: #8c9da3;
+  --gutter: 16px;
+  --dock-header-height: 40px;
+  --dock-capture-height: 0px;
 }
 * { box-sizing: border-box; }
 html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
@@ -26,7 +30,6 @@ svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width:
 .queue-notice strong { font-size: 12px; color: var(--amber); }
 .queue-notice p { margin-top: 3px; font-size: 11px; color: var(--muted); overflow-wrap: anywhere; }
 .queue-notice .icon-button { width: 24px; height: 24px; flex-shrink: 0; }
-.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; flex-shrink: 0; background: var(--header); color: #f2f6f5; }
 .chat-view { position: relative; overflow: hidden; }
 .native-chat-search { display: inline-flex; align-items: center; gap: 7px; max-width: 100%; padding: 6px 9px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); color: var(--muted); font-size: 12px; white-space: nowrap; }
 .native-chat-search { margin: 0; min-width: 0; padding: 0 5px 0 8px; }
@@ -67,10 +70,6 @@ svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width:
 .company-chat-picker { flex: 1; min-width: 0; }
 .request-source-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .icon-button { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; padding: 6px; background: transparent; border: 0; border-radius: 7px; color: var(--muted); flex-shrink: 0; }
-.workspace-tabs { display: flex; gap: 3px; padding: 4px; border-radius: 24px; background: #ffffff0a; flex: 1; min-width: 0; }
-.workspace-tabs button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 10px; border: 0; border-radius: 20px; background: transparent; font-size: 12px; color: #c5d4cf; white-space: nowrap; }
-.workspace-tabs button:hover { background: #ffffff14; }
-.workspace-tabs [aria-selected="true"], .workspace-tabs [aria-selected="true"]:hover { background: #e3f3ec; color: #145f4f; box-shadow: 0 1px 5px var(--shadow); font-weight: 600; }
 .account-wrap { position: relative; flex-shrink: 0; margin-left: auto; }
 .account-button { width: 31px; height: 31px; display: grid; place-items: center; border: 1px solid #54675f; border-radius: 50%; background: #35483f; color: #c7e6d8; }
 .account-button:hover:enabled { background: #435e50; }
@@ -78,15 +77,21 @@ svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width:
 .account-panel p { color: var(--muted); font-size: 12px; margin: 5px 0 12px; }
 .account-panel .button { width: 100%; margin-top: 4px; }
 .indicator { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
-#workspace-content { display: grid; flex: 1; min-height: 0; min-width: 0; }
-.workspace-view { grid-area: 1 / 1; min-height: 0; min-width: 0; display: flex; flex-direction: column; }
-.studio-navigation { display: flex; align-items: center; gap: 8px; padding: 0 16px; border-bottom: 1px solid var(--line); flex-shrink: 0; }
-.studio-tabs { display: flex; gap: 21px; min-width: 0; }
-.studio-tabs button { display: flex; align-items: center; gap: 6px; border: 0; border-bottom: 2px solid transparent; background: transparent; padding: 13px 0 11px; font-size: 12px; color: var(--muted); white-space: nowrap; }
-.studio-tabs [aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+#workspace-content { display: flex; flex-direction: column; flex: 1; min-height: 0; min-width: 0; }
+.workspace-view { flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+.studio-navigation { display: flex; flex-shrink: 0; }
+.studio-tabs { display: flex; gap: 0; height: 100%; min-width: 0; flex-shrink: 0; }
+.studio-tabs button { display: flex; align-items: center; gap: 7px; height: 100%; min-height: 0; margin: 0; border: 0; border-radius: 0; background: transparent; padding: 0 14px; font-size: 12px; color: var(--muted); white-space: nowrap; }
+.studio-tabs [aria-selected="true"] { color: var(--accent); background: var(--dock-selected); font-weight: 600; }
+.studio-content { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.studio-dock-toggle { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex: 1; min-width: 28px; padding: 0 12px; border: 0; border-radius: 0; background: transparent; color: var(--muted); }
+.studio-dock-toggle .preview-label { padding: 0; background: transparent; }
+.studio-dock-toggle > svg { width: 14px; height: 14px; transition: transform .18s; }
+.studio-dock-toggle[aria-expanded="false"] > svg { transform: rotate(180deg); }
+#studio-view[data-collapsed="true"] { flex: 0 0 auto; }
 .count { padding: 1px 5px; background: var(--tint); color: var(--accent); border-radius: 5px; font-size: 10px; }
 .preview-label { color: var(--muted); background: var(--surface); padding: 2px 6px; border-radius: 5px; font-size: 9px; margin-left: auto; white-space: nowrap; }
-.studio-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 16px; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.studio-scroll { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 0; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
 .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
 .section-heading h2 { font-size: 14px; letter-spacing: -.2px; }
 .section-heading > span { font-size: 10px; color: var(--muted); overflow-wrap: anywhere; text-align: right; }
@@ -95,12 +100,6 @@ svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width:
 .primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
 .primary:hover:enabled { background: color-mix(in srgb, var(--accent), black 10%); }
 .subtle { background: transparent; border-color: transparent; color: var(--muted); }
-.profile-card { display: flex; align-items: center; gap: 10px; padding: 11px; border: 1px solid var(--line); border-radius: 9px; margin-bottom: 16px; }
-.profile-avatar { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--tint); color: var(--accent); font-size: 11px; font-weight: 600; flex-shrink: 0; }
-.profile-copy { flex: 1; min-width: 0; }
-.profile-copy select { display: block; width: 100%; border: 0; padding: 0; background: var(--background); font-size: 12px; font-weight: 600; }
-.profile-copy p { color: var(--muted); font-size: 10px; margin-top: 2px; overflow-wrap: anywhere; }
-.profile-card > .button { padding: 5px 2px; }
 .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 13px; }
 .toggle-row strong { font-size: 12px; font-weight: 600; }
 .toggle-row p { color: var(--muted); font-size: 10px; margin-top: 1px; }
@@ -111,8 +110,8 @@ svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width:
 .switch input:checked + span { background: var(--accent); }
 .switch input:checked + span::after { transform: translateX(14px); background: var(--accent-text); }
 .switch:focus-within { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 20px; }
-.job-card { border: 1px solid var(--line); border-radius: 9px; background: var(--surface); overflow: hidden; }
-.job-tools { display: flex; align-items: center; gap: 9px; padding: 5px 8px; border-bottom: 1px solid var(--line); }
+.job-card { border: 0; border-radius: 0; background: var(--surface); overflow: hidden; }
+.job-tools { display: flex; align-items: center; gap: 9px; padding: 5px 8px; }
 .tab-navigation { display: flex; align-items: center; gap: 1px; flex-shrink: 0; }
 .tab-navigation .icon-button { width: 24px; height: 26px; padding: 4px; }
 .tab-navigation > span { color: var(--muted); font-size: 10px; white-space: nowrap; padding: 0 3px; }
@@ -177,10 +176,10 @@ textarea.input { min-height: 100px; line-height: 1.7; font-size: 11px; resize: v
 .keyword-color-row input[type="color"] { width: 46px; height: 30px; border: 1px solid var(--line); border-radius: 5px; background: var(--background); padding: 3px; cursor: pointer; }
 .settings-status { color: var(--muted); font-size: 11px; line-height: 1.7; margin-top: 12px; }
 .studio-footer { flex-shrink: 0; background: var(--background); }
-.form-actions { display: flex; gap: 7px; padding: 8px 16px; border-top: 1px solid var(--line); }
+.form-actions { display: flex; gap: 7px; padding: 8px 16px; }
 .form-actions .primary { flex: 1; min-height: 34px; }
 .resume-queue { display: grid; gap: 11px; list-style: none; margin: 0; padding: 0; }
-.job-request { border: 1px solid var(--line); border-radius: 10px; padding: 12px; background: var(--background); }
+.job-request { border: 0; border-radius: 0; padding: 12px; background: var(--background); }
 .request-top { display: flex; align-items: center; gap: 9px; }
 .company-mark { display: grid; place-items: center; width: 32px; height: 32px; background: var(--surface); border: 1px solid var(--line); border-radius: 9px; font-size: 12px; font-weight: 600; color: var(--accent); flex-shrink: 0; }
 .request-title { flex: 1; min-width: 0; }
@@ -255,15 +254,12 @@ dialog::backdrop { background: #0a18165c; backdrop-filter: blur(2px); }
 @keyframes pulse { 50% { opacity: .3; } }
 @media (prefers-color-scheme: dark) {
   :root { --background: #171e22; --surface: #20292e; --text: #edf2f1; --muted: #a0b1b4; --line: #303e43; --accent: #8bd6bf; --accent-text: #102c25; --tint: #203c34; --header: #101719; --amber: #e4c382; --amber-bg: #393426; --shadow: #00000028; }
+  :root { --dock-surface: #101719; --dock-hover: #253137; --dock-selected: #244038; --dock-grip: #6e838b; }
 }
 @media (max-width: 359px) {
-  .toolbar { padding: 10px 12px; gap: 8px; }
-  .workspace-tabs button { font-size: 11px; padding: 8px 7px; gap: 4px; }
-  .studio-navigation { padding: 0 12px; }
-  .studio-tabs { gap: 14px; }
+  .studio-dock-toggle .preview-label { display: none; }
   .studio-tabs button { font-size: 11px; }
   .preview-label { font-size: 8px; padding: 2px 4px; }
-  .studio-scroll { padding: 12px; }
   .chat-tools { gap: 2px; }
   .chat-tools .icon-button { width: 26px; height: 28px; padding: 5px; }
   .chat-history-navigation .icon-button { width: 20px; height: 16px; padding: 0; }
@@ -272,8 +268,6 @@ dialog::backdrop { background: #0a18165c; backdrop-filter: blur(2px); }
   .job-identity .input { font-size: 10px; padding: 7px 5px; }
   .job-tools { gap: 6px; padding: 5px 6px; }
   .keyword-toggle-text { display: none; }
-  .profile-card { gap: 7px; padding: 9px; }
-  .profile-copy p { font-size: 9px; }
   .options-grid { gap: 9px; }
   .field select { padding: 8px 3px; font-size: 10px; }
   .request-actions .button { padding: 6px 7px; }
@@ -288,3 +282,86 @@ dialog::backdrop { background: #0a18165c; backdrop-filter: blur(2px); }
   .switch { height: 44px; width: 44px; justify-content: center; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+/* One browser dock: job workspace above a persistent, collapsible chat pane. */
+.form-actions, .settings-tabs, .settings-scroll { padding-inline: var(--gutter); }
+#job-panel, #results-panel { margin: 0; border: 0; }
+#job-panel > :is(.section-heading, .form-section-label, .toggle-row, .duplicate-check), #results-panel > .section-heading { margin: 0; padding: 12px var(--gutter); }
+body:has(#capture-current-job:not([hidden])) { --dock-capture-height: 60px; }
+.capture-current-job { display: flex; align-items: center; justify-content: center; gap: 10px; flex: 0 0 60px; width: 100%; height: 60px; margin: 0; padding: 0 12px; border: 0; border-radius: 0; background: var(--accent); color: var(--accent-text); font-size: clamp(12px, 3.6vw, 15px); font-weight: 600; }
+.capture-current-job > svg { width: 24px; height: 24px; }
+.capture-current-job:hover:enabled { background: color-mix(in srgb, var(--accent) 90%, var(--text)); }
+.capture-current-job:focus-visible { outline: 2px solid var(--accent-text); outline-offset: -5px; }
+.capture-current-job:disabled { opacity: 1; cursor: progress; }
+.queue-filters { display: flex; gap: 7px; margin: 0; padding: 0 var(--gutter) 12px; }
+#queue-no-matches { margin: 0; padding: 12px var(--gutter); }
+.queue-search { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; padding: 0 9px; border: 1px solid var(--line); border-radius: 7px; color: var(--muted); }
+.queue-search input { min-width: 0; width: 100%; border: 0; background: transparent; padding: 8px 0; font-size: 11px; outline: none; }
+.queue-search:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.queue-filters select { border: 1px solid var(--line); border-radius: 7px; background: var(--background); padding: 6px; font-size: 10px; max-width: 120px; }
+.resume-queue { gap: 0; }
+.job-request { padding: 12px var(--gutter); }
+.job-request:nth-child(even) { background: var(--surface); }
+.request-top { align-items: start; }
+.request-title-button { border: 0; padding: 0; background: transparent; text-align: left; width: 100%; min-width: 0; }
+.request-title-button:hover:enabled { background: transparent; color: var(--accent); }
+.request-title-button strong { font-size: 13px; }
+.request-title p { font-size: 11px; }
+.company-mark { width: 29px; height: 29px; border-radius: 7px; }
+.request-meta { margin: 7px 0; font-size: 10px; }
+.request-actions { padding-top: 9px; margin-top: 9px; gap: 5px; }
+.request-actions .button { padding: 4px 7px; min-height: 28px; background: var(--surface); }
+.request-actions .button:hover { border-color: var(--accent); }
+.request-updated { margin-left: auto; }
+.request-job-section { padding-bottom: 14px; }
+.request-job-section h3 { font-size: 13px; }
+#request-job { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; line-height: 1.75; max-height: 260px; overflow: auto; }
+.request-metadata { margin-top: 12px; }
+.documents-letter-toggle { margin-top: 18px; }
+.documents-status { border: 1px solid var(--line); background: var(--surface); border-radius: 7px; padding: 9px; font-size: 11px; margin-block: 12px; }
+.documents-status[data-state="valid"] { color: var(--accent); background: var(--tint); }
+.documents-status[data-state="invalid"] { color: var(--amber); }
+.request-actions a.button { text-decoration: none; }
+.form-section-label { display: flex; align-items: center; gap: 7px; margin: 14px 0; font-size: 12px; font-weight: 600; }
+.form-section-label > span, .form-step-number { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 6px; background: var(--tint); color: var(--accent); font-size: 10px; margin-right: 4px; }
+.job-card { background: var(--background); }
+.job-tools { padding: 8px var(--gutter); background: var(--surface); }
+.job-body { grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 12px var(--gutter); }
+.job-identity { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.job-identity .field:last-child { grid-column: 1 / -1; }
+.job-description-field textarea.input { min-height: 135px; }
+.field > span { font-size: 11px; }
+.resume-options { margin: 0; padding: 12px var(--gutter); border: 0; border-radius: 0; }
+.resume-options > summary { color: var(--text); }
+.dock-status-bar { position: relative; order: 1; display: flex; flex-shrink: 0; z-index: 20; }
+.dock-status-bar::before { content: ""; display: none; position: absolute; top: 0; left: 50%; width: 36px; height: 3px; border-radius: 2px; transform: translateX(-50%); background: var(--dock-grip); pointer-events: none; }
+.chat-dock-open .dock-status-bar::before { display: block; }
+#chat-dock-toggle { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 0; border: 0; border-radius: 0; background: transparent; padding: 0 12px; text-align: left; }
+#dock-chat-label { font-size: 11px; font-weight: 600; }
+#queue-summary { font-size: 10px; color: var(--muted); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin-left: auto; }
+#chat-dock-toggle > svg:last-child { width: 14px; height: 14px; transition: transform .18s; }
+#chat-dock-toggle[aria-expanded="true"] > svg:last-child { transform: rotate(180deg); }
+.dock-status-bar .queue-bar { display: flex; height: 100%; padding: 0; margin: 0; border: 0; background: transparent; flex-shrink: 0; }
+.dock-status-bar .account-wrap { height: 100%; margin: 0; }
+.dock-status-bar .queue-bar .icon-button, .dock-status-bar .account-button { width: 40px; height: 100%; min-height: 0; margin: 0; border: 0; border-radius: 0; background: transparent; color: var(--accent); }
+.account-panel { top: auto; right: 6px; bottom: calc(100% + 6px); max-height: calc(100dvh - 70px); overflow-y: auto; border-radius: 12px; box-shadow: 0 -8px 32px #12251b25; }
+.account-panel[data-placement="below"] { top: calc(100% + 6px); bottom: auto; box-shadow: 0 8px 32px #12251b25; }
+#chat-view { position: fixed; top: calc(2 * var(--dock-header-height) + var(--dock-capture-height)); left: 0; width: 100vw; height: calc(100dvh - 2 * var(--dock-header-height) - var(--dock-capture-height)); }
+/* Keep the embedded page's viewport stable when the job workspace is visible.
+   Removing its layout with display:none can trigger the site's startup UI again. */
+#chat-view[hidden] { display: flex !important; transform: translateX(-100%); visibility: hidden; opacity: 0; pointer-events: none; }
+.dock-header { height: var(--dock-header-height); min-height: var(--dock-header-height); max-height: var(--dock-header-height); align-items: stretch; gap: 0; margin: 0; padding: 0; border: 0; background: var(--dock-surface); color: var(--text); }
+.dock-header > button { height: 100%; min-height: 0; }
+.dock-header > button:hover:enabled, .studio-tabs button:hover:enabled, .dock-status-bar .queue-bar .icon-button:hover:enabled, .dock-status-bar .account-button:hover:enabled { background: var(--dock-hover); }
+.dock-header > button:focus-visible, .studio-tabs button:focus-visible, .dock-status-bar .queue-bar .icon-button:focus-visible, .dock-status-bar .account-button:focus-visible { outline-offset: -3px; }
+#dock-chat-label { font-size: 12px; }
+.profile-selection { margin-bottom: 7px; }
+#profile-filename { margin-bottom: 16px; }
+.queue-notice { top: 12px; }
+@media (max-width: 359px) {
+  :root { --gutter: 12px; }
+  .queue-filters { flex-wrap: wrap; }
+  .queue-search { flex-basis: 100%; }
+  .state-pill { white-space: normal; max-width: 90px; }
+  .request-top { gap: 7px; }
+}
