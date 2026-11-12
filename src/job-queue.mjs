@@ -12,13 +12,13 @@ import { cleanJobUrl } from './job-extraction-core.mjs';
 export function applyGeneratedJobMetadata(draft, run, details, timestamp) {
   const index = draft.requests.findIndex(job => job.id === run.jobId), current = draft.requests[index];
   if (!current || current.state === 'cancelled' || current.input.candidateId !== run.job.input.candidateId) throw new Error('This job is no longer available for the AI result.');
-  if (current.jobDetailsRunId === run.id) return { ...current, updatedAt: current.jobDetailsUpdatedAt };
+  if (current.jobDetailsRunId === run.id) { draft.requests[index]={...current,needsAction:false}; return { ...current,needsAction:false, updatedAt: current.jobDetailsUpdatedAt }; }
   if (current.updatedAt !== run.job.updatedAt) throw new Error('This job changed while AI was working. Its newer details and documents were preserved.');
   const stale = !!current.resume && ['company', 'role', 'description'].some(key => current.input.job[key] !== details[key]);
   return draft.requests[index] = { ...current, input: { ...current.input, job: { ...current.input.job, ...details } },
     ...(stale ? { documentsStale: true, state: 'attention' } : {}),
     ...(savedChatUrl(run.url) ? { manualChatUrl: savedChatUrl(run.url) } : {}),
-    jobDetailsRunId: run.id, jobDetailsUpdatedAt: timestamp, updatedAt: timestamp };
+    needsAction:false, jobDetailsRunId: run.id, jobDetailsUpdatedAt: timestamp, updatedAt: timestamp };
 }
 
 // Local job/profile/document storage only. No chat connection or runner exists.
@@ -27,7 +27,7 @@ export function createJobQueue({ store = createQueueStore(),
   uuid = () => crypto.randomUUID(), now = Date.now } = {}) {
   let state = { requests: [], profiles: [], control: {} }, disposed = false;
   const listeners = new Set();
-  const visibleJob = job => ({ ...job, state: job.state === 'cancelled' ? 'cancelled' : job.resume && !job.documentsStale ? 'ready' : job.state === 'queued' ? 'queued' : 'attention' });
+  const visibleJob = job => ({ ...job, state: job.state === 'cancelled' ? 'cancelled' : job.needsAction ? 'attention' : job.resume && !job.documentsStale ? 'ready' : job.state === 'queued' ? 'queued' : 'attention' });
   const snapshot = () => ({ ...state, requests: state.requests.map(visibleJob) });
   const notify = () => { if (!disposed) for (const listener of listeners) listener(snapshot()); };
   async function refresh() { if (!disposed) { state = await store.read(); notify(); } }
@@ -103,6 +103,24 @@ export function createJobQueue({ store = createQueueStore(),
     if (!url) throw new Error('Open the job conversation in Chat first.');
     await ready; await edit(draft => replace(draft, id, { manualChatUrl: url }));
   }
+  async function updateJob(id,input,expectedUpdatedAt,{checkExisting=true}={}) {
+    await ready;
+    return edit(draft=>{
+      const current=draft.requests.find(job=>job.id===id);
+      if(!current||current.state==='cancelled'||current.input.candidateId!==input.candidateId) throw new Error('This job is no longer available.');
+      if(current.updatedAt!==expectedUpdatedAt) throw new Error('This job changed. Reopen its details before editing.');
+      const job=structuredClone(input.job);
+      if(!job.company?.trim()||!job.role?.trim()||!job.description?.trim()) throw new Error('Provide the company, job title and job description.');
+      if(job.url&&(!cleanJobUrl(job.url)||isHiringCafe(job.url))) throw new Error('Use the employer or ATS Apply URL.');
+      if(JSON.stringify(input).length>300000) throw new Error('This job is too large. Shorten its description.');
+      const duplicate=checkExisting&&findExistingJob(input,draft.requests.filter(item=>item.id!==id));
+      if(duplicate) throw Object.assign(new Error('Already applied'),{code:'already-applied',duplicate});
+      const stale=!!current.resume&&['company','role','description'].some(key=>current.input.job[key]!==job[key]);
+      if(['company','role','description','url'].some(key=>current.input.job[key]!==job[key])) delete job.cleanupEvidence;
+      if(job.salary!==current.input.job.salary){job.salarySource='user';job.salaryEvidence='';job.salaryBasis='';}
+      return replace(draft,id,{input:{...current.input,job},...(stale?{documentsStale:true,state:'attention'}:{})});
+    });
+  }
   function documentChange(draft, id, { resume: raw, coverLetter = '', coverLetterEnabled = false, expectedUpdatedAt, generationId, sourceUrl }, source = 'manual') {
     if (typeof coverLetter !== 'string' || coverLetter.length > 50000 || coverLetterEnabled && !coverLetter.trim()) throw new Error('Add a cover letter under 50,000 characters or turn it off.');
     const current = draft.requests.find(job => job.id === id);
@@ -115,7 +133,7 @@ export function createJobQueue({ store = createQueueStore(),
     return replace(draft, id, { resume, coverLetter: coverLetter.trim(), coverLetterEnabled: Boolean(coverLetterEnabled),
       ...(typeof generationId === 'string' ? { documentRunId: generationId } : {}),
       ...(savedChatUrl(sourceUrl) ? { manualChatUrl: savedChatUrl(sourceUrl) } : {}),
-      state: 'ready', documentsStale: false, error: '', documentSaveSource: source, documentSavedAt: savedAt,
+      state: 'ready', needsAction:false, documentsStale: false, error: '', documentSaveSource: source, documentSavedAt: savedAt,
       ...(source === 'manual' ? { manualDocumentUpdatedAt: savedAt } : {}), completedAt: savedAt });
   }
   async function saveDocuments(id, documents) {
@@ -141,7 +159,7 @@ export function createJobQueue({ store = createQueueStore(),
       draft.requests.push(...createExamples().map(job => ({ ...job, state: 'ready', sequence: ++sequence, isExample: true, createdAt: now(), updatedAt: now() })));
     });
   }
-  return { ready, snapshot, refresh, add, completeCapture, importProfile, selectCandidate, cancel, connect, saveDocuments, saveGeneratedDocuments, loadExamples,
+  return { ready, snapshot, refresh, add, completeCapture, importProfile, selectCandidate, cancel, connect, updateJob, saveDocuments, saveGeneratedDocuments, loadExamples,
     subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); },
     profileOptions: () => state.profiles.map(record => ({ ...record.data, id: record.id, filename: record.filename, isExample: record.isExample,
       initials: record.data.name.split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase() })),

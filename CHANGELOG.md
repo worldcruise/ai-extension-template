@@ -2,6 +2,43 @@
 
 ## Unreleased
 
+## 0.18.4 — 2026-11-12
+
+- Make Open application and Go to apply open or focus only the job listing, including from job details. Remove background AI-tab opening from application navigation.
+
+## 0.18.3 — 2026-11-12
+
+- Reject AI Job Search branding as an inferred employer. Read HiringCafe company names from the selected job header, drawer or employer-logo label, retaining structured data fallback and avoiding ambiguous same-title recommendations.
+
+## 0.18.2 — 2026-11-12
+
+- Replace the form's Read page button with Discard. Reset the current tab's unsaved job fields and restore its URL, retaining queued jobs and preferences. Keep page extraction available through its shortcut and one-click capture.
+
+## 0.18.1 — 2026-11-12
+
+- Disable the saved job detail fields while retaining readable text and the separate Edit action.
+
+## 0.18.0 — 2026-11-12
+
+- Continue automatic generation after individual failures, mark failed cards Need action, and expose Fetch result again to observe the original chat without resubmitting. Retain explicit Resume for prompts that were never attempted.
+- Add Edit to job details with version-checked saves and retained documents. Share labelled company, title, salary, URL and description form styling across manual entry, saved details and HiringCafe fallback.
+
+## 0.17.2 — 2026-11-12
+
+- Pin the compact queue search and status selector to the top of the scrolling job list; let the candidate name and Saved jobs heading scroll away.
+
+## 0.17.1 — 2026-11-12
+
+- Cover the dock with a generation status overlay while the automatic resume queue runs. Show progress and the current company; clicking anywhere or pressing Escape stops the remaining queue while the current job finishes.
+
+## 0.17.0 — 2026-11-12
+
+- Add top-right CSV import to manual job entry and its fallback popup. Queue multiple jobs under the captured candidate, support quoted multiline fields and common column names, skip duplicates, and report invalid rows without sending prompts.
+
+## 0.16.0 — 2026-11-12
+
+- Replace the queue footer's manual-entry button with Generate all resumes. Process the selected candidate's unstarted queued jobs sequentially with persistent progress, automatic-save/download preferences, attention pauses, and Stop after current job.
+
 ## 0.15.2 — 2026-11-12
 
 - Increase expanded queue section contrast with a stronger blue-gray background in light and dark themes.

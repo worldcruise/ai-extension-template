@@ -4,7 +4,6 @@ import { exampleProfile } from './resume-data.mjs';
 import { savedChatUrl, requestChatUrl } from './saved-chat.mjs';
 import { resumeTemplates, resumeTemplate } from './resume-templates.mjs';
 import { metadataProvenance, provenanceLabel } from './job-metadata.mjs';
-import { updateReadPageHint } from './shortcut-settings.mjs';
 import { requestJobPageAccess } from './job-page-access.mjs';
 import { canCaptureJobUrl } from './job-capture-url.mjs';
 import { duplicateCheckStorageKey, duplicateJobUrl, jobUrlInList } from './job-duplicates.mjs';
@@ -15,6 +14,8 @@ import { normalizeDocumentSettings } from './document-settings.mjs';
 import { cleanupInput,isHiringCafe } from './job-cleanup.mjs';
 import { readJobAnalysisSetting } from './job-analysis-settings.mjs';
 import { companyMonogram, createApplyJobs } from './apply-jobs.mjs';
+import { batchKey } from './resume-batch.mjs';
+import { importJobCsv } from './job-csv.mjs';
 
 export function createStudio({ openDialog, showStudio, showChat, syncChat = async () => {}, moveTab, queue,
   generations, openApplication, getChatProvider = () => 'chatgpt', getCurrentChat = () => null }) {
@@ -61,6 +62,10 @@ export function createStudio({ openDialog, showStudio, showChat, syncChat = asyn
   let currentTabUrl = '', currentTabBusy = false;
   let previewId = null;
   let expandedCard = null;
+  let batchState = null;
+  const batchChanged = (changes, area) => { if (area === 'local' && changes[batchKey]) { batchState = changes[batchKey].newValue; renderQueue(); } };
+  chrome.storage.onChanged.addListener(batchChanged);
+  void chrome.storage.local.get(batchKey).then(saved => { batchState = saved[batchKey]; renderQueue(); }).catch(() => {});
   const applyJobs = createApplyJobs({ onSelectionChange: request => {
     clearPreview();
     if (q('#apply-tab').getAttribute('aria-selected') === 'true') syncApplyChat(request);
@@ -88,6 +93,35 @@ export function createStudio({ openDialog, showStudio, showChat, syncChat = asyn
   const status = text => { q('#workspace-status').textContent = text; q('.queue-bar').title = text; };
   const candidateId = () => q('#candidate').value;
   const profile = () => profiles[candidateId()];
+  let csvInput = null, csvBusy = false, csvCheckExisting = true;
+  for (const id of ['import-job-csv','manual-job-import']) q('#'+id).addEventListener('click', () => {
+    if (csvBusy) return;
+    csvInput = q('#manual-job-dialog').open ? manualJob.context() : structuredClone({ candidateId:candidateId(),profile:profile(),resumeTemplate:q('#resume-template').value,promptTemplate:q('#prompt-template').value,prompt:prompts[q('#prompt-template').value].text });
+    csvCheckExisting = q('#check-existing-jobs').checked;
+    q('#job-csv-file').value = ''; q('#job-csv-file').click();
+  });
+  q('#job-csv-dialog').addEventListener('cancel', event => { if (csvBusy) event.preventDefault(); });
+  q('#job-csv-file').addEventListener('change', async event => {
+    const file = event.target.files?.[0], input = csvInput;
+    if (!file || !input || csvBusy) return;
+    csvBusy = true;
+    q('#job-csv-context').textContent = `Adding jobs for ${input.profile.name}`;
+    q('#job-csv-status').textContent = 'Reading and adding jobs…'; q('#job-csv-errors').textContent = '';
+    openDialog('job-csv-dialog');
+    for (const button of q('#job-csv-dialog').querySelectorAll('button')) button.disabled = true;
+    for (const id of ['import-job-csv','manual-job-import']) q('#'+id).disabled = true;
+    try {
+      if (file.size > 2000000) throw new Error('Choose a CSV file under 2 MB.');
+      const result = await importJobCsv(await file.text(), input, queue, {checkExisting:csvCheckExisting});
+      q('#job-csv-status').textContent = `${result.added} added · ${result.duplicates} duplicates skipped · ${result.invalid} invalid rows`;
+      q('#job-csv-errors').textContent = result.errors.slice(0,20).join('\n') + (result.errors.length > 20 ? '\nMore invalid rows omitted.' : '');
+    } catch (error) { q('#job-csv-status').textContent = error.message || 'The CSV could not be imported.'; }
+    finally {
+      csvBusy = false;
+      for (const button of q('#job-csv-dialog').querySelectorAll('button')) button.disabled = false;
+      for (const id of ['import-job-csv','manual-job-import']) q('#'+id).disabled = false;
+    }
+  });
   async function perform(task, key = 'general') {
     if (pendingActions.has(key)) return;
     const reflectPending = () => { document.documentElement.dataset.studioBusy = String(pendingActions.size > 0); };
@@ -160,7 +194,19 @@ export function createStudio({ openDialog, showStudio, showChat, syncChat = asyn
   function renderQueue() {
     q('#studio-dock-toggle .preview-label').textContent = 'Saved jobs';
     const all = requests.filter(request => request.input.candidateId === candidateId() && request.state !== 'cancelled' && !request.capturePending);
-    const own = all;
+    const own = all.map(job=>{const run=generations.forJob(job.id);return run&&(['attention','invalid','stopped'].includes(run.phase)||run.trackingState==='suspended'||['failed','partial'].includes(run.downloads?.state)) ? {...job,state:'attention'} : job;});
+    const batchActive = batchState?.active;
+    const queued = own.filter(job => job.state === 'queued' && !job.resume && !job.isExample && !generations.forJob(job.id));
+    q('#generate-all-resumes').disabled = pendingActions.has('batch') || !batchActive && (!initialized || !queued.length);
+    q('#batch-button-label').textContent = batchActive ? 'Stop after current job' : 'Generate all resumes';
+    q('#batch-status').textContent = batchState?.candidateId === candidateId() ? batchState.message || '' : batchActive ? 'Resume generation is running for another candidate.' : '';
+    const overlay = q('#batch-overlay');
+    if (batchActive && !overlay.open) openDialog('batch-overlay');
+    if (!batchActive && overlay.open) overlay.close();
+    q('#batch-overlay-stop').disabled = pendingActions.has('batch-stop');
+    q('#batch-overlay-progress').textContent = pendingActions.has('batch-stop') ? 'Stopping the remaining queue…' : batchState?.message || '';
+    const batchJob = requests.find(job => job.id === batchState?.currentJobId);
+    q('#batch-overlay-company').textContent = batchJob ? `${batchJob.input.job.company} · ${batchJob.input.job.role}` : '';
     const matches = request => {
       const text = `${request.input.job.company} ${request.input.job.role}`.toLocaleLowerCase();
       return text.includes(queueSearch) && (queueFilter === 'all' || request.state === queueFilter);
@@ -168,6 +214,7 @@ export function createStudio({ openDialog, showStudio, showChat, syncChat = asyn
     const visible = own.filter(matches);
     q('#queue-no-matches').hidden = !all.length || visible.length > 0;
     q('#add-request').disabled = !initialized || pendingActions.has('add');
+    q('#discard-job').disabled = !initialized || pendingActions.has('add');
     q('#review-count').textContent = own.length;
     q('#queue-owner').textContent = profile().name;
     q('#empty-queue').hidden = all.length > 0;
@@ -191,7 +238,7 @@ export function createStudio({ openDialog, showStudio, showChat, syncChat = asyn
       const stamp = element('span', 'request-stamp');
       const pill = element('span', 'state-pill');
       pill.dataset.state = request.state;
-      const labels = { ready: 'Ready', queued: 'Queued', attention: 'Needs attention' };
+      const labels = { ready: 'Ready', queued: 'Queued', attention: 'Need action' };
       pill.append(icon(request.state === 'ready' ? 'check' : 'clock'), document.createTextNode(labels[request.state] || request.state));
       stamp.append(pill);
       const chevron = icon('chevron-down'); chevron.classList.add('card-chevron'); stamp.append(chevron);
@@ -211,6 +258,12 @@ export function createStudio({ openDialog, showStudio, showChat, syncChat = asyn
       const details = action('View detail', 'info', 'details', request.id); details.classList.add('request-detail-button');
       const toolsBody = element('div', 'request-tools-body'); toolsBody.id = `job-actions-${request.id}`;
       toolsBody.hidden = expandedCard !== String(request.id);
+      if(request.state==='attention') {
+        const run=generations.forJob(request.id),fetch=action('Fetch result again','refresh','refetch-generation',request.id);
+        fetch.disabled=!run?.sendIntentAt || pendingActions.has(`refetch-generation:${request.id}`);
+        fetch.title=run?.sendIntentAt ? 'Read the existing AI reply again without sending a new prompt' : 'No submission was recorded. Use Resume to prepare the prompt first.';
+        toolsBody.append(fetch);
+      }
       const updated = stamp.querySelector('time'); if (updated) toolsBody.append(updated);
       const links = element('div', 'request-links');
       const jobUrl = safeJobUrl(input.job.url);
@@ -238,12 +291,14 @@ export function createStudio({ openDialog, showStudio, showChat, syncChat = asyn
         const run = generations.forJob(request.id);
         const complete = run && ['complete', 'invalid'].includes(run.phase);
         const stopped = run && (['attention', 'stopped'].includes(run.phase) || run.provider === 'deepseek' && run.trackingState === 'suspended');
-        const name = !run ? 'generate' : complete ? 'review-generation' : stopped ? 'resume-generation' : 'open-generation';
-        const label = !run ? 'Generate documents' : complete ? 'Review documents' : stopped ? 'Resume' : 'Open AI tab';
+        const fetchable=request.state==='attention'&&run?.sendIntentAt;
+        const name = fetchable ? 'refetch-generation' : !run ? 'generate' : complete ? 'review-generation' : stopped ? 'resume-generation' : 'open-generation';
+        const label = fetchable ? 'Fetch result again' : !run ? 'Generate documents' : complete ? 'Review documents' : stopped ? 'Resume' : 'Open AI tab';
         const primary = action(label, 'sparkles', name, request.id); primary.classList.add('generation-action');
         if (request.state === 'ready' && request.resume) actions.append(primary);
         else { primary.classList.add('primary', 'request-main-action'); controls.append(primary); }
         if (run) {
+          if(fetchable&&complete) actions.append(action('Review documents','file','review-generation',request.id));
           const note = element('p', 'generation-status', `${run.provider === 'deepseek' ? 'DeepSeek' : 'ChatGPT'} · ${phaseLabel(run)}${run.error ? '. ' + run.error : ''}`);
           note.setAttribute('role', 'status'); note.title = note.textContent;
           if (request.state === 'ready' && !run.error) generation.append(note); else card.append(note);
@@ -418,14 +473,6 @@ export function createStudio({ openDialog, showStudio, showChat, syncChat = asyn
     renderReadButton();
   }
   function renderReadButton() {
-    const permissionPending = reading?.phase === 'permission';
-    const busy = permissionPending || reading?.tabId===currentTabId;
-    const button = q('#read-page');
-    button.disabled = currentTabId===null || busy;
-    button.setAttribute('aria-busy',String(busy));
-    button.replaceChildren(icon(busy ? 'refresh' : 'scan'),document.createTextNode(permissionPending ? 'Allow access…' : busy ? 'Reading…' : 'Read page'));
-    const feedback = readFeedback.get(currentTabId);
-    updateReadPageHint(button, feedback?.message || '');
     renderCurrentJob();
   }
   function readMessage(tabId, state, message) {
@@ -499,7 +546,15 @@ export function createStudio({ openDialog, showStudio, showChat, syncChat = asyn
       if (reading===request) { reading=null; renderReadButton(); }
     }
   }
-  q('#read-page').addEventListener('click', () => { void readPage(currentTabId, { askAccess: true }); });
+  q('#discard-job').addEventListener('click', () => {
+    if(reading?.tabId===currentTabId) reading=null;
+    for(const field of Object.values(jobFields).map(selector=>q(selector))) {field.value='';field.setCustomValidity('');}
+    if(/^https?:\/\//i.test(currentTabUrl))q('#job-url').value=currentTabUrl;
+    manualUrls.delete(currentTabId);provenanceDrafts.delete(currentTabId);readFeedback.delete(currentTabId);
+    jobDrafts.set(currentTabId,jobDraft());
+    q('#queue-notice').hidden=true;clearTimeout(noticeTimer);
+    renderCurrentJob();status('Unsaved job details discarded.');q('#job-company').focus();
+  });
   function tabError(message) {
     q('#previous-job').disabled = q('#next-job').disabled = true;
     status(message);
@@ -548,6 +603,8 @@ export function createStudio({ openDialog, showStudio, showChat, syncChat = asyn
     q('#request-metadata').replaceChildren(...metadata.flatMap(([label, value]) => [element('dt', '', label), element('dd', '', value)]));
     q('#request-prompt').textContent = input.prompt;
     q('#request-job').textContent = input.tailor ? input.job.description : 'No job description attached to this base resume.';
+    q('#request-job').value=q('#request-job').textContent;
+    for(const key of ['company','role','salary','url']) q('#request-field-'+key).value=input.job[key] || '';
     const listing = q('#request-job-link'), listingUrl = safeJobUrl(input.job.url);
     listing.hidden = !listingUrl;
     if (listingUrl) listing.href = listingUrl; else listing.removeAttribute('href');
@@ -600,7 +657,7 @@ export function createStudio({ openDialog, showStudio, showChat, syncChat = asyn
     if (button.dataset.action === 'prepare-application') {
       applyJobs.select(request.id); showStudio('apply'); syncApplyChat(request); return;
     }
-    if (['generate', 'review-generation', 'resume-generation', 'open-generation', 'stop-generation', 'download-generation'].includes(button.dataset.action)) {
+    if (['generate', 'review-generation', 'resume-generation', 'open-generation', 'stop-generation', 'download-generation','refetch-generation'].includes(button.dataset.action)) {
       const name = button.dataset.action;
       void perform(async () => {
         const run = generations.forJob(request.id);
@@ -608,7 +665,8 @@ export function createStudio({ openDialog, showStudio, showChat, syncChat = asyn
           awaitingReview.add(request.id);
           try { await generations.start(request.id, getChatProvider()); status('Document generation connected to the AI tab. Progress is saved while the dock is closed.'); }
           catch (error) { awaitingReview.delete(request.id); throw error; }
-        } else if (name === 'review-generation') await reviewGeneration(request.id, run.id);
+        } else if (name === 'refetch-generation') { awaitingReview.add(request.id);await generations.refetch(run.id); }
+        else if (name === 'review-generation') await reviewGeneration(request.id, run.id);
         else if (name === 'download-generation') await generations.download(run.id);
         else if (name === 'stop-generation') { awaitingReview.delete(request.id); await generations.stop(run.id); status('Tracking stopped. Any response already generating stays in the AI tab.'); }
         else { if (name === 'resume-generation') awaitingReview.add(request.id); await generations.open(run.id, name === 'resume-generation'); }
@@ -650,10 +708,9 @@ export function createStudio({ openDialog, showStudio, showChat, syncChat = asyn
     event.preventDefault();
     void perform(async () => {
       try {
-        const result = await openApplication(request);
-        const message = result?.warning || (result?.aiTab ? 'Job listing opened. AI chat is available in the background.' : 'Job listing opened.');
-        status(message);
-        if (q('#apply-feedback').dataset.request === String(request.id)) q('#apply-feedback').textContent = result?.warning || 'Application page opened. Your documents are ready to use.';
+        await openApplication(request);
+        status('Job listing opened.');
+        if (q('#apply-feedback').dataset.request === String(request.id)) q('#apply-feedback').textContent = 'Application page opened. Your documents are ready to use.';
       } catch (error) {
         if (q('#apply-feedback').dataset.request === String(request.id)) q('#apply-feedback').textContent = error.message;
         throw error;
@@ -746,7 +803,9 @@ export function createStudio({ openDialog, showStudio, showChat, syncChat = asyn
 
   async function saveRequest(input, options) {
     q('#queue-notice').hidden = true; clearTimeout(noticeTimer);
-    if (options?.captureJobId) {
+    if (options?.editJobId) {
+      await queue.updateJob(options.editJobId,input,options.expectedUpdatedAt,{checkExisting:q('#check-existing-jobs').checked});
+    } else if (options?.captureJobId) {
       const run = generations.captures().find(run=>run.jobId === options.captureJobId);
       if (run && runningPhases.includes(run.phase)) await generations.stop(run.id);
       await queue.completeCapture(options.captureJobId,input);
@@ -756,7 +815,31 @@ export function createStudio({ openDialog, showStudio, showChat, syncChat = asyn
     status('Job saved to the queue.');
   }
 
-  for (const id of ['review-another', 'empty-prepare']) document.getElementById(id).addEventListener('click', () => showStudio('job'));
+  q('#empty-prepare').addEventListener('click', () => showStudio('job'));
+  q('#request-edit').addEventListener('click',()=>{
+    const request=requests.find(job=>job.id===detailRequestId&&job.input.candidateId===candidateId());
+    if(!request)return;
+    q('#request-dialog').close();
+    manualJob.open(request.input,{editJobId:request.id,expectedUpdatedAt:request.updatedAt},'Update the job details below. Existing documents are retained; changes to the company, title or description require updated documents.');
+  });
+  q('#generate-all-resumes').addEventListener('click', () => {
+    void perform(async () => {
+      const reply = await chrome.runtime.sendMessage(batchState?.active ? { type: 'generation.batch-stop' } : { type: 'generation.batch-start', candidateId: candidateId(), provider: getChatProvider() });
+      if (!reply?.ok) { showNotice('Resume queue needs attention', reply?.error || 'Could not start queued resumes.'); return; }
+      batchState = (await chrome.storage.local.get(batchKey))[batchKey]; renderQueue();
+    }, 'batch');
+  });
+  function stopBatchFromOverlay() {
+    if (!batchState?.active) return;
+    void perform(async () => {
+      const reply = await chrome.runtime.sendMessage({type:'generation.batch-stop'});
+      if (!reply?.ok) { showNotice('Could not stop the queue',reply?.error || 'Try clicking again.'); return; }
+      batchState = (await chrome.storage.local.get(batchKey))[batchKey]; renderQueue();
+      status('Automatic generation stopped. The current job can finish; remaining jobs stay queued.');
+    },'batch-stop');
+  }
+  q('#batch-overlay-stop').addEventListener('click',stopBatchFromOverlay);
+  q('#batch-overlay').addEventListener('cancel',event=>{event.preventDefault();stopBatchFromOverlay();});
   for (const id of ['view-queue', 'open-queue']) document.getElementById(id).addEventListener('click', () => showStudio('results'));
   q('#request-open-chat').addEventListener('click', () => {
     const request = requests.find(item => item.id === detailRequestId && item.input.candidateId === candidateId());
@@ -829,7 +912,7 @@ export function createStudio({ openDialog, showStudio, showChat, syncChat = asyn
   }).catch(error => { status(error.message); q('#empty-queue p').textContent = error.message; });
   window.addEventListener('pagehide', unsubscribe, { once: true });
   window.addEventListener('pagehide', unsubscribeRuns, { once: true });
-  window.addEventListener('pagehide', () => { clearTimeout(noticeTimer); chrome.storage.onChanged.removeListener(duplicateOptionChanged); }, { once: true });
+  window.addEventListener('pagehide', () => { clearTimeout(noticeTimer); chrome.storage.onChanged.removeListener(duplicateOptionChanged); chrome.storage.onChanged.removeListener(batchChanged); }, { once: true });
   renderQueue(); renderTemplate();
   return { ready, updateTabs, tabError, readPage,
     chatError(message) { status(message); showNotice('Chat could not open', message); }

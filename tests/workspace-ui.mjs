@@ -323,7 +323,7 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   assert.equal(await read('document.getElementById("resume-paper").dataset.template'), 'harvard');
   await closeDialog('resume-preview-dialog');
 
-  await click('#review-another');
+  await click('#job-tab');
   assert.equal(await read('document.getElementById("studio-scroll").scrollTop'), 0);
   await click('.resume-options > summary');
   const templateOptions = await read('[...document.getElementById("resume-template").options].map(option => option.value)');
@@ -424,7 +424,7 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   assert.equal(await read('document.querySelectorAll("#request-dialog img, #request-dialog script").length'), 0);
   assert.equal(await read('globalThis.injected'), undefined);
   await closeDialog('request-dialog');
-  await click('#review-another');
+  await click('#job-tab');
   await setValue('#job-description', 'Changed after queueing', 'input');
   await click('#view-queue');
   await click('#resume-queue .job-request [data-action="details"]');
@@ -432,7 +432,7 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await closeDialog('request-dialog');
   await click('#resume-queue .job-request [data-action="cancel"]');
   assert.equal(await read('document.querySelectorAll(".job-request").length'), 0);
-  await click('#review-another');
+  await click('#job-tab');
   await click('#tailor');
   assert.equal(await read('document.getElementById("job-context").hidden'), false);
   assert.equal(await read('document.getElementById("job-description").getClientRects().length > 0 && document.getElementById("read-page").getClientRects().length > 0'), true);
@@ -454,7 +454,7 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   assert.match(await text('#request-prompt'), /without tailoring to a job/);
   await closeDialog('request-dialog');
 
-  await click('#review-another');
+  await click('#job-tab');
   await click('#account-toggle'); await click('#profile-details');
   await click('#reset-examples');
   assert.equal(await read('document.querySelectorAll(".job-request").length'), 3);
@@ -537,7 +537,7 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
     assert.equal(await read('document.documentElement.scrollWidth <= innerWidth && document.querySelector(".settings-scroll").scrollWidth <= document.querySelector(".settings-scroll").clientWidth'), true);
   }
   await click('#settings-back');
-  await click('#review-another');
+  await click('#job-tab');
   await setValue('#job-description', 'React and SQL should stay plain in the dock.', 'input');
   assert.equal(await read('document.getElementById("highlight-keywords").checked'), true);
   assert.equal(await read('document.getElementById("keyword-page-status")'), null);

@@ -31,6 +31,12 @@ export async function checkQueueCardsUI({ cdp, panel, read, click, until, artifa
     const channel=new BroadcastChannel('ai-agent-resume-queue');channel.postMessage('changed');channel.close();return id;
   })()`);
   await until(()=>read('document.querySelectorAll("#resume-queue .job-request").length===4'),'queue cards loaded');await click('#results-tab');
+  await click('#job-tab');
+  await change('job-company','Discard this draft');await change('job-title','Draft role');await change('job-description','Unsaved draft details');
+  await click('#discard-job');
+  assert.equal(await read('["job-company","job-title","job-description"].every(id=>document.getElementById(id).value==="")'),true);
+  assert.equal(await read('document.querySelectorAll("#resume-queue .job-request").length'),4,'Discard preserves saved queue items');
+  await click('#results-tab');
   assert.equal(await read('document.querySelectorAll(".request-tools, .request-controls summary").length'),0);
   assert.equal(await read('[...document.querySelectorAll(".request-detail-button")].every(button=>button.textContent==="View detail")'),true);
   assert.equal(await read(`document.querySelector('[data-request-id="${queuedId}"] .request-salary').textContent`),'USD 120,000–160,000 / year');
@@ -59,12 +65,26 @@ export async function checkQueueCardsUI({ cdp, panel, read, click, until, artifa
           if(width===390) await shot(`queue-expanded-${theme}.png`);
           assert.equal(await read(`(()=>{const card=document.querySelector('[data-request-id="1"]'),bounds=card.getBoundingClientRect();return [...card.querySelector('.request-actions').children].every(button=>{const rect=button.getBoundingClientRect();return rect.width>40&&rect.height>=44&&rect.left>=bounds.left&&rect.right<=bounds.right;});})()`),true,`expanded actions at ${width}px`);
           await click('[data-request-id="1"] .request-title-button');
+          if(width===390) {
+            await cdp.send('Emulation.setDeviceMetricsOverride',{width,height:500,deviceScaleFactor:1,mobile:false},panel);
+            await read('document.getElementById("studio-scroll").scrollTop=240');
+            assert.equal(await read('(()=>{const scroller=document.getElementById("studio-scroll").getBoundingClientRect(),filters=document.querySelector(".queue-filters").getBoundingClientRect(),heading=document.querySelector(".queue-heading").getBoundingClientRect();return Math.abs(filters.top-scroller.top)<1&&filters.height<=46&&heading.bottom<=scroller.top;})()'),true,'compact search stays pinned while the heading scrolls away in '+theme);
+            await shot(`queue-sticky-${theme}.png`);
+            await read('document.getElementById("studio-scroll").scrollTop=0');
+            await cdp.send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:false},panel);
+          }
         }
       }
     }
   }
   await cdp.send('Emulation.setDeviceMetricsOverride',{width:390,height:900,deviceScaleFactor:1,mobile:false},panel);await click('#results-tab');
   await click('[data-request-id="1"] .request-detail-button');assert.equal(await read('document.getElementById("request-dialog").open'),true);assert.ok((await read('document.getElementById("request-job").textContent')).includes('TypeScript'));await close('request-dialog');
+  await click('[data-request-id="1"] .request-detail-button');await click('#request-edit');
+  assert.equal(await read('document.getElementById("manual-job-title").textContent'),'Edit job details');
+  assert.equal(await read('document.getElementById("manual-job-company").value'),'Northstar');
+  await change('manual-job-salary','USD 115,000 / year');await click('#manual-job-save');
+  await until(()=>read('!document.getElementById("manual-job-dialog").open'),'job changes saved');
+  await click('[data-request-id="1"] .request-detail-button');assert.equal(await read('document.getElementById("request-field-salary").value'),'USD 115,000 / year');await close('request-dialog');
   await click('[data-request-id="1"] .request-title-button');await click('[data-request-id="1"] [data-action="preview"]');
   assert.equal(await read('document.getElementById("resume-preview-dialog").open'),true);assert.equal(await read('document.querySelectorAll("#studio-scroll .resume-paper").length'),0);await shot('resume-popup.png');await close('resume-preview-dialog');
   await click('[data-request-id="1"] [data-action="cover-letter"]');assert.equal(await read('document.getElementById("cover-letter-copy").textContent'),letter);assert.equal(await read('document.getElementById("cover-letter-copy").children.length'),0);await close('cover-letter-dialog');

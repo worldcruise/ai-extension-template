@@ -69,6 +69,27 @@ test('HTML conversion removes active content and URL cleaning rejects unsafe sch
   for (const url of ['javascript:alert(1)','file:///tmp/job','https://user:password@jobs.test/role']) assert.equal(cleanJobUrl(url),'');
   assert.equal(cleanJobUrl('', 'https://jobs.test/role'),'');
 });
+test('HiringCafe retries when the title is ready before the company name',async()=>{
+  let reads=0;
+  const url='https://hiring.cafe/job/selected-id';
+  const browser={tabs:{get:async()=>({url})},scripting:{executeScript:async()=>{
+    reads++;return [{frameId:0,result:capture(page({url,site:'HiringCafe',role:'Platform Engineer',company:reads>1?'Hydrated Employer':'',pageTitle:'AI Job Search | HiringCafe',descriptions:[{text:description,source:'HiringCafe',rank:90}]}))}];
+  }}};
+  const result=await createJobExtractionService(browser)(1);assert.equal(result.fields.company,'Hydrated Employer');assert.equal(reads,2);
+});
+test('HiringCafe never uses AI Job Search as employer and can recover selected embedded employer data',()=>{
+  const evidence=page({site:'HiringCafe',url:'https://hiring.cafe/job/selected-id',company:'AI Job Search',semanticCompany:'AI Job Search',role:'Platform Engineer',pageTitle:'Platform Engineer | AI Job Search | HiringCafe',meta:{'og:site_name':'AI Job Search'},descriptions:[{text:description,source:'HiringCafe',rank:90}]});
+  let result=extractJobFromEvidence(capture(evidence));assert.equal(result.fields.company,'');assert.ok(result.missing.includes('company'));assert.equal(result.fields.role,'Platform Engineer');
+  evidence.states=[{id:'selected-id',company:'Correct Employer',title:'Platform Engineer',description}];
+  result=extractJobFromEvidence(capture(evidence));assert.equal(result.fields.company,'Correct Employer');assert.equal(result.provenance.company.kind,'structured');
+});
+test('same-title HiringCafe recommendations require a selected identity or matching employer',()=>{
+  const evidence=page({site:'HiringCafe',url:'https://hiring.cafe/',role:'Platform Engineer'});
+  const values=[{id:'first',company:'Wrong employer',title:'Platform Engineer',description},{id:'second',company:'Correct employer',title:'Platform Engineer',description}];
+  assert.equal(chooseStructuredJob(values,evidence),null);
+  assert.equal(chooseStructuredJob(values,{...evidence,company:'Correct employer'}).id,'second');
+  assert.equal(chooseStructuredJob(values,{...evidence,url:'https://hiring.cafe/?selectedJobId=second'}).id,'second');
+});
 
 test('background extraction targets only the requested tab and rejects navigation races', async () => {
   const evidence=page({structured:[{title:'Platform Engineer',company:'Acme',description}]});

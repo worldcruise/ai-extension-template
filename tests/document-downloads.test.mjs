@@ -50,6 +50,16 @@ test('automatic downloads honor disabled settings and never export invalid gener
     assert.equal((await f.read()).downloads, undefined); assert.equal(f.calls.export.length, 0); assert.equal(f.calls.saves.length, 0); f.manager.dispose();
   }
 });
+test('a successful delivery clears Need action only for its own saved document run',async()=>{
+  for(const documentRunId of ['run-1','newer-run']) {
+    const f=fixture();f.manager.dispose();f.completeBeforeAck();
+    const state={requests:[{id:'job-1',state:'ready',needsAction:true,error:'Download failed',documentRunId,resume:{summary:'Keep my saved document'}}]};
+    const manager=createDocumentDownloads({...f.options,jobs:{change:async edit=>({value:edit(state)})}});
+    await manager.start('run-1');
+    assert.equal(state.requests[0].needsAction,documentRunId!=='run-1');
+    assert.equal(state.requests[0].resume.summary,'Keep my saved document');manager.dispose();
+  }
+});
 
 test('simultaneous completion notifications export and download once', async () => {
   const f = fixture(); let release;

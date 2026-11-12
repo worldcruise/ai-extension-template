@@ -1,7 +1,7 @@
 # AI Agent Template
 
 A Chrome Manifest V3 extension with a docked job form, application queue, and
-expandable ChatGPT / DeepSeek chat. Current version: **0.15.2**.
+expandable ChatGPT / DeepSeek chat. Current version: **0.18.4**.
 
 Save jobs locally, then choose **Generate documents** to submit a prompt and
 collect and validate the reply. With Auto download on, the documents are saved
@@ -107,10 +107,12 @@ their job/profile snapshot, prompt, progress, conversation link, and captured
 reply locally. Clicking Generate documents sends that snapshot to the selected
 provider through its website using your signed-in session.
 
-**Read page** extracts a job's company, title, URL, and description from the
+The **Read page shortcut** extracts a job's company, title, URL, and description from the
 selected browser tab. Review or edit those fields, select the desired template
 preferences, and choose **Add to queue**. Writing preferences are included when
 you subsequently generate documents; the resume template controls preview style.
+**Discard** resets unsaved company, title and description fields for the current
+tab and restores its browser URL. Saved queue items and document preferences remain intact.
 
 **Add This Job in One Click** appears for HTTP/HTTPS pages absent from the
 selected candidate's list, excluding AI chat sites and webmail pages. By default
@@ -146,6 +148,14 @@ any extracted fields, and the reason for the failure. Enter or correct the
 company, title, optional salary, and description, then choose **Add to queue**.
 The form keeps the original candidate and retains your entries if saving fails.
 
+**Import CSV** at the top right of Add a job or the manual-entry popup adds several
+jobs at once. Required headers are `company`, `title`, `description`; `url` and
+`salary` are optional. Common alternatives such as Company Name, Job Title, JD
+and Apply URL also work. Quote fields containing commas or line breaks, doubling
+embedded quotes. Import up to 1,000 rows in a file under 2 MB. Jobs use the candidate
+and resume preferences selected when Import was clicked. The summary reports added,
+duplicate and invalid rows. CSV import saves jobs without starting AI generation.
+
 **Check existing company or URL** is enabled by default. It checks the selected
 candidate's saved jobs before adding a duplicate. Company matching ignores case
 and extra spaces; URLs ignore tracking parameters while retaining job IDs and
@@ -161,10 +171,14 @@ Delete removes the job from the visible queue using its existing cancellation st
 Details can connect the current ChatGPT or
 DeepSeek conversation, which can later be reopened from the job.
 
-**Go to apply** opens or reuses the job listing and focuses it. Its saved AI
-conversation is reused or opened in the background, without sending a prompt
-or taking focus. A job without a saved AI conversation opens only the listing.
-Repeated clicks reuse those tabs.
+**Edit** in View detail opens the shared job form used by manual entry and
+HiringCafe fallback. Saving checks that the job has not changed in another window.
+Company, title or JD changes retain existing documents and mark them as needing
+an update. Editing job fields does not send a prompt.
+
+**Open application / Go to apply** opens or reuses only the job listing and focuses
+it. Saved AI conversations remain available through the separate chat controls.
+Repeated clicks reuse the listing tab.
 
 For both providers, **Generate documents** checks the active provider tab first,
 then other open tabs by most recent use. It skips chats that are generating a
@@ -248,7 +262,17 @@ health checks report Tracking paused after 45 seconds without a heartbeat and
 offer Resume, preserving the active job and its submission record. A page reload can
 reattach its current run; connection failures require Resume. On upgrade, any
 additional active DeepSeek runs are paused with their saved data preserved.
-There is one run per job, with no bulk runner or automatic submission retries.
+There is one run per job. **Generate all resumes** in the Queue footer processes
+the selected candidate's unstarted queued jobs in order using the current provider.
+While running, a full-window status shows progress and the current company.
+Click anywhere on it (or press Escape) to stop after the current job.
+It retains progress when the dock closes, waits for each reply and any automatic
+document delivery. A failed job becomes **Need action** and the queue continues
+with the next job. Its **Fetch result again** action observes the original chat
+without sending another prompt; a job with no recorded submission still uses
+**Resume** to prepare its prompt. **Stop after current job**
+leaves the current response running and the remaining jobs queued. Existing runs
+are skipped; use their card controls to review or resume them. There are no automatic submission retries.
 Browser checks use local fixtures; live compatibility depends on each
 provider's markup and signed-in session.
 See [the DeepSeek capture investigation](docs/deepseek-capture-research.md) for
@@ -287,7 +311,7 @@ Retries do not repeat a successful automatic save. With Auto download off,
 Review and Save control which generated documents become the approved job records.
 
 Existing jobs, profiles, and documents are preserved. Old in-progress records
-without a saved resume appear as Needs attention; old records with saved resumes
+without a saved resume appear as Need action; old records with saved resumes
 appear as Ready. No old runner, delivery, or recovery work resumes.
 
 ## Shortcuts and highlights
@@ -309,7 +333,7 @@ with granted access. They use literal matching and preserve page markup.
 | `src/job-queue.mjs`, `src/queue-store.mjs` | Local job/profile/document persistence |
 | `src/generation-service.mjs`, `src/generation-store.mjs`, `src/generation-client.mjs` | Persistent per-job runs, tab ownership, and UI progress |
 | `src/generation-tab.js`, `src/generation-dom.js`, `src/generation-chatgpt.js`, `src/generation-deepseek.js` | Browser-tab input, submission receipt, and reply observation |
-| `src/chatgpt-submit-adapter.js`, `src/ai-tabs.mjs`, `src/apply-tabs.mjs` | Native plain-text input and Enter, idle-provider tab selection, and background chat reuse for Go to apply |
+| `src/chatgpt-submit-adapter.js`, `src/ai-tabs.mjs`, `src/apply-tabs.mjs` | Native plain-text input and Enter, idle-provider tab selection, and application listing tab reuse |
 | `src/generation-data.mjs` | Prompt envelopes, conversation URLs, and reply validation |
 | `src/manual-documents.mjs`, `src/queue-documents.mjs`, `src/resume-data.mjs` | Manual document import, editing, and validation |
 | `src/chatgpt-frame.js`, `src/sidebar.mjs`, `src/sidebar-protocol.mjs` | Embedded ChatGPT UI state and manual navigation |

@@ -18,10 +18,13 @@ export function createManualJobForm({ openDialog, saveRequest }) {
     const job = Object.fromEntries(Object.entries(fields).map(([key, field]) => [key, field.value.trim()]));
     if (!job.description) fields.description.setCustomValidity('Paste the job description to add this job.');
     try {
+      if(current.options?.editJobId && !job.url) job.url='';
+      else {
       const url = new URL(job.url);
       if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) throw new Error();
       if (current.options?.captureJobId && isHiringCafe(url.href)) throw new Error();
       job.url = url.href;
+      }
     } catch { fields.url.setCustomValidity('Enter an http:// or https:// job URL.'); }
     if (!form.reportValidity()) return;
     const { input, options } = current, ticket = epoch;
@@ -41,10 +44,13 @@ export function createManualJobForm({ openDialog, saveRequest }) {
       for (const control of dialog.querySelectorAll('button,input,textarea')) control.disabled = false;
     }
   });
-  return { open(input, options, reason) {
+  return { context: () => current && structuredClone(current.input), open(input, options, reason) {
     if (busy) return;
     current = structuredClone({ input, options }); epoch++;
-    fields.company.required = fields.role.required = Boolean(options?.captureJobId);
+    fields.company.required = fields.role.required = Boolean(options?.captureJobId || options?.editJobId);
+    fields.url.required = !options?.editJobId;
+    q('#manual-job-title').textContent=options?.editJobId ? 'Edit job details' : 'Add job manually';
+    q('#manual-job-save').textContent=options?.editJobId ? 'Save changes' : 'Add to queue';
     q('#manual-job-context').textContent = `Save for ${input.profile.name}`;
     q('#manual-job-reason').textContent = reason || 'This page could not be read automatically. Enter the job details below.';
     status.textContent = '';

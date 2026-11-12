@@ -449,6 +449,15 @@ export function createGenerationService({ browser = chrome, store = createGenera
     if (run.tabId != null) void browser.tabs.sendMessage(run.tabId, { type: 'generation.stop', id }).catch(() => {});
     return summary(run);
   }
+  async function refetch(id) {
+    const run=await get(id);
+    if(!run) throw new Error('This generation no longer exists.');
+    if(!run.sendIntentAt) throw new Error('No submission attempt was recorded. Open the AI tab and use Resume to prepare this job first.');
+    if((await store.read()).runs.some(other=>other.id!==id&&(runningPhases.includes(other.phase)||other.phase==='validating'))) throw new Error('Wait for the automatic queue to finish before fetching this result again.');
+    if(run.tabId!=null) await browser.tabs.sendMessage(run.tabId,{type:'generation.stop',id}).catch(()=>{});
+    await patch(id,()=>({phase:'submitted',trackingState:null,error:'',code:'',actorId:null,documentId:null}));
+    return open(id,true);
+  }
   const onUpdated = (tabId, info) => {
     if (info.status === 'complete') void reconnectDeepseek(tabId).catch(() => {});
     if (info.status === 'complete' || 'frozen' in info || 'discarded' in info) {
@@ -461,7 +470,7 @@ export function createGenerationService({ browser = chrome, store = createGenera
     for (const run of runs.filter(run => run.tabId === tabId && runningPhases.includes(run.phase))) await patch(run.id, current => tracked(current) && current.tabId === tabId ? { phase: 'attention', trackingState: null, code: 'tab-closed', error: 'The AI tab was closed. Resume will check the saved conversation without resending.' } : null);
   }).catch(() => {}); };
   browser.tabs.onUpdated.addListener(onUpdated); browser.tabs.onRemoved.addListener(onRemoved); browser.tabs.onActivated?.addListener(onActivated);
-  return { start, startCapture:(jobId,provider)=>start(jobId,provider,{kind:'job-cleanup'}),open, attach, event, list, reconnect, health, stop,
+  return { start, startCapture:(jobId,provider)=>start(jobId,provider,{kind:'job-cleanup'}),open, refetch, attach, event, list, reconnect, health, stop,
     async read(id) { const run = await get(id); if (!run) throw new Error('Run not found.'); const { job, prompt, ...value } = run; return value; },
     dispose() { disposed = true; browser.tabs.onUpdated.removeListener(onUpdated); browser.tabs.onRemoved.removeListener(onRemoved); browser.tabs.onActivated?.removeListener(onActivated); } };
 }

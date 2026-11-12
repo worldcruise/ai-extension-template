@@ -35,7 +35,7 @@ function roleText(value) {
 }
 function companyText(value, trusted=true) {
   const text = clean(value).split('\n')[0].replace(/^at\s+/i,'').replace(/\s+(?:company\s+)?logo$/i,'').trim();
-  return text && text.length<=180 && !sectionName.test(text) && (trusted || !boardNames.test(text)) ? text : '';
+  return text && text.length<=180 && !sectionName.test(text) && (trusted || !boardNames.test(text) && !/^(?:ai(?:[- ]powered)?\s+)?job\s+search(?:\s+engine)?$/i.test(text)) ? text : '';
 }
 function titleParts(evidence) {
   const source = clean(evidence.meta?.['og:title'] || evidence.pageTitle).replace(/\s*[|–—-]\s*(?:LinkedIn|Indeed|Glassdoor|Greenhouse|Lever|Ashby|Workday|Hiring\s?Cafe|Jobright|Handshake|SmartRecruiters)\s*$/i,'');
@@ -52,7 +52,7 @@ function titleParts(evidence) {
 function identityMatch(candidate, evidence) {
   const page = cleanJobUrl(evidence.url), target=cleanJobUrl(candidate.url,evidence.url);
   const current = new URL(page);
-  const selected = ['currentJobId','jobId','job_id','gh_jid','jk','requisitionId'].map(key=>current.searchParams.get(key)).filter(Boolean);
+  const selected = ['currentJobId','jobId','job_id','selectedJobId','gh_jid','jk','requisitionId'].map(key=>current.searchParams.get(key)).filter(Boolean);
   const candidateId = /^[\w-]+$/.test(candidate.id || '') ? candidate.id : '';
   if (selected.some(id => candidateId===id || (!candidateId && target && new URL(target).pathname.includes(id)))) return 120;
   if (selected.length && candidateId) return 0;
@@ -67,14 +67,16 @@ export function chooseStructuredJob(candidates, evidence) {
     const identity = identityMatch(item,evidence);
     const title = normalized(item.title);
     const headingMatch = Boolean(heading && title && (title===heading || heading.includes(title) || title.includes(heading)));
-    const score = identity + (headingMatch ? 40 : 0) + (item.description ? 12 : 0) + (item.company ? 5 : 0);
-    return {item,score,identified:identity>0 || headingMatch,headingMatch};
+    const employerMatch=evidence.site==='HiringCafe' && normalized(evidence.company) && normalized(evidence.company)===normalized(item.company);
+    const score = identity + (headingMatch ? 40 : 0) + (employerMatch ? 30 : 0) + (item.description ? 12 : 0) + (item.company ? 5 : 0);
+    return {item,score,identity,identified:identity>0 || headingMatch,headingMatch};
   }).sort((a,b)=>b.score-a.score);
   if (!ranked.length) return null;
   const different = ranked.find(value => normalized(value.item.title)!==normalized(ranked[0].item.title) ||
     (value.item.company && ranked[0].item.company && normalized(value.item.company)!==normalized(ranked[0].item.company)) ||
     (value.item.id && ranked[0].item.id && value.item.id!==ranked[0].item.id));
   if (different && !ranked[0].identified && ranked[0].score-different.score<20) return null;
+  if(evidence.site==='HiringCafe' && different && !ranked[0].identity && ranked[0].score===different.score) return null;
   if (roleText(evidence.role) && !ranked[0].identified) return null;
   return ranked[0].item;
 }
@@ -84,7 +86,9 @@ function documentJob(evidence) {
   const state = chooseStructuredJob(evidence.states,evidence);
   const primary = structured || state;
   const parsed = titleParts(evidence);
-  let company = companyText(evidence.company) || companyText(primary?.company) || companyText(evidence.semanticCompany) || parsed.company;
+  const hiringCafe=evidence.site==='HiringCafe'||/^https?:\/\/(?:[\w-]+\.)?(?:hiring\.cafe|hiringcafe\.com)(?:[/:]|$)/i.test(evidence.url || '');
+  const domCompany=value=>companyText(value,!hiringCafe);
+  let company = domCompany(evidence.company) || companyText(primary?.company) || domCompany(evidence.semanticCompany) || parsed.company;
   let role = roleText(evidence.role) || roleText(primary?.title) || roleText(evidence.semanticRole);
   let roleKind = !roleText(evidence.role) && roleText(primary?.title) ? 'structured' : 'page';
   if (!role || normalized(role)===normalized(company)) {
@@ -110,8 +114,8 @@ function documentJob(evidence) {
   if (!description || (!primary && !(semantic && (role || company)) && !(native?.hits>=2 && role))) return null;
   if (state && !structured && !evidence.site && cues(description)<2 && !semantic) return null;
   const certainty = structured ? 100 : state ? 92 : semantic ? 85 : 55;
-  const provenance = { company: !company ? { kind: 'missing' } : { kind: !companyText(evidence.company) && companyText(primary?.company) ? 'structured' : 'page',
-    source: !companyText(evidence.company) && companyText(primary?.company) ? structured ? 'JobPosting' : 'Embedded job JSON' : 'Page metadata or DOM' },
+  const provenance = { company: !company ? { kind: 'missing' } : { kind: !domCompany(evidence.company) && companyText(primary?.company) ? 'structured' : 'page',
+    source: !domCompany(evidence.company) && companyText(primary?.company) ? structured ? 'JobPosting' : 'Embedded job JSON' : 'Page metadata or DOM' },
     role: !role ? { kind: 'missing' } : { kind: roleKind, source: roleKind === 'structured' ? structured ? 'JobPosting' : 'Embedded job JSON' : 'Page metadata or DOM' } };
   return {company,role,description,url:cleanJobUrl(evidence.url),source,provenance,
     cleanupContext: [evidence.pageTitle,...(evidence.headings || []),JSON.stringify(primary || {}), ...(evidence.descriptions || []).filter(item=>item.rank>=75).slice(0,2).map(item=>item.text)].filter(Boolean).join('\n\n').slice(0,25000),

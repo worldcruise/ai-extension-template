@@ -59,15 +59,13 @@ export async function checkProviderWorkflowUI({ cdp, panel, read, click, until, 
     await read(`chrome.tabs.remove(${existing})`);
     await click(`${card} [data-action="details"]`);
     await click('#request-job-link');
-    await until(async()=> (await tabs()).filter(tab=>tab.url===job.chat).length===1,'missing saved AI conversation opened');
-    all=await tabs();const reopened=all.find(tab=>tab.url===job.chat);
-    assert.notEqual(reopened.id,existing);assert.equal(reopened.active,false);assert.equal(all.find(tab=>tab.id===listing.id).active,true);
+    all=await tabs();assert.equal(all.some(tab=>tab.url===job.chat),false,'application never opens the saved AI conversation');assert.equal(all.find(tab=>tab.id===listing.id).active,true);
     await click('#request-job-link');
-    all=await tabs();assert.equal(all.filter(tab=>tab.url===job.url).length,1);assert.equal(all.filter(tab=>tab.url===job.chat).length,1);
+    all=await tabs();assert.equal(all.filter(tab=>tab.url===job.url).length,1);assert.equal(all.filter(tab=>tab.url===job.chat).length,0);
     assert.equal(all.find(tab=>tab.id===listing.id).active,true);
     await click('#request-dialog [data-close-dialog]');
-    checks.push(`${job.provider} missing saved chat opens once in background from Details`);
-    await read(`chrome.tabs.remove(${JSON.stringify([listing.id,reopened.id])})`);
+    checks.push(`${job.provider} application link opens only the listing from Details`);
+    await read(`chrome.tabs.remove(${JSON.stringify([listing.id])})`);
   }
   const unlinked=seeded.jobs.find(job=>!job.chat), beforeAI=(await tabs()).filter(tab=>/^https:\/\/(chatgpt\.com|chat\.deepseek\.com)\//.test(tab.url)).map(tab=>tab.id);
   await click(`[data-request-id="${unlinked.id}"] a[data-action="apply"]`);

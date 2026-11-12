@@ -220,7 +220,13 @@ try {
   };
   const state = () => read('document.getElementById("connection").dataset.state');
   await until(() => read('document.documentElement?.dataset.studioReady === "true"'), 'combined workspace startup');
-  if (process.argv.includes('--job-cleanup-only')) {
+  if (process.argv.includes('--hiringcafe-company-only')) {
+    const {checkHiringCafeCompany}=await import('./hiringcafe-company-ui.mjs');
+    const report=await checkHiringCafeCompany({cdp,read,evaluate,until,session});
+    assert.deepEqual(errors,[]);
+    await writeFile(join(artifacts,'hiringcafe-company-results.json'),JSON.stringify({fixtureOnly:true,...report},null,2));
+    console.log('HiringCafe company extraction browser checks passed.');
+  } else if (process.argv.includes('--job-cleanup-only')) {
     const report=await checkJobCleanupUI({cdp,panel,read,click,evaluate,until,targets,session});
     assert.deepEqual(errors,[]);
     await writeFile(join(artifacts,'job-cleanup-results.json'),JSON.stringify({fixtureOnly:true,...report},null,2));
@@ -245,6 +251,18 @@ try {
     assert.deepEqual(errors, []);
     await writeFile(join(artifacts, 'provider-workflow-results.json'), JSON.stringify({ fixtureOnly:true, ...report }, null, 2));
     console.log('Provider workflow browser checks passed.');
+  } else if (process.argv.includes('--csv-only')) {
+    const { checkJobCsvUI } = await import('./job-csv-ui.mjs');
+    const report = await checkJobCsvUI({read,click,until});
+    assert.deepEqual(errors, []);
+    await writeFile(join(artifacts,'job-csv-results.json'),JSON.stringify({fixtureOnly:true,...report},null,2));
+    console.log('CSV job import browser checks passed.');
+  } else if (process.argv.includes('--batch-only')) {
+    const { checkResumeBatchUI } = await import('./resume-batch-ui.mjs');
+    const report = await checkResumeBatchUI({ cdp, panel, read, click, evaluate, until, session });
+    assert.deepEqual(errors, []);
+    await writeFile(join(artifacts, 'resume-batch-results.json'), JSON.stringify({fixtureOnly:true,...report},null,2));
+    console.log('Sequential resume batch browser checks passed.');
   } else if (process.argv.includes('--cards-only')) {
     const report = await checkQueueCardsUI({ cdp, panel, read, click, until, artifacts });
     assert.deepEqual(errors, []);
@@ -257,7 +275,7 @@ try {
     console.log('Document generation browser checks passed.');
   } else {
   assert.equal(await read('document.querySelectorAll(".job-request").length'), 0, 'real queue starts empty');
-  await click('#review-another'); await click('#account-toggle'); await click('#profile-details'); await click('#reset-examples');
+  await click('#job-tab'); await click('#account-toggle'); await click('#profile-details'); await click('#reset-examples');
   await read('if (document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
   await until(async () => await state() === 'ready', 'embedded ChatGPT readiness');
   assert.equal(await read('document.getElementById("connection").hidden'), true);
@@ -479,7 +497,7 @@ try {
   await until(async () => await totalHighlights() === 0, 'clearing every list removes all highlights while enabled');
   await evaluate(dockSession, `chrome.storage.local.set({keywordHighlights:${JSON.stringify(storedHighlights)}})`);
   await until(async () => await totalHighlights() === 9, 'saved color groups restored');
-  await evaluate(dockSession, 'document.getElementById("review-another").click()');
+  await evaluate(dockSession, 'document.getElementById("job-tab").click()');
   await until(() => evaluate(dockSession, 'document.getElementById("job-url").value === "https://jobs.example.test/engineering"'), 'accessible page URL autofills');
   await until(() => evaluate(dockSession, '!document.getElementById("highlight-keywords").disabled'), 'native keyword toggle loaded');
   assert.equal(await evaluate(dockSession, 'document.getElementById("highlight-keywords").checked'), true);

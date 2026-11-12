@@ -48,6 +48,17 @@ test('corrected job details preserve older documents and update the save revisio
   queue.dispose();
 });
 
+test('editing a saved job preserves documents, marks changed documents stale and rejects older edits',async()=>{
+  const {queue,input}=await fixture(),id=await queue.add(input);
+  let saved=queue.snapshot().requests.find(job=>job.id===id);
+  await queue.saveDocuments(id,{resume:JSON.stringify(resumeFor(saved)),expectedUpdatedAt:saved.updatedAt});
+  saved=queue.snapshot().requests.find(job=>job.id===id);
+  const change=structuredClone(saved.input);change.job.company='Correct company';
+  await queue.updateJob(id,change,saved.updatedAt);
+  const updated=queue.snapshot().requests.find(job=>job.id===id);
+  assert.equal(updated.input.job.company,'Correct company');assert.ok(updated.resume);assert.equal(updated.documentsStale,true);
+  await assert.rejects(queue.updateJob(id,change,saved.updatedAt),/changed/);queue.dispose();
+});
 test('saving snapshots the job locally and exposes no runner or chat action API', async () => {
   const { queue, store, input } = await fixture();
   const id = await queue.add(input);

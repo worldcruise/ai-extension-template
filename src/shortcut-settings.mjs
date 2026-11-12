@@ -31,7 +31,7 @@ export function updateReadPageHint(button, result) {
 
 export function createShortcutSettings({ browser = globalThis.chrome, root = document, events = window } = {}) {
   const q = selector => root.querySelector(selector);
-  const button = q('#read-page');
+  const button = q('#read-page') || q('#read-page-shortcut');
   const status = q('#shortcut-settings-status');
   q('#workspace-shortcut-list').replaceChildren(...globalThis.AiAgentWorkspaceKeys.bindings.flatMap(binding => {
     const label = root.createElement('dt'); label.textContent = binding.label;

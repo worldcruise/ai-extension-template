@@ -32,7 +32,8 @@ export function createJobExtractionService(browser=globalThis.chrome) {
         throw failure('page-changed','The page changed while reading. Try Read page again.');
       }
       const result=extractJobFromEvidence(capture);
-      if (result) return result;
+      const waitingForCompany=result?.missing.includes('company') && /(^|\.)(hiring\.cafe|hiringcafe\.com)$/i.test(new URL(capture.url).hostname);
+      if (result && (!waitingForCompany || attempt===4)) return result;
       if (attempt===4) {
         throw failure('no-job', capture?.blockedFrames?.length
           ? 'The job may be in an embedded page. Open the listing in its own tab and try Read page again.'

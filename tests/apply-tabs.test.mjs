@@ -29,11 +29,11 @@ function fixture(initial = []) {
   return { browser, tabs, created, updates, windows, inspections };
 }
 
-test('Go to apply reuses the exact saved conversation for either provider without focusing AI', async () => {
+test('Go to apply focuses only the listing and leaves existing AI conversations untouched', async () => {
   for (const conversationUrl of ['https://chatgpt.com/c/saved', 'https://chat.deepseek.com/a/chat/s/saved']) {
     const f = fixture([{ id: 1, url: jobUrl, active: false }, { id: 2, url: conversationUrl, windowId: 2, active: true, busy: true }]);
     const result = await openApplicationTabs({ jobUrl, conversationUrl: conversationUrl + '?private=value', provider: 'chatgpt', browser: f.browser });
-    assert.equal(result.jobTab.id, 1); assert.equal(result.aiTab.id, 2); assert.equal(result.warning, '');
+    assert.equal(result.jobTab.id, 1); assert.equal(result.aiTab, null); assert.equal(result.warning, '');
     assert.deepEqual(f.created, []);
     assert.deepEqual(f.updates, [{ id: 1, active: true }]);
     assert.deepEqual(f.windows, [{ id: 1, focused: true }]);
@@ -41,19 +41,18 @@ test('Go to apply reuses the exact saved conversation for either provider withou
   }
 });
 
-test('missing listing and saved conversation open once, with only the listing active', async () => {
+test('duplicate clicks open only one listing even when a saved AI conversation is supplied', async () => {
   for (const conversationUrl of ['https://chatgpt.com/c/saved', 'https://chat.deepseek.com/a/chat/s/saved']) {
     const f = fixture();
     const args = { jobUrl, conversationUrl, browser: f.browser };
     const results = await Promise.all([openApplicationTabs(args), openApplicationTabs(args)]);
     assert.equal(results[0].jobTab.id, results[1].jobTab.id);
-    assert.equal(results[0].aiTab.id, results[1].aiTab.id);
-    assert.deepEqual(f.created, [{ url: jobUrl, active: true }, { url: conversationUrl, active: false }]);
+    assert.equal(results[0].aiTab,null);assert.equal(results[1].aiTab,null);
+    assert.deepEqual(f.created, [{ url: jobUrl, active: true }]);
     assert.deepEqual(f.updates, [{ id: results[0].jobTab.id, active: true }]);
     assert.equal(f.tabs.get(results[0].jobTab.id).active, true);
-    assert.equal(f.tabs.get(results[0].aiTab.id).active, false);
     await openApplicationTabs(args);
-    assert.equal(f.created.length, 2, 'later clicks reuse the already-open tabs');
+    assert.equal(f.created.length, 1, 'later clicks reuse the listing');
   }
 });
 
@@ -79,12 +78,12 @@ test('an unlinked job creates only its listing even when no AI tab is open', asy
   assert.equal(f.tabs.get(result.jobTab.id).active, true);
 });
 
-test('AI failures leave the listing focused and return a warning', async () => {
+test('opening an existing listing never attempts to create an AI tab', async () => {
   const f = fixture([{ id: 1, url: jobUrl }]);
   f.browser.tabs.create = async () => { throw new Error('Browser cannot open an AI tab.'); };
   const result = await openApplicationTabs({ jobUrl, conversationUrl: 'https://chatgpt.com/c/saved', browser: f.browser });
   assert.equal(result.jobTab.id, 1); assert.equal(result.aiTab, null);
-  assert.match(result.warning, /Job listing opened.*Browser cannot open an AI tab/);
+  assert.equal(result.warning,'');
   assert.equal(f.tabs.get(1).active, true);
 });
 
@@ -95,7 +94,7 @@ test('invalid listing URLs cannot open tabs; invalid saved AI links cannot redir
   }
   assert.equal(f.created.length, 0);
   const result = await openApplicationTabs({ jobUrl, conversationUrl: 'https://chatgpt.com.evil.test/c/stolen', browser: f.browser });
-  assert.equal(result.aiTab, null); assert.match(result.warning, /invalid/);
+  assert.equal(result.aiTab, null); assert.equal(result.warning,'');
   assert.deepEqual(f.created, [{ url: jobUrl, active: true }]);
 });
 

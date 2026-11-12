@@ -20,9 +20,9 @@ function dataUrl(file) {
 
 export function createDocumentDownloads({ browser = chrome, store = createGenerationStore(),
   files = createDocumentFileStore(), jobs = createQueueStore(), exportFiles = exportDocuments, saveGenerated = saveGeneratedDocuments,
-  now = Date.now, uuid = () => crypto.randomUUID() } = {}) {
+  now = Date.now, uuid = () => crypto.randomUUID(), onChange = () => {} } = {}) {
   const pending = new Map(), updating = new Map();
-  const notify = () => { void browser.runtime.sendMessage({ type: 'generation.changed' }).catch(() => {}); };
+  const notify = () => { void browser.runtime.sendMessage({ type: 'generation.changed' }).catch(() => {}); void Promise.resolve().then(onChange).catch(() => {}); };
   const read = async id => (await store.read()).runs.find(run => run.id === id);
   async function update(id, edit) {
     const { value } = await store.change(state => {
@@ -32,6 +32,17 @@ export function createDocumentDownloads({ browser = chrome, store = createGenera
       if (!change) return run;
       return state.runs[index] = { ...run, downloads: change };
     });
+    if(value?.downloads?.state==='complete' && value.downloads.savedAt && typeof jobs.change==='function') {
+      try {
+        const cleared=await jobs.change(state=>{
+          const index=state.requests.findIndex(job=>job.id===value.jobId);
+          const job=state.requests[index];
+          if(!job?.needsAction||job.state==='cancelled'||job.documentsStale||job.documentRunId!==id)return false;
+          state.requests[index]={...job,needsAction:false,error:''};return true;
+        });
+        if(cleared.value && typeof BroadcastChannel==='function'){const channel=new BroadcastChannel('ai-agent-resume-queue');channel.postMessage('changed');channel.close();}
+      } catch { /* Preserve completed downloads if queue storage is temporarily unavailable. */ }
+    }
     notify(); return value;
   }
   function overall(delivery) {

@@ -62,6 +62,36 @@ export function collectJobEvidence(adapters) {
       semanticCompany:first(['[itemprop="hiringOrganization"] [itemprop="name"]','[itemprop="hiringOrganization"]','[data-company-name]','[data-testid="company-name"]','.company-name']),
       headings:query('h1,h2').filter(visible).map(textOf).filter(Boolean).slice(0,12),
       meta:{}, structured:[], states:[], descriptions:[]};
+    let hiringScope=null;
+    if(adapter?.name==='HiringCafe') {
+      const dialogs=query('[role="dialog"]').filter(node=>visible(node)&&node.querySelector('[data-testid="drawer-header-bar"]'));
+      hiringScope=dialogs.at(-1) || null;
+      const scope=hiringScope || doc.querySelector('main') || doc.body;
+      const headings=[...scope.querySelectorAll(hiringScope ? 'h2.font-extrabold,h2[class*="text-3xl"],[data-testid="job-title"],h1' : '[data-testid="job-title"],h1')].filter(visible);
+      const heading=headings.find(node=>!node.closest('nav,header,aside')&&!/^(?:hiring\s?cafe|ai(?:[- ]powered)? job search(?: engine)?)$/i.test(clean(textOf(node))));
+      if(heading) {
+        evidence.role=textOf(heading).split('\n')[0];
+        const sibling=heading.nextElementSibling;
+        let company='';
+        if(sibling&&visible(sibling)) {
+          const name=sibling.matches('.font-bold,[class*="font-bold"],[data-testid="company-name"]') ? sibling : sibling.querySelector(hiringScope ? '[data-testid="company-name"],.font-bold,span' : '[data-testid="company-name"],.font-bold,strong');
+          if(name&&visible(name))company=textOf(name).replace(/^@\s*/,'');
+        }
+        if(!company) {
+          const logo=heading.parentElement?.querySelector('img[alt]');
+          if(logo&&visible(logo))company=clean(logo.alt).replace(/\s+logo$/i,'');
+        }
+        const localCompany=heading.parentElement?.querySelector('[data-testid="company-name"],[data-company-name],.company-name');
+        evidence.company=company || textOf(localCompany);
+        evidence.semanticCompany=evidence.company;
+        // Keep a page-wide company marker from a recommended card out of a selected drawer.
+        if(hiringScope) {
+          const labelled=hiringScope.querySelector('[data-testid="company-name"],[data-company-name],.company-name');
+          evidence.company=company || textOf(labelled);
+          evidence.semanticCompany='';
+        }
+      }
+    }
     for (const key of ['og:title','og:site_name','twitter:title','description','company','author']) {
       const node = doc.querySelector(`meta[property="${key}"],meta[name="${key}"]`);
       if (node?.content) evidence.meta[key] = clean(node.content).slice(0,3000);
@@ -87,7 +117,7 @@ export function collectJobEvidence(adapters) {
       const value = { title:typeof title==='string' ? title.slice(0,500) : '', company:typeof company==='string' ? company.slice(0,300) : '',
         description:typeof description==='string' ? description.slice(0,100000) : '',
         url:typeof node.url==='string' ? node.url : node.jobUrl || node.job_url || '',
-        id:String(node.identifier?.value || node.identifier || node.id || node.jobId || node.requisition_id || '').slice(0,150), type };
+        id:String(node.identifier?.value || node.identifier || node.id || node._id || node.jobId || node.requisition_id || '').slice(0,150), type };
       if (typeof node.salary === 'string') value.salary = node.salary.slice(0,500);
       const pay = node.baseSalary, range = pay?.value;
       if (pay && typeof pay === 'object' && range && typeof range === 'object') value.salary = [pay.currency,range.minValue,range.maxValue,range.value,range.unitText].filter(item=>typeof item === 'string' || typeof item === 'number').join(' ').slice(0,500);
@@ -159,6 +189,7 @@ export function collectJobEvidence(adapters) {
       }
     }
     for (const node of query('main,article,[role="main"],section').slice(0,30)) add(node,'main content',30);
+    if(hiringScope) add(hiringScope,'HiringCafe selected listing',90);
     add(doc.body,'page body',10);
     documents.push(evidence);
     for (const frame of query('iframe')) {

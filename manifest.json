@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AI Agent Template",
   "short_name": "Sidebar GPT",
-  "version": "0.15.2",
+  "version": "0.18.4",
   "description": "A docked job queue and job form with expandable ChatGPT and DeepSeek conversations.",
   "minimum_chrome_version": "116",
   "permissions": [

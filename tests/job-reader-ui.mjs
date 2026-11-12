@@ -39,7 +39,7 @@ export async function checkJobReader({cdp,id,sourceSession,dockSession,evaluate,
     }
     const target=await until(async()=>(await cdp.send('Target.getTargets',{filter:[{type:'tab',exclude:false}]})).targetInfos.find(tab=>tab.url===url),'job tab action target');
     if (fixture.id !== 'greenhouse') await cdp.send('Extensions.triggerAction',{id,targetId:target.targetId});
-    await dock('document.getElementById("review-another").click()');
+    await dock('document.getElementById("job-tab").click()');
     await until(()=>dock('!document.getElementById("read-page").disabled'),'Read page available');
     if (fixture.partial) await dock('document.getElementById("job-company").value="Keep existing company";document.getElementById("job-company").dispatchEvent(new Event("input",{bubbles:true}))');
     const before=await fields();

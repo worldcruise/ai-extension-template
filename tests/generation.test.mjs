@@ -60,6 +60,23 @@ async function submitted(f, jobId = 'job-1', provider = 'deepseek') {
   return { run: await f.service.read(run.id), sender, actor, url };
 }
 
+for(const provider of ['chatgpt','deepseek']) test(`${provider} fetch again observes a failed reply without authorizing another submission`,async()=>{
+  const f=fixture(),first=await submitted(f,'job-1',provider);
+  await f.service.event(first.run.id,first.actor,{kind:'result',raw:'invalid JSON',url:first.url},first.sender);
+  assert.equal((await f.service.read(first.run.id)).phase,'invalid');
+  const fresh=await f.service.refetch(first.run.id);
+  assert.equal(fresh.sendIntentAt,first.run.sendIntentAt);assert.equal(fresh.phase,'submitted');
+  const attach=await f.service.attach(first.run.id,'refetch-actor',f.sender(fresh));
+  assert.equal(attach.mode,'observe');
+  const authorization=await f.service.event(first.run.id,'refetch-actor',{kind:'authorize',baseline:{users:0,answers:0}},f.sender(fresh));
+  assert.equal(authorization.granted,false);
+  f.service.dispose();
+});
+test('fetch again cannot prepare an unsent prompt',async()=>{
+  const f=fixture(),run=await f.service.start('job-1','chatgpt');
+  await assert.rejects(f.service.refetch(run.id),/No submission attempt/);f.service.dispose();
+});
+
 test('prompts bind immutable candidate/job data and output validation preserves fixed facts', () => {
   const item = job(), data = envelope(item, 'run-1'), prompt = generationPrompt(item, 'run-1');
   assert.ok(prompt.startsWith('DOCUMENT_RUN:run-1'));
