@@ -10,5 +10,6 @@ export function parseManualResume(source, request) {
   const envelope = value && Object.hasOwn(value, 'resume') ? value : { schemaVersion: 1, requestId: request.id, resume: value };
   if (Object.hasOwn(envelope, 'coverLetter')) delete envelope.coverLetter;
   if (Object.hasOwn(envelope, 'runId')) delete envelope.runId;
+  if (Object.hasOwn(envelope, 'job')) delete envelope.job;
   return parseResume(JSON.stringify(envelope), request);
 }

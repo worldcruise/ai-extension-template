@@ -99,3 +99,19 @@ test('a failed tab switch releases the controls and a later refresh can recover'
   assert.equal(latest.count, 2);
   navigation.dispose();
 });
+
+test('pending navigation publishes the destination so capture eligibility changes before load completes', async () => {
+  const data = fixture([{ id: 1, windowId: 1, index: 0, active: true, url: 'https://jobs.example.test/job' }]);
+  let latest;
+  const navigation = createBrowserTabs({ browser: data.browser, onChange: state => { latest = state; } });
+  await navigation.ready;
+  assert.equal(latest.url, 'https://jobs.example.test/job');
+  data.rows[0].pendingUrl = 'https://mail.google.com/mail/';
+  data.browser.tabs.onUpdated.emit(1, { status: 'loading' }, data.rows[0]);
+  await navigation.refresh();
+  assert.equal(latest.url, 'https://mail.google.com/mail/');
+  delete data.rows[0].pendingUrl;
+  await navigation.refresh();
+  assert.equal(latest.url, 'https://jobs.example.test/job', 'cancelled navigation restores the actual page');
+  navigation.dispose();
+});

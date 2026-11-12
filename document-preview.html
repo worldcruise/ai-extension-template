@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en" data-preview-state="loading">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Document preview</title>
+  <link rel="icon" href="assets/icon-32.png">
+  <link rel="stylesheet" href="src/document-preview.css">
+</head>
+<body>
+  <main class="document-preview-page">
+    <header class="document-preview-heading">
+      <div><p id="document-preview-kind" class="document-preview-kind">Downloaded document</p><h1 id="document-preview-filename">Document preview</h1></div>
+      <button id="document-preview-open" type="button" disabled>Open downloaded file</button>
+    </header>
+    <p id="document-preview-status" role="status" aria-live="polite">Loading downloaded document…</p>
+    <iframe id="document-preview-pdf" title="Downloaded PDF preview" referrerpolicy="no-referrer" hidden></iframe>
+    <pre id="document-preview-text" tabindex="0" hidden></pre>
+  </main>
+  <script type="module" src="src/document-preview.mjs"></script>
+</body>
+</html>

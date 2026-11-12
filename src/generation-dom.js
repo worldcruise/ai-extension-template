@@ -63,7 +63,8 @@
   function completedJSON(raw, run) {
     try {
       const value = JSON.parse(raw.trim().replace(/^```(?:json)?\s*\n?([\s\S]*?)\n?```$/i, '$1'));
-      return value?.requestId === run.jobId && value?.runId === run.id && value.resume && typeof value.coverLetter === 'string';
+      const matched = value?.requestId === run.jobId && value?.runId === run.id;
+      return matched && (run.kind === 'job-cleanup' ? value.kind === 'job-cleanup' && value.job && typeof value.job.description === 'string' : value.resume && typeof value.coverLetter === 'string');
     } catch { return false; }
   }
   globalThis.AiAgentGenerationDOM = { visible, text, normal, editor, firstVisible, disabled, sendControl, hasAttachment, fill, userNodes, userTurn, after, answerText, completedJSON };

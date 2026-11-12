@@ -6,22 +6,30 @@ import { resumeTemplates, resumeTemplate } from './resume-templates.mjs';
 import { metadataProvenance, provenanceLabel } from './job-metadata.mjs';
 import { updateReadPageHint } from './shortcut-settings.mjs';
 import { requestJobPageAccess } from './job-page-access.mjs';
+import { canCaptureJobUrl } from './job-capture-url.mjs';
 import { duplicateCheckStorageKey, duplicateJobUrl, jobUrlInList } from './job-duplicates.mjs';
 import { createQueueDocuments } from './queue-documents.mjs';
+import { createManualJobForm } from './manual-job-form.mjs';
 import { phaseLabel, runningPhases } from './generation-data.mjs';
+import { normalizeDocumentSettings } from './document-settings.mjs';
+import { cleanupInput,isHiringCafe } from './job-cleanup.mjs';
+import { readJobAnalysisSetting } from './job-analysis-settings.mjs';
+import { companyMonogram, createApplyJobs } from './apply-jobs.mjs';
 
-export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
-  generations, getChatProvider = () => 'chatgpt', getCurrentChat = () => null }) {
+export function createStudio({ openDialog, showStudio, showChat, syncChat = async () => {}, moveTab, queue,
+  generations, openApplication, getChatProvider = () => 'chatgpt', getCurrentChat = () => null }) {
   const q = selector => document.querySelector(selector);
   let requests = [];
   const documents = createQueueDocuments({ queue, openDialog,
     getRequest: id => requests.find(item => item.id === id && item.input.candidateId === candidateId()),
-    onSaved: () => { clearPreview(); showStudio('results'); status('Resume and cover letter saved on this job.'); }
+    onSaved: () => { clearPreview(); showStudio(q('#apply-tab').getAttribute('aria-selected') === 'true' ? 'apply' : 'results'); status('Resume and cover letter saved on this job.'); }
   });
+  const manualJob = createManualJobForm({ openDialog, saveRequest });
   let profiles = { ...exampleProfiles };
   let initialized = false;
   const pendingActions = new Set();
   const awaitingReview = new Set();
+  const captureFallbacks = new Set();
   let noticeTimer, duplicateOptionSaving = false;
   function showNotice(title, message) {
     clearTimeout(noticeTimer);
@@ -52,6 +60,18 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
   let currentTabId = null;
   let currentTabUrl = '', currentTabBusy = false;
   let previewId = null;
+  let expandedCard = null;
+  const applyJobs = createApplyJobs({ onSelectionChange: request => {
+    clearPreview();
+    if (q('#apply-tab').getAttribute('aria-selected') === 'true') syncApplyChat(request);
+  } });
+  function syncApplyChat(request = applyJobs.selected()) {
+    const url = request && (generations.forJob(request.id)?.url || requestChatUrl(request));
+    void syncChat(url).catch(error => {
+      if (request && applyJobs.selected()?.id === request.id) q('#apply-feedback').textContent = error.message;
+    });
+  }
+  q('#apply-tab').addEventListener('click', () => syncApplyChat());
   let detailRequestId = null;
   let queueSearch = '', queueFilter = 'all';
   let reading = null;
@@ -104,6 +124,10 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     q('#candidate').replaceChildren(...groups.filter(group => group.children.length));
     q('#candidate').value = profiles[selected] ? selected : options.find(item => !item.isExample)?.id || options[0]?.id;
     renderCandidate(); renderQueue();
+    if (q('#request-dialog').open) {
+      const current = requests.find(request => request.id === detailRequestId && request.input.candidateId === candidateId() && request.state !== 'cancelled');
+      if (current) requestDetails(current, false); else q('#request-dialog').close();
+    }
   }
   q('#resume-template').replaceChildren(...resumeTemplates.map(template => {
     const option = document.createElement('option');
@@ -130,13 +154,12 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
   }
   function clearPreview() {
     previewId = null;
-    q('#resume-preview').hidden = true;
-    q('#resume-preview').open = false;
+    if (q('#resume-preview-dialog').open) q('#resume-preview-dialog').close();
     q('#resume-paper').replaceChildren();
   }
   function renderQueue() {
     q('#studio-dock-toggle .preview-label').textContent = 'Saved jobs';
-    const all = requests.filter(request => request.input.candidateId === candidateId() && request.state !== 'cancelled');
+    const all = requests.filter(request => request.input.candidateId === candidateId() && request.state !== 'cancelled' && !request.capturePending);
     const own = all;
     const matches = request => {
       const text = `${request.input.job.company} ${request.input.job.role}`.toLocaleLowerCase();
@@ -153,77 +176,116 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
       const company = input.tailor ? input.job.company || 'Company not provided' : 'Base resume';
       const card = element('li', 'job-request');
       card.dataset.requestId = String(request.id);
-      const top = element('div', 'request-top');
-      const title = element('div', 'request-title');
-      const heading = action('', null, 'details', request.id);
-      heading.className = 'request-title-button';
-      heading.setAttribute('aria-label', `View job details for ${input.job.role} at ${company}`);
-      heading.append(element('strong', '', company), element('p', '', input.job.role));
-      title.append(heading);
+      const top = action('', null, 'toggle-card', request.id);
+      top.className = 'request-top request-title-button';
+      top.setAttribute('aria-label', `Expand or collapse ${input.job.role} at ${company}`);
+      top.setAttribute('aria-expanded', String(expandedCard === String(request.id)));
+      top.setAttribute('aria-controls', `job-actions-${request.id}`);
+      const title = element('span', 'request-title');
+      title.append(element('strong', '', company), element('span', 'request-role', input.job.role));
+      if (input.tailor && typeof input.job.salary === 'string' && input.job.salary.trim()) {
+        const salary = element('span','request-salary', input.job.salary.trim());
+        if (input.job.salaryBasis) salary.title = input.job.salaryBasis;
+        title.append(salary);
+      }
+      const stamp = element('span', 'request-stamp');
       const pill = element('span', 'state-pill');
       pill.dataset.state = request.state;
-      const labels = { ready: request.isExample ? 'Ready' : 'Ready for review', queued: 'Queued', attention: 'Needs attention' };
+      const labels = { ready: 'Ready', queued: 'Queued', attention: 'Needs attention' };
       pill.append(icon(request.state === 'ready' ? 'check' : 'clock'), document.createTextNode(labels[request.state] || request.state));
-      top.append(element('span', 'company-mark', company[0]), title, pill);
-      const number = typeof request.id === 'number' ? String(request.id).padStart(3, '0') : request.id.slice(0, 8);
-      const meta = element('div', 'request-meta', `${input.profile.name.split(' ')[0]} · ${resumeTemplate(input.resumeTemplate).name} · #${number}`);
+      stamp.append(pill);
+      const chevron = icon('chevron-down'); chevron.classList.add('card-chevron'); stamp.append(chevron);
       if (request.updatedAt) {
         const date = new Date(request.updatedAt);
         if (Number.isFinite(date.getTime())) {
-          const stamp = element('time', 'request-updated', date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
-          stamp.dateTime = date.toISOString(); stamp.title = `Updated ${date.toLocaleString()}`; meta.append(stamp);
+          const time = element('time', 'request-updated', `Updated ${date.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })}`);
+          time.dateTime = date.toISOString(); time.title = date.toLocaleString(); stamp.append(time);
         }
       }
-      if (request.state === 'ready' && request.isExample) {
-        const saved = element('span', 'example-saved');
-        saved.append(icon('check'), document.createTextNode('Saved example'));
-        meta.append(saved);
-      }
-      card.append(top, meta);
-      if (request.isExample) card.append(element('p', 'field-hint', 'Example result'));
-      const actions = element('div', 'request-actions');
-      if (!request.isExample) {
-        const run = generations.forJob(request.id);
-        const complete = run && ['complete', 'invalid'].includes(run.phase);
-        const stopped = run && ['attention', 'stopped'].includes(run.phase);
-        const name = !run ? 'generate' : complete ? 'review-generation' : stopped ? 'resume-generation' : 'open-generation';
-        const label = !run ? 'Generate documents' : complete ? 'Review documents' : stopped ? 'Resume' : 'Open AI tab';
-        const primary = action(label, 'sparkles', name, request.id); primary.classList.add('generation-action');
-        actions.append(primary);
-        if (run) {
-          const note = element('p', 'generation-status', `${run.provider === 'deepseek' ? 'DeepSeek' : 'ChatGPT'} · ${phaseLabel(run)}${run.error ? '. ' + run.error : ''}`);
-          note.setAttribute('role', 'status'); card.append(note);
-          if (complete || stopped) actions.append(action('Open AI tab', 'external', 'open-generation', request.id));
-          if (runningPhases.includes(run.phase)) actions.append(action('Stop tracking', 'close', 'stop-generation', request.id));
-        }
-      }
-      actions.append(action('Details', 'file', 'details', request.id));
+      if (request.isExample) stamp.append(element('span', 'example-saved', 'Example'));
+      const logo = element('span', 'company-monogram', companyMonogram(company));
+      logo.setAttribute('aria-hidden', 'true');
+      const identity = element('span', 'request-identity'); identity.append(logo, title);
+      top.append(identity, stamp); card.append(top);
+      const controls = element('div', 'request-controls');
+      const details = action('View detail', 'info', 'details', request.id); details.classList.add('request-detail-button');
+      const toolsBody = element('div', 'request-tools-body'); toolsBody.id = `job-actions-${request.id}`;
+      toolsBody.hidden = expandedCard !== String(request.id);
+      const updated = stamp.querySelector('time'); if (updated) toolsBody.append(updated);
+      const links = element('div', 'request-links');
       const jobUrl = safeJobUrl(input.job.url);
       if (jobUrl) {
-        const link = element('a', 'button', 'Go to apply');
-        link.href = jobUrl; link.target = '_blank'; link.rel = 'noopener noreferrer'; actions.append(link);
+        const link = element('a', 'button');
+        link.append(icon('external'), document.createTextNode('Go to apply'));
+        link.dataset.action = 'apply'; link.dataset.request = String(request.id);
+        if (pendingActions.has(`apply:${request.id}`)) link.setAttribute('aria-busy', 'true');
+        link.href = jobUrl; link.target = '_blank'; link.rel = 'noopener noreferrer'; links.append(link);
       }
       if (request.state === 'ready' || requestChatUrl(request)) {
         const review = action('Open chat', 'chat', 'review', request.id);
         review.disabled = !requestChatUrl(request);
         review.title = review.disabled ? 'No originating conversation is recorded. Open Details to inspect this result.' : 'Open this result’s originating conversation';
-        actions.prepend(review);
+        links.append(review);
       }
-      if (request.state === 'ready') actions.append(action('View resume', 'file', 'preview', request.id));
-      const editDocuments = action('Documents', 'file-pen', 'documents', request.id);
-      actions.append(editDocuments);
-      if (['queued', 'attention'].includes(request.state)) actions.append(action('Cancel', 'close', 'cancel', request.id));
-      card.append(actions);
+      if (links.children.length) toolsBody.append(links);
+      if (request.state === 'ready' && request.resume) {
+        const apply = action('Apply to job', 'external', 'prepare-application', request.id);
+        apply.classList.add('primary', 'request-main-action'); controls.append(apply);
+      }
+      if (!request.isExample) {
+        const generation = element('div', 'request-generation');
+        const actions = element('div', 'generation-actions');
+        const run = generations.forJob(request.id);
+        const complete = run && ['complete', 'invalid'].includes(run.phase);
+        const stopped = run && (['attention', 'stopped'].includes(run.phase) || run.provider === 'deepseek' && run.trackingState === 'suspended');
+        const name = !run ? 'generate' : complete ? 'review-generation' : stopped ? 'resume-generation' : 'open-generation';
+        const label = !run ? 'Generate documents' : complete ? 'Review documents' : stopped ? 'Resume' : 'Open AI tab';
+        const primary = action(label, 'sparkles', name, request.id); primary.classList.add('generation-action');
+        if (request.state === 'ready' && request.resume) actions.append(primary);
+        else { primary.classList.add('primary', 'request-main-action'); controls.append(primary); }
+        if (run) {
+          const note = element('p', 'generation-status', `${run.provider === 'deepseek' ? 'DeepSeek' : 'ChatGPT'} · ${phaseLabel(run)}${run.error ? '. ' + run.error : ''}`);
+          note.setAttribute('role', 'status'); note.title = note.textContent;
+          if (request.state === 'ready' && !run.error) generation.append(note); else card.append(note);
+          if (complete || stopped) actions.append(action('Open AI tab', 'external', 'open-generation', request.id));
+          if (run.phase === 'complete') {
+            const download = action('Download files', 'download', 'download-generation', request.id);
+            download.disabled = ['starting', 'downloading'].includes(run.downloads?.state); actions.append(download);
+          }
+          if (run.downloads && run.downloads.state !== 'skipped') {
+            const downloadText = ({ starting: run.downloads.autoSave && !run.downloads.savedAt ? 'Saving documents…' : 'Preparing downloads…', downloading: 'Downloading documents…', complete: run.downloads.savedAt ? 'Documents saved and downloaded.' : 'Documents downloaded.', partial: 'Downloads need attention.', failed: 'Documents could not be downloaded. Use Download files to retry.' })[run.downloads.state] || '';
+            const message = [...(run.downloads.errors || []).map(item => item.message), ...(run.downloads.files || []).filter(item => item.error).map(item => item.error)].join(' ');
+            const note = element('p', 'generation-status', [downloadText, message].filter(Boolean).join(' '));
+            if (['partial', 'failed'].includes(run.downloads.state)) card.append(note); else generation.append(note);
+          }
+          if (runningPhases.includes(run.phase)) actions.append(action('Stop tracking', 'close', 'stop-generation', request.id));
+        }
+        generation.append(actions); toolsBody.append(generation);
+      }
+      const actions = element('div', 'request-actions');
+      actions.setAttribute('role', 'group'); actions.setAttribute('aria-label', `Documents and actions for ${company}`);
+      const resume = action('Resume', 'file', 'preview', request.id);
+      resume.disabled = !request.resume || request.documentsStale;
+      resume.title = resume.disabled ? 'Generate documents or use Update to save a resume first.' : 'View saved resume';
+      const letter = action('Cover letter', 'mail', 'cover-letter', request.id);
+      letter.disabled = !request.coverLetterEnabled || !request.coverLetter?.trim();
+      letter.title = letter.disabled ? 'Use Update to save and include a cover letter first.' : 'View saved cover letter';
+      const remove = action('Delete', 'trash', 'cancel', request.id); remove.classList.add('danger');
+      remove.title = `Remove ${company} from the queue`;
+      actions.append(resume, letter, action('Update', 'file-pen', 'documents', request.id), remove);
+      toolsBody.prepend(actions); controls.append(details); card.append(controls, toolsBody);
       return card;
     };
     q('#resume-queue').replaceChildren(...visible.map(renderCard));
+    applyJobs.render({ jobs: own, candidate: { id: candidateId(), name: profile().name },
+      currentTabUrl, pending: pendingActions });
     const counts = own.reduce((total, request) => { total[request.state] = (total[request.state] || 0) + 1; return total; }, {});
     const parts = [];
     if (counts.ready) parts.push(`${counts.ready} ready`);
     if (counts.queued) parts.push(`${counts.queued} queued`);
     if (counts.attention) parts.push(`${counts.attention} need attention`);
     q('#queue-summary').textContent = parts.join(' · ') || 'Queue empty';
-    renderCurrentJob();
+    renderCurrentJob(); renderCaptures();
   }
 
   function safeJobUrl(value) {
@@ -241,7 +303,7 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
       : 'Add This Job in One Click';
   }
   function canCaptureCurrentJob() {
-    return initialized && Number.isInteger(currentTabId) && currentTabId >= 0 && Boolean(safeJobUrl(currentTabUrl)) &&
+    return initialized && Number.isInteger(currentTabId) && currentTabId >= 0 && canCaptureJobUrl(currentTabUrl) &&
       !jobUrlInList(currentTabUrl, candidateId(), requests);
   }
   q('#queue-search').addEventListener('input', event => { queueSearch = event.target.value.trim().toLocaleLowerCase(); renderQueue(); });
@@ -253,36 +315,86 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
       resumeTemplate: q('#resume-template').value, promptTemplate: q('#prompt-template').value,
       prompt: prompts[q('#prompt-template').value].text });
     const checkExisting = q('#check-existing-jobs').checked;
+    const options = { checkExisting, checkExistingUrl: true };
+    let extracted = {}, pendingJobId;
+    const manual = reason => {
+      q('#queue-notice').hidden = true; clearTimeout(noticeTimer);
+      const applyUrl = extracted.cleanupEvidence?.applyUrls?.[0];
+      manualJob.open({ ...input, job: { ...extracted, url: isHiringCafe(url) ? applyUrl || '' : url, tabId } }, {...options,...(pendingJobId ? {captureJobId:pendingJobId} : {})}, reason);
+    };
     void perform(async () => {
-      // Request site access in this click's gesture, before any other await.
-      const response = await readPage(tabId, { askAccess: true, showErrorDialog: false });
-      if (!response) {
-        showNotice('Job was not added', readFeedback.get(tabId)?.message || 'Try again when the job page is ready.');
-        return;
-      }
-      const latest = await chrome.tabs.get(tabId).catch(() => null);
-      if (tabId !== currentTabId || currentTabUrl !== url || latest?.url !== url || candidateId() !== input.candidateId ||
-          duplicateJobUrl(response.fields?.url) !== duplicateJobUrl(url)) {
-        showNotice('Job was not added', 'The page or selected profile changed. Click Add This Job on the page you want to save.');
-        return;
-      }
-      if (jobUrlInList(url, input.candidateId, queue.snapshot().requests)) return;
-      const fields = response.fields;
-      if (!fields.description?.trim()) {
-        showStudio('job');
-        showNotice('Add the job description', 'This page did not provide a job description. Review the form before saving.');
-        q('#job-description').focus();
-        return;
-      }
-      // Use the freshly read page, never a manually entered URL or another tab's draft.
-      input.job = { company: fields.company?.trim() || '', role: fields.role?.trim() || input.profile.role,
-        url: fields.url, description: fields.description.trim(), tabId, provenance: response.provenance };
-      try { await saveRequest(input, { checkExisting, checkExistingUrl: true }); }
-      catch (error) {
-        if (error.code !== 'already-applied') showNotice('Job was not added', error.message);
-        throw error;
-      }
+      try {
+        // Request site access in this click's gesture, before any other await.
+        const response = await readPage(tabId, { askAccess: true, showErrorDialog: false });
+        if (!response) {
+          manual(readFeedback.get(tabId)?.message || 'The page could not be read. Enter the job details manually.');
+          return;
+        }
+        if (duplicateJobUrl(response.fields?.url) === duplicateJobUrl(url)) extracted = { ...response.fields, provenance: response.provenance };
+        const latest = await chrome.tabs.get(tabId).catch(() => null);
+        if (tabId !== currentTabId || currentTabUrl !== url || latest?.url !== url || candidateId() !== input.candidateId ||
+            duplicateJobUrl(response.fields?.url) !== duplicateJobUrl(url)) {
+          manual('The page or selected profile changed. Review the original job details below before saving.');
+          return;
+        }
+        if (jobUrlInList(url, input.candidateId, queue.snapshot().requests)) return;
+        const fields = response.fields;
+        if (!fields.description?.trim()) {
+          manual('This page did not provide a job description. Paste it below to add the job.');
+          return;
+        }
+        // Use the freshly read page, never a manually entered URL or another tab's draft.
+        input.job = { company: fields.company?.trim() || '', role: fields.role?.trim() || '',
+          url: fields.url, description: fields.description.trim(), ...(fields.salary?.trim() ? {salary:fields.salary.trim()} : {}),tabId, provenance: response.provenance };
+        const analyzeWithAI = await readJobAnalysisSetting().catch(()=>false);
+        status('Finding the application link…');
+        const applyUrls = await generations.applyUrls(tabId,url);
+        if (!analyzeWithAI) {
+          if (isHiringCafe(url)) input.job.url = applyUrls[0];
+          await saveRequest(input,options);
+          return;
+        }
+        const cleanedInput = cleanupInput(input,{...response.cleanupEvidence,applyUrls});
+        extracted = cleanedInput.job;
+        pendingJobId = await queue.add(cleanedInput,{...options,capturePending:true});
+        await generations.capture(pendingJobId,getChatProvider());
+        status('AI is cleaning the job. Its card will appear after the JSON is validated.');
+      } catch (error) { manual(error.message || 'The job could not be added automatically. Review its details below.'); }
     }, 'add');
+  });
+
+  function editCapture(request, reason) {
+    const input = structuredClone(request.input);
+    input.job.url = input.job.cleanupEvidence?.applyUrls?.[0] || (isHiringCafe(input.job.url) ? '' : input.job.url);
+    manualJob.open(input,{captureJobId:request.id},reason || 'Review the job details and employer Apply URL.');
+  }
+  function renderCaptures() {
+    const container = q('#job-capture-progress');
+    const pending = requests.filter(request=>request.capturePending && request.state !== 'cancelled' && request.input.candidateId === candidateId());
+    container.hidden = !pending.length;
+    container.replaceChildren(...pending.map(request=>{
+      const run = generations.captures().find(run=>run.jobId === request.id), row = element('div','job-capture-progress-row');
+      const label = run ? run.phase === 'generating' ? 'Cleaning job details with AI…' : run.phase === 'validating' ? 'Validating job JSON…' : phaseLabel(run) : 'AI job cleanup is waiting';
+      const message = element('p','generation-status', `${request.input.job.company || 'Job capture'} · ${label}${run?.error ? '. '+run.error : ''}`);
+      message.setAttribute('role','status'); row.append(message);
+      const active = run && (runningPhases.includes(run.phase) && run.trackingState !== 'suspended' || ['complete','invalid'].includes(run.phase));
+      for (const [text,name] of [[active ? 'Open AI tab' : 'Resume',active ? 'open' : 'resume'],['Enter manually','manual'],['Cancel','cancel']]) {
+        const button = element('button','button',text); button.type='button'; button.dataset.captureAction=name; button.dataset.captureJob=request.id; row.append(button);
+      }
+      return row;
+    }));
+  }
+  q('#job-capture-progress').addEventListener('click',event=>{
+    const button = event.target.closest('button[data-capture-action]'); if (!button) return;
+    const request = requests.find(request=>request.id === button.dataset.captureJob && request.capturePending && request.state !== 'cancelled');
+    if (!request) return;
+    const run = generations.captures().find(run=>run.jobId === request.id), name = button.dataset.captureAction;
+    if (name === 'manual') {editCapture(request,run?.error);return;}
+    void perform(async()=>{
+      if (name === 'cancel') {if (run) await generations.stop(run.id);await queue.cancel(request.id);}
+      else if (run) await generations.open(run.id,name === 'resume');
+      else await generations.capture(request.id,getChatProvider());
+    },`capture:${request.id}`);
   });
 
   function updateTabs({ count, index, tabId, url, busy }) {
@@ -419,7 +531,7 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     connect.title = !current ? 'Open a conversation in Chat first' : 'Connect the current conversation to this saved company';
     connect.replaceChildren(icon('link'), document.createTextNode(source ? 'Replace with current chat' : 'Connect current chat'));
   }
-  function requestDetails(request) {
+  function requestDetails(request, reveal = true) {
     detailRequestId = request.id;
     const { input } = request;
     q('#request-dialog-title').textContent = `${input.tailor ? input.job.company : 'Base resume'} · #${String(request.id).padStart(3, '0')}`;
@@ -430,6 +542,8 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     ];
     const provenance = metadataProvenance(input.job);
     metadata.push(['Company source', provenanceLabel(provenance.company)], ['Job title source', provenanceLabel(provenance.role)]);
+    if (input.job.salary) metadata.push(['Salary',input.job.salary],['Salary source',input.job.salarySource === 'estimated' ? 'AI estimate (not listed)' : input.job.salarySource === 'listed' ? 'Listed in the job' : 'Entered or extracted']);
+    if (input.job.salaryBasis) metadata.push(['Estimate assumptions',input.job.salaryBasis]);
     if (input.tailor && input.job.url) metadata.push(['Source URL', input.job.url]);
     q('#request-metadata').replaceChildren(...metadata.flatMap(([label, value]) => [element('dt', '', label), element('dd', '', value)]));
     q('#request-prompt').textContent = input.prompt;
@@ -440,34 +554,11 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     q('#request-output-section').hidden = !request.resume && !request.rawOutput;
     q('#request-output').textContent = request.resume ? JSON.stringify(request.resume, null, 2) : request.rawOutput || '';
     renderSource(request);
-    renderGenerationDetails();
-    openDialog('request-dialog');
+    if (reveal) openDialog('request-dialog');
   }
-  function renderGenerationDetails() {
-    const run = generations.forJob(detailRequestId);
-    q('#request-generation-section').hidden = !run;
-    q('#request-generation-status').textContent = run ? `${phaseLabel(run)}${run.error ? '. ' + run.error : ''}` : '';
-    q('#request-generation-diagnostics').textContent = run?.diagnostics || run?.captureDiagnostics ? JSON.stringify({
-      ...(run.diagnostics ? { submission: { checkedAt: new Date(run.diagnosticAt).toISOString(), ...run.diagnostics } } : {}),
-      ...(run.captureDiagnostics ? { capture: { checkedAt: new Date(run.captureDiagnosticAt).toISOString(), ...run.captureDiagnostics } } : {})
-    }, null, 2) : 'No AI diagnostics have been recorded for this run yet.';
-    q('#copy-generation-diagnostics').hidden = !run?.diagnostics && !run?.captureDiagnostics;
-  }
-  q('#copy-generation-diagnostics').addEventListener('click', async () => {
-    const text = q('#request-generation-diagnostics').textContent;
-    try { await navigator.clipboard.writeText(text); status('Submission diagnostics copied.'); }
-    catch {
-      const range = document.createRange(); range.selectNodeContents(q('#request-generation-diagnostics'));
-      const selection = window.getSelection(); selection.removeAllRanges(); selection.addRange(range);
-      status('Diagnostics selected. Press Ctrl+C or Command+C to copy.');
-    }
-  });
   function preview(request) {
     if (request.state !== 'ready' || !request.resume) return;
     previewId = request.id;
-    showStudio('results');
-    q('#resume-preview').hidden = false;
-    q('#resume-preview').open = true;
     q('#resume-preview-title').textContent = `${request.input.tailor ? request.input.job.company : 'Base resume'} · ${request.isExample ? 'Example resume' : 'Resume'}`;
     const paper = q('#resume-paper');
     const data = request.resume;
@@ -488,16 +579,28 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
       }
     }
     if (data.education.length) paper.append(element('h3', '', 'Education'), ...data.education.map(item => element('p', '', [item.degree, item.institution, [item.startDate, item.endDate].filter(Boolean).join(' – ')].filter(Boolean).join(' · '))));
-    q('#resume-preview').scrollIntoView({ block: 'start' });
+    openDialog('resume-preview-dialog');
     status(`Previewing the ${resumeTemplate(request.input.resumeTemplate).name} resume · ${data.company}`);
   }
 
   function requestAction(event) {
     const button = event.target.closest('button[data-action]');
-    if (!button) return;
+    if (!button || button.disabled) return;
     const request = requests.find(item => String(item.id) === button.dataset.request && item.input.candidateId === candidateId());
     if (!request) return;
-    if (['generate', 'review-generation', 'resume-generation', 'open-generation', 'stop-generation'].includes(button.dataset.action)) {
+    if (button.dataset.action === 'toggle-card') {
+      expandedCard = expandedCard === String(request.id) ? null : String(request.id);
+      for (const card of q('#resume-queue').children) {
+        const expanded = card.dataset.requestId === expandedCard;
+        card.querySelector('.request-title-button').setAttribute('aria-expanded', String(expanded));
+        card.querySelector('.request-tools-body').hidden = !expanded;
+      }
+      return;
+    }
+    if (button.dataset.action === 'prepare-application') {
+      applyJobs.select(request.id); showStudio('apply'); syncApplyChat(request); return;
+    }
+    if (['generate', 'review-generation', 'resume-generation', 'open-generation', 'stop-generation', 'download-generation'].includes(button.dataset.action)) {
       const name = button.dataset.action;
       void perform(async () => {
         const run = generations.forJob(request.id);
@@ -506,6 +609,7 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
           try { await generations.start(request.id, getChatProvider()); status('Document generation connected to the AI tab. Progress is saved while the dock is closed.'); }
           catch (error) { awaitingReview.delete(request.id); throw error; }
         } else if (name === 'review-generation') await reviewGeneration(request.id, run.id);
+        else if (name === 'download-generation') await generations.download(run.id);
         else if (name === 'stop-generation') { awaitingReview.delete(request.id); await generations.stop(run.id); status('Tracking stopped. Any response already generating stays in the AI tab.'); }
         else { if (name === 'resume-generation') awaitingReview.add(request.id); await generations.open(run.id, name === 'resume-generation'); }
       }, `${name}:${request.id}`);
@@ -517,17 +621,63 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
       if (url) showChat(url);
     }
     if (button.dataset.action === 'preview') preview(request);
+    if (button.dataset.action === 'cover-letter' && request.coverLetterEnabled && request.coverLetter?.trim()) {
+      q('#cover-letter-context').textContent = `${request.input.job.company || 'Base resume'} · ${request.input.job.role}`;
+      q('#cover-letter-copy').textContent = request.coverLetter;
+      openDialog('cover-letter-dialog');
+    }
     if (button.dataset.action === 'documents') documents.open(request.id);
+    if (button.dataset.action === 'documents-letter') documents.open(request.id, { focus: 'cover-letter' });
+    if (['download-resume', 'download-cover-letter'].includes(button.dataset.action)) {
+      const name = button.dataset.action;
+      void perform(async () => {
+        await generations.downloadSaved(request.id, name === 'download-resume' ? 'resume' : 'cover-letter');
+        status('Saved document download started.');
+      }, `${name}:${request.id}`);
+    }
     if (button.dataset.action === 'cancel') {
       void perform(async () => {
         const run = generations.forJob(request.id);
         if (run) await generations.stop(run.id);
         awaitingReview.delete(request.id);
-        await queue.cancel(request.id); if (previewId === request.id) clearPreview(); status(`Request cancelled · ${request.input.job.company}`);
+        await queue.cancel(request.id); if (previewId === request.id) clearPreview(); status(`Removed from queue · ${request.input.job.company}`);
       }, `cancel:${request.id}`);
     }
   }
+  function applyFromLink(event, request) {
+    if (!request || typeof openApplication !== 'function' || event.defaultPrevented || event.button !== 0 ||
+        event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    void perform(async () => {
+      try {
+        const result = await openApplication(request);
+        const message = result?.warning || (result?.aiTab ? 'Job listing opened. AI chat is available in the background.' : 'Job listing opened.');
+        status(message);
+        if (q('#apply-feedback').dataset.request === String(request.id)) q('#apply-feedback').textContent = result?.warning || 'Application page opened. Your documents are ready to use.';
+      } catch (error) {
+        if (q('#apply-feedback').dataset.request === String(request.id)) q('#apply-feedback').textContent = error.message;
+        throw error;
+      }
+    }, `apply:${request.id}`);
+  }
+  q('#resume-queue').addEventListener('click', event => {
+    const link = event.target.closest('a[data-action="apply"]');
+    if (!link) return;
+    const request = requests.find(item => String(item.id) === link.dataset.request && item.input.candidateId === candidateId());
+    applyFromLink(event, request);
+  });
+  q('#request-job-link').addEventListener('click', event => {
+    const request = requests.find(item => item.id === detailRequestId && item.input.candidateId === candidateId());
+    applyFromLink(event, request);
+  });
   q('#resume-queue').addEventListener('click', requestAction);
+  q('#apply-panel').addEventListener('click', requestAction);
+  q('#apply-go-queue').addEventListener('click', () => showStudio('results'));
+  q('#apply-open-job').addEventListener('click', event => {
+    if (event.currentTarget.getAttribute('aria-disabled') === 'true') { event.preventDefault(); return; }
+    const request = requests.find(item => String(item.id) === event.currentTarget.dataset.request && item.input.candidateId === candidateId());
+    applyFromLink(event, request);
+  });
   q('#candidate').addEventListener('change', () => {
     renderCandidate();
     void queue.selectCandidate(candidateId()).catch(error => status(error.message));
@@ -596,7 +746,11 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
 
   async function saveRequest(input, options) {
     q('#queue-notice').hidden = true; clearTimeout(noticeTimer);
-    await queue.add(input, options);
+    if (options?.captureJobId) {
+      const run = generations.captures().find(run=>run.jobId === options.captureJobId);
+      if (run && runningPhases.includes(run.phase)) await generations.stop(run.id);
+      await queue.completeCapture(options.captureJobId,input);
+    } else await queue.add(input, options);
     clearPreview(); renderQueue();
     if (q('#chat-view').hidden) showStudio('results');
     status('Job saved to the queue.');
@@ -622,7 +776,10 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
     try { await navigator.clipboard.writeText(JSON.stringify(request.resume, null, 2)); status('Resume JSON copied.'); }
     catch { status('Could not copy. Open Review to select the JSON.'); }
   });
-  q('#export-resume').addEventListener('click', () => openDialog('export-dialog'));
+  q('#export-resume').addEventListener('click', () => {
+    const request = requests.find(item => item.id === previewId && item.input.candidateId === candidateId());
+    if (request) void perform(() => generations.downloadSaved(request.id, 'resume'), `download-resume:${request.id}`);
+  });
   q('#reset-examples').addEventListener('click', () => { void perform(async () => {
     await queue.loadExamples(); q('#profile-dialog').close(); q('#candidate').value = 'morgan';
     renderCandidate(); clearPreview(); renderQueue(); showStudio('results');
@@ -655,9 +812,13 @@ export function createStudio({ openDialog, showStudio, showChat, moveTab, queue,
   }
   const unsubscribeRuns = generations.subscribe(runs => {
     renderQueue();
-    if (q('#request-dialog').open) renderGenerationDetails();
+    for (const run of runs) if (run.kind === 'job-cleanup' && ['invalid','attention'].includes(run.phase) && !captureFallbacks.has(run.id)) {
+      const pending = requests.find(request=>request.id === run.jobId && request.capturePending && request.state !== 'cancelled' && request.input.candidateId === candidateId());
+      if (pending && !q('dialog[open]')) {captureFallbacks.add(run.id);editCapture(pending,run.error);}
+    }
     for (const run of runs) if (awaitingReview.has(run.jobId) && ['complete', 'invalid'].includes(run.phase)) {
       awaitingReview.delete(run.jobId);
+      if (normalizeDocumentSettings(run.documentSettings).autoDownload) continue;
       void reviewGeneration(run.jobId, run.id).catch(error => status(error.message));
     }
   });

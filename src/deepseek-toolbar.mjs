@@ -200,11 +200,12 @@ export function createDeepseekToolbar() {
   return {
     probe: () => command('probe'),
     getCurrentChat: () => connected ? deepseekRoutes.conversation(currentUrl) : null,
-    async openConversation(url) {
+    async openConversation(url, { isCurrent = () => true } = {}) {
       const target = deepseekRoutes.conversation(url);
       if (!target) throw new Error('This is not a DeepSeek conversation URL.');
       const deadline = Date.now() + 6000;
       while ((!connected || !state.ready) && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 100));
+      if (!isCurrent()) return;
       if (!connected || !state.ready) throw new Error('Wait for DeepSeek’s message box to load, then open this saved chat again.');
       if (target === currentUrl) return;
       if (state.hasDraft || state.busy || navigating) throw new Error('Finish your DeepSeek draft or response before opening a saved chat.');

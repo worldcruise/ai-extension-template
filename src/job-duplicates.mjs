@@ -29,7 +29,9 @@ export function duplicateJobUrl(value) {
 export function jobUrlInList(value, candidateId, requests = []) {
   const url = duplicateJobUrl(value);
   return Boolean(url && candidateId && requests.some(request => request.state !== 'cancelled' &&
-    request.input?.candidateId === candidateId && duplicateJobUrl(request.input.job?.url) === url));
+    request.input?.candidateId === candidateId && [request.input.job?.url,
+      request.capturePending || !/^https?:\/\/(?:[^/]+\.)?(?:hiring\.cafe|hiringcafe\.com)(?:\/|$)/i.test(request.captureSourceUrl || '') ? request.captureSourceUrl : null
+    ].some(value=>duplicateJobUrl(value) === url)));
 }
 
 export function findExistingJob(input, requests = []) {

@@ -1,0 +1,20 @@
+/* Shared palette from ApplicationTracker_v2.1's studio theme. */
+:root {
+  color-scheme: light;
+  font: 13px/1.55 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --background: #ffffff; --surface: #f5f6fa; --text: #182339; --muted: #5c687e;
+  --line: #e2e7ef; --accent: #4f46e5; --accent-ink: #4f46e5; --accent-text: #ffffff; --tint: #eeedff;
+  --header: #182339; --amber: #946000; --amber-bg: #fff4da; --shadow: #1823390a; --danger: #b42318;
+  --dock-surface: #e5e8f1; --dock-hover: #dbe0ef; --dock-selected: #d8d7f6; --dock-grip: #8290a6;
+  --field: #ffffff; --button-hover: #eef0fa; --success: #237552; --success-bg: #e9f5ee;
+  --queue-expanded: #e6eaf4;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #151f31; --surface: #0c1220; --text: #e5eaf3; --muted: #a5b2c6;
+  --line: #334155; --accent: #6558e8; --accent-ink: #b3abff; --accent-text: #ffffff; --tint: #292442;
+  --header: #e5eaf3; --amber: #f3cf87; --amber-bg: #342c20; --shadow: #00000022; --danger: #ffb4ab;
+  --dock-surface: #101929; --dock-hover: #243149; --dock-selected: #292442; --dock-grip: #7788a3;
+  --field: #101929; --button-hover: #243149; --success: #90dbb6; --success-bg: #18392f;
+  --queue-expanded: #28364e;
+}

@@ -11,7 +11,10 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
     field.value = ${JSON.stringify(value)};
     field.dispatchEvent(new Event(${JSON.stringify(event)}, { bubbles: true }));
   })()`);
-  const closeDialog = id => click(`#${id} [data-close-dialog]`);
+  const closeDialog = async id => {
+    await cdp.send('Page.bringToFront', {}, panel);
+    await read(`new Promise(resolve=>{const dialog=document.getElementById(${JSON.stringify(id)});if(!dialog.open){resolve();return;}dialog.addEventListener('close',resolve,{once:true});dialog.querySelector('[data-close-dialog]').click();})`);
+  };
   async function checkChatViewportAcrossCollapse(session, editor) {
     const settleLayout = () => read('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');
     await settleLayout();
@@ -252,11 +255,15 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await read('if (document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
   await read('document.getElementById("chat-toolbar-reveal").focus()');
   await until(() => read('!document.getElementById("company-chat-search").disabled'), 'expanded ChatGPT restores search readiness');
+  await until(() => evaluate(frameSession, '!document.documentElement.inert'), 'expanded ChatGPT restores native search interaction');
   await cdp.send('Page.bringToFront', {}, panel);
   await read('document.getElementById("company-chat-search").value="resume planning";document.getElementById("company-chat-search").focus()');
-  await cdp.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 }, panel);
+  await cdp.send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13, text: '\r' }, panel);
   await cdp.send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 }, panel);
-  await until(() => evaluate(frameSession, 'Boolean(document.getElementById("native-search-dialog")?.open) && document.querySelector("#native-search-dialog input").value === "resume planning"'), 'ChatGPT searches the typed query after Enter');
+  await until(() => evaluate(frameSession, 'Boolean(document.getElementById("native-search-dialog")?.open) && document.querySelector("#native-search-dialog input").value === "resume planning"'), 'ChatGPT searches the typed query after Enter').catch(async error => {
+    const details = await read('({focus:document.activeElement.id,query:document.getElementById("company-chat-search").value,toolbar:document.getElementById("chat-toolbar-shell").dataset.open,status:document.getElementById("native-search-status").textContent,chatHidden:document.getElementById("chat-view").hidden})');
+    throw new Error(`${error.message}: ${JSON.stringify(details)}`);
+  });
   await until(() => read('!document.getElementById("native-search-submit").disabled'), 'ChatGPT search readback finishes');
   assert.equal(await read('document.getElementById("native-search-status").hidden'), true, 'ChatGPT query accepted without error');
   assert.equal(await read('document.querySelectorAll("#company-chat-list").length'), 0, 'custom saved chat results removed');
@@ -273,6 +280,8 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await read('if (!document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
   assert.equal(await read('document.querySelectorAll(".job-request").length'), 3);
   await screenshot('workspace-queue.png');
+  assert.deepEqual(await read('[...document.querySelector(\'[data-request-id="1"] .request-actions\').children].map(button=>button.textContent)'), ['Resume', 'Cover letter', 'Update', 'Delete']);
+  assert.equal(await read('document.querySelector(\'[data-request-id="1"] [data-action="cover-letter"]\').disabled'), true, 'missing cover letters cannot open an empty document');
   await setValue('#queue-search', 'northstar', 'input');
   assert.equal(await read('document.querySelectorAll("#resume-queue .job-request").length'), 1, 'queue search matches a saved company');
   await setValue('#queue-filter', 'queued');
@@ -281,7 +290,7 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await setValue('#queue-filter', 'all');
   assert.equal(await read('document.querySelectorAll("#resume-queue .job-request").length'), 3, 'filters leave saved jobs intact');
 
-  assert.equal(await read('document.querySelectorAll(".state-pill[data-state=ready]").length'), 3);
+  assert.equal(await read('document.querySelectorAll("#resume-queue .state-pill[data-state=ready]").length'), 3);
   await click('[data-request-id="1"] [data-action="details"]');
   assert.equal(await read('document.getElementById("request-dialog").open'), true);
   assert.match(await text('#request-metadata'), /Morgan Taylor/);
@@ -299,18 +308,20 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   assert.equal(await read('document.getElementById("request-dialog").open'), false);
 
   await click('[data-request-id="1"] [data-action="preview"]');
+  assert.equal(await read('document.getElementById("resume-preview-dialog").open'), true);
   assert.match(await text('#resume-paper'), /Morgan Taylor/);
   assert.match(await text('#resume-paper'), /Education/);
   await screenshot('workspace-resume.png');
   await read('Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: async value => { globalThis.copiedResume = value; } } })');
   await click('#copy-json');
   assert.equal(JSON.parse(await read('globalThis.copiedResume')).company, 'Northstar');
+  await read("chrome.storage.local.set({documentSettings:{autoDownload:false,autoPreview:false,formats:['json']}})");
   await click('#export-resume');
-  assert.equal(await read('document.getElementById("export-dialog").open'), true);
-  assert.equal(await read('document.querySelectorAll(".export-format:disabled").length'), 2);
-  await closeDialog('export-dialog');
+  assert.equal(await read("import(chrome.runtime.getURL('src/generation-store.mjs')).then(m=>m.createGenerationStore().read()).then(state=>state.runs.some(run=>run.kind==='document-export'&&run.exportKinds[0]==='resume'))"), true);
+  await closeDialog('resume-preview-dialog');
   await click('[data-request-id="2"] [data-action="preview"]');
   assert.equal(await read('document.getElementById("resume-paper").dataset.template'), 'harvard');
+  await closeDialog('resume-preview-dialog');
 
   await click('#review-another');
   assert.equal(await read('document.getElementById("studio-scroll").scrollTop'), 0);
@@ -647,10 +658,11 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
         const fullHeight=(selector,bar)=>{const bounds=document.querySelector(selector).getBoundingClientRect();return bounds.top===bar.top && bounds.bottom===bar.bottom;};
         return bars.every(bar=>bar.height===40 && bar.left===0 && bar.right===innerWidth) &&
           getComputedStyle(job).backgroundColor===getComputedStyle(chat).backgroundColor &&
-          ['#job-tab','#results-tab','#studio-dock-toggle'].every(selector=>fullHeight(selector,bars[0])) &&
-          ['#chat-dock-toggle','#open-queue','#account-toggle'].every(selector=>fullHeight(selector,bars[1])) &&
-          document.getElementById('job-tab').getBoundingClientRect().left===0 &&
-          document.getElementById('chat-dock-toggle').getBoundingClientRect().left===0;
+          ['#job-tab','#results-tab','#apply-tab','#studio-dock-toggle'].every(selector=>fullHeight(selector,bars[0])) &&
+          ['.dock-provider-picker','#chat-dock-toggle','#open-queue','#account-toggle'].every(selector=>fullHeight(selector,bars[1])) &&
+          document.getElementById('apply-tab').getBoundingClientRect().left===0 &&
+          document.querySelector('.dock-provider-picker').getBoundingClientRect().left===0 &&
+          document.getElementById('chat-dock-toggle').getBoundingClientRect().left===document.querySelector('.dock-provider-picker').getBoundingClientRect().right;
       })()`), true, 'compact headers and full-height buttons reach the dock edges at ' + width);
       assert.ok(layout.scrollHeight > 350);
       assert.equal(await read('document.querySelector(".studio-footer").getBoundingClientRect().height <= 90'), true, `compact footer at ${width}px`);
@@ -664,9 +676,11 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await cdp.send('Emulation.setDeviceMetricsOverride', { width: 390, height: 900, deviceScaleFactor: 1, mobile: false }, panel);
   await click('#results-tab');
   await read('document.getElementById("studio-scroll").scrollTop = 0');
-  await cdp.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'dark' }] }, panel);
+  await read("chrome.storage.local.set({'ui-theme:v1':'dark'})");
+  await until(()=>read('document.documentElement.dataset.theme==="dark"'),'dark theme');
   await screenshot('workspace-dark.png');
-  await cdp.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'light' }] }, panel);
+  await read("chrome.storage.local.set({'ui-theme:v1':'light'})");
+  await until(()=>read('document.documentElement.dataset.theme==="light"'),'light theme');
   await read('if (document.getElementById("chat-view").hidden) document.getElementById("chat-dock-toggle").click()');
   assert.equal(await read('document.querySelectorAll("#studio-tab, #chat-tab, #tracker-return, .chat-dock-heading").length'), 0, 'former tabs and duplicate chat header removed');
   assert.equal(await read('document.querySelectorAll(".dock-status-bar").length'), 1, 'one status bar serves both collapsed and expanded chat');
@@ -736,6 +750,12 @@ export async function checkWorkspaceUI({ cdp, panel, read, click, frameSession, 
   await until(() => read('!document.getElementById("documents-dialog").open'), 'manual documents saved');
   assert.equal((await savedRequest()).coverLetter, 'A reviewed cover letter for Northstar.');
   assert.equal((await savedRequest()).state, 'ready');
+  await click('[data-request-id="1"] [data-action="cover-letter"]');
+  assert.equal(await read('document.getElementById("cover-letter-dialog").open'), true);
+  assert.equal(await text('#cover-letter-copy'), 'A reviewed cover letter for Northstar.');
+  await screenshot('workspace-cover-letter.png');
+  await closeDialog('cover-letter-dialog');
+  assert.equal((await savedRequest()).coverLetter, 'A reviewed cover letter for Northstar.', 'viewing a cover letter does not edit it');
   await click('#chat-dock-toggle');
   await checkCurrentJobUI({ cdp, panel, read, click, until, screenshot, frameSession, evaluate, checkChatViewportAcrossCollapse });
   return { layouts, checks: ['single dock with bottom chat accordion and account menu', 'ChatGPT frame and draft retained', 'Studio form retained',

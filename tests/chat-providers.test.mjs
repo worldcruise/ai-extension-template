@@ -6,15 +6,16 @@ import { deepseekEmbedRules } from '../src/sidebar-protocol.mjs';
 function setup(saved = 'chatgpt', beforeChange = async () => {}) {
   const nodes = new Map();
   const document = { getElementById(id) {
-    if (!nodes.has(id)) nodes.set(id, { hidden: false, value: '', listeners: {},
+    if (!nodes.has(id)) nodes.set(id, { hidden: false, value: '', listeners: {}, focusCalls: 0,
       addEventListener(name, listener) { this.listeners[name] = listener; },
+      focus() { this.focusCalls++; },
       getAttribute(name) { return this[name] || null; } });
     return nodes.get(id);
   } };
-  const writes = [], opened = [], selected = [];
+  const writes = [], opened = [], selected = [], selectionSources = [];
   const browser = { storage: { local: { get: async () => ({ chatProvider: saved }), set: async value => writes.push(value) } },
     tabs: { create: async value => opened.push(value) } };
-  return { connection: createChatProviders({ document, browser, beforeChange, onSelect: provider => selected.push(provider) }), nodes, writes, opened, selected };
+  return { connection: createChatProviders({ document, browser, beforeChange, onSelect: (provider, source) => { selected.push(provider); selectionSources.push(source); } }), nodes, writes, opened, selected, selectionSources };
 }
 const settle = () => new Promise(resolve => setImmediate(resolve));
 
@@ -52,6 +53,42 @@ test('active-job guard rejects switching without loading DeepSeek or saving pref
   assert.equal(nodes.get('provider-status').textContent, 'Job active');
   assert.deepEqual(writes, []);
   assert.deepEqual(selected, [], 'rejected selection leaves the menu open');
+});
+
+test('bottom selector switches and persists the provider while synchronizing menu and settings', async () => {
+  const { connection, nodes, writes, selected, selectionSources } = setup('deepseek');
+  await connection.ready;
+  for (const id of ['chat-provider', 'workflow-provider', 'dock-chat-provider']) assert.equal(nodes.get(id).value, 'deepseek');
+  assert.deepEqual(selected, [], 'restoring a provider does not expand chat');
+  const frame = nodes.get('deepseek-frame'); frame.src = DEEPSEEK_HOME + 'a/chat/s/preserved';
+  const dock = nodes.get('dock-chat-provider'); dock.value = 'chatgpt'; dock.listeners.change(); await settle();
+  for (const id of ['chat-provider', 'workflow-provider', 'dock-chat-provider']) assert.equal(nodes.get(id).value, 'chatgpt');
+  assert.deepEqual(writes.at(-1), { chatProvider: 'chatgpt' });
+  assert.deepEqual(selected, ['chatgpt']); assert.deepEqual(selectionSources, ['dock']);
+  assert.equal(dock.focusCalls, 1, 'provider selection retains keyboard focus in the bottom bar');
+  assert.equal(frame.src, DEEPSEEK_HOME + 'a/chat/s/preserved');
+  const settings = nodes.get('workflow-provider'); settings.value = 'deepseek'; settings.listeners.change(); await settle();
+  assert.equal(dock.value, 'deepseek'); assert.equal(nodes.get('chat-provider').value, 'deepseek');
+  assert.deepEqual(selected, ['chatgpt'], 'Settings changes do not expand chat');
+  assert.equal(frame.src, DEEPSEEK_HOME + 'a/chat/s/preserved');
+});
+
+test('bottom selector shares pending and rejected-switch states with the other controls', async () => {
+  let reject;
+  const pending = new Promise((_, rejectPromise) => { reject = rejectPromise; });
+  const { connection, nodes, writes, selected } = setup('chatgpt', () => pending);
+  await connection.ready;
+  const dock = nodes.get('dock-chat-provider'); dock.value = 'deepseek'; dock.listeners.change();
+  for (const id of ['chat-provider', 'workflow-provider', 'dock-chat-provider']) assert.equal(nodes.get(id).disabled, true);
+  reject(new Error('Finish the current action first.')); await settle();
+  for (const id of ['chat-provider', 'workflow-provider', 'dock-chat-provider']) {
+    assert.equal(nodes.get(id).disabled, false); assert.equal(nodes.get(id).value, 'chatgpt');
+  }
+  assert.equal(nodes.get('dock-provider-status').textContent, 'Finish the current action first.');
+  assert.equal(nodes.get('provider-status').textContent, 'Finish the current action first.');
+  assert.equal(dock.title, 'Finish the current action first.');
+  assert.equal(nodes.get('deepseek-frame').src, undefined);
+  assert.deepEqual(writes, []); assert.deepEqual(selected, []);
 });
 
 test('DeepSeek header changes only match its HTTPS host in extension subframes', () => {

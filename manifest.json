@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AI Agent Template",
   "short_name": "Sidebar GPT",
-  "version": "0.6.2",
+  "version": "0.15.2",
   "description": "A docked job queue and job form with expandable ChatGPT and DeepSeek conversations.",
   "minimum_chrome_version": "116",
   "permissions": [
@@ -11,6 +11,8 @@
     "storage",
     "activeTab",
     "tabs",
+    "downloads",
+    "downloads.open",
     "scripting"
   ],
   "host_permissions": [
@@ -83,6 +85,6 @@
     }
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'; frame-src https://chatgpt.com https://chat.deepseek.com;"
+    "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'; frame-src 'self' blob: https://chatgpt.com https://chat.deepseek.com;"
   }
 }

@@ -61,3 +61,10 @@ test('missing company labels, base resumes and generated resume fields do not be
   assert.equal(findExistingJob(input({ url: '' }), [historical]), null);
   assert.deepEqual(historical, before, 'matching never rewrites historical labels or provenance');
 });
+test('capture source aliases hide saved ordinary listings but not an entire HiringCafe search page', () => {
+  const rows=[{id:'one',state:'queued',captureSourceUrl:'https://jobs.example.test/listing',input:{candidateId:'candidate',job:{url:'https://ats.example/apply/1'}}},
+    {id:'two',state:'queued',captureSourceUrl:'https://hiring.cafe/',input:{candidateId:'candidate',job:{url:'https://ats.example/apply/2'}}}];
+  assert.equal(jobUrlInList('https://jobs.example.test/listing','candidate',rows),true);
+  assert.equal(jobUrlInList('https://hiring.cafe/','candidate',rows),false);
+  rows[1].capturePending=true;assert.equal(jobUrlInList('https://hiring.cafe/','candidate',rows),true);
+});

@@ -1,4 +1,5 @@
 import { parseManualResume } from './manual-documents.mjs';
+import { normalizeDocumentSettings } from './document-settings.mjs';
 
 export function createQueueDocuments({ queue, getRequest, openDialog, onSaved }) {
   const q = selector => document.querySelector(selector), dialog = q('#documents-dialog');
@@ -51,7 +52,7 @@ export function createQueueDocuments({ queue, getRequest, openDialog, onSaved })
       letter.disabled = !enabled.checked;
     }
   });
-  return { open(id, { generated = null } = {}) {
+  return { open(id, { generated = null, focus = 'resume' } = {}) {
     if (busy) return;
     const request = getRequest(id);
     if (!request) return;
@@ -62,9 +63,11 @@ export function createQueueDocuments({ queue, getRequest, openDialog, onSaved })
     letter.value = request.coverLetter || ''; enabled.checked = request.coverLetterEnabled === true;
     if (generated) {
       resume.value = generated.result ? JSON.stringify(generated.result.resume, null, 2) : generated.raw || '';
-      letter.value = generated.result?.coverLetter || ''; enabled.checked = true;
+      const includeCoverLetter = normalizeDocumentSettings(generated.documentSettings).includeCoverLetter;
+      letter.value = includeCoverLetter ? generated.result?.coverLetter || '' : '';
+      enabled.checked = includeCoverLetter && Boolean(letter.value.trim());
     }
     validate(); openDialog('documents-dialog');
-    resume.focus();
+    (focus === 'cover-letter' && enabled.checked ? letter : resume).focus();
   } };
 }

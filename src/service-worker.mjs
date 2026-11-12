@@ -2,25 +2,33 @@ import { EMBED_RULE_ID, DEEPSEEK_EMBED_RULE_ID, embedRules, deepseekEmbedRules }
 import { createJobExtractionService } from './job-extraction-service.mjs';
 import { createReadPageCommands } from './read-page-commands.mjs';
 import { createGenerationService } from './generation-service.mjs';
+import { createDocumentDownloads } from './document-downloads.mjs';
+import { resolveApplicationUrls } from './job-apply-url.mjs';
 
-const generations = createGenerationService();
+const documentDownloads = createDocumentDownloads();
+const generations = createGenerationService({ onComplete: run => documentDownloads.start(run) });
+void documentDownloads.reconnect().catch(() => {});
 chrome.runtime.onMessage.addListener((message, sender, respond) => {
   if (sender.id !== chrome.runtime.id || !message?.type?.startsWith('generation.')) return false;
   const ui = sender.url === chrome.runtime.getURL('index.html');
   let task;
   if (ui && message.type === 'generation.start') task = () => generations.start(message.jobId, message.provider);
+  if (ui && message.type === 'generation.capture') task = () => generations.startCapture(message.jobId,message.provider);
+  if (ui && message.type === 'generation.apply-urls') task = () => resolveApplicationUrls(message.tabId,message.sourceUrl);
   if (ui && message.type === 'generation.list') task = async () => {
-    const runs = await generations.list();
+    const runs = await generations.list({ health: message.health === true });
     if (message.reconnect) void generations.reconnect().catch(() => {});
     return runs;
   };
   if (ui && message.type === 'generation.read') task = () => generations.read(message.id);
   if (ui && message.type === 'generation.open') task = () => generations.open(message.id, message.resume === true);
   if (ui && message.type === 'generation.stop') task = () => generations.stop(message.id);
+  if (ui && message.type === 'generation.download') task = () => documentDownloads.start(message.id, { manual: true });
+  if (ui && message.type === 'generation.download-saved') task = () => documentDownloads.startSaved(message.jobId, message.kind);
   if (!ui && message.type === 'generation.attach') task = () => generations.attach(message.id, message.actorId, sender);
   if (!ui && message.type === 'generation.event') task = () => generations.event(message.id, message.actorId, message.data || {}, sender);
   if (!task) return false;
-  Promise.resolve().then(task).then(value => respond({ ok: true, value }), error => respond({ ok: false, error: error.message || 'The generation could not continue.' }));
+  Promise.resolve().then(task).then(value => respond({ ok: true, value }), error => respond({ ok: false, code: error.code || 'generation-denied', error: error.message || 'The generation could not continue.' }));
   return true;
 });
 

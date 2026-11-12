@@ -5,18 +5,37 @@
   let active = null;
   const failure = (code, message) => Object.assign(new Error(message), { code });
   async function request(message) {
-    const reply = await chrome.runtime.sendMessage(message);
-    if (!reply?.ok) throw failure('connection', reply?.error || 'The extension connection was interrupted. Use Resume to check this run.');
-    return reply.value;
+    let timer;
+    try {
+      const reply = await Promise.race([chrome.runtime.sendMessage(message), new Promise((_, reject) => {
+        timer = setTimeout(() => reject(failure('connection', 'The extension did not respond.')), 8000);
+      })]);
+      if (!reply) throw failure('connection', 'The extension connection was interrupted.');
+      // An explicit ownership/validation denial must never be retried as a
+      // network failure. A missing transport reply has different semantics.
+      if (!reply.ok) throw failure('generation-denied', reply.error || 'This generation can no longer use this page.');
+      return reply.value;
+    } catch (error) {
+      if (['connection', 'generation-denied'].includes(error.code)) throw error;
+      throw failure('connection', 'The extension connection was interrupted.');
+    } finally { clearTimeout(timer); }
   }
   function start(id) {
-    if (active) return;
-    const task = { id, actorId: crypto.randomUUID(), stopped: false, wake: new Set(), controller: new AbortController() };
+    if (active) {
+      if (active.id === id) for (const resolve of active.wake) resolve();
+      return;
+    }
+    const task = { id, actorId: crypto.randomUUID(), stopped: false, wake: new Set(), controller: new AbortController(),
+      disconnectedAt: null, failure: null, pausedMs: 0, frozenAt: null };
     active = task;
     void execute(task).finally(() => { if (active === task) active = null; });
   }
   async function execute(task) {
-    let adapter, run, pulse, observer, captureDiagnostics;
+    let adapter, run, pulse, observer, captureDiagnostics, heartbeatPending = false;
+    const connectionLostMessage = () => run?.provider === 'deepseek'
+      ? 'Tracking lost its connection. Use Resume to keep checking this chat without sending again.'
+      : 'Tracking lost its connection. Reconnecting to this chat without sending again.';
+    const elapsedTime = () => Date.now() - task.pausedMs - (task.frozenAt == null ? 0 : Date.now() - task.frozenAt);
     const wake = () => { for (const resolve of task.wake) resolve(); task.wake.clear(); };
     const pause = () => new Promise(resolve => {
       const done = () => { clearTimeout(timer); task.wake.delete(done); resolve(); };
@@ -24,15 +43,63 @@
     });
     const check = () => {
       if (task.stopped) throw failure('stopped', 'Tracking stopped.');
+      if (task.failure) throw task.failure;
+      if (task.disconnectedAt != null && elapsedTime() - task.disconnectedAt >= 30000) {
+        throw failure('transport-disconnected', connectionLostMessage());
+      }
       if (run?.url && adapter.conversation() !== run.url) throw failure('navigated', 'The AI tab moved away from this job’s conversation. Return to it and use Resume.');
     };
-    const emit = data => request({ type: 'generation.event', id: task.id, actorId: task.actorId, data: { url: adapter?.conversation(), ...data } }).then(value => {
-      if (value?.stopped) { task.stopped = true; throw failure('stopped', 'Tracking stopped.'); }
-      return value;
-    });
+    const emit = async (data, retry = data.kind !== 'authorize') => {
+      // DeepSeek uses explicit Resume for connection recovery while its
+      // single-tab workflow is restored. Never replay a failed event or send.
+      if (run?.provider === 'deepseek') retry = false;
+      const deadline = elapsedTime() + 30000;
+      while (true) {
+        if (data.kind !== 'error') {
+          if (task.stopped) throw failure('stopped', 'Tracking stopped.');
+          if (task.failure) throw task.failure;
+        }
+        try {
+          const value = await request({ type: 'generation.event', id: task.id, actorId: task.actorId, data: { url: adapter?.conversation(), ...data } });
+          if (value?.stopped) { task.stopped = true; throw failure('stopped', 'Tracking stopped.'); }
+          task.disconnectedAt = null;
+          return value;
+        } catch (error) {
+          if (error.code !== 'connection') throw error;
+          task.disconnectedAt ??= elapsedTime();
+          // Never repeat authorization: the service may have persisted send
+          // intent before its acknowledgment was lost. Recovery observes only.
+          if (!retry) throw error;
+          if (elapsedTime() >= deadline || task.stopped) throw failure(task.stopped ? 'stopped' : 'transport-disconnected', connectionLostMessage());
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+    };
+    const heartbeat = async () => {
+      if (heartbeatPending || task.stopped) return;
+      heartbeatPending = true;
+      try { await emit({ kind: 'heartbeat', diagnostics: captureDiagnostics }, false); }
+      catch (error) {
+        if (error.code !== 'connection') { task.failure = error; task.controller.abort(error); }
+        // A transient transport failure leaves the observer alive. The service
+        // watchdog reports stale status if the connection remains unavailable.
+      } finally { heartbeatPending = false; wake(); }
+    };
+    const freeze = () => { task.frozenAt ??= Date.now(); };
+    const resume = () => {
+      if (task.frozenAt != null) { task.pausedMs += Date.now() - task.frozenAt; task.frozenAt = null; }
+      wake(); if (run && !task.stopped) void heartbeat();
+    };
+    const visibility = () => { if (!document.hidden) resume(); };
     async function until(probe, timeout, code, message) {
-      const deadline = Date.now() + timeout;
-      while (Date.now() < deadline) { check(); const value = await probe(); if (value) return value; await pause(); }
+      const started = Date.now(), paused = task.pausedMs;
+      // Frozen pages do not consume the observation timeout. Probe once on
+      // wake so a reply that finished in the background can be recognized.
+      while (true) {
+        check(); const value = await probe(); if (value) return value;
+        if (Date.now() - started - (task.pausedMs - paused) >= timeout) break;
+        await pause();
+      }
       throw failure(code, typeof message === 'function' ? message() : message);
     }
     try {
@@ -42,7 +109,9 @@
       const matchesPrompt = editor => adapter.matchesPrompt ? adapter.matchesPrompt(editor, run.prompt) : d.normal(d.text(editor)) === d.normal(run.prompt);
       observer = new MutationObserver(wake); observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true, characterData: true });
       for (const event of ['input', 'change', 'popstate', 'online']) window.addEventListener(event, wake, true);
-      pulse = setInterval(() => { void emit({ kind: 'heartbeat', diagnostics: captureDiagnostics }).catch(() => { task.stopped = true; task.controller.abort(failure('stopped', 'Tracking disconnected.')); wake(); }); }, 10000);
+      document.addEventListener('freeze', freeze); document.addEventListener('resume', resume);
+      document.addEventListener('visibilitychange', visibility); window.addEventListener('pageshow', resume);
+      pulse = setInterval(() => { void heartbeat(); }, 10000);
       async function prepare() {
         let loginReported = false;
         const prepared = await until(async () => {
@@ -59,7 +128,8 @@
         let editor = prepared.editor;
         await emit({ kind: 'phase', phase: 'preparing' });
         const baseline = adapter.baseline();
-        if (run.provider !== 'chatgpt' && (baseline.users || baseline.answers)) throw failure('existing-chat', 'This tab already contains a conversation. The extension will not add a job prompt to it.');
+        run.baseline = baseline;
+        if (!run.usesExistingTab && (baseline.users || baseline.answers)) throw failure('existing-chat', 'This tab already contains a conversation. Open a new chat and use Resume.');
         if (adapter.send) {
           const submission = await adapter.send(run, { signal: task.controller.signal, beforeSubmit: async () => {
             check();
@@ -115,9 +185,13 @@
         }
       }
       if (run.mode === 'prepare') await prepare();
-      // A verified ChatGPT send does not depend on its receipt DOM. Manual sending
-      // and DeepSeek still use the posted user turn to establish submission.
-      if (run.provider !== 'chatgpt' || !run.sendIntentAt) await until(() => adapter.answer(run).user, 45000, 'uncertain', 'Could not confirm the submitted message. Inspect the AI tab, then use Resume to check again. Nothing will be resent.');
+      // Restore DeepSeek's posted-prompt anchor before observing its reply.
+      // ChatGPT keeps its verified-submission path without requiring a bubble.
+      if (run.provider === 'deepseek' || !run.submittedAt && !run.sendIntentAt) await until(() => {
+        const answer = adapter.answer(run);
+        captureDiagnostics = answer.diagnostics;
+        return answer.user;
+      }, 45000, 'uncertain', 'Could not confirm the submitted message. Inspect the AI tab, then use Resume to check again. Nothing will be resent.');
       if (!run.sendIntentAt) {
         if (run.provider !== 'chatgpt') await until(() => adapter.conversation(), 15000, 'missing-conversation', 'The posted prompt has no conversation link yet. Use Resume after the page finishes loading.');
         await emit({ kind: 'observed', marker: `DOCUMENT_RUN:${run.id}` });
@@ -128,25 +202,36 @@
       const reply = await until(async () => {
         const answer = adapter.answer(run);
         captureDiagnostics = answer.diagnostics;
-        if (!answer.user && run.provider !== 'chatgpt') throw failure('conversation-changed', 'The submitted message is no longer visible. Return to this job’s conversation and use Resume.');
+        if (!answer.user && run.provider === 'deepseek') throw failure('conversation-changed', 'The submitted message is no longer available. Return to this job’s conversation and use Resume.');
         const alert = [...document.querySelectorAll('[role="alert"]')].find(node => d.visible(node) && /network error|something went wrong|rate limit|too many requests|server busy/i.test(d.text(node)));
         if (alert) throw failure('provider-error', 'The provider reported a connection, usage, or generation error. Inspect the AI tab; use Resume after resolving it.');
-        if (answer.node && !generatingReported) { await emit({ kind: 'phase', phase: 'generating', diagnostics: captureDiagnostics }); generatingReported = true; }
+        if ((answer.node || adapter.busy(answer)) && !generatingReported) { await emit({ kind: 'phase', phase: 'generating', diagnostics: captureDiagnostics }); generatingReported = true; }
         if (answer.raw !== previous) { previous = answer.raw; changedAt = Date.now(); }
         const url = adapter.conversation();
         if (url && !run.url) { await emit({ kind: 'phase', phase: generatingReported ? 'generating' : 'submitted' }); run.url = url; }
         const completed = answer.complete || run.outputFormat !== 'json-code-block' && d.completedJSON(answer.raw, run);
-        return answer.raw && (url || run.provider === 'chatgpt') && !adapter.busy(answer) && Date.now() - changedAt >= 1500 && completed ? answer : null;
-      }, 300000, 'reply-timeout', 'The reply did not finish within five minutes. Use Resume to continue observing the same conversation; the prompt will not be sent again.');
+        const streaming = adapter.busy(answer), stableMs = Date.now() - changedAt;
+        if (run.provider === 'deepseek') captureDiagnostics = { ...captureDiagnostics, conversationFound: Boolean(url), stableMs,
+          code: streaming ? 'waiting_for_idle' : !url ? 'waiting_for_conversation' : completed && stableMs < 1500 ? 'waiting_for_stability' : captureDiagnostics?.code };
+        return answer.raw && (url || run.provider === 'chatgpt') && !streaming && stableMs >= 1500 && completed ? answer : null;
+      }, 300000, 'reply-timeout', () => {
+        const problem = run.provider === 'deepseek' && captureDiagnostics?.replyChars && !captureDiagnostics.generationActive
+          ? 'DeepSeek has a reply, but its final document output could not be confirmed. Open Details to inspect the capture diagnostics.'
+          : 'The reply did not finish within five minutes.';
+        return `${problem} Use Resume to continue observing the same conversation; the prompt will not be sent again.`;
+      });
       await emit({ kind: 'result', raw: reply.raw, diagnostics: captureDiagnostics });
     } catch (error) {
       if (error.code !== 'stopped') {
-        try { await emit({ kind: 'error', code: error.code || 'page-error', message: error.message, diagnostics: error.diagnostics || captureDiagnostics }); }
+        task.controller.abort(error);
+        try { await emit({ kind: 'error', code: error.code || 'page-error', message: error.message, diagnostics: error.diagnostics || captureDiagnostics }, false); }
         catch { /* The persistent intent remains authoritative if the extension or page disconnected. */ }
       }
     } finally {
       clearInterval(pulse); observer?.disconnect();
       for (const event of ['input', 'change', 'popstate', 'online']) window.removeEventListener(event, wake, true);
+      document.removeEventListener('freeze', freeze); document.removeEventListener('resume', resume);
+      document.removeEventListener('visibilitychange', visibility); window.removeEventListener('pageshow', resume);
       wake();
     }
   }

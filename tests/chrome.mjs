@@ -17,6 +17,11 @@ import { jobPageFixtures, jobFixtureResponse } from './fixtures/job-pages.mjs';
 import { chatFixtureScript } from './fixtures/chat-ui.mjs';
 import { generationFixture } from './fixtures/generation-chat.mjs';
 import { checkGenerationUI } from './generation-ui.mjs';
+import { checkQueueCardsUI } from './queue-cards-ui.mjs';
+import { checkProviderWorkflowUI } from './provider-workflow-ui.mjs';
+import { checkManualJobUI } from './manual-job-ui.mjs';
+import { checkDocumentDownloadUI } from './document-download-ui.mjs';
+import { checkJobCleanupUI } from './job-cleanup-ui.mjs';
 
 const artifacts = fileURLToPath(new URL('../artifacts/', import.meta.url));
 const paths = [process.env.CHROME_PATH,
@@ -41,7 +46,7 @@ class CDP {
         if (!task) return;
         this.pending.delete(message.id);
         clearTimeout(task.timer);
-        if (message.error) task.reject(new Error(message.error.message));
+        if (message.error) { task.error.message = `${task.method}: ${message.error.message}`; task.reject(task.error); }
         else task.resolve(message.result);
       } else {
         for (const handler of this.listeners.get(message.method) || []) handler(message.params, message.sessionId);
@@ -51,8 +56,9 @@ class CDP {
   send(method, params = {}, sessionId) {
     return new Promise((resolve, reject) => {
       const id = ++this.sequence;
-      const timer = setTimeout(() => { this.pending.delete(id); reject(new Error(`CDP timeout: ${method}`)); }, method === 'Runtime.evaluate' ? 30000 : 15000);
-      this.pending.set(id, { resolve, reject, timer });
+      const error = new Error(); Error.captureStackTrace(error, this.send);
+      const timer = setTimeout(() => { this.pending.delete(id); error.message = `CDP timeout: ${method}`; reject(error); }, method === 'Runtime.evaluate' ? 30000 : 15000);
+      this.pending.set(id, { resolve, reject, timer, method, error });
       this.socket.send(JSON.stringify({ id, method, params, ...(sessionId ? { sessionId } : {}) }));
     });
   }
@@ -77,6 +83,11 @@ let mode = 'ready';
 let requests = 0;
 const fixtureServer = await serveFixture((request, response) => {
   requests++;
+  if (['mail.google.com', 'outlook.office.com'].includes(request.headers.host?.split(':')[0])) {
+    response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    response.end('<!doctype html><title>Mail fixture</title><main>Private inbox fixture</main>');
+    return;
+  }
   if (request.headers.host?.startsWith('chat.deepseek.com')) {
     response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'X-Frame-Options': 'DENY', 'Content-Security-Policy': "frame-ancestors 'none'" });
     response.end(`<!doctype html><html><head><style>body{font:16px system-ui}nav{display:flex;gap:20px}textarea{width:90%;margin-top:80px}</style></head><body><button type="button" aria-label="Search chats" onclick="document.getElementById('native-search-dialog').showModal()">Search chats</button><dialog id="native-search-dialog"><input placeholder="Search chats"></dialog><div id="history-open" role="button" tabindex="0" style="position:absolute;left:8px;top:8px;width:24px;height:24px"><svg width="20" height="20"><path d="M2 2h16v16H2z"/></svg></div><div id="history-close" role="button" tabindex="0" style="position:absolute;left:8px;top:8px;width:24px;height:24px" hidden><svg width="20" height="20"><path d="M2 2h16v16H2z"/></svg></div><nav id="history" hidden><div><h3>Pinned</h3><a href="/a/chat/s/pinned-old">Pinned older chat</a><h3>Recent</h3><a href="/a/chat/s/11111111-1111-4111-8111-111111111111">Recent DeepSeek chat</a><a href="/a/chat/s/22222222-2222-4222-8222-222222222222">Older DeepSeek chat</a></div></nav><section id="fixture-cookie-banner" role="dialog" style="position:fixed;top:110px;left:10px;right:10px;padding:20px;background:white;border:1px solid black;z-index:20"><p>We use cookies</p><button id="fixture-cookie-reject" onclick="document.getElementById('fixture-cookie-banner').hidden=true;document.body.dataset.cookieChoice='reject'">Reject all</button><button id="fixture-cookie-accept" onclick="document.getElementById('fixture-cookie-banner').hidden=true;document.body.dataset.cookieChoice='accept'">Accept all</button></section><h1>DeepSeek fixture</h1><textarea placeholder="Message DeepSeek"></textarea><script>const nav=document.getElementById('history'),saved=nav.innerHTML,open=document.getElementById('history-open'),close=document.getElementById('history-close');nav.replaceChildren();open.onclick=()=>{setTimeout(()=>{nav.innerHTML=saved;nav.hidden=false;open.hidden=true;close.hidden=false;nav.querySelectorAll('a').forEach(link=>link.onclick=event=>{event.preventDefault();setTimeout(()=>{history.pushState({},'',link.getAttribute('href'));nav.hidden=false;open.hidden=true;close.hidden=false;},150);});},250);};close.onclick=()=>{nav.hidden=true;nav.replaceChildren();open.hidden=false;close.hidden=true;};</script><script>(${generationFixture.toString()})();</script></body></html>`);
@@ -111,7 +122,7 @@ const profile = await mkdtemp(join(tmpdir(), 'sidebar-gpt-test-'));
 const browser = spawn(executable, [
   '--headless=new', '--no-first-run', '--no-default-browser-check',
   '--disable-background-networking', '--disable-component-update', '--disable-sync',
-  `--host-resolver-rules=${[...new Set(['chatgpt.com','chat.deepseek.com','jobs.example.test','blocked.jobs.example.test',...jobPageFixtures.map(item=>item.host)])].map(host=>`MAP ${host} 127.0.0.1:${fixtureServer.port}`).join(', ')}`,
+  `--host-resolver-rules=${[...new Set(['chatgpt.com','chat.deepseek.com','mail.google.com','outlook.office.com','jobs.example.test','blocked.jobs.example.test',...jobPageFixtures.map(item=>item.host)])].map(host=>`MAP ${host} 127.0.0.1:${fixtureServer.port}`).join(', ')}`,
   '--no-proxy-server', '--ignore-certificate-errors',
   '--enable-unsafe-extension-debugging', '--remote-debugging-port=0',
   `--user-data-dir=${profile}`, 'about:blank'
@@ -167,7 +178,7 @@ try {
     sessions.set(targetInfo.targetId, configuring);
     configuring.catch(error => {
       // Navigation can discard a short-lived target while CDP configures it.
-      if (activeSessions.has(sessionId) && error.message !== 'Session with given id not found.') errors.push(error.message);
+      if (activeSessions.has(sessionId) && !error.message.endsWith('Session with given id not found.')) errors.push(error.message);
     });
   });
   await cdp.send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: true, flatten: true });
@@ -188,6 +199,9 @@ try {
     return result.result.value;
   }
   await until(() => evaluate(workerSession, 'typeof chrome !== "undefined" && Boolean(chrome.declarativeNetRequest) && chrome.declarativeNetRequest.getDynamicRules().then(rules => rules.length === 2)'), 'embed rules');
+  // Older layout/generation fixtures assert tab counts and focus. Exercise
+  // automatic downloads/previews in their dedicated real-download suite.
+  if (!process.argv.includes('--documents-only')) await evaluate(workerSession, 'chrome.storage.local.set({documentSettings:{autoDownload:false}})');
   assert.equal(await evaluate(workerSession, '(async () => (await chrome.sidePanel.getPanelBehavior()).openPanelOnActionClick)()'), false);
   const rules = await evaluate(workerSession, 'chrome.declarativeNetRequest.getDynamicRules()');
   assert.deepEqual(rules[0].condition.initiatorDomains, [id]);
@@ -205,8 +219,38 @@ try {
     await until(() => read('document.documentElement.dataset.studioBusy !== "true"'), 'Studio action saved');
   };
   const state = () => read('document.getElementById("connection").dataset.state');
-  await until(() => read('document.documentElement.dataset.studioReady === "true"'), 'combined workspace startup');
-  if (process.argv.includes('--generation-only')) {
+  await until(() => read('document.documentElement?.dataset.studioReady === "true"'), 'combined workspace startup');
+  if (process.argv.includes('--job-cleanup-only')) {
+    const report=await checkJobCleanupUI({cdp,panel,read,click,evaluate,until,targets,session});
+    assert.deepEqual(errors,[]);
+    await writeFile(join(artifacts,'job-cleanup-results.json'),JSON.stringify({fixtureOnly:true,...report},null,2));
+    console.log('AI job cleanup browser checks passed.');
+  } else if (process.argv.includes('--documents-only')) {
+    const report = await checkDocumentDownloadUI({ cdp, panel, targetId, evaluate, until, targets, session, artifacts, workerSession });
+    assert.deepEqual(errors, []);
+    await writeFile(join(artifacts, 'document-download-results.json'), JSON.stringify({ fixtureOnly:true, ...report }, null, 2));
+    console.log('Document download and settings browser checks passed.');
+  } else if (process.argv.includes('--deepseek-single-only')) {
+    const checks = await checkGenerationUI({ cdp, panel, read, click, evaluate, until, targets, session, artifacts, workerSession, deepseekSingle:true });
+    assert.deepEqual(errors, []);
+    await writeFile(join(artifacts, 'deepseek-single-results.json'), JSON.stringify({ fixtureOnly:true, checks }, null, 2));
+    console.log('Single-tab DeepSeek browser checks passed.');
+  } else if (process.argv.includes('--manual-job-only')) {
+    const report = await checkManualJobUI({ cdp, panel, read, click, until, artifacts });
+    assert.deepEqual(errors, []);
+    await writeFile(join(artifacts, 'manual-job-results.json'), JSON.stringify({ fixtureOnly:true, ...report }, null, 2));
+    console.log('Manual job fallback browser checks passed.');
+  } else if (process.argv.includes('--provider-workflow-only')) {
+    const report = await checkProviderWorkflowUI({ cdp, panel, read, click, until, artifacts });
+    assert.deepEqual(errors, []);
+    await writeFile(join(artifacts, 'provider-workflow-results.json'), JSON.stringify({ fixtureOnly:true, ...report }, null, 2));
+    console.log('Provider workflow browser checks passed.');
+  } else if (process.argv.includes('--cards-only')) {
+    const report = await checkQueueCardsUI({ cdp, panel, read, click, until, artifacts });
+    assert.deepEqual(errors, []);
+    await writeFile(join(artifacts, 'queue-cards-results.json'), JSON.stringify({ fixtureOnly:true, ...report }, null, 2));
+    console.log('Queue card browser checks passed.');
+  } else if (process.argv.includes('--generation-only')) {
     const checks = await checkGenerationUI({ cdp, panel, read, click, evaluate, until, targets, session, artifacts, workerSession });
     assert.deepEqual(errors, []);
     await writeFile(join(artifacts, 'generation-results.json'), JSON.stringify({ fixtureOnly: true, checks }, null, 2));
@@ -308,9 +352,11 @@ try {
   const iframeTarget = await until(async () => (await targets()).find(target => target.type === 'iframe' && target.url.startsWith('https://chatgpt.com/')), 'ChatGPT frame');
   const frameSession = await session(iframeTarget.targetId);
   const workspace = await checkWorkspaceUI({ cdp, panel, read, click, frameSession, deepseekSession, evaluate, artifacts, until });
-  if (process.argv.includes('--workspace-only')) {
-    workspace.checks.push(...await checkDeepseekRecoveryUI({ cdp, panel, read, click, evaluate, until, frameSession, targets, session }));
-    workspace.checks.push(...await checkGenerationUI({ cdp, panel, read, click, evaluate, until, targets, session, artifacts, workerSession }));
+  if (process.argv.includes('--workspace-only') || process.argv.includes('--dock-only')) {
+    if (process.argv.includes('--workspace-only')) {
+      workspace.checks.push(...await checkDeepseekRecoveryUI({ cdp, panel, read, click, evaluate, until, frameSession, targets, session }));
+      workspace.checks.push(...await checkGenerationUI({ cdp, panel, read, click, evaluate, until, targets, session, artifacts, workerSession }));
+    }
     assert.deepEqual(errors, []);
     const report = { fixtureOnly: true, workspaceOnly: true, workspace };
     await writeFile(join(artifacts, 'workspace-results.json'), JSON.stringify(report, null, 2));

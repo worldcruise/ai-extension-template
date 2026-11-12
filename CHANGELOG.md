@@ -2,6 +2,95 @@
 
 ## Unreleased
 
+## 0.15.2 — 2026-11-12
+
+- Increase expanded queue section contrast with a stronger blue-gray background in light and dark themes.
+
+## 0.15.1 — 2026-11-12
+
+- Remove AI generation and diagnostics from the job detail popup and its unused rendering/copy handlers. Give expanded queue actions a subtle contrasting background in both themes.
+
+## 0.15.0 — 2026-11-12
+
+- Put Apply to jobs first and make it the default view. Replace More with View detail, use one expanded queue card at a time, and show job descriptions and document previews in popups. Add three icons beside each saved document, individual document downloads, and a disabled lightning Autofill bar. Move the theme control into the user menu.
+- Silently switch the sidebar to the selected Apply job's saved conversation without expanding chat, changing browser-tab focus, or discarding drafts or running responses. Keep the most recent selection when jobs change rapidly.
+- Include corrected company/title, cleaned JD, observed Apply URL, and listed or estimated salary in new tailored-generation JSON. Validate and refresh saved cards automatically before document approval, protect newer edits, and flag older documents when job details change. Display salary without an AI estimate prefix while retaining attribution and assumptions in details.
+
+## 0.14.0 — 2026-11-12
+
+- Adopt ApplicationTracker_v2.1's indigo light/navy dark theme with a persistent status-bar toggle. Keep the dock headers full width and move manual job entry to the + tab.
+- Simplify queue cards to company, role, salary, status and a primary action. Put document, chat and maintenance controls under an accessible More disclosure, preserving its open state during progress updates.
+- Add an Apply to jobs view connected to the selected candidate's prepared queue, with job navigation, saved document previews, updates, downloads and application-tab reuse. Verify Queue and Apply in both themes at 280–800px, document actions, tab reuse and theme persistence.
+
+## 0.13.0 — 2026-11-12
+
+- Add Let AI analyze the job under Chat settings → Job capture, off by default. One-click capture saves page extraction directly unless the user explicitly enables AI cleanup and salary estimation. Keep HiringCafe Apply-link resolution independent of AI analysis.
+- Persist and synchronize the setting, reject new AI capture requests without opt-in, and retain explicit recovery for previously authorized captures. Cover default-off capture without AI tabs/runs, setting persistence, and enabling/disabling the analysis workflow.
+
+## 0.12.0 — 2026-11-12
+
+- Clean one-click job captures through the selected ChatGPT or DeepSeek web tab before creating the final card. Validate the JSON schema and capture identity, employer/title/description, observed Apply URL and salary attribution. Retain the cleanup conversation for subsequent document generation, with pending progress, Resume, cancellation and manual fallback.
+- Resolve HiringCafe's external Apply href or observe the destination of its unambiguous JavaScript Apply control. Save the employer/ATS URL as the job URL, reject invented and HiringCafe destinations, and apply duplicate checks to the cleaned fields.
+- Preserve listed numeric pay only with an exact evidence quote. Otherwise request a candidate-based salary range, label it AI estimate on the card, and expose its assumptions in Details. Extend browser coverage to both providers, direct/JavaScript Apply links, invalid cleanup and saved-chat reuse.
+
+## 0.11.0 — 2026-11-12
+
+- Make Auto download also save validated generated documents to the job and mark it Ready before creating the selected files. Preserve optional cover letters and conversation links; work with the dock closed and keep the review popup closed.
+- Reuse atomic document validation and stale-edit checks for automatic saves. Preserve newer manual edits, avoid repeating saves on duplicate completion/download retries, and report save failures without discarding captured results or downloading unsaved generated files.
+
+## 0.10.2 — 2026-11-12
+
+- Keep the document review popup closed after generation when Auto download is enabled, including replies that need review. Retain explicit Review documents and automatic review when Auto download is disabled; keep Auto preview controlled separately.
+
+## 0.10.1 — 2026-11-12
+
+- Repair DeepSeek capture using documented native response markup: extract highlighted `pre` spans without code-banner text, collect sections within the bound response, prefer its final-answer container, and recognize labelled sibling action controls. Complete matching JSON does not depend on hover controls; real streaming and text stability still gate capture.
+- Scope DeepSeek generation indicators to its response/composer and distinguish Stop generating from audio playback. Add bounded capture diagnostics for extraction, stability, conversation availability, and completion evidence, plus a specific timeout for visible but unrecognized output.
+- Report expired DeepSeek heartbeats as Tracking paused with Resume available, retaining one active job and observe-only recovery after submission. Add structural regression tests derived from a public DeepSeek page capture and document the research and its limitations.
+
+## 0.10.0 — 2026-11-12
+
+- Add document settings for optional cover letters, automatic downloads, and automatic browser previews, enabled by default. Support selecting PDF, Word, and JSON together, with PDF initially selected. Persist preferences per run, download only validated results, and expose manual download retries without changing captured documents.
+- Bundle PDF/Word export libraries and fonts locally. Preview completed files from their saved bytes; provide text previews for Word and a user-triggered action to open the downloaded file. Preserve export status across service-worker restarts and prevent duplicate automatic downloads.
+- Fix DeepSeek skipping submission when a composer mirror contains the run marker. Exclude draft previews, wait for the composer to release unlabelled markers, and prefer actual user bubbles over stale mirror text when collecting the reply. Keep single-job handling and one-time submission guards; allow Resume to recover the prior unsent conversation-link error.
+
+## 0.9.2 — 2026-11-11
+
+- Restore DeepSeek's posted-prompt-to-answer capture path and limit it to one active job across tabs. Remove unanchored response selection and periodic/tab-activation recovery; retain explicit Resume and page-load observation without resending. Pause extra legacy runs while preserving their data.
+- Fix the capture regression that classified accessibility live regions and copy-status elements as drafts. Stop treating a generic DeepSeek result styling class as proof that generation is still running. Keep actual Stop/streaming checks, next-user boundaries, and result validation.
+- Replace concurrent DeepSeek browser coverage with sequential single-tab capture, same-tab reuse, accessibility markup, saved conversations, reload, and invalid-output checks.
+
+## 0.9.1 — 2026-11-11
+
+- Track concurrent DeepSeek chats independently, including thinking-only replies and submitted prompts whose user bubble disappears. Match fallback replies to exact job/run IDs, exclude later turns, and ignore unrelated sidebar loading indicators.
+- Recover observation after transient extension connection failures, page reloads, and tab suspension without resending prompts or changing tab focus. Show Reconnecting or Tracking paused when monitoring is unavailable, preserve Stop/completion during recovery, and expose bounded DeepSeek capture diagnostics.
+- Add concurrent browser coverage for independent completion order, hidden user messages, reloads, and a dropped heartbeat, plus adapter, runner, and lifecycle regression tests.
+
+## 0.9.0 — 2026-11-11
+
+- Open a manual job form when one-click capture cannot read or save a listing, including embedded-page, permission, missing-description, and navigation errors. Preserve the original URL, candidate, and extracted fields; support salary entry and keep failed saves editable with duplicate checks.
+
+## 0.8.2 — 2026-11-11
+
+- Hide and disable Add This Job in One Click on AI chat sites and webmail pages, including while navigating to them. Keep job listings eligible and reject direct activation of the capture control on excluded pages.
+
+## 0.8.1 — 2026-11-11
+
+- Start unlinked ChatGPT and DeepSeek jobs in a new conversation by loading the home page in the selected idle tab before preparing the prompt. Keep home tabs, saved conversations, and submitted-run recovery in place. Block preparation and submission in the old conversation while navigation is pending or fails.
+
+## 0.8.0 — 2026-11-11
+
+- Reuse the first idle ChatGPT or DeepSeek tab for new document runs, skipping provider streaming and tabs reserved by other jobs. DeepSeek accepts existing conversation history and captures only the requested turn. Retain new-tab fallback, saved-conversation recovery, and one-time submission guards.
+- Turn the provider name in the bottom AI bar into a synchronized selector. Go to apply reuses the listing tab and keeps it focused while the associated AI conversation is reused or opened in the background without submitting a prompt.
+
+## 0.7.1 — 2026-11-11
+
+- Adapt ApplicationTracker_v2.1's compact queue cards: a clickable company/role/salary header, right-aligned status and update time, and four equal Resume, Cover letter, Update, and Delete buttons. Keep the borderless dock, separate AI controls and listing/chat links, and add a read-only saved cover-letter view.
+
+## 0.7.0 — 2026-11-11
+
+- Open ChatGPT automatically when no suitable tab exists: use the home page for new jobs and the exact conversation URL for saved chats. Reuse matching tabs, bind generation before navigation, wait for page readiness, and coalesce concurrent Open/Resume actions. Resume keeps submitted runs observe-only. Open selected AI also creates a ChatGPT tab when needed.
+
 ## 0.6.2 — 2026-11-11
 
 - Request one fenced JSON code panel and three output checks. Capture ChatGPT's current turn/search layouts and CodeMirror code panels, exclude thinking and later turns, and wait for streaming to end plus ready Send or final-reply controls. Validate the complete code block, job/run IDs, schema and candidate facts before review. Preserve capture diagnostics alongside submission diagnostics and keep Resume observe-only after sending.

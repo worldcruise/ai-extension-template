@@ -17,3 +17,11 @@ test('submission diagnostics retain bounded measurements without prompt content 
   assert.equal(generationDiagnostics({ code: 'PRIVATE' }), null);
   assert.equal(generationDiagnostics(null), null);
 });
+
+test('DeepSeek capture diagnostics identify the blocking gate without response text', () => {
+  const value = generationDiagnostics({stage:'capture',code:'waiting_for_stability',replyParts:2,codeBlocks:1,
+    extraction:'pre',busyReason:'none',completionBasis:'matching-json',stableMs:500,conversationFound:true,raw:'PRIVATE'});
+  assert.equal(value.stableMs, 500); assert.equal(value.extraction, 'pre'); assert.equal(value.completionBasis, 'matching-json');
+  assert.equal(value.replyParts, 2); assert.equal(value.conversationFound, true); assert.equal(value.raw, undefined);
+  assert.equal(generationDiagnostics({busyReason:'PRIVATE',extraction:'PRIVATE',completionBasis:'PRIVATE',stableMs:-1}), null);
+});

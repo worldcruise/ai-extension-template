@@ -6,6 +6,8 @@
   <meta name="color-scheme" content="light dark">
   <title>Application Tracker</title>
   <link rel="icon" href="assets/icon-32.png">
+  <script src="src/theme.js"></script>
+  <link rel="stylesheet" href="src/theme.css">
   <link rel="stylesheet" href="src/sidebar.css">
   <script src="src/build-info.js"></script>
   <script type="module" src="src/workspace.mjs"></script>
@@ -18,8 +20,9 @@
   </aside>
   <main id="workspace-content">
     <section id="studio-view" class="workspace-view studio-view" role="region" aria-label="Application tracker">
-      <div class="studio-navigation dock-header"><div class="studio-tabs" role="tablist" aria-label="Application workspace"><button id="job-tab" type="button" role="tab" aria-selected="false" aria-controls="job-panel" tabindex="-1">Job form</button><button id="results-tab" type="button" role="tab" aria-selected="true" aria-controls="results-panel">Queue<span id="review-count" class="count">0</span></button></div><button id="studio-dock-toggle" class="studio-dock-toggle" type="button" aria-expanded="true" aria-controls="studio-content" aria-label="Collapse job form and queue" title="Collapse job form and queue"><span class="preview-label">Browser tab</span><i data-icon="chevron-up"></i></button></div>
+      <div class="studio-navigation dock-header"><div class="studio-tabs" role="tablist" aria-label="Application workspace"><button id="apply-tab" type="button" role="tab" aria-selected="true" aria-controls="apply-panel"><i data-icon="external"></i>Apply to jobs</button><button id="results-tab" type="button" role="tab" aria-selected="false" aria-controls="results-panel" tabindex="-1"><i data-icon="queue"></i>Queue<span id="review-count" class="count">0</span></button><button id="job-tab" class="add-job-tab" type="button" role="tab" aria-selected="false" aria-controls="job-panel" tabindex="-1" aria-label="Add a job" title="Add a job manually"><i data-icon="plus"></i></button></div><button id="studio-dock-toggle" class="studio-dock-toggle" type="button" aria-expanded="true" aria-controls="studio-content" aria-label="Collapse job workspace" title="Collapse job workspace"><i data-icon="chevron-up"></i><span class="preview-label sr-only">Saved jobs</span></button></div>
       <button id="capture-current-job" class="capture-current-job" type="button" hidden disabled title="Read this page and save the job"><i data-icon="sparkles"></i><span id="capture-current-job-label">Add This Job in One Click</span></button>
+      <div id="job-capture-progress" class="job-capture-progress" aria-label="AI job cleanup" hidden></div>
       <div id="studio-content" class="studio-content">
       <div id="studio-scroll" class="studio-scroll">
         <section id="job-panel" role="tabpanel" aria-labelledby="job-tab" hidden>
@@ -45,25 +48,42 @@
             </div><div id="template-preview" class="template-preview" aria-label="Selected template preview" aria-live="polite"><p id="template-caption" class="preview-caption">Resume template</p><img id="resume-thumbnail" class="resume-thumbnail" alt="Resume template preview" width="816" height="1056"><div id="prompt-preview" class="prompt-preview" hidden><strong id="prompt-name">Job focused</strong><p id="prompt-text"></p></div></div></div>
           </details>
         </section>
-        <section id="results-panel" role="tabpanel" aria-labelledby="results-tab">
-          <div class="section-heading"><h2>Application queue</h2><span id="queue-owner">Morgan Taylor</span></div>
+        <section id="apply-panel" class="apply-panel" role="tabpanel" aria-labelledby="apply-tab">
+          <div class="apply-context"><span>Prepared jobs</span><span id="apply-candidate"></span></div>
+          <div id="apply-empty" class="empty-state" hidden><span class="empty-icon"><i data-icon="file"></i></span><h3>Prepare a job first</h3><p>Generate and save a resume in Queue, then choose it here to apply.</p><button id="apply-go-queue" class="button primary" type="button">Open queue<i data-icon="arrow-right"></i></button></div>
+          <div id="apply-setup" class="apply-setup" hidden>
+            <div class="apply-job-picker"><label class="field" for="apply-job-select"><span>Choose a job <span id="apply-job-count" class="muted"></span></span><select id="apply-job-select" class="input"></select></label><div class="apply-pager" role="group" aria-label="Prepared job navigation"><button id="apply-previous" class="icon-button" type="button" aria-label="Previous prepared job"><i data-icon="chevron-left"></i></button><button id="apply-next" class="icon-button" type="button" aria-label="Next prepared job"><i data-icon="chevron-right"></i></button></div></div>
+            <button id="apply-job-card" class="apply-job-heading" type="button" data-action="details" title="View job description"><span id="apply-company-logo" class="company-monogram" aria-hidden="true"></span><span class="apply-job-identity"><strong id="apply-company"></strong><span id="apply-role"></span><span id="apply-salary" class="request-salary" hidden></span></span><span class="state-pill" data-state="ready"><i data-icon="check"></i>Ready</span><i class="apply-details-chevron" data-icon="chevron-right"></i></button>
+            <section class="apply-documents" aria-labelledby="apply-documents-title">
+              <div class="apply-section-heading"><h3 id="apply-documents-title">Your documents</h3></div>
+              <div class="apply-document"><span class="apply-document-icon"><i data-icon="file"></i></span><div><strong>Resume</strong><span id="apply-resume-name">Saved for this job</span></div><div class="document-icon-actions" role="group" aria-label="Resume actions"><button id="apply-update" class="icon-button" type="button" data-action="documents" aria-label="Edit resume" title="Edit resume"><i data-icon="file-pen"></i></button><button id="apply-resume" class="icon-button" type="button" data-action="preview" aria-label="Preview resume" title="Preview resume"><i data-icon="eye"></i></button><button id="apply-download" class="icon-button" type="button" data-action="download-resume" aria-label="Download resume" title="Download resume"><i data-icon="download"></i></button></div></div>
+              <div id="apply-letter-row" class="apply-document"><span class="apply-document-icon"><i data-icon="mail"></i></span><div><strong>Cover letter</strong><span>Saved for this job</span></div><div class="document-icon-actions" role="group" aria-label="Cover letter actions"><button id="apply-letter-update" class="icon-button" type="button" data-action="documents-letter" aria-label="Edit cover letter" title="Edit cover letter"><i data-icon="file-pen"></i></button><button id="apply-letter" class="icon-button" type="button" data-action="cover-letter" aria-label="Preview cover letter" title="Preview cover letter"><i data-icon="eye"></i></button><button id="apply-letter-download" class="icon-button" type="button" data-action="download-cover-letter" aria-label="Download cover letter" title="Download cover letter"><i data-icon="download"></i></button></div></div>
+            </section>
+            <div class="apply-destination"><i data-icon="link"></i><div><strong id="apply-site"></strong><span id="apply-tab-state"></span></div></div>
+            <a id="apply-open-job" class="button primary apply-open-job" data-action="apply" target="_blank" rel="noopener noreferrer"><i data-icon="external"></i>Open application</a>
+            <p id="apply-feedback" class="field-hint" role="status" aria-live="polite"></p>
+          </div>
+        </section>
+        <section id="results-panel" role="tabpanel" aria-labelledby="results-tab" hidden>
+          <div class="section-heading queue-heading"><h2 class="sr-only">Application queue</h2><span id="queue-owner">Morgan Taylor</span><span>Saved jobs</span></div>
           <div class="queue-filters"><label class="queue-search"><i data-icon="search"></i><input id="queue-search" type="search" aria-label="Search queued jobs" placeholder="Find company or role" autocomplete="off"></label><label class="sr-only" for="queue-filter">Queue status</label><select id="queue-filter"><option value="all">All statuses</option><option value="queued">Queued</option><option value="ready">Ready</option><option value="attention">Needs attention</option></select></div>
           <p id="queue-no-matches" class="field-hint" role="status" hidden>No matching jobs. Change the search or status filter.</p><ol id="resume-queue" class="resume-queue" aria-label="Application queue"></ol>
 
           <div id="empty-queue" class="empty-state" hidden><span class="empty-icon"><i data-icon="file-pen"></i></span><h3>A fresh start for this candidate</h3><p>Import your profile from Profile, then Add to queue to save a job.</p><button id="empty-prepare" class="button" type="button">Review a job<i data-icon="arrow-right"></i></button></div>
-          <details id="resume-preview" class="document-preview" hidden><summary id="resume-preview-title">Resume preview</summary><article id="resume-paper" class="resume-paper" aria-label="Resume preview"></article><div class="document-actions"><button id="copy-json" class="button" type="button"><i data-icon="copy"></i>Copy JSON</button><button id="export-resume" class="button" type="button"><i data-icon="download"></i>Export</button></div></details>
         </section>
       </div>
         <footer class="studio-footer">
           <div id="job-actions" class="form-actions" hidden><button id="add-request" class="button primary" type="button" title="Save this job"><i data-icon="plus"></i>Add to queue</button><button id="view-queue" class="button" type="button">View queue</button></div>
-          <div id="results-actions" class="form-actions"><button id="review-another" class="button review-another" type="button"><i data-icon="plus"></i>Review another job</button></div>
+          <div id="results-actions" class="form-actions" hidden><button id="review-another" class="button review-another subtle" type="button"><i data-icon="plus"></i>Add a job manually</button></div>
+          <div id="apply-actions" class="autofill-bar"><div class="autofill-placeholder"><span id="autofill-placeholder-label">Autofill · Coming soon</span><div class="autofill-track" aria-hidden="true"><span></span></div></div><button class="button primary" type="button" disabled aria-describedby="autofill-placeholder-label"><i data-icon="lightning"></i>Autofill</button></div>
 
           <p id="workspace-status" class="sr-only" role="status" aria-live="polite">Select a request to review.</p>
         </footer>
       </div>
     </section>
     <footer class="dock-status-bar dock-header">
-    <button id="chat-dock-toggle" type="button" aria-expanded="false" aria-controls="chat-view"><i data-icon="chat"></i><span id="dock-chat-label">ChatGPT</span><span id="queue-summary">Queue empty</span><i class="dock-chevron" data-icon="chevron-up"></i></button>
+    <div class="dock-provider-picker"><i data-icon="chat"></i><select id="dock-chat-provider" aria-label="AI chat provider" aria-describedby="dock-provider-status" title="Choose AI chat provider"><option value="chatgpt">ChatGPT</option><option value="deepseek">DeepSeek</option></select><i data-icon="chevron-down"></i><span id="dock-provider-status" class="sr-only" role="status" aria-live="polite"></span></div>
+    <button id="chat-dock-toggle" type="button" aria-label="Expand or collapse AI chat" aria-expanded="false" aria-controls="chat-view"><span id="queue-summary">Queue empty</span><i class="dock-chevron" data-icon="chevron-up"></i></button>
     <div class="queue-bar"><button id="open-queue" class="icon-button" type="button" aria-label="Open application queue" title="Open application queue"><i data-icon="queue"></i></button></div>
     <div class="account-wrap">
       <button id="account-toggle" class="account-button" type="button" title="Chat settings" aria-label="Chat settings" aria-expanded="false" aria-controls="account-panel"><i data-icon="user"></i></button>
@@ -72,6 +92,7 @@
         <div class="provider-picker"><label for="chat-provider">Chat provider</label><select id="chat-provider"><option value="chatgpt">ChatGPT</option><option value="deepseek">DeepSeek</option></select><span id="provider-status" role="status" aria-live="polite"></span></div>
         <button id="account-sign-in" class="button subtle" type="button"><i data-icon="external"></i><span id="provider-sign-in-label">Sign in to ChatGPT</span></button>
         <button id="profile-details" class="button subtle" type="button"><i data-icon="user"></i>Candidate profile</button>
+        <button id="theme-toggle" class="button subtle theme-toggle" type="button" aria-label="Switch to dark theme" title="Switch to dark theme"><i data-icon="moon"></i><i data-icon="sun"></i><span id="theme-label">Dark theme</span></button>
         <button id="account-settings" class="button subtle" type="button"><i data-icon="settings"></i>Settings</button>
 
       </section>
@@ -136,9 +157,34 @@
         </form>
       </section><section id="queue-settings-panel" role="tabpanel" aria-labelledby="queue-settings-tab" hidden>
         <h3>Chat provider</h3><p class="settings-description">Choose which chat to show in the dock or open in a browser tab.</p>
-        <p class="field-hint">Open ChatGPT in a browser tab first. Generate documents inserts the prompt as plain text there, presses Enter, and collects the reply for review. DeepSeek opens its own tab. Adding a job only saves it.</p>
+        <p class="field-hint">Generate documents uses an idle AI tab or opens one when needed; saved conversations are reused. DeepSeek handles one task at a time. Add to queue saves the manual job form locally.</p>
         <label class="field" for="workflow-provider"><span>AI provider</span><select id="workflow-provider" class="input"><option value="chatgpt">ChatGPT</option><option value="deepseek">DeepSeek</option></select></label>
         <button id="queue-connection-open" class="button" type="button"><i data-icon="external"></i>Open selected AI</button>
+        <h3 class="settings-subheading">Job capture</h3>
+        <label class="settings-check"><input id="job-ai-analysis" type="checkbox" aria-describedby="job-ai-analysis-hint" disabled><span>Let AI analyze the job</span></label>
+        <p id="job-ai-analysis-hint" class="field-hint">Off by default. When enabled, one-click capture sends extracted job details to the selected AI for cleanup and salary estimation before saving the card. When off, it saves the page extraction directly.</p>
+        <p id="job-ai-analysis-status" class="settings-status" role="status" aria-live="polite">Loading job analysis setting…</p>
+        <h3 class="settings-subheading">Documents</h3>
+        <form id="document-settings-form">
+          <label class="settings-check"><input id="document-include-cover-letter" type="checkbox" checked><span>Add cover letter</span></label>
+          <p class="field-hint">Include a cover letter with newly generated resumes.</p>
+          <label class="settings-check"><input id="document-auto-download" type="checkbox" checked aria-describedby="document-auto-download-hint"><span>Auto download</span></label>
+          <p id="document-auto-download-hint" class="field-hint">Automatically save validated documents to the job, then download them.</p>
+          <fieldset class="document-format-options" aria-describedby="document-format-hint">
+            <legend>Download formats</legend>
+            <div class="document-format-choices">
+              <label class="settings-check"><input id="document-format-pdf" type="checkbox" value="pdf" checked><span>PDF</span></label>
+              <label class="settings-check"><input id="document-format-docx" type="checkbox" value="docx"><span>Word (.docx)</span></label>
+              <label class="settings-check"><input id="document-format-json" type="checkbox" value="json"><span>JSON</span></label>
+            </div>
+            <p id="document-format-hint" class="field-hint">Choose one or more formats.</p>
+          </fieldset>
+          <div class="document-setting-followup">
+            <label class="settings-check"><input id="document-auto-preview" type="checkbox" checked aria-describedby="document-auto-preview-hint"><span>Auto preview</span></label>
+            <p id="document-auto-preview-hint" class="field-hint">Open a browser preview when each download finishes.</p>
+          </div>
+          <p id="document-settings-status" class="settings-status" role="status" aria-live="polite">Loading document settings…</p>
+        </form>
       </section><section id="shortcut-settings-panel" role="tabpanel" aria-labelledby="shortcut-settings-tab" hidden>
         <h3>Read page</h3><p class="settings-description">Read Company, Job title, URL, and Job Description from the active job page. The shortcut opens Job form and runs the same action as the Read page button.</p>
         <dl class="request-metadata"><dt>Current shortcut</dt><dd><kbd id="read-page-shortcut">Checking…</kbd></dd><dt>Default shortcut</dt><dd id="read-page-shortcut-default">Ctrl+Shift+F (Command+Shift+F on macOS)</dd></dl>
@@ -151,6 +197,24 @@
     </section>
   </main>
 
+  <dialog id="resume-preview-dialog" class="resume-preview-dialog" aria-labelledby="resume-preview-title"><div class="dialog-heading"><h2 id="resume-preview-title">Resume preview</h2><button class="icon-button" type="button" data-close-dialog aria-label="Close resume preview"><i data-icon="close"></i></button></div><div id="resume-preview" class="dialog-content"><article id="resume-paper" class="resume-paper" aria-label="Resume preview"></article><div class="document-actions"><button id="copy-json" class="button" type="button"><i data-icon="copy"></i>Copy JSON</button><button id="export-resume" class="button" type="button"><i data-icon="download"></i>Download</button></div></div></dialog>
+  <dialog id="cover-letter-dialog" aria-labelledby="cover-letter-title">
+    <div class="dialog-heading"><div><span class="eyebrow">Saved document</span><h2 id="cover-letter-title">Cover letter</h2><p id="cover-letter-context" class="field-hint"></p></div><button class="icon-button" type="button" data-close-dialog aria-label="Close cover letter"><i data-icon="close"></i></button></div>
+    <div class="dialog-content"><p id="cover-letter-copy"></p></div>
+  </dialog>
+  <dialog id="manual-job-dialog" aria-labelledby="manual-job-title" aria-describedby="manual-job-reason">
+    <div class="dialog-heading"><div><h2 id="manual-job-title">Add job manually</h2><p id="manual-job-context" class="field-hint"></p></div><button class="icon-button" type="button" data-close-dialog aria-label="Close manual job form"><i data-icon="close"></i></button></div>
+    <form id="manual-job-form" class="dialog-content manual-job-form">
+      <p id="manual-job-reason" class="field-hint"></p>
+      <label class="field" for="manual-job-company"><span>Company</span><input id="manual-job-company" class="input" type="text" maxlength="180" autocomplete="organization" placeholder="Company name"></label>
+      <label class="field" for="manual-job-role"><span>Job title</span><input id="manual-job-role" class="input" type="text" maxlength="220" autocomplete="off" placeholder="Job title from the listing"></label>
+      <label class="field" for="manual-job-salary"><span>Salary <span class="muted">(optional)</span></span><input id="manual-job-salary" class="input" type="text" maxlength="250" autocomplete="off" placeholder="For example, USD 90,000–120,000 per year"></label>
+      <label class="field" for="manual-job-url"><span>Job URL</span><input id="manual-job-url" class="input" type="url" required inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://…"></label>
+      <label class="field" for="manual-job-description"><span>Job description</span><textarea id="manual-job-description" class="input" required rows="7" maxlength="100000" placeholder="Paste the job description here…"></textarea></label>
+      <p id="manual-job-status" class="documents-status" role="status" aria-live="polite"></p>
+      <div class="document-actions"><button class="button" type="button" data-close-dialog>Cancel</button><button id="manual-job-save" class="button primary" type="submit"><i data-icon="plus"></i>Add to queue</button></div>
+    </form>
+  </dialog>
   <dialog id="documents-dialog" aria-labelledby="documents-title">
     <div class="dialog-heading"><div><span class="eyebrow">Job documents</span><h2 id="documents-title">Resume &amp; cover letter</h2><p id="documents-context" class="field-hint"></p></div><button class="icon-button" type="button" data-close-dialog aria-label="Close document form"><i data-icon="close"></i></button></div>
     <form id="documents-form" class="dialog-content">
@@ -165,8 +229,7 @@
     </form>
   </dialog>
   <dialog id="read-page-error-dialog" aria-labelledby="read-page-error-title"><div class="dialog-heading"><h2 id="read-page-error-title">Could not read this page</h2><button class="icon-button" type="button" data-close-dialog aria-label="Close Read page error"><i data-icon="close"></i></button></div><div class="dialog-content"><p id="read-page-error-message" class="settings-description"></p><button class="button" type="button" data-close-dialog>Close</button></div></dialog>
-    <dialog id="profile-dialog" aria-labelledby="profile-dialog-title"><div class="dialog-heading"><div><span id="profile-kind" class="eyebrow">Candidate profile</span><h2 id="profile-dialog-title">Candidate profile</h2></div><button class="icon-button" type="button" data-close-dialog aria-label="Close profile"><i data-icon="close"></i></button></div><div class="dialog-content"><label class="field profile-selection" for="candidate"><span>Candidate profile</span><select id="candidate" class="input"><optgroup label="Example profiles"><option value="morgan">Morgan Taylor</option><option value="jordan">Jordan Lee</option></optgroup></select></label><p id="profile-filename" class="field-hint"></p><h3 id="profile-name"></h3><p id="profile-role" class="muted"></p><p id="profile-summary" class="profile-summary"></p><div id="profile-skills" class="skill-tags"></div><div class="integration-note"><i data-icon="file-json"></i><div><strong>Candidate JSON</strong><p>Import your profile in the example format. Profiles, queued jobs, and results are saved on this device. Add to queue saves the job. Use Documents to add a resume and cover letter.</p></div></div><input id="profile-file" type="file" accept="application/json,.json" hidden><button id="import-profile" class="button" type="button"><i data-icon="upload"></i>Import profile JSON</button><button id="download-profile-example" class="button" type="button"><i data-icon="download"></i>Download example format</button><p id="profile-import-status" class="settings-status" role="status" aria-live="polite"></p><button id="reset-examples" class="button subtle" type="button">Load example results</button></div></dialog>
-  <dialog id="request-dialog" aria-labelledby="request-dialog-title"><div class="dialog-heading"><div><span class="eyebrow">Saved job</span><h2 id="request-dialog-title">Request details</h2></div><button class="icon-button" type="button" data-close-dialog aria-label="Close request"><i data-icon="close"></i></button></div><div class="dialog-content"><section class="request-job-section"><div class="section-heading"><h3>Job description</h3><a id="request-job-link" class="button" target="_blank" rel="noopener noreferrer" hidden>Go to apply<i data-icon="external"></i></a></div><p id="request-job"></p></section><details class="request-section"><summary>Job &amp; candidate details</summary><dl id="request-metadata" class="request-metadata"></dl></details><details class="request-section" open><summary>Prompt &amp; instructions</summary><p id="request-prompt"></p></details><details id="request-generation-section" class="request-section" hidden><summary>AI generation &amp; diagnostics</summary><p id="request-generation-status"></p><p>Submission and capture checks. Diagnostics contain counts and states, without prompt or response text.</p><pre id="request-generation-diagnostics"></pre><button id="copy-generation-diagnostics" class="button" type="button" hidden>Copy diagnostics</button></details><details id="request-output-section" class="request-section"><summary>Saved resume JSON</summary><pre id="request-output"></pre></details><div class="integration-note"><i data-icon="link"></i><div><strong>Source conversation</strong><p id="request-source-note"></p></div></div><div class="request-source-actions"><button id="request-open-chat" class="button" type="button" disabled><i data-icon="chat"></i>Open connected chat</button><button id="request-connect-chat" class="button" type="button" disabled><i data-icon="link"></i>Connect current chat</button></div></div></dialog>
-  <dialog id="export-dialog" aria-labelledby="export-dialog-title"><div class="dialog-heading"><div><span class="eyebrow">Resume export</span><h2 id="export-dialog-title">Choose a format</h2></div><button class="icon-button" type="button" data-close-dialog aria-label="Close export"><i data-icon="close"></i></button></div><div class="dialog-content"><div class="export-formats"><button class="export-format" type="button" disabled><i data-icon="file"></i><strong>PDF</strong><span>Ready to share</span></button><button class="export-format" type="button" disabled><i data-icon="file-pen"></i><strong>Word</strong><span>Editable .docx</span></button></div><p class="muted">Document export is not connected yet. You can copy the resume JSON from its preview.</p></div></dialog>
+    <dialog id="profile-dialog" aria-labelledby="profile-dialog-title"><div class="dialog-heading"><div><span id="profile-kind" class="eyebrow">Candidate profile</span><h2 id="profile-dialog-title">Candidate profile</h2></div><button class="icon-button" type="button" data-close-dialog aria-label="Close profile"><i data-icon="close"></i></button></div><div class="dialog-content"><label class="field profile-selection" for="candidate"><span>Candidate profile</span><select id="candidate" class="input"><optgroup label="Example profiles"><option value="morgan">Morgan Taylor</option><option value="jordan">Jordan Lee</option></optgroup></select></label><p id="profile-filename" class="field-hint"></p><h3 id="profile-name"></h3><p id="profile-role" class="muted"></p><p id="profile-summary" class="profile-summary"></p><div id="profile-skills" class="skill-tags"></div><div class="integration-note"><i data-icon="file-json"></i><div><strong>Candidate JSON</strong><p>Import your profile in the example format. Profiles, queued jobs, and results are saved on this device. Add to queue saves the job. Use Update on a job card to add a resume and cover letter.</p></div></div><input id="profile-file" type="file" accept="application/json,.json" hidden><button id="import-profile" class="button" type="button"><i data-icon="upload"></i>Import profile JSON</button><button id="download-profile-example" class="button" type="button"><i data-icon="download"></i>Download example format</button><p id="profile-import-status" class="settings-status" role="status" aria-live="polite"></p><button id="reset-examples" class="button subtle" type="button">Load example results</button></div></dialog>
+  <dialog id="request-dialog" aria-labelledby="request-dialog-title"><div class="dialog-heading"><div><span class="eyebrow">Saved job</span><h2 id="request-dialog-title">Request details</h2></div><button class="icon-button" type="button" data-close-dialog aria-label="Close request"><i data-icon="close"></i></button></div><div class="dialog-content"><section class="request-job-section"><div class="section-heading"><h3>Job description</h3><a id="request-job-link" class="button" target="_blank" rel="noopener noreferrer" hidden>Go to apply<i data-icon="external"></i></a></div><p id="request-job"></p></section><details class="request-section"><summary>Job &amp; candidate details</summary><dl id="request-metadata" class="request-metadata"></dl></details><details class="request-section" open><summary>Prompt &amp; instructions</summary><p id="request-prompt"></p></details><details id="request-output-section" class="request-section"><summary>Saved resume JSON</summary><pre id="request-output"></pre></details><div class="integration-note"><i data-icon="link"></i><div><strong>Source conversation</strong><p id="request-source-note"></p></div></div><div class="request-source-actions"><button id="request-open-chat" class="button" type="button" disabled><i data-icon="chat"></i>Open connected chat</button><button id="request-connect-chat" class="button" type="button" disabled><i data-icon="link"></i>Connect current chat</button></div></div></dialog>
   </body>
 </html>

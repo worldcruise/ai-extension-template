@@ -24,6 +24,6 @@ export const jobSiteAdapters = [
   { name:'Handshake', host:'(^|\\.)joinhandshake\\.com$', description:['[class*="job-description"]','[class*="JobDescription"]','[data-hook*="description"]'], role:['main h1','main h2'], company:['a[href*="/employers/"]','a[href*="/e/"]'] },
   { name:'ZipRecruiter', host:'(^|\\.)ziprecruiter\\.com$', description:['.job_description','[data-testid="job-description"]','.jobDescriptionSection'], role:['h1'], company:['[data-testid="company-name"]','.hiring_company'] },
   { name:'Dice', host:'(^|\\.)dice\\.com$', description:['[data-testid="jobDescriptionHtml"]','#jobdescSec','.job-description'], role:['[data-testid="jobTitle"]','h1'], company:['[data-testid="companyName"]','.company-name'] },
-  { name:'HiringCafe', host:'(^|\\.)hiring\\.cafe$', description:['[data-testid="job-description"]','[class*="job-description"]','[class*="jobDescription"]'], role:['[data-testid="job-title"]','h1'], company:['[data-testid="company-name"]','[class*="company-name"]'] },
+  { name:'HiringCafe', host:'(^|\\.)(hiring\\.cafe|hiringcafe\\.com)$', description:['[data-testid="job-description"]','[class*="job-description"]','[class*="jobDescription"]'], role:['[data-testid="job-title"]','h1'], company:['[data-testid="company-name"]','[class*="company-name"]'] },
   { name:'Jobright', host:'(^|\\.)jobright\\.ai$', description:['[class*="job-description"]','[class*="jobDescription"]','[class*="index_job-detail"]'], role:['[class*="index_job-title__"]','h1'], company:['[class*="index_company-name__"]'] }
 ];

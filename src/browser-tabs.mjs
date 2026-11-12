@@ -14,8 +14,9 @@ export function createBrowserTabs({ browser = globalThis.chrome, onChange = () =
     return result;
   };
   const publish = () => {
+    const selected = tabs.find(tab => tab.id === selectedId);
     if (!disposed) onChange({ windowId, count: tabs.length, index: tabs.findIndex(tab => tab.id === selectedId) + 1,
-      tabId: selectedId ?? null, url: tabs.find(tab => tab.id === selectedId)?.url || '', busy });
+      tabId: selectedId ?? null, url: selected?.pendingUrl || selected?.url || '', busy });
   };
   const report = () => {
     tabs = [];

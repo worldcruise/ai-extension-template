@@ -114,6 +114,7 @@ function documentJob(evidence) {
     source: !companyText(evidence.company) && companyText(primary?.company) ? structured ? 'JobPosting' : 'Embedded job JSON' : 'Page metadata or DOM' },
     role: !role ? { kind: 'missing' } : { kind: roleKind, source: roleKind === 'structured' ? structured ? 'JobPosting' : 'Embedded job JSON' : 'Page metadata or DOM' } };
   return {company,role,description,url:cleanJobUrl(evidence.url),source,provenance,
+    cleanupContext: [evidence.pageTitle,...(evidence.headings || []),JSON.stringify(primary || {}), ...(evidence.descriptions || []).filter(item=>item.rank>=75).slice(0,2).map(item=>item.text)].filter(Boolean).join('\n\n').slice(0,25000),
     score:certainty + (company ? 5 : 0) + (role ? 5 : 0) + Math.min(description.length/1000,10)};
 }
 
@@ -122,6 +123,6 @@ export function extractJobFromEvidence(capture) {
   const job = jobs[0];
   if (!job) return null;
   const fields = {company:job.company,role:job.role,url:cleanJobUrl(capture.url),description:job.description};
-  return {fields,source:job.source,provenance:job.provenance,missing:Object.entries(fields).filter(([,value])=>!value).map(([key])=>key),
+  return {fields,source:job.source,provenance:job.provenance,cleanupEvidence:{context:job.cleanupContext},missing:Object.entries(fields).filter(([,value])=>!value).map(([key])=>key),
     blockedFrames:(capture.blockedFrames || []).length};
 }

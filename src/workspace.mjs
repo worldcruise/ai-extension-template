@@ -1,6 +1,7 @@
 import { createJobQueue } from './job-queue.mjs';
 import { createGenerationClient } from './generation-client.mjs';
-import { existingChatGPTTabs, focusChatGPTTab } from './chatgpt-tabs.mjs';
+import { openProviderTab } from './ai-tabs.mjs';
+import { openApplicationTabs } from './apply-tabs.mjs';
 import { createChatSidebar } from './sidebar.mjs';
 import { createStudio } from './studio.mjs';
 import { renderIcons } from './icons.mjs';
@@ -8,11 +9,13 @@ import { createBrowserTabs } from './browser-tabs.mjs';
 import { createKeywordSettings } from './keyword-settings.mjs';
 import { createPageHighlights } from './page-highlights.mjs';
 import { createShortcutSettings } from './shortcut-settings.mjs';
+import { createDocumentSettings } from './document-settings.mjs';
+import { createJobAnalysisSettings } from './job-analysis-settings.mjs';
 import { createWorkspaceShortcuts } from './workspace-shortcuts.mjs';
 import { createChatProviders } from './chat-providers.mjs';
 import { createDeepseekToolbar } from './deepseek-toolbar.mjs';
 import { createWorkspaceDock } from './workspace-dock.mjs';
-import { chatProviderForUrl } from './saved-chat.mjs';
+import { chatProviderForUrl, requestChatUrl } from './saved-chat.mjs';
 
 const q = selector => document.querySelector(selector);
 renderIcons();
@@ -66,8 +69,8 @@ const { select: selectView } = createWorkspaceDock({
 });
 
 const studioScroll = q('#studio-scroll');
-const studioPositions = { job: 0, results: 0 };
-let studioPanel = 'results';
+const studioPositions = { job: 0, results: 0, apply: 0 };
+let studioPanel = 'apply';
 function setStudioExpanded(expanded) {
   const content = q('#studio-content'), toggle = q('#studio-dock-toggle');
   if (expanded === !content.hidden) return;
@@ -76,7 +79,7 @@ function setStudioExpanded(expanded) {
   q('#studio-view').dataset.collapsed = String(!expanded);
   document.body.classList.toggle('studio-dock-collapsed', !expanded);
   toggle.setAttribute('aria-expanded', String(expanded));
-  toggle.title = `${expanded ? 'Collapse' : 'Expand'} job form and queue`;
+  toggle.title = `${expanded ? 'Collapse' : 'Expand'} job workspace`;
   toggle.setAttribute('aria-label', toggle.title);
   if (expanded) studioScroll.scrollTop = studioPositions[studioPanel];
   else if (content.contains(document.activeElement)) toggle.focus();
@@ -88,13 +91,15 @@ q('.studio-navigation').addEventListener('click', event => {
   q('#studio-dock-toggle').focus();
 });
 const selectStudioTab = bindTabs([
-  { id: 'job', tab: q('#job-tab'), panel: q('#job-panel') },
-  { id: 'results', tab: q('#results-tab'), panel: q('#results-panel') }
+  { id: 'apply', tab: q('#apply-tab'), panel: q('#apply-panel') },
+  { id: 'results', tab: q('#results-tab'), panel: q('#results-panel') },
+  { id: 'job', tab: q('#job-tab'), panel: q('#job-panel') }
 ], id => {
   selectView('studio');
   studioScroll.scrollTop = studioPositions[id];
   q('#job-actions').hidden = id !== 'job';
   q('#results-actions').hidden = id !== 'results';
+  q('#apply-actions').hidden = id !== 'apply';
 }, id => {
   if (!q('#studio-content').hidden) studioPositions[studioPanel] = studioScroll.scrollTop;
   studioPanel = id;
@@ -122,13 +127,30 @@ let browserTabs;
 let browserWindowId;
 const queue = createJobQueue();
 const generations = createGenerationClient();
+let silentChatRevision = 0, silentChatWork = Promise.resolve();
+function syncSidebarChat(url) {
+  const revision = ++silentChatRevision;
+  if (!url) return Promise.resolve();
+  const isCurrent = () => revision === silentChatRevision;
+  const task = async () => {
+    await chatProviders.ready;
+    if (!isCurrent()) return;
+    const provider = chatProviderForUrl(url);
+    await chatProviders.showProvider(provider);
+    if (!isCurrent()) return;
+    await (provider === 'deepseek' ? deepseekChat : chat).openConversation(url, { reveal: false, isCurrent });
+  };
+  silentChatWork = silentChatWork.catch(() => {}).then(task);
+  return silentChatWork;
+}
 async function openSelectedChat() {
   await chatProviders.ready;
-  if (chatProviders.current() === 'chatgpt') return focusChatGPTTab((await existingChatGPTTabs())[0]);
-  return chrome.tabs.create({ url: 'https://chat.deepseek.com/', active: true });
+  return openProviderTab(chatProviders.current());
 }
 q('#queue-connection-open').addEventListener('click', () => { void openSelectedChat().catch(error => studio.chatError(error.message)); });
 const shortcutSettings = createShortcutSettings();
+createDocumentSettings();
+createJobAnalysisSettings();
 bindTabs([
   { id: 'keywords', tab: q('#keyword-settings-tab'), panel: q('#keyword-settings-panel') },
   { id: 'queue', tab: q('#queue-settings-tab'), panel: q('#queue-settings-panel') },
@@ -141,9 +163,14 @@ const studio = createStudio({
   queue,
   generations,
   getChatProvider: () => chatProviders?.current() || 'chatgpt',
+  openApplication: request => openApplicationTabs({ jobUrl: request.input.job.url,
+    conversationUrl: generations.forJob(request.id)?.url || requestChatUrl(request),
+    provider: chatProviders?.current() || 'chatgpt' }),
   openDialog,
+  syncChat: syncSidebarChat,
   showStudio: panel => { selectView('studio'); selectStudioTab(panel); },
   showChat: url => {
+    silentChatRevision++;
     if (!url) { selectView('chat'); return; }
     void (async () => {
       const provider = chatProviderForUrl(url);
@@ -188,11 +215,11 @@ window.addEventListener('pagehide', () => {
 });
 
 chat = createChatSidebar({
-  onOpenChat: () => selectView('chat'),
+  onOpenChat: () => { silentChatRevision++; selectView('chat'); },
   onShortcut: action => workspaceShortcuts?.run(action),
 });
 deepseekChat = createDeepseekToolbar();
-chatProviders = createChatProviders({ onSelect: () => { selectView('chat'); closeAccount(true); } });
+chatProviders = createChatProviders({ onSelect: (_provider, source) => { silentChatRevision++; selectView('chat'); closeAccount(source !== 'dock'); } });
 workspaceShortcuts = createWorkspaceShortcuts({ selectView, selectJob: () => selectStudioTab('job') });
 window.addEventListener('pagehide', () => { queue.dispose(); generations.dispose(); }, { once: true });
 

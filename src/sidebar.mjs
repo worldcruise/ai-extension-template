@@ -242,11 +242,12 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
   });
   document.getElementById('retry').addEventListener('click', () => initialized ? navigateManually(currentUrl) : void start());
   window.addEventListener('pagehide', () => { resetHistory(); clearTimeout(watchdog); clearInterval(polling); chrome.runtime.onMessage.removeListener(onWorkspaceShortcut); });
-  async function openConversation(url) {
+  async function openConversation(url, { reveal = true, isCurrent = () => true } = {}) {
     const target = linkedConversationUrl(url);
     if (!target) return;
     if (target !== currentUrl) await navigationGuard();
-    onOpenChat();
+    if (!isCurrent()) return;
+    if (reveal) onOpenChat();
     if (target !== currentUrl) loadChat(target);
     toolbar.hide();
     toolbar.updateCurrent();

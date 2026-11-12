@@ -88,6 +88,9 @@ export function collectJobEvidence(adapters) {
         description:typeof description==='string' ? description.slice(0,100000) : '',
         url:typeof node.url==='string' ? node.url : node.jobUrl || node.job_url || '',
         id:String(node.identifier?.value || node.identifier || node.id || node.jobId || node.requisition_id || '').slice(0,150), type };
+      if (typeof node.salary === 'string') value.salary = node.salary.slice(0,500);
+      const pay = node.baseSalary, range = pay?.value;
+      if (pay && typeof pay === 'object' && range && typeof range === 'object') value.salary = [pay.currency,range.minValue,range.maxValue,range.value,range.unitText].filter(item=>typeof item === 'string' || typeof item === 'number').join(' ').slice(0,500);
       if (value.title && (value.description || type==='json-ld')) (type==='json-ld' ? evidence.structured : evidence.states).push(value);
     }
     function walkJson(node, type, level=0, refs=new Map()) {
