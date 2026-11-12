@@ -88,6 +88,11 @@ export function createStudio({ openDialog, showStudio, showChat, syncChat = asyn
     provenanceDrafts.set(currentTabId, { ...current, [key]: { ...descriptor, value: value.trim() } });
   }
   const manualUrls = new Set();
+  const releaseTabDraft = id => {
+    jobDrafts.delete(id);provenanceDrafts.delete(id);readFeedback.delete(id);manualUrls.delete(id);
+    if(currentTabId===id){currentTabId=null;for(const selector of Object.values(jobFields))q(selector).value='';}
+  };
+  chrome.tabs.onRemoved.addListener(releaseTabDraft);
   const jobFields = { company: '#job-company', role: '#job-title', url: '#job-url', description: '#job-description' };
   const jobDraft = () => Object.fromEntries(Object.entries(jobFields).map(([key, selector]) => [key, q(selector).value]));
   const status = text => { q('#workspace-status').textContent = text; q('.queue-bar').title = text; };
@@ -912,7 +917,7 @@ export function createStudio({ openDialog, showStudio, showChat, syncChat = asyn
   }).catch(error => { status(error.message); q('#empty-queue p').textContent = error.message; });
   window.addEventListener('pagehide', unsubscribe, { once: true });
   window.addEventListener('pagehide', unsubscribeRuns, { once: true });
-  window.addEventListener('pagehide', () => { clearTimeout(noticeTimer); chrome.storage.onChanged.removeListener(duplicateOptionChanged); chrome.storage.onChanged.removeListener(batchChanged); }, { once: true });
+  window.addEventListener('pagehide', () => { clearTimeout(noticeTimer);chrome.tabs.onRemoved.removeListener(releaseTabDraft); chrome.storage.onChanged.removeListener(duplicateOptionChanged); chrome.storage.onChanged.removeListener(batchChanged); }, { once: true });
   renderQueue(); renderTemplate();
   return { ready, updateTabs, tabError, readPage,
     chatError(message) { status(message); showNotice('Chat could not open', message); }

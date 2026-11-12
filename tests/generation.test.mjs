@@ -966,6 +966,15 @@ test('generation client polls health only while active, coalesces polls and clea
   client.dispose(); assert.equal(timers.size, 0); assert.equal(listener, null);
 });
 
+test('generation change bursts share one history read and one follow-up read',async()=>{
+  let listener,calls=0,release,blocked=false;
+  const browser={runtime:{id:'extension',onMessage:{addListener:fn=>listener=fn,removeListener:()=>{}},sendMessage:async()=>{calls++;if(blocked)return new Promise(resolve=>release=()=>resolve({ok:true,value:[]}));return {ok:true,value:[]};}}};
+  const client=createGenerationClient({browser});await client.ready;blocked=true;
+  for(let n=0;n<30;n++)listener({type:'generation.changed'},{id:'extension'});
+  assert.equal(calls,2);blocked=false;release();await new Promise(setImmediate);
+  assert.equal(calls,3);client.dispose();
+});
+
 test('DeepSeek Resume retries an unsent missing-conversation run in its owned home tab', async () => {
   const f = fixture(); f.tabs.clear(); f.tabs.set(1, { id:1, active:true, url:'https://chat.deepseek.com/' });
   const initial = await f.service.start('job-1', 'deepseek'), sender = f.sender(initial);

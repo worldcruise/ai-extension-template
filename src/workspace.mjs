@@ -57,6 +57,8 @@ let chatProviders;
 let workspaceShortcuts;
 const { select: selectView } = createWorkspaceDock({
   onOpen: () => requestAnimationFrame(() => {
+    if(pendingSidebarUrl){const url=pendingSidebarUrl;pendingSidebarUrl=null;void syncSidebarChat(url).catch(error=>studio.chatError(error.message));}
+    else { chatProviders?.ensureCurrent();if(chatProviders?.current()==='chatgpt')void chat?.ensureLoaded(); }
     chat?.probe();
     deepseekChat?.probe();
   }),
@@ -127,9 +129,10 @@ let browserTabs;
 let browserWindowId;
 const queue = createJobQueue();
 const generations = createGenerationClient();
-let silentChatRevision = 0, silentChatWork = Promise.resolve();
+let silentChatRevision = 0, silentChatWork = Promise.resolve(), pendingSidebarUrl = null;
 function syncSidebarChat(url) {
   const revision = ++silentChatRevision;
+  pendingSidebarUrl=url || null;
   if (!url) return Promise.resolve();
   const isCurrent = () => revision === silentChatRevision;
   const task = async () => {
@@ -137,6 +140,9 @@ function syncSidebarChat(url) {
     if (!isCurrent()) return;
     const provider = chatProviderForUrl(url);
     await chatProviders.showProvider(provider);
+    if(q('#chat-view').hidden){pendingSidebarUrl=url;return;}
+    pendingSidebarUrl=null;
+    chatProviders.ensureCurrent();
     if (!isCurrent()) return;
     await (provider === 'deepseek' ? deepseekChat : chat).openConversation(url, { reveal: false, isCurrent });
   };
@@ -168,6 +174,7 @@ const studio = createStudio({
   syncChat: syncSidebarChat,
   showStudio: panel => { selectView('studio'); selectStudioTab(panel); },
   showChat: url => {
+    pendingSidebarUrl=null;
     silentChatRevision++;
     if (!url) { selectView('chat'); return; }
     void (async () => {
@@ -213,11 +220,12 @@ window.addEventListener('pagehide', () => {
 });
 
 chat = createChatSidebar({
+  lazy:true,
   onOpenChat: () => { silentChatRevision++; selectView('chat'); },
   onShortcut: action => workspaceShortcuts?.run(action),
 });
 deepseekChat = createDeepseekToolbar();
-chatProviders = createChatProviders({ onSelect: (_provider, source) => { silentChatRevision++; selectView('chat'); closeAccount(source !== 'dock'); } });
+chatProviders = createChatProviders({ lazy:true, onSelect: (_provider, source) => { pendingSidebarUrl=null;silentChatRevision++; selectView('chat'); closeAccount(source !== 'dock'); } });
 workspaceShortcuts = createWorkspaceShortcuts({ selectView, selectJob: () => selectStudioTab('job') });
 window.addEventListener('pagehide', () => { queue.dispose(); generations.dispose(); }, { once: true });
 

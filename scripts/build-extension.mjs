@@ -9,7 +9,7 @@ export const root = fileURLToPath(new URL('../', import.meta.url));
 export const extensionFiles = [
   'src/build-info.js', 'src/job-metadata.mjs', 'src/job-duplicates.mjs', 'src/job-capture-url.mjs','src/job-cleanup.mjs','src/job-apply-url.mjs','src/job-analysis-settings.mjs',
   'manifest.json', 'index.html',
-  'document-preview.html', 'src/document-preview.mjs', 'src/document-preview.css',
+  'document-preview.html', 'src/document-preview.mjs', 'src/document-preview.css', 'src/document-preview-tabs.mjs',
   'src/document-settings.mjs', 'src/document-file-store.mjs', 'src/document-export.mjs', 'src/document-downloads.mjs',
   'vendor/document-libraries.mjs', 'vendor/DOCUMENT-LICENSES.txt', 'vendor/fontkit-LICENSE.txt',
   'assets/fonts/NotoSans-Regular.ttf', 'assets/fonts/NotoSans-Bold.ttf', 'assets/fonts/OFL.txt',

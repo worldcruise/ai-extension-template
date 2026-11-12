@@ -1,7 +1,7 @@
 import { CHATGPT_HOME, CHATGPT_ORIGIN, FRAME_CHANNEL, frameMessage, frameShortcutMessage, conversationUrl, linkedConversationUrl } from './sidebar-protocol.mjs';
 import { createChatToolbar } from './chat-toolbar.mjs';
 
-export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {} } = {}) {
+export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}, lazy = false } = {}) {
   const frame = document.getElementById('chatgpt-frame');
   const connection = document.getElementById('connection');
   const status = document.getElementById('status');
@@ -17,6 +17,7 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
   let polling;
   let initialized = false;
   let starting = false;
+  let pendingStart = null;
   let awaitingFrameLoad = false;
   let chatEstablished = false;
   let toolbar;
@@ -245,6 +246,7 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
   async function openConversation(url, { reveal = true, isCurrent = () => true } = {}) {
     const target = linkedConversationUrl(url);
     if (!target) return;
+    if(!initialized){currentUrl=target;await ensureLoaded();}
     if (target !== currentUrl) await navigationGuard();
     if (!isCurrent()) return;
     if (reveal) onOpenChat();
@@ -260,8 +262,9 @@ export function createChatSidebar({ onOpenChat = () => {}, onShortcut = () => {}
     moveHistory: direction => { void moveHistory(direction); },
     selectConversation: chat => { void moveHistory(null, chat.url); }
   });
-  void start();
-  return { probe, openConversation, getCurrentChat: () => linkedConversationUrl(currentUrl),
+  function ensureLoaded() { return initialized ? Promise.resolve() : pendingStart ||= start().finally(()=>{pendingStart=null;}); }
+  if(!lazy)void ensureLoaded();
+  return { probe, ensureLoaded, openConversation, getCurrentChat: () => linkedConversationUrl(currentUrl),
     hideControls: toolbar.hide,
     signIn: () => openTab(`${CHATGPT_ORIGIN}/auth/login`) };
 }

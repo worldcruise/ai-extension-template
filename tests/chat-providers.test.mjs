@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import { createChatProviders, DEEPSEEK_HOME } from '../src/chat-providers.mjs';
 import { deepseekEmbedRules } from '../src/sidebar-protocol.mjs';
 
-function setup(saved = 'chatgpt', beforeChange = async () => {}) {
+function setup(saved = 'chatgpt', beforeChange = async () => {}, options={}) {
   const nodes = new Map();
   const document = { getElementById(id) {
-    if (!nodes.has(id)) nodes.set(id, { hidden: false, value: '', listeners: {}, focusCalls: 0,
+    if (!nodes.has(id)) nodes.set(id, { hidden: id==='chat-view'&&!!options.lazy, value: '', listeners: {}, focusCalls: 0,
       addEventListener(name, listener) { this.listeners[name] = listener; },
       focus() { this.focusCalls++; },
       getAttribute(name) { return this[name] || null; } });
@@ -15,9 +15,14 @@ function setup(saved = 'chatgpt', beforeChange = async () => {}) {
   const writes = [], opened = [], selected = [], selectionSources = [];
   const browser = { storage: { local: { get: async () => ({ chatProvider: saved }), set: async value => writes.push(value) } },
     tabs: { create: async value => opened.push(value) } };
-  return { connection: createChatProviders({ document, browser, beforeChange, onSelect: (provider, source) => { selected.push(provider); selectionSources.push(source); } }), nodes, writes, opened, selected, selectionSources };
+  return { connection: createChatProviders({ document, browser, beforeChange,...options,onSelect: (provider, source) => { selected.push(provider); selectionSources.push(source); } }), nodes, writes, opened, selected, selectionSources };
 }
 const settle = () => new Promise(resolve => setImmediate(resolve));
+test('collapsed workspace can restore DeepSeek selection without loading its page',async()=>{
+  const {connection,nodes}=setup('deepseek',undefined,{lazy:true});await connection.ready;
+  assert.equal(connection.current(),'deepseek');assert.equal(nodes.get('deepseek-frame').src,undefined);
+  nodes.get('chat-view').hidden=false;connection.ensureCurrent();assert.equal(nodes.get('deepseek-frame').src,DEEPSEEK_HOME);
+});
 
 test('saved provider restores lazily and switching preserves both frame identities and routes', async () => {
   const { connection, nodes, writes, opened, selected } = setup();

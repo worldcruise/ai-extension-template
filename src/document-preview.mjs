@@ -53,7 +53,7 @@ async function load() {
       content.hidden = false;
       status.textContent = stored.format === 'docx' ? 'Text preview. Open the downloaded file to view its Word formatting.' : 'Contents of the downloaded JSON file.';
     }
-    file = stored; open.disabled = false;
+    file = {state:stored.state,downloadId:stored.downloadId}; open.disabled = false;
     document.documentElement.dataset.previewState = 'ready';
   } catch (error) {
     if (disposed) return;

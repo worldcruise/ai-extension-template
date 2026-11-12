@@ -5,6 +5,7 @@ import { exportDocuments } from './document-export.mjs';
 import { createJobQueue } from './job-queue.mjs';
 import { createQueueStore } from './queue-store.mjs';
 import { parseManualResume } from './manual-documents.mjs';
+import { openDocumentPreview } from './document-preview-tabs.mjs';
 
 async function saveGeneratedDocuments(run) {
   const queue = createJobQueue();
@@ -22,18 +23,19 @@ export function createDocumentDownloads({ browser = chrome, store = createGenera
   files = createDocumentFileStore(), jobs = createQueueStore(), exportFiles = exportDocuments, saveGenerated = saveGeneratedDocuments,
   now = Date.now, uuid = () => crypto.randomUUID(), onChange = () => {} } = {}) {
   const pending = new Map(), updating = new Map();
-  const notify = () => { void browser.runtime.sendMessage({ type: 'generation.changed' }).catch(() => {}); void Promise.resolve().then(onChange).catch(() => {}); };
-  const read = async id => (await store.read()).runs.find(run => run.id === id);
+  const notify = run => { void browser.runtime.sendMessage({ type: 'generation.changed' }).catch(() => {}); void Promise.resolve().then(()=>onChange(run)).catch(() => {}); };
+  const read = async id => store.get ? store.get(id) : (await store.read()).runs.find(run => run.id === id);
   async function update(id, edit) {
-    const { value } = await store.change(state => {
+    const editRun=run=>{if(!run)return null;const change=edit(run.downloads,run);return change?{...run,downloads:change}:run;};
+    const { value } = store.update ? await store.update(id,editRun) : await store.change(state => {
       const index = state.runs.findIndex(run => run.id === id);
       if (index < 0) return null;
-      const run = state.runs[index], change = edit(run.downloads, run);
-      if (!change) return run;
-      return state.runs[index] = { ...run, downloads: change };
+      return state.runs[index] = editRun(state.runs[index]);
     });
     if(value?.downloads?.state==='complete' && value.downloads.savedAt && typeof jobs.change==='function') {
       try {
+        const needsClear=!jobs.getJob || (await jobs.getJob(value.jobId))?.needsAction;
+        if(needsClear) {
         const cleared=await jobs.change(state=>{
           const index=state.requests.findIndex(job=>job.id===value.jobId);
           const job=state.requests[index];
@@ -41,9 +43,10 @@ export function createDocumentDownloads({ browser = chrome, store = createGenera
           state.requests[index]={...job,needsAction:false,error:''};return true;
         });
         if(cleared.value && typeof BroadcastChannel==='function'){const channel=new BroadcastChannel('ai-agent-resume-queue');channel.postMessage('changed');channel.close();}
+        }
       } catch { /* Preserve completed downloads if queue storage is temporarily unavailable. */ }
     }
-    notify(); return value;
+    notify(value); return value;
   }
   function overall(delivery) {
     const unsettled = delivery.files.some(file => file.state === 'downloading');
@@ -73,7 +76,7 @@ export function createDocumentDownloads({ browser = chrome, store = createGenera
         const next = { ...delivery, files: rows }; next.state = overall(next); return next;
       });
       if (preview && current) {
-        try { await browser.tabs.create({ url: browser.runtime.getURL('document-preview.html') + '?file=' + encodeURIComponent(item.key), active: true }); }
+        try { await openDocumentPreview(browser,item); }
         catch (error) { await update(runId, delivery => {
           const next = { ...delivery, errors: [...delivery.errors, { message: 'Downloaded, but the preview could not open: ' + error.message }] };
           next.state = overall(next); return next;
@@ -143,8 +146,8 @@ export function createDocumentDownloads({ browser = chrome, store = createGenera
   }
   async function startSaved(jobId, kind) {
     if (!['resume', 'cover-letter'].includes(kind)) throw new Error('Choose a resume or cover letter to download.');
-    const job = (await jobs.read()).requests.find(job => job.id === jobId && job.state !== 'cancelled');
-    if (!job?.resume || job.documentsStale) throw new Error('Save current documents for this job before downloading.');
+    const job = jobs.getJob ? await jobs.getJob(jobId) : (await jobs.read()).requests.find(job => job.id === jobId);
+    if (!job?.resume || job.state==='cancelled' || job.documentsStale) throw new Error('Save current documents for this job before downloading.');
     const resume = parseManualResume(JSON.stringify(job.resume), job);
     const hasLetter = job.coverLetterEnabled && !!job.coverLetter?.trim();
     if (kind === 'cover-letter' && !hasLetter) throw new Error('This job has no saved cover letter.');
@@ -159,13 +162,13 @@ export function createDocumentDownloads({ browser = chrome, store = createGenera
   }
   const onChanged = delta => {
     if (!delta.state && !delta.error) return;
-    void store.read().then(async ({ runs }) => {
+    void (store.summaries ? store.summaries() : store.read().then(state=>state.runs)).then(async runs => {
       for (const run of runs) for (const file of run.downloads?.files || []) if (file.downloadId === delta.id) await inspect(run.id, file);
     }).catch(() => {});
   };
   browser.downloads.onChanged.addListener(onChanged);
   async function reconnect() {
-    for (const run of (await store.read()).runs) {
+    for (const run of store.summaries ? await store.summaries() : (await store.read()).runs) {
       const delivery = run.downloads;
       if (!delivery || !['starting', 'downloading'].includes(delivery.state) || pending.has(run.id)) continue;
       for (const file of delivery.files) await inspect(run.id, file);

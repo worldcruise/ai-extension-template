@@ -1,7 +1,7 @@
 # AI Agent Template
 
 A Chrome Manifest V3 extension with a docked job form, application queue, and
-expandable ChatGPT / DeepSeek chat. Current version: **0.18.4**.
+expandable ChatGPT / DeepSeek chat. Current version: **0.19.0**.
 
 Save jobs locally, then choose **Generate documents** to submit a prompt and
 collect and validate the reply. With Auto download on, the documents are saved
@@ -75,7 +75,9 @@ current browser tab focused. Drafts and active responses remain protected.
 Each document has Edit, Preview and Download icons. Resume, cover-letter and job
 description previews open in popups. The bottom Autofill bar is a disabled placeholder.
 
-Both provider frames stay mounted when switching views, preserving conversation
+Provider pages load when chat is first expanded. Selecting a prepared job while
+chat is collapsed remembers its conversation without loading another AI application.
+Once loaded, both provider frames stay mounted when switching views, preserving conversation
 and composer state. Collapsed chat keeps its viewport off-screen, with input and
 focus disabled until expansion. The frames use your existing browser sessions.
 
@@ -300,6 +302,9 @@ continues to open the review form automatically.
 After a reply passes validation, selected documents download to the `AI Agent`
 folder in Chrome's configured Downloads location, even if the dock is closed.
 Each completed download can open a browser preview using the same saved bytes.
+Automatic previews reuse one unpinned tab per document kind and format, displaying
+the latest file while retaining every download. This limits growing batches to
+two preview tabs with the default PDF settings. Pinned previews are preserved.
 Word has a text preview; **Open downloaded file** launches the native file on a
 click. Browser settings can still prompt for a download location. Downloads use
 a clean one-column layout; template thumbnails currently affect the in-app preview.

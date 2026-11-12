@@ -3,6 +3,7 @@ import { runningPhases } from './generation-data.mjs';
 export function createGenerationClient({ browser = chrome, pollMs = 10000,
   schedule = setInterval, unschedule = clearInterval } = {}) {
   let runs = [], revision = 0, disposed = false, timer = null, healthPending = false;
+  let refreshing=null,queued=false,wantReconnect=false,wantHealth=false;
   const listeners = new Set();
   async function call(type, args = {}) {
     const reply = await browser.runtime.sendMessage({ type: `generation.${type}`, ...args });
@@ -19,9 +20,17 @@ export function createGenerationClient({ browser = chrome, pollMs = 10000,
     else if ((!active || disposed) && timer != null) { unschedule(timer); timer = null; }
   }
   async function refresh(reconnect = false, health = false) {
-    const ticket = ++revision, value = await call('list', { reconnect, health });
-    if (disposed || ticket !== revision) return;
-    runs = value; updatePolling(); for (const listener of listeners) listener(runs);
+    if(disposed)return;
+    revision++;queued=true;wantReconnect ||= reconnect;wantHealth ||= health;
+    if(!refreshing)refreshing=(async()=>{
+      while(queued&&!disposed){
+        queued=false;const ticket=revision,options={reconnect:wantReconnect,health:wantHealth};wantReconnect=wantHealth=false;
+        const value=await call('list',options);
+        if(disposed||ticket!==revision)continue;
+        runs=value;updatePolling();for(const listener of listeners)listener(runs);
+      }
+    })().finally(()=>{refreshing=null;if(queued&&!disposed)void refresh().catch(()=>{});});
+    return refreshing;
   }
   const onMessage = (message, sender) => {
     if (sender.id === browser.runtime.id && !sender.tab && message?.type === 'generation.changed') void refresh().catch(() => {});

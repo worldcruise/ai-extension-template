@@ -3,7 +3,7 @@ export const PROVIDER_KEY = 'chatProvider';
 export const normalizeProvider = value => value === 'deepseek' ? 'deepseek' : 'chatgpt';
 
 // Keep both providers mounted; selecting one never navigates the other frame.
-export function createChatProviders({ beforeChange = async () => {}, onSelect = () => {}, onChange = () => {}, browser = chrome, document: doc = document }) {
+export function createChatProviders({ beforeChange = async () => {}, onSelect = () => {}, onChange = () => {}, browser = chrome, document: doc = document, lazy = false }) {
   const select = doc.getElementById('chat-provider');
   const settingsSelect = doc.getElementById('workflow-provider');
   const dockSelect = doc.getElementById('dock-chat-provider');
@@ -18,9 +18,10 @@ export function createChatProviders({ beforeChange = async () => {}, onSelect = 
     doc.getElementById('provider-sign-in-label').textContent = `Sign in to ${provider === 'deepseek' ? 'DeepSeek' : 'ChatGPT'}`;
     doc.getElementById('chatgpt-pane').hidden = provider !== 'chatgpt';
     doc.getElementById('deepseek-pane').hidden = provider !== 'deepseek';
-    if (provider === 'deepseek' && !frame.getAttribute('src')) frame.src = DEEPSEEK_HOME;
+    if(!lazy || !doc.getElementById('chat-view')?.hidden) ensureCurrent();
     onChange(provider);
   }
+  function ensureCurrent() { if(provider==='deepseek'&&!frame.getAttribute('src'))frame.src=DEEPSEEK_HOME; }
   function report(message = '') {
     status.textContent = message;
     if (dockStatus) dockStatus.textContent = message;
@@ -54,7 +55,7 @@ export function createChatProviders({ beforeChange = async () => {}, onSelect = 
   const ready = browser.storage.local.get(PROVIDER_KEY).then(saved => {
     if (!touched) return choose(saved[PROVIDER_KEY], { persist: false, guard: false });
   }).catch(() => {});
-  return { ready, current: () => provider,
+  return { ready, current: () => provider, ensureCurrent,
     showProvider: value => { touched = true; return choose(value); },
     showChatGPT: () => { touched = true; return choose('chatgpt', { guard: false }); } };
 }

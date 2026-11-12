@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.19.0 — 2026-11-12
+
+- Load embedded AI pages only when chat is expanded, retaining pending saved-conversation selection. Reuse automatic document preview tabs by document kind/format, preserve pinned tabs, and release closed-tab drafts and redundant preview byte references.
+- Replace full-history run reads/updates with keyed IndexedDB access, stream lightweight run summaries, coalesce UI refreshes and avoid batch advancement on heartbeats. Add a controlled Chrome memory review and preview-reuse regressions.
+
 ## 0.18.4 — 2026-11-12
 
 - Make Open application and Go to apply open or focus only the job listing, including from job details. Remove background AI-tab opening from application navigation.

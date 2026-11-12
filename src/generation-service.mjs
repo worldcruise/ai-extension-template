@@ -23,7 +23,8 @@ const trackingStaleMs = 45000, recoveryRetryMs = 15000;
 export function createGenerationService({ browser = chrome, store = createGenerationStore(), jobs = createQueueStore(),
   now = Date.now, uuid = () => crypto.randomUUID(), trackingTimeoutMs = 4000, onComplete = () => {}, saveCapture = saveCapturedJob } = {}) {
   const notify = () => { void browser.runtime.sendMessage({ type: 'generation.changed' }).catch(() => {}); };
-  const get = async id => (await store.read()).runs.find(run => run.id === id);
+  const get = async id => store.get ? store.get(id) : (await store.read()).runs.find(run => run.id === id);
+  const summaries = async () => store.summaries ? store.summaries() : (await store.read()).runs.map(summary);
   const tabKey = id => `document-generation-tab:${id}`;
   const connections = new Map();
   const providerConnections = new Map();
@@ -48,18 +49,20 @@ export function createGenerationService({ browser = chrome, store = createGenera
   }
   const owned = async run => Number.isInteger(run.tabId) && (await browser.storage.session.get(tabKey(run.tabId)))[tabKey(run.tabId)] === run.id;
   async function patch(id, edit, announce = true) {
-    const { value } = await store.change(state => {
+    const editRun=run=>{
+      if(!run)throw new Error('This generation no longer exists.');
+      const delta=edit(run);return delta?{...run,...delta,updatedAt:now()}:run;
+    };
+    const { value } = store.update ? await store.update(id,editRun) : await store.change(state => {
       const index = state.runs.findIndex(run => run.id === id);
       if (index < 0) throw new Error('This generation no longer exists.');
-      const run = state.runs[index], delta = edit(run);
-      if (!delta) return run;
-      return state.runs[index] = { ...run, ...delta, updatedAt: now() };
+      return state.runs[index] = editRun(state.runs[index]);
     });
     if (announce) notify();
     return value;
   }
   async function availableJob(id) {
-    const job = (await jobs.read()).requests.find(job => job.id === id);
+    const job = jobs.getJob ? await jobs.getJob(id) : (await jobs.read()).requests.find(job => job.id === id);
     if (!job || job.state === 'cancelled' || job.isExample) throw new Error('Select a saved job to generate documents.');
     return job;
   }
@@ -402,7 +405,7 @@ export function createGenerationService({ browser = chrome, store = createGenera
   }
   async function health({ tabId = null, force = false, prepare = false } = {}) {
     if (disposed) return;
-    const pending = (await store.read()).runs.filter(run => tracked(run) && (tabId == null || run.tabId === tabId));
+    const pending = (await summaries()).filter(run => tracked(run) && (tabId == null || run.tabId === tabId));
     // A hung renderer must not prevent other jobs from reporting or recovering.
     let next = 0;
     await Promise.all(Array.from({ length: Math.min(4, pending.length) }, async () => {
@@ -410,10 +413,10 @@ export function createGenerationService({ browser = chrome, store = createGenera
     }));
   }
   async function list({ health: checkHealth = false } = {}) {
-    const { runs } = await store.read();
+    const runs = await summaries();
     for (const run of runs) if (run.phase === 'validating') await finalize(run.id);
     if (checkHealth) await health();
-    return (await store.read()).runs.filter(run => run.kind !== 'document-export').map(summary);
+    return (checkHealth || runs.some(run=>run.phase==='validating') ? await summaries() : runs).filter(run => run.kind !== 'document-export');
   }
   async function reconnect() {
     await list();

@@ -28,5 +28,23 @@ export function createGenerationStore({ indexedDB = globalThis.indexedDB } = {})
       tx.onerror = tx.onabort = () => reject(failure || tx.error || new Error('Could not save generation progress.'));
     });
   }
-  return { read: async () => (await change()).state, change };
+  async function access(id, edit) {
+    const db=await database();
+    return new Promise((resolve,reject)=>{
+      const tx=db.transaction('runs',edit?'readwrite':'readonly'),table=tx.objectStore('runs');let value,failure;
+      const request=table.get(id);
+      request.onsuccess=()=>{try{const previous=request.result;value=edit?edit(previous):previous;if(value?.then)throw new Error('Run storage edits must be synchronous.');if(edit&&value&&value!==previous)table.put(value);}catch(error){failure=error;tx.abort();}};
+      tx.oncomplete=()=>resolve({value});tx.onerror=tx.onabort=()=>reject(failure||tx.error||new Error('Could not access generation progress.'));
+    });
+  }
+  async function summaries() {
+    const db=await database();
+    return new Promise((resolve,reject)=>{
+      const tx=db.transaction('runs'),values=[];
+      const request=tx.objectStore('runs').openCursor();
+      request.onsuccess=()=>{const cursor=request.result;if(!cursor)return;const {job,prompt,raw,result,...summary}=cursor.value;values.push(summary);cursor.continue();};
+      tx.oncomplete=()=>resolve(values);tx.onerror=tx.onabort=()=>reject(tx.error||new Error('Could not list generation progress.'));
+    });
+  }
+  return { read: async () => (await change()).state, change, get:async id=>(await access(id)).value, update:access, summaries };
 }

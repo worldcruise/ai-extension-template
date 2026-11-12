@@ -220,7 +220,12 @@ try {
   };
   const state = () => read('document.getElementById("connection").dataset.state');
   await until(() => read('document.documentElement?.dataset.studioReady === "true"'), 'combined workspace startup');
-  if (process.argv.includes('--hiringcafe-company-only')) {
+  if (process.argv.includes('--memory-only')) {
+    const {checkMemoryUI}=await import('./memory-ui.mjs');
+    const report=await checkMemoryUI({cdp,panel,workerSession,read,evaluate});
+    await writeFile(join(artifacts,process.argv.includes('--baseline')?'memory-baseline.json':'memory-current.json'),JSON.stringify(report,null,2));
+    console.log(JSON.stringify(report,null,2));
+  } else if (process.argv.includes('--hiringcafe-company-only')) {
     const {checkHiringCafeCompany}=await import('./hiringcafe-company-ui.mjs');
     const report=await checkHiringCafeCompany({cdp,read,evaluate,until,session});
     assert.deepEqual(errors,[]);

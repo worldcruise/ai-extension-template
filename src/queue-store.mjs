@@ -49,5 +49,12 @@ export function createQueueStore({ indexedDB = globalThis.indexedDB, name = QUEU
       tx.onabort = tx.onerror = () => reject(failure || tx.error || new Error('Could not save locally. Keep the panel open and retry saving.'));
     });
   }
-  return { read: async () => (await transaction()).state, change: transaction };
+  async function getJob(id) {
+    const db=await database();
+    return new Promise((resolve,reject)=>{
+      const tx=db.transaction('requests'),request=tx.objectStore('requests').get(id);
+      tx.oncomplete=()=>resolve(request.result);tx.onerror=tx.onabort=()=>reject(tx.error||new Error('Could not read this job.'));
+    });
+  }
+  return { read: async () => (await transaction()).state, change: transaction, getJob };
 }

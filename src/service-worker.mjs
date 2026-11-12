@@ -6,7 +6,7 @@ import { createDocumentDownloads } from './document-downloads.mjs';
 import { resolveApplicationUrls } from './job-apply-url.mjs';
 import { createResumeBatch } from './resume-batch.mjs';
 
-const documentDownloads = createDocumentDownloads({ onChange: () => resumeBatch.tick() });
+const documentDownloads = createDocumentDownloads({ onChange: run => ['complete','failed','partial','skipped'].includes(run?.downloads?.state) ? resumeBatch.tick() : undefined });
 const generations = createGenerationService({ onComplete: async run => { await documentDownloads.start(run); await resumeBatch.tick(); } });
 const resumeBatch = createResumeBatch({ generations });
 void resumeBatch.tick().catch(() => {});
@@ -34,7 +34,9 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
   if (!ui && message.type === 'generation.attach') task = () => generations.attach(message.id, message.actorId, sender);
   if (!ui && message.type === 'generation.event') task = () => generations.event(message.id, message.actorId, message.data || {}, sender);
   if (!task) return false;
-  Promise.resolve().then(task).then(value => respond({ ok: true, value }), error => respond({ ok: false, code: error.code || 'generation-denied', error: error.message || 'The generation could not continue.' })).finally(() => { void resumeBatch.tick().catch(() => {}); });
+  Promise.resolve().then(task).then(value => respond({ ok: true, value }), error => respond({ ok: false, code: error.code || 'generation-denied', error: error.message || 'The generation could not continue.' })).finally(() => {
+    if(message.type==='generation.event' && message.data?.kind!=='heartbeat' || message.type==='generation.stop' || message.type==='generation.list'&&(message.health||message.reconnect)) void resumeBatch.tick().catch(() => {});
+  });
   return true;
 });
 
